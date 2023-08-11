@@ -43,42 +43,117 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  URL: string = "";
+  get URL(): string {
+    throw new UnImplemented();
+  }
 
   alinkColor: string = "";
-  all: any;
-  anchors: any;
-  applets: any;
+
+  get all(): HTMLAllCollection {
+    throw new UnImplemented();
+  }
+
+  get anchors(): HTMLCollectionOf<HTMLAnchorElement> {
+    throw new UnImplemented();
+  }
+
+  get applets(): HTMLCollection {
+    throw new UnImplemented();
+  }
+
   bgColor: string = "";
-  body: any;
-  characterSet: string = "";
+  body: HTMLElement;
+
+  get characterSet(): string {
+    throw new UnImplemented();
+  }
+
   charset: string = "";
 
-  readonly compatMode: string = "";
-  contentType: string = "";
+  get compatMode(): string {
+    throw new UnImplemented();
+  }
+
+  get contentType(): string {
+    throw new UnImplemented();
+  }
+
   cookie: string = "";
-  currentScript: any | null;
-  defaultView: any;
+
+  get currentScript(): HTMLOrSVGScriptElement | null {
+    throw new UnImplemented();
+  }
+
+  get defaultView(): (WindowProxy & typeof globalThis) | null {
+    throw new UnImplemented();
+  }
+
   designMode: string = "";
   dif = "";
-  doctype: DocumentType | null = null;
-  documentElement: any;
-  documentURI: string = "";
+
+  get doctype(): DocumentType | null {
+    throw new UnImplemented();
+  }
+
+  get documentElement(): HTMLElement {
+    throw new UnImplemented();
+  }
+
+  get documentURI(): string {
+    throw new UnImplemented();
+  }
+
   domain: string = "";
   dir: string = "";
-  embeds: any;
+
+  get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
+    throw new UnImplemented();
+  }
+
   fgColor: string = "";
-  forms: any;
-  fullscreen: boolean = false;
-  fullscreenEnabled: boolean = false;
-  head: any;
-  hidden: boolean = false;
-  images: any;
-  implementation: any;
-  inputEncoding: string = "";
-  lastModified: string = "";
+
+  get forms(): HTMLCollectionOf<HTMLFormElement> {
+    throw new UnImplemented();
+  }
+
+  get fullscreen(): boolean {
+    throw new UnImplemented();
+  }
+
+  get fullscreenEnabled(): boolean {
+    throw new UnImplemented();
+  }
+
+  get head(): HTMLHeadElement {
+    throw new UnImplemented();
+  }
+
+  get hidden(): boolean {
+    throw new UnImplemented();
+  }
+
+  get images(): HTMLCollectionOf<HTMLImageElement> {
+    throw new UnImplemented();
+  }
+
+  get implementation(): DOMImplementation {
+    throw new UnImplemented();
+  }
+
+  get inputEncoding(): string {
+    throw new UnImplemented();
+  }
+
+  get lastModified(): string {
+    throw new UnImplemented();
+  }
+
   linkColor: string = "";
-  links: any;
+
+  get links(): HTMLCollectionOf<HTMLAnchorElement | HTMLAreaElement> {
+    throw new UnImplemented();
+  }
+
   get location(): Location {
     throw new UnImplemented();
   }
@@ -97,22 +172,49 @@ export class Document extends Node implements IDocument {
     null;
   onvisibilitychange: ((this: globalThis.Document, ev: Event) => any) | null =
     null;
-  get ownerDocument(): null {
+
+  override get ownerDocument(): null {
     return null;
   }
 
-  pictureInPictureEnabled: boolean = false;
+  get pictureInPictureEnabled(): boolean {
+    throw new UnImplemented();
+  }
 
-  plugins: any;
+  get plugins(): HTMLCollectionOf<HTMLEmbedElement> {
+    throw new UnImplemented();
+  }
 
-  readyState: DocumentReadyState = "complete";
-  referrer: string = "";
-  rootElement: any | null;
-  scripts: any;
-  scrollingElement: any | null = null;
-  timeline: any;
+  get readyState(): DocumentReadyState {
+    throw new UnImplemented();
+  }
+
+  get referrer(): string {
+    throw new UnImplemented();
+  }
+
+  get rootElement(): SVGSVGElement | null {
+    throw new UnImplemented();
+  }
+
+  get scripts(): HTMLCollectionOf<HTMLScriptElement> {
+    throw new UnImplemented();
+  }
+
+  get scrollingElement(): Element | null {
+    throw new UnImplemented();
+  }
+
+  get timeline(): DocumentTimeline {
+    throw new UnImplemented();
+  }
+
   title: string = "";
-  visibilityState: DocumentVisibilityState = "hidden";
+
+  get visibilityState(): DocumentVisibilityState {
+    throw new UnImplemented();
+  }
+
   vlinkColor: string = "";
 
   override isEqualNode(otherNode: Node | null): boolean {
