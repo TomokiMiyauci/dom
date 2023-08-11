@@ -5,14 +5,17 @@ import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { Slottable } from "./slottable.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import type { Document } from "./document.ts";
+import { Document } from "./document.ts";
 import type { IElement } from "../interface.d.ts";
 
 export class Element extends Node implements IElement {
+  readonly attributes: NamedNodeMap;
   constructor(public readonly tagName: string) {
     super();
     this.attributes = new NamedNodeMap(this);
   }
+
+  override nodeDocument: Document = new Document();
 
   override get nodeType(): NodeType.ELEMENT_NODE {
     return NodeType.ELEMENT_NODE;
@@ -37,10 +40,6 @@ export class Element extends Node implements IElement {
   }
 
   override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
-  }
-
-  get attributes(): NamedNodeMap {
     throw new UnImplemented();
   }
 
@@ -83,7 +82,7 @@ export class Element extends Node implements IElement {
   outerHTML: string = "";
 
   get ownerDocument(): Document {
-    throw new UnImplemented();
+    return this.documentNode;
   }
 
   get part(): DOMTokenList {
@@ -382,3 +381,5 @@ export class Element extends Node implements IElement {
 
 export interface Element
   extends NonDocumentTypeChildNode, ParentNode, Slottable {}
+
+export function setAttribute(attr: Attr, element: Element): Attr | null {}

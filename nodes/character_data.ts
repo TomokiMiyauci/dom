@@ -1,10 +1,12 @@
 import { Node } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
+import { Document } from "./document.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
+  override nodeDocument: Document = new Document();
   abstract data: string;
 
   get length(): number {

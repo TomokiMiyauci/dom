@@ -12,6 +12,8 @@ import { type IDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 
 export class Document extends Node implements IDocument {
+  override nodeDocument = null;
+
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
   }
@@ -518,6 +520,16 @@ export class Document extends Node implements IDocument {
 
   writeln(...text: string[]): void {
     throw new UnImplemented();
+  }
+
+  override toString(): string {
+    const c = [];
+    this.childNodes.forEach((node) => {
+      c.push(node);
+    });
+
+    const ch = c.map(String);
+    return "Document" + ch;
   }
 }
 

@@ -1,5 +1,6 @@
 import { Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
+import { Document } from "./document.ts";
 import { type Element } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
 
@@ -20,6 +21,8 @@ export class Attr extends Node implements IAttr {
     this.#localName = localName;
     this.name = "";
   }
+
+  override nodeDocument: Document = new Document();
 
   override get nodeType(): NodeType.ATTRIBUTE_NODE {
     return NodeType.ATTRIBUTE_NODE;
@@ -77,13 +80,6 @@ export class Attr extends Node implements IAttr {
   }
 
   name: string;
-}
-
-function changeAttributes(attribute: Attr, value: string): void {
-  const oldValue = attribute.value;
-  attribute.value = value;
-
-  handleAttributesChanges(attribute, attribute.ownerElement, oldValue, value);
 }
 
 function appendAttributes(attribute: Attr, element: Element) {

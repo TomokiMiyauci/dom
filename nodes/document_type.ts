@@ -1,5 +1,6 @@
 import { Node, NodeType } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
+import { Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
 import type { IDocumentType } from "../interface.d.ts";
 
@@ -15,6 +16,8 @@ export class DocumentType extends Node implements IDocumentType {
     this.#publicId = publicId;
     this.#systemId = systemId;
   }
+
+  override nodeDocument: Document = new Document();
 
   get ownerDocument(): any {
     throw new UnImplemented();
