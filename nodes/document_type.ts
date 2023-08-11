@@ -4,9 +4,18 @@ import { UnImplemented } from "./utils.ts";
 import type { IDocumentType } from "../interface.d.ts";
 
 export class DocumentType extends Node implements IDocumentType {
-  name = "";
-  publicId = "";
-  systemId = "";
+  #name: string;
+  #publicId: string;
+  #systemId: string;
+
+  constructor(name: string, publicId: string, systemId: string) {
+    super();
+
+    this.#name = name;
+    this.#publicId = publicId;
+    this.#systemId = systemId;
+  }
+
   get ownerDocument(): any {
     throw new UnImplemented();
   }
@@ -35,6 +44,18 @@ export class DocumentType extends Node implements IDocumentType {
 
   override isEqualNode(otherNode: Node | null): boolean {
     throw new UnImplemented();
+  }
+
+  get name(): string {
+    return this.#name;
+  }
+
+  get publicId(): string {
+    return this.#publicId;
+  }
+
+  get systemId(): string {
+    return this.#systemId;
   }
 }
 
