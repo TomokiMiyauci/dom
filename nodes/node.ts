@@ -31,6 +31,13 @@ export abstract class Node extends EventTarget implements INode {
 
   abstract get nodeName(): string;
 
+  abstract get nodeValue(): string | null;
+
+  abstract set nodeValue(value: string | null);
+
+  abstract get textContent(): string | null;
+  abstract set textContent(value: string | null);
+
   get index(): number {
     return 0;
   }
@@ -78,13 +85,6 @@ export abstract class Node extends EventTarget implements INode {
   get nextSibling(): (Node & ChildNode) | null {
     throw new UnImplemented();
   }
-
-  abstract get nodeValue(): string | null;
-
-  abstract set nodeValue(value: string | null);
-
-  abstract get textContent(): string | null;
-  abstract set textContent(value: string | null);
 
   normalize(): void {}
 

@@ -31,9 +31,10 @@ export class DocumentType extends Node implements IDocumentType {
     return this.#name;
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
+  override get nodeValue(): null {
+    return null;
   }
+
   override set nodeValue(value: string | null) {
     throw new UnImplemented();
   }

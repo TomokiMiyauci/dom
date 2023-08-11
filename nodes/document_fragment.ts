@@ -16,9 +16,10 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     return "#document-fragment";
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
+  override get nodeValue(): null {
+    return null;
   }
+
   override set nodeValue(value: string | null) {
     throw new UnImplemented();
   }

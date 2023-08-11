@@ -33,8 +33,8 @@ export class Attr extends Node implements IAttr {
     return qualifiedName;
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
+  override get nodeValue(): string {
+    return this.#value;
   }
 
   override set nodeValue(value: string | null) {

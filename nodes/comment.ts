@@ -16,13 +16,6 @@ export class Comment extends CharacterData implements IComment {
     return "#comment";
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
-  }
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
-  }
-
   override get textContent(): string | null {
     throw new UnImplemented();
   }

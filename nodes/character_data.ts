@@ -13,6 +13,13 @@ export abstract class CharacterData extends Node implements ICharacterData {
     throw new UnImplemented();
   }
 
+  override get nodeValue(): string {
+    return this.data;
+  }
+  override set nodeValue(value: string | null) {
+    throw new UnImplemented();
+  }
+
   appendData(data: string): void {
     throw new UnImplemented();
   }

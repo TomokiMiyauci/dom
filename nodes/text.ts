@@ -20,13 +20,6 @@ export class Text extends CharacterData implements IText {
     return "#text";
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
-  }
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
-  }
-
   override get textContent(): string | null {
     throw new UnImplemented();
   }

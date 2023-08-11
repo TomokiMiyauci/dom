@@ -99,9 +99,10 @@ export class Element extends Node implements IElement {
     return this.#upperQualifiedName;
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
+  override get nodeValue(): null {
+    return null;
   }
+
   override set nodeValue(value: string | null) {
     throw new UnImplemented();
   }

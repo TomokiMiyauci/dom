@@ -29,9 +29,10 @@ export class Document extends Node implements IDocument {
     return "#document";
   }
 
-  override get nodeValue(): string | null {
-    throw new UnImplemented();
+  override get nodeValue(): null {
+    return null;
   }
+
   override set nodeValue(value: string | null) {
     throw new UnImplemented();
   }
