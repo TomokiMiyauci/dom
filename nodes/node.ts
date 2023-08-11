@@ -98,26 +98,77 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
-  readonly DOCUMENT_POSITION_DISCONNECTED = 1;
-  readonly DOCUMENT_POSITION_PRECEDING = 2;
-  readonly DOCUMENT_POSITION_FOLLOWING = 4;
-  readonly DOCUMENT_POSITION_CONTAINS = 8;
-  readonly DOCUMENT_NODE = 9;
-  readonly DOCUMENT_TYPE_NODE = 10;
-  readonly DOCUMENT_FRAGMENT_NODE = 11;
-  readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
-  readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+  get DOCUMENT_POSITION_DISCONNECTED(): 1 {
+    return 1;
+  }
 
-  readonly ELEMENT_NODE = 1;
-  readonly ENTITY_NODE = 6;
+  get DOCUMENT_POSITION_PRECEDING(): 2 {
+    return 2;
+  }
 
-  readonly ATTRIBUTE_NODE = 2;
-  readonly TEXT_NODE = 3;
-  readonly CDATA_SECTION_NODE = 4;
-  readonly ENTITY_REFERENCE_NODE = 5;
-  readonly COMMENT_NODE = 8;
-  readonly PROCESSING_INSTRUCTION_NODE = 7;
-  readonly NOTATION_NODE = 12;
+  get DOCUMENT_POSITION_FOLLOWING(): 4 {
+    return 4;
+  }
+
+  get DOCUMENT_POSITION_CONTAINS(): 8 {
+    return 8;
+  }
+
+  get DOCUMENT_NODE(): 9 {
+    return 9;
+  }
+
+  get DOCUMENT_TYPE_NODE(): 10 {
+    return 10;
+  }
+
+  get DOCUMENT_FRAGMENT_NODE(): 11 {
+    return 11;
+  }
+
+  get DOCUMENT_POSITION_CONTAINED_BY(): 16 {
+    return 16;
+  }
+
+  get DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC(): 32 {
+    return 32;
+  }
+
+  get ELEMENT_NODE(): 1 {
+    return 1;
+  }
+
+  get ENTITY_NODE(): 6 {
+    return 6;
+  }
+
+  get ATTRIBUTE_NODE(): 2 {
+    return 2;
+  }
+
+  get TEXT_NODE(): 3 {
+    return 3;
+  }
+
+  get CDATA_SECTION_NODE(): 4 {
+    return 4;
+  }
+
+  get ENTITY_REFERENCE_NODE(): 5 {
+    return 5;
+  }
+
+  get COMMENT_NODE(): 8 {
+    return 8;
+  }
+
+  get PROCESSING_INSTRUCTION_NODE(): 7 {
+    return 7;
+  }
+
+  get NOTATION_NODE(): 12 {
+    return 12;
+  }
 
   compareDocumentPosition(other: Node): number {
     throw new UnImplemented();
