@@ -24,12 +24,13 @@ export class Attr extends Node implements IAttr {
 
   override nodeDocument: Document = new Document();
 
-  override get nodeType(): NodeType.ATTRIBUTE_NODE {
-    return NodeType.ATTRIBUTE_NODE;
-  }
-
   override get nodeName(): string {
-    throw new UnImplemented();
+    const prefix = this.#namespacePrefix;
+    const qualifiedName = prefix === null
+      ? this.#localName
+      : `${prefix}:${this.#localName}`;
+
+    return qualifiedName;
   }
 
   override get nodeValue(): string | null {

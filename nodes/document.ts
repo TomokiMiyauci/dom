@@ -7,19 +7,26 @@ import { UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
+import { createElement } from "./element.ts";
+import { Namespace } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { type IDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 
+export const type = Symbol();
+
 export class Document extends Node implements IDocument {
+  [type]: "xml" | "html" = "xml";
+  #contentType: string = "application/xml";
+
   override nodeDocument = null;
 
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
   }
 
-  override get nodeName(): string {
-    throw new UnImplemented();
+  override get nodeName(): "#document" {
+    return "#document";
   }
 
   override get nodeValue(): string | null {
@@ -141,6 +148,10 @@ export class Document extends Node implements IDocument {
   createDocumentFragment(): DocumentFragment {
     return new DocumentFragment();
   }
+
+  /**
+   * [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-createelement)
+   */
   createElement<K extends keyof HTMLElementTagNameMap>(
     tagName: K,
     options?: ElementCreationOptions | undefined,
@@ -154,13 +165,28 @@ export class Document extends Node implements IDocument {
     options?: ElementCreationOptions | undefined,
   ): HTMLElement;
   createElement(
-    tagName: unknown,
+    tagName: string,
     options?: unknown,
   ):
     | HTMLElementTagNameMap[K]
     | HTMLElementDeprecatedTagNameMap[K]
     | HTMLElement {
-    throw new UnImplemented();
+    // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
+    // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
+
+    // 3. Let is be null.
+    const is = null;
+
+    // 4. If options is a dictionary and options["is"] exists, then set is to it.
+
+    // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
+    const namespace =
+      (this[type] !== "xml" || this.#contentType === "application/xhtml+xml")
+        ? Namespace.HTML
+        : null;
+
+    // 6. Return the result of creating an element given this, localName, namespace, null, is, and with the synchronous custom elements flag set.
+    return createElement(this, tagName, namespace, null, is);
   }
   createElementNS(
     namespaceURI: "http://www.w3.org/1999/xhtml",

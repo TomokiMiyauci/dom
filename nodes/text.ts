@@ -1,4 +1,5 @@
 import { Node, NodeType } from "./node.ts";
+import { Document } from "./document.ts";
 import { CharacterData } from "./character_data.ts";
 import { UnImplemented } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
@@ -9,12 +10,14 @@ export class Text extends CharacterData implements IText {
     super();
   }
 
+  override nodeDocument: Document = new Document();
+
   override get nodeType(): NodeType.TEXT_NODE {
     return NodeType.TEXT_NODE;
   }
 
-  override get nodeName(): string {
-    throw new UnImplemented();
+  override get nodeName(): "#text" {
+    return "#text";
   }
 
   override get nodeValue(): string | null {

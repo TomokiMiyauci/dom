@@ -12,8 +12,8 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     return NodeType.DOCUMENT_FRAGMENT_NODE;
   }
 
-  override get nodeName(): string {
-    throw new UnImplemented();
+  override get nodeName(): "#document-fragment" {
+    return "#document-fragment";
   }
 
   override get nodeValue(): string | null {
