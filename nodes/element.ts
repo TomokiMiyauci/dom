@@ -13,6 +13,7 @@ import {
 import { Namespace } from "../infra/namespace.ts";
 import { List } from "../infra/list.ts";
 import { descendantTextContent } from "./text.ts";
+import { find } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 
 /**
@@ -228,8 +229,18 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getattribute
+   */
   getAttribute(qualifiedName: string): string | null {
-    throw new UnImplemented();
+    // 1. Let attr be the result of getting an attribute given qualifiedName and this.
+    const attr = getAttributeByName(qualifiedName, this);
+
+    // 2. If attr is null, return null.
+    if (attr === null) return attr;
+
+    // 3. Return attr’s value.
+    return attr._value;
   }
 
   getAttributeNS(namespace: string | null, localName: string): string | null {
@@ -569,4 +580,43 @@ export function createElement(
 
   // 8. Return result.
   return result!;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace
+ */
+export function getAttributeByNamespaceAndLocalName(
+  namespace: string | null,
+  localName: string,
+  element: Element,
+): Attr | null {
+  // 1. If namespace is the empty string, then set it to null.
+  namespace ||= null;
+
+  // 2. Return the attribute in element’s attribute list whose namespace is namespace and local name is localName, if any; otherwise null.
+  return find(
+    element._attributeList,
+    (attribute) =>
+      attribute._namespace === namespace && attribute._localName === localName,
+  ) ?? null;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name
+ */
+export function getAttributeByName(
+  qualifiedName: string,
+  element: Element,
+): Attr | null {
+  // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
+  if (
+    element._namespace === Namespace.HTML &&
+    element.nodeDocument._type !== "xml"
+  ) qualifiedName = qualifiedName.toLowerCase();
+
+  // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
+  return find(
+    element._attributeList,
+    (attribute) => attribute._qualifiedName === qualifiedName,
+  ) ?? null;
 }

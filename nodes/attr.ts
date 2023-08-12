@@ -23,7 +23,7 @@ export class Attr extends Node implements IAttr {
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-qualified-name
    */
-  get #qualifiedName(): string {
+  get _qualifiedName(): string {
     // An attribute’s qualified name is its local name if its namespace prefix is null, and its namespace prefix, followed by ":", followed by its local name, otherwise.
     const prefix = this._namespacePrefix;
     const qualifiedName = prefix === null
@@ -43,7 +43,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return this.#qualifiedName;
+    return this._qualifiedName;
   }
 
   /**
@@ -111,7 +111,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return this.#qualifiedName;
+    return this._qualifiedName;
   }
 
   /**
