@@ -1,6 +1,6 @@
 import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
-import type { Attr } from "./attr.ts";
+import { type Attr, handleAttributesChanges } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { Slottable } from "./slottable.ts";
@@ -422,12 +422,20 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-setattributenode
+   */
   setAttributeNode(attr: Attr): Attr | null {
-    throw new UnImplemented();
+    // to return the result of setting an attribute given attr and this.
+    return setAttribute(attr, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-setattributenodens
+   */
   setAttributeNodeNS(attr: Attr): Attr | null {
-    throw new UnImplemented();
+    // to return the result of setting an attribute given attr and this.
+    return setAttribute(attr, this);
   }
 
   setPointerCapture(pointerId: number): void {
@@ -478,7 +486,36 @@ export class Element extends Node implements IElement {
 export interface Element
   extends NonDocumentTypeChildNode, ParentNode, Slottable {}
 
-export function setAttribute(attr: Attr, element: Element): Attr | null {}
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
+ */
+export function setAttribute(attr: Attr, element: Element): Attr | null {
+  // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
+  if (!(attr._element === null || attr._element === element)) {
+    throw new DOMException(
+      "The attribute is in use by another element",
+      "InUseAttributeError",
+    );
+  }
+
+  // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
+  const oldAttr = getAttributeByNamespaceAndLocalName(
+    attr._namespace,
+    attr._localName,
+    element,
+  );
+
+  // 3. If oldAttr is attr, return attr.
+  if (oldAttr === attr) return attr;
+
+  // 4. If oldAttr is non-null, then replace oldAttr with attr.
+  if (oldAttr) replaceAttribute(oldAttr, attr);
+  // 5. Otherwise, append attr to element.
+  else appendAttribute(attr, element);
+
+  // 6. Return oldAttr.
+  return oldAttr;
+}
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-create-element)
@@ -600,6 +637,25 @@ export function getAttributeByNamespaceAndLocalName(
       attribute._namespace === namespace && attribute._localName === localName,
   ) ?? null;
 }
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-append
+ */
+export function appendAttribute(attribute: Attr, element: Element): void {
+  // 1. Append attribute to element’s attribute list.
+  element._attributeList.append(attribute);
+
+  // 2. Set attribute’s element to element.
+  attribute._element = element;
+
+  // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
+  handleAttributesChanges(attribute, element, null, attribute._value);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
+ */
+export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name

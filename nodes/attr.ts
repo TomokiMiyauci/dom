@@ -183,7 +183,7 @@ export function changeAttributes(attribute: Attr, value: string): void {
 export function handleAttributesChanges(
   attribute: Attr,
   element: Element | null,
-  oldValue: string,
+  oldValue: string | null,
   newValue: string,
 ): void {
   // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
