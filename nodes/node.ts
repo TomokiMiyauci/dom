@@ -65,7 +65,7 @@ export abstract class Node extends Tree(EventTarget) implements INode {
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
-    return new NodeList() as never as NodeListOf<Node & ChildNode>;
+    return new NodeList(this) as never as NodeListOf<Node & ChildNode>;
   }
 
   get firstChild(): (Node & ChildNode) | null {
