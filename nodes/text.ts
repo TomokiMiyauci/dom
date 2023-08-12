@@ -8,6 +8,8 @@ import { isNotNull } from "../utils.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { len } from "./node_tree.ts";
+import { orderTree } from "../trees/tree.ts";
+import { ifilter, imap, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
   _data: string;
@@ -101,7 +103,7 @@ export function splitText(node: Text, offset: number): Text {
  * @see https://triple-underscore.github.io/DOM4-ja.html#_concatenate-text-data
  */
 function concatTextData(list: List<Text>): string {
-  return [...list].join("");
+  return [...imap(list, (text) => text._data)].join("");
 }
 
 /**
@@ -132,4 +134,15 @@ export function contiguousSibling(
   }
 
   return list;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-descendant-text-content
+ */
+export function descendantTextContent(node: Node) {
+  const list = new List<Text>();
+
+  for (const text of ifilter(tail(orderTree(node)), isText)) list.append(text);
+
+  return concatTextData(list);
 }

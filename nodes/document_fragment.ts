@@ -24,9 +24,13 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     throw new UnImplemented();
   }
 
-  override get textContent(): string | null {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override get textContent(): null {
+    return null;
   }
+
   override set textContent(value: string | null) {
     throw new UnImplemented();
   }

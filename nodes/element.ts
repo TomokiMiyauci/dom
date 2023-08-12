@@ -12,6 +12,7 @@ import {
 } from "../html/custom_element.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { List } from "../infra/list.ts";
+import { descendantTextContent } from "./text.ts";
 import type { IElement } from "../interface.d.ts";
 
 /**
@@ -109,9 +110,13 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  override get textContent(): string | null {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override get textContent(): string {
+    return descendantTextContent(this);
   }
+
   override set textContent(value: string | null) {
     throw new UnImplemented();
   }

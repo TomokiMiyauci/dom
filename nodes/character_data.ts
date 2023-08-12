@@ -16,9 +16,13 @@ export abstract class CharacterData extends Node implements ICharacterData {
     throw new UnImplemented();
   }
 
-  override get textContent(): null {
-    return null;
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override get textContent(): string {
+    return this._data;
   }
+
   override set textContent(value: string | null) {
     throw new UnImplemented();
   }

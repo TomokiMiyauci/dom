@@ -4,7 +4,7 @@ import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
 
 export class Comment extends CharacterData implements IComment {
-  constructor(public data: string) {
+  constructor(data: string) {
     super();
   }
 
@@ -14,13 +14,6 @@ export class Comment extends CharacterData implements IComment {
 
   override get nodeName(): "#comment" {
     return "#comment";
-  }
-
-  override get textContent(): string | null {
-    throw new UnImplemented();
-  }
-  override set textContent(value: string | null) {
-    throw new UnImplemented();
   }
 
   override isEqualNode(otherNode: Node | null): boolean {
