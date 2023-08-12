@@ -9,18 +9,18 @@ function eq(left: unknown, right: unknown): boolean {
 export class List<T> {
   readonly [index: number]: T;
 
-  #equals: (left: T, right: T) => boolean;
+  private equals: (left: T, right: T) => boolean;
   private list: T[] = [];
 
   constructor() {
-    this.#equals = eq;
+    this.equals = eq;
 
     return new Proxy(this, {
       get: (target, prop) => {
         if (typeof prop === "string") {
           const indexLike = Number(prop);
 
-          if (Number.isInteger(indexLike)) return this.list[indexLike];
+          if (Number.isInteger(indexLike)) return target.list[indexLike];
         }
 
         return target[prop as never];
@@ -68,7 +68,7 @@ export class List<T> {
   replace(item: T, replacement: T): void {
     // To replace within a list that is not an ordered set is to replace all items from the list that match a given condition with the given item, or do nothing if none do.
     for (const [index, insertedItem] of this.list.entries()) {
-      if (this.#equals(insertedItem, item)) {
+      if (this.equals(insertedItem, item)) {
         this.list[index] = replacement;
       }
     }
@@ -79,7 +79,7 @@ export class List<T> {
    */
   remove(item: T): void {
     // To remove zero or more items from a list is to remove all items from the list that match a given condition, or do nothing if none do.
-    this.list = this.list.filter((value) => this.#equals(value, item));
+    this.list = this.list.filter((value) => this.equals(value, item));
   }
 
   /**
@@ -96,7 +96,7 @@ export class List<T> {
   contains(item: T): boolean {
     // A list contains an item if it appears in the list. We can also denote this by saying that, for a list list and an index index, "list[index] exists".
     for (const value of this.list) {
-      if (this.#equals(value, item)) return true;
+      if (this.equals(value, item)) return true;
     }
 
     return false;
