@@ -1,4 +1,4 @@
-import { Node, NodeType } from "./node.ts";
+import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import type { Attr } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
@@ -26,18 +26,20 @@ enum CustomElementState {
 }
 
 export class Element extends Node implements IElement {
-  #namespace: Namespace | null;
+  _namespace: Namespace | null;
   #namespacePrefix: string | null;
   #localName: string;
   #customElementState: CustomElementState;
   #customElementDefinition: CustomElementDefinition | null;
-  #attributeList: List<unknown>;
+  _attributeList: List<Attr>;
   #isValue: string | null;
+
+  _ID: string | null = null;
 
   /**
    * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
    */
-  get #qualifiedName(): string {
+  get _qualifiedName(): string {
     // An element’s qualified name is its local name if its namespace prefix is null; otherwise its namespace prefix, followed by ":", followed by its local name.
     const prefix = this.#namespacePrefix;
     const qualifiedName = prefix === null
@@ -52,11 +54,11 @@ export class Element extends Node implements IElement {
    */
   get #upperQualifiedName(): string {
     // 1. Let qualifiedName be this’s qualified name.
-    let qualifiedName = this.#qualifiedName;
+    let qualifiedName = this._qualifiedName;
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this.#namespace === Namespace.HTML && this.nodeDocument._type === "html"
+      this._namespace === Namespace.HTML && this.nodeDocument._type === "html"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -67,7 +69,7 @@ export class Element extends Node implements IElement {
 
   readonly attributes: NamedNodeMap;
   constructor(
-    attributeList: List<unknown>,
+    attributeList: List<Attr>,
     namespace: Namespace | null,
     namespacePrefix: string | null,
     localName: string,
@@ -77,8 +79,8 @@ export class Element extends Node implements IElement {
     document: Document,
   ) {
     super();
-    this.#attributeList = attributeList;
-    this.#namespace = namespace;
+    this._attributeList = attributeList;
+    this._namespace = namespace;
     this.#namespacePrefix = namespacePrefix;
     this.#localName = localName;
     this.#customElementState = customElementState;
@@ -255,6 +257,9 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getelementsbytagname
+   */
   getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
     qualifiedName: K,
   ): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
@@ -271,14 +276,14 @@ export class Element extends Node implements IElement {
     qualifiedName: string,
   ): HTMLCollectionOf<globalThis.Element>;
   getElementsByTagName(
-    qualifiedName: unknown,
+    qualifiedName: string,
   ):
     | HTMLCollectionOf<HTMLElementTagNameMap[K]>
     | HTMLCollectionOf<SVGElementTagNameMap[K]>
     | HTMLCollectionOf<MathMLElementTagNameMap[K]>
     | HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>
     | HTMLCollectionOf<globalThis.Element> {
-    throw new UnImplemented();
+    return getElementsByQualifiedName(qualifiedName, this);
   }
 
   getElementsByTagNameNS(

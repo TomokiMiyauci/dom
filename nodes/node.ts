@@ -1,11 +1,12 @@
 import { UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
-import type { ParentNode } from "./parent_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
 import { appendNode } from "./mutation.ts";
-import { Tree } from "../trees/tree.ts";
+import { HTMLCollection } from "./html_collection.ts";
+import { Tree, Treeable } from "../trees/tree.ts";
+import { Namespace } from "../infra/namespace.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -22,8 +23,9 @@ export enum NodeType {
   NOTATION_NODE = 12,
 }
 
-export abstract class Node extends Tree(EventTarget) implements INode {
-  abstract nodeDocument: Document | null;
+@Treeable
+export abstract class Node extends EventTarget implements INode {
+  abstract nodeDocument: Document;
 
   abstract get nodeType(): NodeType;
 
@@ -209,4 +211,35 @@ export abstract class Node extends Tree(EventTarget) implements INode {
   }
 }
 
-type Child = (Node & ChildNode) | null;
+export interface Node extends Tree {}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname
+ */
+export function getElementsByQualifiedName(
+  qualifiedName: string,
+  root: Node,
+): HTMLCollection {
+  // 1. If qualifiedName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches only descendant elements.
+  if (qualifiedName === "*") {
+    return new HTMLCollection(root, (node) => node !== root);
+  }
+
+  // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
+  if (root.nodeDocument._type !== "xml") {
+    return new HTMLCollection(root, (element) =>
+      element !== root &&
+        // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
+        (element._namespace === Namespace.HTML &&
+          element._qualifiedName === qualifiedName.toLowerCase()) ||
+      // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
+      (element._namespace !== Namespace.HTML &&
+        element._qualifiedName === qualifiedName));
+  }
+
+  // 3. Otherwise, return an HTMLCollection rooted at root, whose filter matches descendant elements whose qualified name is qualifiedName.
+  return new HTMLCollection(
+    root,
+    (element) => element !== root && element._qualifiedName === qualifiedName,
+  );
+}

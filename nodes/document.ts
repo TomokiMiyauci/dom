@@ -1,23 +1,26 @@
-import { Node, NodeType } from "./node.ts";
+import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { FontFaceSource } from "./font_face_source.ts";
 import { XPathEvaluatorBase } from "./x_path_evaluator_base.ts";
-import { UnImplemented } from "./utils.ts";
+import { isElement, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
 import { createElement } from "./element.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
-import { type IDocument } from "../interface.d.ts";
+import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 
+@ParentNode
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
-  #contentType: string = "application/xml";
+  _contentType: string = "application/xml";
 
-  override nodeDocument = null;
+  override get nodeDocument(): Document {
+    return this;
+  }
 
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
@@ -74,7 +77,7 @@ export class Document extends Node implements IDocument {
   }
 
   get contentType(): string {
-    throw new UnImplemented();
+    return this._contentType;
   }
 
   cookie: string = "";
@@ -95,7 +98,11 @@ export class Document extends Node implements IDocument {
   }
 
   get documentElement(): HTMLElement {
-    throw new UnImplemented();
+    for (const node of this._children) {
+      if (isElement(node)) return node as HTMLElement;
+    }
+
+    return null;
   }
 
   get documentURI(): string {
@@ -282,7 +289,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (this._type !== "xml" || this.#contentType === "application/xhtml+xml")
+      (this._type !== "xml" || this._contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -533,6 +540,9 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-getelementsbytagname
+   */
   getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
     qualifiedName: K,
   ): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
@@ -547,14 +557,14 @@ export class Document extends Node implements IDocument {
   ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
   getElementsByTagName(
-    qualifiedName: unknown,
+    qualifiedName: string,
   ):
     | HTMLCollectionOf<HTMLElementTagNameMap[K]>
     | HTMLCollectionOf<SVGElementTagNameMap[K]>
     | HTMLCollectionOf<MathMLElementTagNameMap[K]>
     | HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>
     | HTMLCollectionOf<Element> {
-    throw new UnImplemented();
+    return getElementsByQualifiedName(qualifiedName, this);
   }
 
   getElementsByTagNameNS(
@@ -654,6 +664,6 @@ export interface Document
   extends
     DocumentOrShadowRoot,
     FontFaceSource,
+    IParentNode,
     NonElementParentNode,
-    ParentNode,
     XPathEvaluatorBase {}
