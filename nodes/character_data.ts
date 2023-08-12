@@ -1,18 +1,15 @@
 import { Node } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
-import { Document } from "./document.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 
-export const $data = Symbol();
-
 export abstract class CharacterData extends Node implements ICharacterData {
   // override nodeDocument: Document = new Document();
-  abstract [$data]: string;
+  abstract _data: string;
 
   override get nodeValue(): string {
-    return this[$data];
+    return this._data;
   }
 
   override set nodeValue(value: string | null) {
@@ -35,7 +32,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this[$data];
+    return this._data;
   }
 
   appendData(data: string): void {

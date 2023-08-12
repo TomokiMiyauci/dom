@@ -13,10 +13,8 @@ import { DocumentFragment } from "./document_fragment.ts";
 import { type IDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 
-export const type = Symbol();
-
 export class Document extends Node implements IDocument {
-  [type]: "xml" | "html" = "xml";
+  _type: "xml" | "html" = "xml";
   #contentType: string = "application/xml";
 
   override nodeDocument = null;
@@ -284,7 +282,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (this[type] !== "xml" || this.#contentType === "application/xhtml+xml")
+      (this._type !== "xml" || this.#contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -649,16 +647,6 @@ export class Document extends Node implements IDocument {
 
   writeln(...text: string[]): void {
     throw new UnImplemented();
-  }
-
-  override toString(): string {
-    const c = [];
-    this.childNodes.forEach((node) => {
-      c.push(node);
-    });
-
-    const ch = c.map(String);
-    return "Document" + ch;
   }
 }
 

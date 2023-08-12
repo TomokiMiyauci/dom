@@ -1,30 +1,23 @@
 import { Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
-import { Document } from "./document.ts";
 import { type Element } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
 
-export const $namespace = Symbol();
-export const $namespacePrefix = Symbol();
-export const $element = Symbol();
-export const $value = Symbol();
-export const $localName = Symbol();
-
 export class Attr extends Node implements IAttr {
-  [$namespace]: string | null;
-  [$namespacePrefix]: string | null;
-  [$localName]: string;
-  [$value]: string = "";
-  [$element]: Element | null;
+  _namespace: string | null;
+  _namespacePrefix: string | null;
+  _localName: string;
+  _value = "";
+  _element: Element | null;
 
   constructor(localName: string) {
     super();
 
-    this[$namespace] = null;
-    this[$namespacePrefix] = null;
-    this[$element] = null;
-    this[$value] = "";
-    this[$localName] = localName;
+    this._namespace = null;
+    this._namespacePrefix = null;
+    this._element = null;
+    this._value = "";
+    this._localName = localName;
   }
 
   /**
@@ -32,15 +25,15 @@ export class Attr extends Node implements IAttr {
    */
   get #qualifiedName(): string {
     // An attribute’s qualified name is its local name if its namespace prefix is null, and its namespace prefix, followed by ":", followed by its local name, otherwise.
-    const prefix = this[$namespacePrefix];
+    const prefix = this._namespacePrefix;
     const qualifiedName = prefix === null
-      ? this[$localName]
-      : `${prefix}:${this[$localName]}`;
+      ? this.localName
+      : `${prefix}:${this._localName}`;
 
     return qualifiedName;
   }
 
-  override nodeDocument: Document = new Document();
+  // override nodeDocument: Document = new Document();
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodetype
@@ -58,7 +51,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -74,7 +67,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -94,7 +87,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this[$namespace];
+    return this._namespace;
   }
 
   /**
@@ -102,7 +95,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this[$namespacePrefix];
+    return this._namespacePrefix;
   }
 
   /**
@@ -110,7 +103,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this[$localName];
+    return this._localName;
   }
 
   /**
@@ -126,7 +119,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -142,7 +135,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this[$element];
+    return this._element;
   }
 
   /**
@@ -162,8 +155,8 @@ export function setAnExistingAttributeValue(
   value: string,
 ): void {
   // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (attribute[$element] === null) {
-    attribute[$value] = value;
+  if (attribute._element === null) {
+    attribute._value = value;
   } else {
     // 2. Otherwise, change attribute to value.
     changeAttributes(attribute, value);
@@ -175,13 +168,13 @@ export function setAnExistingAttributeValue(
  */
 export function changeAttributes(attribute: Attr, value: string): void {
   // 1. Let oldValue be attribute’s value.
-  const oldValue = attribute[$value];
+  const oldValue = attribute._value;
 
   // 2. Set attribute’s value to value.
-  attribute[$value] = value;
+  attribute._value = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  handleAttributesChanges(attribute, attribute[$element], oldValue, value);
+  handleAttributesChanges(attribute, attribute._element, oldValue, value);
 }
 
 /**

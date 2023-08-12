@@ -1,22 +1,20 @@
 import type { INamedNodeMap } from "../interface.d.ts";
-import { html } from "./deps.ts";
+import { html } from "../deps.ts";
 import { UnImplemented } from "./utils.ts";
 import { type Element, setAttribute } from "./element.ts";
 import type { Attr } from "./attr.ts";
 
-const attributeList = Symbol();
-
 export class NamedNodeMap implements INamedNodeMap {
-  [attributeList]: Attr[] = [];
+  _attributeList: Attr[] = [];
 
   constructor(public element: Element) {}
 
   get length(): number {
-    return this[attributeList].length;
+    return this._attributeList.length;
   }
 
   item(index: number): Attr | null {
-    return this[attributeList][index] ?? null;
+    return this._attributeList[index] ?? null;
   }
 
   getNamedItem(qualifiedName: string): Attr | null {
@@ -58,7 +56,7 @@ function getAttributesByName(
     qualifiedName = qualifiedName.toLowerCase();
   }
 
-  return element.attributes[attributeList].find((attr) => {
+  return element.attributes._attributeList.find((attr) => {
     const q = attr.prefix === null
       ? attr.localName
       : attr.prefix + ":" + attr.localName;
@@ -74,7 +72,7 @@ function getAttributeByNamespace(
 ): Attr | null {
   namespace ||= null;
 
-  return element.attributes[attributeList].find((attr) => {
+  return element.attributes._attributeList.find((attr) => {
     return attr.namespaceURI === namespace && attr.localName === localName;
   }) ?? null;
 }

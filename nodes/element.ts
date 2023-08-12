@@ -5,7 +5,7 @@ import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { Slottable } from "./slottable.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { Document, type } from "./document.ts";
+import { Document } from "./document.ts";
 import {
   CustomElementDefinition,
   lookUpCustomElementDefinition,
@@ -56,7 +56,7 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this.#namespace === Namespace.HTML && this.nodeDocument[type] === "html"
+      this.#namespace === Namespace.HTML && this.nodeDocument._type === "html"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -157,7 +157,7 @@ export class Element extends Node implements IElement {
   outerHTML: string = "";
 
   get ownerDocument(): Document {
-    return this.documentNode;
+    return this.nodeDocument;
   }
 
   get part(): DOMTokenList {
