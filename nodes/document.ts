@@ -10,13 +10,20 @@ import { Comment } from "./comment.ts";
 import { createElement } from "./element.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
+import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 
 @ParentNode
+@NonElementParentNode
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
+
+  /**
+   * @see https://momdo.github.io/html/dom.html#current-document-readiness
+   */
+  _currentDocumentReadiness: DocumentReadyState = "complete";
 
   override get nodeDocument(): Document {
     return this;
@@ -38,9 +45,13 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  override get textContent(): string | null {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override get textContent(): null {
+    return null;
   }
+
   override set textContent(value: string | null) {
     throw new UnImplemented();
   }
@@ -191,8 +202,12 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://momdo.github.io/html/dom.html#dom-document-readystate
+   */
   get readyState(): DocumentReadyState {
-    throw new UnImplemented();
+    // to return this's current document readiness.
+    return this._currentDocumentReadiness;
   }
 
   get referrer(): string {
@@ -525,10 +540,6 @@ export class Document extends Node implements IDocument {
   }
 
   exitPointerLock(): void {
-    throw new UnImplemented();
-  }
-
-  getElementById(elementId: string): any | null {
     throw new UnImplemented();
   }
 
