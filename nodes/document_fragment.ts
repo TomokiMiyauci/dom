@@ -5,6 +5,7 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { UnImplemented } from "./utils.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
 
+@ParentNode
 export class DocumentFragment extends Node implements IDocumentFragment {
   override nodeDocument: Document = new Document();
 

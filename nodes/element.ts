@@ -32,6 +32,7 @@ enum CustomElementState {
   Custom = "custom",
 }
 
+@ParentNode
 export class Element extends Node implements IElement {
   _namespace: Namespace | null;
   #namespacePrefix: string | null;
