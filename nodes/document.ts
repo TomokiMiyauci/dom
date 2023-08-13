@@ -8,7 +8,7 @@ import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
 import { createElement } from "./element.ts";
-import { Namespace } from "../infra/namespace.ts";
+import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
@@ -311,6 +311,10 @@ export class Document extends Node implements IDocument {
     // 6. Return the result of creating an element given this, localName, namespace, null, is, and with the synchronous custom elements flag set.
     return createElement(this, tagName, namespace, null, is);
   }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createelementns
+   */
   createElementNS(
     namespaceURI: "http://www.w3.org/1999/xhtml",
     qualifiedName: string,
@@ -342,9 +346,9 @@ export class Document extends Node implements IDocument {
     options?: string | ElementCreationOptions | undefined,
   ): Element;
   createElementNS(
-    namespace: unknown,
-    qualifiedName: unknown,
-    options?: unknown,
+    namespace: Namespace | null,
+    qualifiedName: string,
+    options?: string | ElementCreationOptions,
   ):
     | HTMLElement
     | Element
@@ -352,7 +356,8 @@ export class Document extends Node implements IDocument {
     | SVGElement
     | MathMLElementTagNameMap[K]
     | MathMLElement {
-    throw new UnImplemented();
+    // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
+    return internalCreateElement(this, namespace, qualifiedName, options);
   }
 
   createEvent(eventInterface: "AnimationEvent"): AnimationEvent;
@@ -678,3 +683,30 @@ export interface Document
     IParentNode,
     NonElementParentNode,
     XPathEvaluatorBase {}
+
+/**
+ * @see https://dom.spec.whatwg.org/#internal-createelementns-steps
+ */
+export function internalCreateElement(
+  document: Document,
+  namespace: Namespace | null,
+  qualifiedName: string,
+  options?: string | ElementCreationOptions,
+): Element {
+  // 1. Let namespace, prefix, and localName be the result of passing namespace and qualifiedName to validate and extract.
+  const { namespace: $namespace, prefix, localName } = validateAndExtract(
+    namespace,
+    qualifiedName,
+  );
+
+  // 2. Let is be null.
+  let is: string | null = null;
+
+  // 3. If options is a dictionary and options["is"] exists, then set is to it.
+  if (typeof options === "object" && "is" in options) {
+    is = options["is"] ?? null;
+  }
+
+  // 4. Return the result of creating an element given document, localName, namespace, prefix, is, and with the synchronous custom elements flag set.
+  return createElement(document, localName, $namespace, prefix, is);
+}

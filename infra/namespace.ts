@@ -1,3 +1,9 @@
+import {
+  DOMExceptionDescription,
+  DOMExceptionName,
+} from "../webidl/exception.ts";
+import { isNotNull } from "../utils.ts";
+
 /**
  * [Infra Living Standard](https://infra.spec.whatwg.org/#namespaces)
  */
@@ -31,4 +37,95 @@ export enum Namespace {
    * @see https://infra.spec.whatwg.org/#xmlns-namespace
    */
   XMLNS = "http://www.w3.org/2000/xmlns/",
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#validate
+ */
+function validate(qualifiedName: string) {
+  // throw an "InvalidCharacterError" DOMException if qualifiedName does not match the QName production.
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#validate-and-extract
+ */
+export function validateAndExtract(
+  namespace: Namespace | null,
+  qualifiedName: string,
+): {
+  namespace: Namespace | null;
+  prefix: string | null;
+  localName: string | null;
+} {
+  // 1. If namespace is the empty string, then set it to null.
+  namespace ||= null;
+
+  // 2. Validate qualifiedName.
+  validate(qualifiedName);
+
+  // 3. Let prefix be null.
+  let prefix = null;
+
+  // 4. Let localName be qualifiedName.
+  let localName = qualifiedName;
+
+  // 5. If qualifiedName contains a U+003A (:), then:
+  if (qualifiedName.includes(":")) {
+    // @optimized
+    // 1. Let splitResult be the result of running strictly split given qualifiedName and U+003A (:).
+    const splitResult = divide(qualifiedName, ":");
+
+    // 2. Set prefix to splitResult[0].
+    prefix = splitResult[0];
+
+    // 3. Set localName to splitResult[1].
+    localName = splitResult[1];
+  }
+
+  // 6. If prefix is non-null and namespace is null, then throw a "NamespaceError" DOMException.
+  if (isNotNull(prefix) && namespace === null) {
+    throw new DOMException(
+      DOMExceptionDescription.NamespaceError,
+      DOMExceptionName.NamespaceError,
+    );
+  }
+
+  // 7. If prefix is "xml" and namespace is not the XML namespace, then throw a "NamespaceError" DOMException.
+  if (prefix === "xml" && namespace !== Namespace.XML) {
+    throw new DOMException(
+      DOMExceptionDescription.NamespaceError,
+      DOMExceptionName.NamespaceError,
+    );
+  }
+
+  // 8. If either qualifiedName or prefix is "xmlns" and namespace is not the XMLNS namespace, then throw a "NamespaceError" DOMException.
+  if (
+    (qualifiedName === "xmlns" || prefix === "xmlns") &&
+    namespace !== Namespace.XMLNS
+  ) {
+    throw new DOMException(
+      DOMExceptionDescription.NamespaceError,
+      DOMExceptionName.NamespaceError,
+    );
+  }
+
+  // 9. If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException.
+  if (
+    namespace === Namespace.XMLNS && (qualifiedName !== "xmlns") &&
+    prefix !== "xmlns"
+  ) {
+    throw new DOMException(
+      DOMExceptionDescription.NamespaceError,
+      DOMExceptionName.NamespaceError,
+    );
+  }
+
+  // 10. Return namespace, prefix, and localName.
+  return { namespace, prefix, localName };
+}
+
+function divide(input: string, delimiter: string): [string, string] {
+  const pos = input.indexOf(delimiter);
+
+  return [input.slice(0, pos), input.slice(pos)];
 }
