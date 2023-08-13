@@ -30,7 +30,7 @@ enum CustomElementState {
 export class Element extends Node implements IElement {
   _namespace: Namespace | null;
   #namespacePrefix: string | null;
-  #localName: string | null;
+  #localName: string;
   #customElementState: CustomElementState;
   #customElementDefinition: CustomElementDefinition | null;
   _attributeList: List<Attr>;
@@ -74,7 +74,7 @@ export class Element extends Node implements IElement {
     attributeList: List<Attr>,
     namespace: Namespace | null,
     namespacePrefix: string | null,
-    localName: string | null,
+    localName: string,
     customElementState: CustomElementState,
     customElementDefinition: CustomElementDefinition | null,
     isValue: string | null,
@@ -150,8 +150,11 @@ export class Element extends Node implements IElement {
 
   id: string = "";
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-localname
+   */
   get localName(): string {
-    throw new UnImplemented();
+    return this.#localName;
   }
 
   get namespaceURI(): string | null {
@@ -522,7 +525,7 @@ export function setAttribute(attr: Attr, element: Element): Attr | null {
  */
 export function createElement(
   document: Document,
-  localName: string | null,
+  localName: string,
   namespace: Namespace | null,
   prefix: string | null = null, // 1. If prefix was not given, let prefix be null.
   is: string | null = null, // 2. If is was not given, let is be null.

@@ -55,7 +55,7 @@ export function validateAndExtract(
 ): {
   namespace: Namespace | null;
   prefix: string | null;
-  localName: string | null;
+  localName: string;
 } {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
