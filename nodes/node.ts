@@ -2,8 +2,9 @@ import { UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
+import { Text } from "./text.ts";
 import type { INode } from "../interface.d.ts";
-import { appendNode } from "./mutation.ts";
+import { appendNode, replaceNode } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
@@ -242,4 +243,18 @@ export function getElementsByQualifiedName(
     root,
     (element) => element !== root && element._qualifiedName === qualifiedName,
   );
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#string-replace-all
+ */
+export function replaceAllString(string: string, parent: Node): void {
+  // 1. Let node be null.
+  let node = null;
+
+  // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
+  if (string !== "") node = new Text(string, parent.nodeDocument);
+
+  // 3. Replace all with node within parent.
+  replaceNode(node, parent);
 }

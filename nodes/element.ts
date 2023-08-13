@@ -1,4 +1,9 @@
-import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
+import {
+  getElementsByQualifiedName,
+  Node,
+  NodeType,
+  replaceAllString,
+} from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import { type Attr, handleAttributesChanges } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
@@ -118,8 +123,14 @@ export class Element extends Node implements IElement {
     return descendantTextContent(this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
   override set textContent(value: string | null) {
-    throw new UnImplemented();
+    value ??= "";
+
+    // String replace all with the given value within this.
+    replaceAllString(value, this);
   }
 
   override isEqualNode(otherNode: Node | null): boolean {
