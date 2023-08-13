@@ -2,16 +2,29 @@ import { type Element } from "./element.ts";
 import { type Node } from "./node.ts";
 import type { IHTMLCollection } from "../interface.d.ts";
 import { find } from "../deps.ts";
-import { UnImplemented } from "./utils.ts";
 import { Namespace } from "../infra/namespace.ts";
 
 export class HTMLCollection implements IHTMLCollection {
+  [index: number]: Element;
+
   _root: Node;
   _filter: (node: Element) => boolean;
 
   constructor(root: Node, filter: (node: Element) => boolean) {
     this._root = root;
     this._filter = filter;
+
+    return new Proxy(this, {
+      get: (target, propKey, receiver) => {
+        if (typeof propKey === "string") {
+          const number = Number.parseInt(propKey);
+
+          if (Number.isInteger(number)) return this.getItem(number);
+        }
+
+        return Reflect.get(target, propKey, receiver);
+      },
+    });
   }
 
   get length(): number {
@@ -19,7 +32,7 @@ export class HTMLCollection implements IHTMLCollection {
   }
 
   item(index: number): Element | null {
-    throw new UnImplemented();
+    return this.getItem(index) ?? null;
   }
 
   /**
@@ -51,6 +64,10 @@ export class HTMLCollection implements IHTMLCollection {
 
   *[Symbol.iterator](): IterableIterator<Element> {
     yield* getRepresent(this._root, this._filter);
+  }
+
+  private getItem(index: number): Element | undefined {
+    return getRepresent(this._root, this._filter)[index];
   }
 }
 
