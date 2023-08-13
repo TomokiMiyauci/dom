@@ -1,9 +1,4 @@
-import {
-  getElementsByQualifiedName,
-  Node,
-  NodeType,
-  replaceAllString,
-} from "./node.ts";
+import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import { Attr, changeAttributes, handleAttributesChanges } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
@@ -20,6 +15,8 @@ import { List } from "../infra/list.ts";
 import { descendantTextContent } from "./text.ts";
 import { find } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
+import { Text } from "./text.ts";
+import { replaceNode } from "./mutation.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -724,4 +721,18 @@ export function getAttributeByName(
     element._attributeList,
     (attribute) => attribute._qualifiedName === qualifiedName,
   ) ?? null;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#string-replace-all
+ */
+export function replaceAllString(string: string, parent: Node): void {
+  // 1. Let node be null.
+  let node = null;
+
+  // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
+  if (string !== "") node = new Text(string, parent.nodeDocument);
+
+  // 3. Replace all with node within parent.
+  replaceNode(node, parent);
 }
