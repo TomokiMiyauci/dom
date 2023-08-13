@@ -1,4 +1,5 @@
 import { OrderedSet } from "../infra/set.ts";
+import { type Constructor, enumerate } from "../utils.ts";
 
 function isChild(source: Tree, target: Tree): boolean {
   return source.parent === target;
@@ -46,22 +47,15 @@ export function nextSibling(tree: Tree): Tree | null {
   return null;
 }
 
-function* enumerate<T>(
-  iterable: Iterable<T>,
-  start = 0,
-): Iterable<[index: number, item: T]> {
-  for (const item of iterable) {
-    yield [start++, item];
-  }
-}
-
-type Constructor = new (...args: any[]) => {};
-
-export function Tree<T extends Constructor>(Ctor: T) {
-  return class Treeable extends Ctor {
+export function Treeable<T extends Constructor>(Ctor: T) {
+  return class extends Ctor implements Tree {
     _parent: Tree<T> | null = null;
 
-    _children: OrderedSet<Tree<T>> = new OrderedSet();
+    #children: OrderedSet<Tree<T>> = new OrderedSet();
+
+    get _children(): OrderedSet<Tree<T>> {
+      return this.#children;
+    }
 
     get _firstChild(): this | null {
       return this._children[0] ?? null;
@@ -89,4 +83,33 @@ export function Tree<T extends Constructor>(Ctor: T) {
       return 0;
     }
   };
+}
+
+export interface Tree {
+  _parent: Tree<T> | null;
+  _children: OrderedSet<Tree<T>>;
+}
+
+export function getRoot(tree: Tree): Tree {
+  if (tree._parent === null) return tree;
+
+  return getRoot(tree._parent);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-tree-order
+ */
+export function* orderTree<T extends Tree>(tree: T): IterableIterator<T> {
+  yield tree;
+
+  for (const child of tree._children) {
+    yield* orderTree(child);
+  }
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-tree-descendant
+ */
+export function* descendant<T extends Tree>(tree: T): IterableIterator<T> {
+  for (const child of tree._children) yield* orderTree(child);
 }
