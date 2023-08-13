@@ -10,7 +10,7 @@ import {
   CustomElementDefinition,
   lookUpCustomElementDefinition,
 } from "../html/custom_element.ts";
-import { Namespace } from "../infra/namespace.ts";
+import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { List } from "../infra/list.ts";
 import { descendantTextContent } from "./text.ts";
 import { find } from "../deps.ts";
@@ -460,12 +460,22 @@ export class Element extends Node implements IElement {
     changeAttributes(attribute, value);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-setattributens
+   */
   setAttributeNS(
     namespace: string | null,
     qualifiedName: string,
     value: string,
   ): void {
-    throw new UnImplemented();
+    // 1. Let namespace, prefix, and localName be the result of passing namespace and qualifiedName to validate and extract.
+    const { namespace: ns, prefix, localName } = validateAndExtract(
+      namespace,
+      qualifiedName,
+    );
+
+    // 2. Set an attribute value for this using localName, value, and also prefix and namespace.
+    setAttributeValue(this, localName, value, prefix, ns);
   }
 
   /**
@@ -561,6 +571,37 @@ export function setAttribute(attr: Attr, element: Element): Attr | null {
 
   // 6. Return oldAttr.
   return oldAttr;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-set-value
+ */
+export function setAttributeValue(
+  element: Element,
+  localName: string,
+  value: string,
+  prefix: string | null = null,
+  namespace: string | null = null,
+): void {
+  // 1. Let attribute be the result of getting an attribute given namespace, localName, and element.
+  const attribute = getAttributeByNamespaceAndLocalName(
+    namespace,
+    localName,
+    element,
+  );
+
+  // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
+  if (attribute === null) {
+    const attr = new Attr(localName);
+    attr._namespace = namespace;
+    attr._namespacePrefix = prefix;
+    attr._value = value;
+    attr.nodeDocument = element.nodeDocument;
+    appendAttribute(attr, element);
+    return;
+  }
+  // 3. Change attribute to value.
+  changeAttributes(attribute, value);
 }
 
 /**
