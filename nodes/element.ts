@@ -5,7 +5,7 @@ import {
   replaceAllString,
 } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
-import { type Attr, handleAttributesChanges } from "./attr.ts";
+import { Attr, changeAttributes, handleAttributesChanges } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { Slottable } from "./slottable.ts";
@@ -424,8 +424,35 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-setattribute
+   */
   setAttribute(qualifiedName: string, value: string): void {
-    throw new UnImplemented();
+    // 1. If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException.
+
+    // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
+    if (
+      this._namespace === Namespace.HTML && this.nodeDocument._type !== "xml"
+    ) qualifiedName = qualifiedName.toLowerCase();
+
+    // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
+    const attribute = find(
+      this._attributeList,
+      (attr) => attr._qualifiedName === qualifiedName,
+    ) ?? null;
+
+    // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
+    if (attribute === null) {
+      const attribute = new Attr(qualifiedName);
+      attribute._value = value;
+      attribute.nodeDocument = this.nodeDocument;
+
+      appendAttribute(attribute, this);
+      return;
+    }
+
+    // 5. Change attribute to value.
+    changeAttributes(attribute, value);
   }
 
   setAttributeNS(
