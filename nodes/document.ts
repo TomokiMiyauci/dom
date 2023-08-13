@@ -3,7 +3,7 @@ import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { FontFaceSource } from "./font_face_source.ts";
 import { XPathEvaluatorBase } from "./x_path_evaluator_base.ts";
-import { isElement, UnImplemented } from "./utils.ts";
+import { isDocumentType, isElement, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
@@ -13,6 +13,7 @@ import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
+import { find } from "../deps.ts";
 
 @ParentNode
 @NonElementParentNode
@@ -97,15 +98,26 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-defaultview
+   */
   get defaultView(): (WindowProxy & typeof globalThis) | null {
-    throw new UnImplemented();
+    // TODO
+    return globalThis;
+    // 1. If this's browsing context is null, then return null.
+
+    // 2. Return this's browsing context's WindowProxy object.
   }
 
   designMode: string = "";
   dif = "";
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-doctype
+   */
   get doctype(): DocumentType | null {
-    throw new UnImplemented();
+    // return the child of this that is a doctype; otherwise null.
+    return find(this._children, isDocumentType) ?? null;
   }
 
   get documentElement(): HTMLElement {
