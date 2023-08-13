@@ -39,6 +39,9 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
       throw new UnImplemented();
     }
 
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-queryselector
+     */
     querySelector<K extends keyof HTMLElementTagNameMap>(
       selectors: K,
     ): HTMLElementTagNameMap[K] | null;
@@ -55,7 +58,7 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
       selectors: string,
     ): E | null;
     querySelector(
-      selectors: unknown,
+      selectors: string,
     ):
       | E
       | HTMLElementTagNameMap[K]
@@ -63,7 +66,8 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
       | MathMLElementTagNameMap[K]
       | HTMLElementDeprecatedTagNameMap[K]
       | null {
-      throw new UnImplemented();
+      // return the first result of running scope-match a selectors string selectors against this, if the result is not an empty list;
+      return matchScopedSelectorsString(selectors, this)[0] ?? null;
     }
 
     querySelectorAll<K extends keyof HTMLElementTagNameMap>(
