@@ -1,7 +1,7 @@
 import { Node } from "./node.ts";
-import { type Public } from "../deps.ts";
+import { enumerate, type Public } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
-import { enumerate } from "../utils.ts";
+import { type Element } from "./element.ts";
 
 export class NodeList implements INodeList {
   [k: number]: Node;
@@ -39,4 +39,31 @@ export interface NodeListOf<T extends Node> extends Public<NodeList> {
     callbackfn: (value: T, key: number, parent: NodeListOf<T>) => void,
     thisArg?: any,
   ): void;
+}
+
+export class StaticNodeList implements INodeList {
+  #items: Element[];
+
+  constructor(ref: Element[]) {
+    this.#items = ref;
+  }
+
+  item(index: number): Element | null {
+    return this.#items[index] ?? null;
+  }
+
+  get length(): number {
+    return this.#items.length;
+  }
+
+  forEach(
+    callbackfn: (value: Node, key: number, parent: any) => void,
+    thisArg?: any,
+  ): void {
+    this.#items.forEach(callbackfn, thisArg);
+  }
+
+  *[Symbol.iterator]() {
+    yield* this.#items;
+  }
 }
