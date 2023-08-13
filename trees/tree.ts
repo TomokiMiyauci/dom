@@ -1,5 +1,5 @@
 import { OrderedSet } from "../infra/set.ts";
-import { type Constructor, enumerate } from "../utils.ts";
+import { type Constructor, enumerate } from "../deps.ts";
 
 function isChild(source: Tree, target: Tree): boolean {
   return source.parent === target;

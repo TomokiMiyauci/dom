@@ -4,12 +4,11 @@ import { CharacterData, replaceData, substringData } from "./character_data.ts";
 import { isText, UnImplemented } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
 import { List } from "../infra/list.ts";
-import { isNotNull } from "../utils.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { len } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
-import { ifilter, imap, tail } from "../deps.ts";
+import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
   _data: string;

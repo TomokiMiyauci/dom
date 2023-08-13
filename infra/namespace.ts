@@ -2,7 +2,7 @@ import {
   DOMExceptionDescription,
   DOMExceptionName,
 } from "../webidl/exception.ts";
-import { isNotNull } from "../utils.ts";
+import { isNotNull } from "../deps.ts";
 
 /**
  * [Infra Living Standard](https://infra.spec.whatwg.org/#namespaces)
