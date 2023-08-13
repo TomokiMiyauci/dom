@@ -6,7 +6,6 @@ import { Element } from "../nodes/element.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { DocumentType } from "../nodes/document_type.ts";
 import { Document } from "../nodes/document.ts";
-import { HTMLTemplateElement } from "../nodes/template.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
 
 export type DOMTreeAdapterMap = TreeAdapterTypeMap<
@@ -18,7 +17,7 @@ export type DOMTreeAdapterMap = TreeAdapterTypeMap<
   Element,
   Comment,
   Text,
-  HTMLTemplateElement,
+  void,
   DocumentType
 >;
 
@@ -39,7 +38,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     const document = new Document();
     const element = document.createElement(tagName);
     const attributes = attrs.map(attrToAttribute);
-    attributes.forEach(element.attributes.setNamedItem.bind(element));
+
+    attributes.forEach((attr) => {
+      element.setAttributeNode(attr);
+    });
+
     Object.defineProperty(element, "namespaceURI", { value: namespaceURI });
 
     return element;
@@ -57,13 +60,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     templateElement: HTMLTemplateElement,
     contentElement: DocumentFragment,
   ): void {
-    Object.defineProperty(templateElement, "content", {
-      value: contentElement,
-    });
+    throw new Error("");
   }
 
   getTemplateContent(templateElement: HTMLTemplateElement): DocumentFragment {
-    return templateElement.content;
+    throw new Error("");
   }
 
   setDocumentType(
