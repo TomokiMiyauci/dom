@@ -178,6 +178,13 @@ export class Element extends Node implements IElement {
     null;
   outerHTML: string = "";
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-tagname
+   */
+  get tagName(): string {
+    return this.#upperQualifiedName;
+  }
+
   get ownerDocument(): Document {
     return this.nodeDocument;
   }
