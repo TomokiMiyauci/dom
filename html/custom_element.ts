@@ -6,7 +6,7 @@ import type { Document } from "../nodes/document.ts";
 export function lookUpCustomElementDefinition(
   document: Document,
   namesapce: string | null,
-  localName: string,
+  localName: string | null,
   is: string | null,
 ): CustomElementDefinition | null {
   // 1. If namespace is not the HTML namespace, return null.

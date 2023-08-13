@@ -90,7 +90,7 @@ export interface Tree {
   _children: OrderedSet<Tree<T>>;
 }
 
-export function getRoot(tree: Tree): Tree {
+export function getRoot<T extends Tree>(tree: T): T {
   if (tree._parent === null) return tree;
 
   return getRoot(tree._parent);
