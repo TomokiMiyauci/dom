@@ -12,6 +12,14 @@ import { $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-text-text
+   */
+  constructor(data: string = "") {
+    // set this’s data to data and this’s node document to current global object’s associated Document.
+    super(data, globalThis.document);
+  }
+
   override get nodeType(): NodeType.TEXT_NODE {
     return NodeType.TEXT_NODE;
   }
