@@ -13,11 +13,11 @@ import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { len } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
-import { $data, $nodeDocument } from "./internal.ts";
+import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
-  static #create(
+  static [$create](
     { data, nodeDocument }: CharacterDataStates & NodeStates,
   ): Text {
     const node = new Text(data);
@@ -48,7 +48,7 @@ export class Text extends CharacterData implements IText {
   }
 
   protected override clone(document: Document): Text {
-    return Text.#create({ data: this[$data], nodeDocument: document });
+    return Text[$create]({ data: this[$data], nodeDocument: document });
   }
 
   /**

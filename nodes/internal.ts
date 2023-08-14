@@ -9,3 +9,4 @@ export const $origin = Symbol();
 export const $isValue = Symbol();
 export const $nodeDocument = Symbol();
 export const $data = Symbol();
+export const $create = Symbol();

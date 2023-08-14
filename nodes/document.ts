@@ -14,7 +14,12 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find } from "../deps.ts";
-import { $implementation, $nodeDocument, $origin } from "./internal.ts";
+import {
+  $create,
+  $implementation,
+  $nodeDocument,
+  $origin,
+} from "./internal.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
@@ -571,8 +576,12 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createtextnode
+   */
   createTextNode(data: string): Text {
-    return new Text(data);
+    // return a new Text node whose data is data and node document is this.
+    return Text[$create]({ data, nodeDocument: this });
   }
 
   createTreeWalker(
