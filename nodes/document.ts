@@ -19,6 +19,7 @@ import {
   $implementation,
   $nodeDocument,
   $origin,
+  $URL,
 } from "./internal.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
 
@@ -38,6 +39,7 @@ export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
 
+  [$URL]: string = "about:blank";
   [$implementation]: DOMImplementation;
   [$origin]: Origin = { type: "opaque" };
 
@@ -93,6 +95,7 @@ export class Document extends Node implements IDocument {
   }
 
   get URL(): string {
+    console.log(333);
     throw new UnImplemented();
   }
 
