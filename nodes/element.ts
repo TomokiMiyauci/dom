@@ -16,7 +16,7 @@ import { descendantTextContent } from "./text.ts";
 import { find } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
-import { replaceNode } from "./mutation.ts";
+import { replaceAllNode } from "./mutation.ts";
 import {
   $create,
   $element,
@@ -810,5 +810,5 @@ export function replaceAllString(string: string, parent: Node): void {
   }
 
   // 3. Replace all with node within parent.
-  replaceNode(node, parent);
+  replaceAllNode(node, parent);
 }

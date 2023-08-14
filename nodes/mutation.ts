@@ -2,12 +2,10 @@ import { isDocumentFragment } from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { $nodeDocument } from "./internal.ts";
+import { OrderedSet } from "../infra/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-node-replace
- */
-export function replaceNode(child: Node | null, parent: Node): void {}
+import { orderTreeChildren } from "../trees/tree.ts";
+import { queueTreeMutationRecord } from "./mutation_observer.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-insert
@@ -133,6 +131,37 @@ export function preInsertNode(
 
   // 5. Return node.
   return node;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-node-replace-all
+ */
+export function replaceAllNode(node: Node | null, parent: Node): void {
+  // 1. Let removedNodes be parent’s children.
+  const removeNodes = parent._children;
+
+  // @optimized
+  // 2. Let addedNodes be the empty set.
+  // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
+  const addNodes = !node
+    ? new OrderedSet()
+    : isDocumentFragment(node)
+    ? node._children.clone()
+    // 4. Otherwise, if node is non-null, set addedNodes to « node ».
+    : new OrderedSet([node]);
+
+  // 5. Remove all parent’s children, in tree order, with the suppress observers flag set.
+  for (const node of orderTreeChildren(parent._children)) {
+    removeNode(node, true);
+  }
+
+  // 6. If node is non-null, then insert node into parent before null with the suppress observers flag set.
+  if (node) insertNode(node, parent, null, true);
+
+  // 7. If either addedNodes or removedNodes is not empty, then queue a tree mutation record for parent with addedNodes, removedNodes, null, and null.
+  if (!addNodes.isEmpty || !removeNodes.isEmpty) {
+    queueTreeMutationRecord(parent, addNodes, removeNodes, null, null);
+  }
 }
 
 /**
