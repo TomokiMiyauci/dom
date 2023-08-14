@@ -1,14 +1,24 @@
-import { type Document } from "../nodes/document.ts";
+import { Document } from "../nodes/document.ts";
 import type { IDOMParser } from "../interface.d.ts";
-import { parse } from "../deps.ts";
-import { DOMTreeAdapter, DOMTreeAdapterMap } from "./utils.ts";
+import { HTMLParser } from "./html_parser.ts";
 
 export class DOMParser implements IDOMParser {
   parseFromString(string: string, type: DOMParserSupportedType): Document {
-    if (type !== "text/html") throw new Error("unimplemented");
+    const document = new Document();
+    document._contentType = type;
+    // document[$URL] = globalThis.window.document.URL;
 
-    return parse<DOMTreeAdapterMap>(string, {
-      treeAdapter: new DOMTreeAdapter(),
-    });
+    switch (type) {
+      case "text/html": {
+        document._type = "html";
+        const parser = new HTMLParser(document);
+
+        return parser.parse(string);
+      }
+
+      default: {
+        throw new Error("unimplemented");
+      }
+    }
   }
 }
