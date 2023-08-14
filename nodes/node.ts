@@ -3,7 +3,7 @@ import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
-import { appendNode } from "./mutation.ts";
+import { appendNode, preRemoveChild } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
@@ -42,10 +42,6 @@ export abstract class Node extends EventTarget implements INode {
 
   abstract get textContent(): string | null;
   abstract set textContent(value: string | null);
-
-  get index(): number {
-    return 0;
-  }
 
   get baseURI(): string {
     throw new UnImplemented();
@@ -225,7 +221,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   removeChild<T extends Node>(child: T): T {
-    throw new UnImplemented();
+    return preRemoveChild(child, this);
   }
 
   get parentElement(): any | null {

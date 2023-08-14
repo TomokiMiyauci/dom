@@ -2,6 +2,7 @@ import { isDocumentFragment } from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { $nodeDocument } from "./internal.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -132,6 +133,22 @@ export function preInsertNode(
 
   // 5. Return node.
   return node;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-node-pre-remove
+ */
+export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
+  // 1. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
+  if (child._parent !== parent) {
+    throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+  }
+
+  // 2. Remove child.
+  removeNode(child);
+
+  // 3. Return child.
+  return child;
 }
 
 /**

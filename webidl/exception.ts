@@ -1,5 +1,6 @@
 export enum DOMExceptionName {
   NamespaceError = "NamespaceError",
+  NotFoundError = "NotFoundError",
 }
 
 export enum DOMExceptionDescription {
