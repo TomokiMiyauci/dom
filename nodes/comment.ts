@@ -1,10 +1,19 @@
 import { type Document } from "./document.ts";
-import { Node, NodeType } from "./node.ts";
-import { CharacterData } from "./character_data.ts";
+import { Node, NodeStates, NodeType } from "./node.ts";
+import { CharacterData, type CharacterDataState } from "./character_data.ts";
 import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
+import { $data, $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
+  static #create({ data, nodeDocument }: CharacterDataState & NodeStates) {
+    const node = new Comment(data);
+
+    node[$nodeDocument] = nodeDocument;
+
+    return node;
+  }
+
   /**
    * @see https://dom.spec.whatwg.org/#dom-comment-comment
    */
@@ -25,7 +34,7 @@ export class Comment extends CharacterData implements IComment {
     throw new UnImplemented();
   }
 
-  protected override clone(document: Document): Node {
-    return new Comment(this.data, document);
+  protected override clone(document: Document): Comment {
+    return Comment.#create({ data: this[$data], nodeDocument: document });
   }
 }

@@ -6,6 +6,13 @@ import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 
+export interface CharacterDataState {
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-cd-data
+   */
+  data: string;
+}
+
 export abstract class CharacterData extends Node implements ICharacterData {
   [$data]: string;
 
