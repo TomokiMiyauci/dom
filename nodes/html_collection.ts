@@ -3,6 +3,12 @@ import { type Node } from "./node.ts";
 import type { IHTMLCollection } from "../interface.d.ts";
 import { find } from "../deps.ts";
 import { Namespace } from "../infra/namespace.ts";
+import {
+  $localName,
+  $namespace,
+  $namespacePrefix,
+  $value,
+} from "./internal.ts";
 
 export class HTMLCollection implements IHTMLCollection {
   [index: number]: Element;
@@ -52,8 +58,8 @@ export class HTMLCollection implements IHTMLCollection {
           find(
             node._attributeList,
             (attr) =>
-              attr._localName === "name" && attr._namespace === null &&
-              attr._namespacePrefix === null && attr._value === key,
+              attr[$localName] === "name" && attr[$namespace] === null &&
+              attr[$namespacePrefix] === null && attr[$value] === key,
           )
       ) return node;
     }
