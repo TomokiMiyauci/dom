@@ -1,12 +1,21 @@
 import { Node } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
+import { type Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
+import { $nodeDocument } from "./internal.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
   // override nodeDocument: Document = new Document();
   abstract _data: string;
+
+  constructor(document: Document) {
+    super();
+    this[$nodeDocument] = document;
+  }
+
+  override [$nodeDocument]: Document;
 
   override get nodeValue(): string {
     return this._data;

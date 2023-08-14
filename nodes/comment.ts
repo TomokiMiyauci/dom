@@ -7,12 +7,8 @@ import { $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
   constructor(data: string, document: Document) {
-    super();
-
-    this[$nodeDocument] = document;
+    super(document);
   }
-
-  override nodeDocument: Document;
 
   override get nodeType(): NodeType.COMMENT_NODE {
     return NodeType.COMMENT_NODE;

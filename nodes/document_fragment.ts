@@ -8,7 +8,7 @@ import { $nodeDocument } from "./internal.ts";
 
 @ParentNode
 export class DocumentFragment extends Node implements IDocumentFragment {
-  override nodeDocument: Document;
+  override [$nodeDocument]: Document;
 
   constructor(document: Document) {
     super();

@@ -51,10 +51,6 @@ export class Document extends Node implements IDocument {
     return this;
   }
 
-  override get nodeDocument(): Document {
-    return this;
-  }
-
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
   }

@@ -82,7 +82,7 @@ export class Attr extends Node implements IAttr {
     return qualifiedName;
   }
 
-  override nodeDocument: Document;
+  override [$nodeDocument]: Document;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodetype

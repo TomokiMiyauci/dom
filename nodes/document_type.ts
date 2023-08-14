@@ -24,11 +24,7 @@ export class DocumentType extends Node implements IDocumentType {
     this[$nodeDocument] = document;
   }
 
-  override nodeDocument: Document;
-
-  get ownerDocument(): any {
-    throw new UnImplemented();
-  }
+  override [$nodeDocument]: Document;
 
   override get nodeType(): NodeType.DOCUMENT_TYPE_NODE {
     return NodeType.DOCUMENT_TYPE_NODE;
