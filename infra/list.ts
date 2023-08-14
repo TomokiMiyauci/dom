@@ -1,22 +1,14 @@
-export abstract class ListCore<T> {
+import { Indexer } from "./utils.ts";
+
+export abstract class ListCore<T> extends Indexer<T | undefined> {
   readonly [index: number]: T;
 
   protected list: T[] = [];
 
   constructor(iterable?: Iterable<T>) {
-    if (iterable) for (const item of iterable) this.append(item);
+    super((index) => this.list[index]);
 
-    return new Proxy(this, {
-      get: (target, prop) => {
-        if (typeof prop === "string") {
-          const indexLike = Number(prop);
-
-          if (Number.isInteger(indexLike)) return target.list[indexLike];
-        }
-
-        return target[prop as never];
-      },
-    });
+    if (iterable) for (const item of iterable) this.list.push(item);
   }
 
   protected abstract create(): this;
