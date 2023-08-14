@@ -1,4 +1,4 @@
-export class ListCore<T> {
+export abstract class ListCore<T> {
   readonly [index: number]: T;
 
   protected list: T[] = [];
@@ -18,6 +18,8 @@ export class ListCore<T> {
       },
     });
   }
+
+  protected abstract create(): this;
 
   /** Add item to end of list. O(1)
    *
@@ -53,7 +55,8 @@ export class ListCore<T> {
   insert(index: number, item: T): void {
     if (this.isInRange(index)) {
       // To insert an item into a list before an index is to add the given item to the list between the given index − 1 and the given index. If the given index is 0, then prepend the given item to the list.
-      this.list.splice(index, 0, item);
+      if (!index) this.prepend(item);
+      else this.list.splice(index, 0, item);
     }
   }
 
@@ -66,13 +69,13 @@ export class ListCore<T> {
     this.list = this.list.filter((value) => !predicate(value));
   }
 
-  /** To be empty list. O(1)
+  /** To be empty list. O(n)
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-empty)
    */
   empty(): void {
     /** To empty a list is to remove all of its items. */
-    this.list.length = 0;
+    this.remove(T);
   }
 
   /** Whether the {@linkcode item} included in list or not. O(n)
@@ -84,6 +87,20 @@ export class ListCore<T> {
     for (const value of this.list) if (item === value) return true;
 
     return false;
+  }
+
+  /** Return shallow copied list. O(n)
+   *
+   * @see https://infra.spec.whatwg.org/#list-clone
+   */
+  clone(): this {
+    // create a new list clone, of the same designation,
+    const clone = this.create();
+
+    // and, for each item of list, append item to clone, so that clone contains the same items, in the same order as list.
+    for (const item of this) clone.append(item);
+
+    return clone;
   }
 
   /**
@@ -128,17 +145,11 @@ export class List<T> extends ListCore<T> {
     }
   }
 
-  /** Return shallow copied list. O(n)
-   *
-   * @see https://infra.spec.whatwg.org/#list-clone
-   */
-  clone(): List<T> {
-    // create a new list clone, of the same designation,
-    const clone = new List<T>();
-
-    // and, for each item of list, append item to clone, so that clone contains the same items, in the same order as list.
-    for (const item of this) clone.append(item);
-
-    return clone;
+  protected override create(): this {
+    return Object.assign(new List());
   }
+}
+
+function T(): true {
+  return true;
 }
