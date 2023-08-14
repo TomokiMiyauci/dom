@@ -1,6 +1,7 @@
 import { isDocumentFragment } from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
+import { $nodeDocument } from "./internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -151,7 +152,7 @@ export function appendNode(node: Node, parent: Node): Node {
  */
 export function adoptNode(node: Node, document: Document): void {
   // 1. Let oldDocument be node’s node document.
-  const oldDocument = node.nodeDocument;
+  const oldDocument = node[$nodeDocument];
 
   // 2. If node’s parent is non-null, then remove node.
   if (node._parent !== null) removeNode(node);

@@ -2,6 +2,7 @@ import { Node, NodeType } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
+import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../interface.d.ts";
 
 export class DocumentType extends Node implements IDocumentType {
@@ -20,7 +21,7 @@ export class DocumentType extends Node implements IDocumentType {
     this.#name = name;
     this.#publicId = publicId;
     this.#systemId = systemId;
-    this.nodeDocument = document;
+    this[$nodeDocument] = document;
   }
 
   override nodeDocument: Document;

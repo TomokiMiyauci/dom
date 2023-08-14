@@ -7,7 +7,7 @@ import { appendNode } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $namespace } from "./internal.ts";
+import { $namespace, $nodeDocument } from "./internal.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -30,7 +30,7 @@ export interface NodeStates {
 
 @Treeable
 export abstract class Node extends EventTarget implements INode {
-  abstract nodeDocument: Document;
+  abstract [$nodeDocument]!: Document;
 
   abstract get nodeType(): NodeType;
 
@@ -56,7 +56,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get ownerDocument(): Document | null {
-    return this.nodeDocument;
+    return this[$nodeDocument];
   }
 
   getRootNode(options?: GetRootNodeOptions | undefined): Node {
@@ -94,7 +94,7 @@ export abstract class Node extends EventTarget implements INode {
   normalize(): void {}
 
   cloneNode(deep?: boolean | undefined): Node {
-    let document = this.nodeDocument;
+    let document = this[$nodeDocument];
     const copy = this.clone(document);
 
     if (isDocument(copy)) document = copy;
@@ -248,7 +248,7 @@ export function getElementsByQualifiedName(
   }
 
   // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
-  if (root.nodeDocument._type !== "xml") {
+  if (root[$nodeDocument]._type !== "xml") {
     return new HTMLCollection(root, (element) =>
       element !== root &&
         // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.

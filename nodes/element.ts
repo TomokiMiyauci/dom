@@ -23,6 +23,7 @@ import {
   $localName,
   $namespace,
   $namespacePrefix,
+  $nodeDocument,
   $value,
 } from "./internal.ts";
 
@@ -71,7 +72,8 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this[$namespace] === Namespace.HTML && this.nodeDocument._type === "html"
+      this[$namespace] === Namespace.HTML &&
+      this[$nodeDocument]._type === "html"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -99,7 +101,7 @@ export class Element extends Node implements IElement {
     this.#customElementState = customElementState;
     this.#customElementDefinition = customElementDefinition;
     this[$isValue] = isValue;
-    this.nodeDocument = document;
+    this[$nodeDocument] = document;
 
     this.attributes = new NamedNodeMap(this);
   }
@@ -208,7 +210,7 @@ export class Element extends Node implements IElement {
   }
 
   get ownerDocument(): Document {
-    return this.nodeDocument;
+    return this[$nodeDocument];
   }
 
   get part(): DOMTokenList {
@@ -461,7 +463,7 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this[$namespace] === Namespace.HTML && this.nodeDocument._type !== "xml"
+      this[$namespace] === Namespace.HTML && this[$nodeDocument]._type !== "xml"
     ) qualifiedName = qualifiedName.toLowerCase();
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -475,7 +477,7 @@ export class Element extends Node implements IElement {
       const attribute = new Attr({
         localName: qualifiedName,
         value,
-        nodeDocument: this.nodeDocument,
+        nodeDocument: this[$nodeDocument],
       });
 
       appendAttribute(attribute, this);
@@ -623,7 +625,7 @@ export function setAttributeValue(
       namespacePrefix: prefix,
       localName,
       value,
-      nodeDocument: element.nodeDocument,
+      nodeDocument: element[$nodeDocument],
     });
 
     appendAttribute(attr, element);
@@ -784,7 +786,7 @@ export function getAttributeByName(
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
     element[$namespace] === Namespace.HTML &&
-    element.nodeDocument._type !== "xml"
+    element[$nodeDocument]._type !== "xml"
   ) qualifiedName = qualifiedName.toLowerCase();
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
@@ -802,7 +804,7 @@ export function replaceAllString(string: string, parent: Node): void {
   let node = null;
 
   // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
-  if (string !== "") node = new Text(string, parent.nodeDocument);
+  if (string !== "") node = new Text(string, parent[$nodeDocument]);
 
   // 3. Replace all with node within parent.
   replaceNode(node, parent);

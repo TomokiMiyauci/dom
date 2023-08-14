@@ -8,6 +8,7 @@ import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { len } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
+import { $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
@@ -17,7 +18,7 @@ export class Text extends CharacterData implements IText {
     super();
 
     this._data = data;
-    this.nodeDocument = document;
+    this[$nodeDocument] = document;
   }
 
   override nodeDocument: Document;
@@ -75,7 +76,7 @@ export function splitText(node: Text, offset: number): Text {
   const newData = substringData(node, offset, count);
 
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
-  const newNode = new Text(newData, node.nodeDocument);
+  const newNode = new Text(newData, node[$nodeDocument]);
 
   // 6 Let parent be node’s parent.
   const parent = node._parent;

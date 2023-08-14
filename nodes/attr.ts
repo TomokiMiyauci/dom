@@ -9,6 +9,7 @@ import {
   $localName,
   $namespace,
   $namespacePrefix,
+  $nodeDocument,
   $value,
 } from "./internal.ts";
 
@@ -65,7 +66,7 @@ export class Attr extends Node implements IAttr {
     this[$value] = value;
     this[$localName] = localName;
     this[$element] = element;
-    this.nodeDocument = nodeDocument;
+    this[$nodeDocument] = nodeDocument;
   }
 
   /**

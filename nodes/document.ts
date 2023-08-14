@@ -14,7 +14,7 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find } from "../deps.ts";
-import { $implementation, $origin } from "./internal.ts";
+import { $implementation, $nodeDocument, $origin } from "./internal.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
@@ -45,6 +45,10 @@ export class Document extends Node implements IDocument {
     super();
 
     this[$implementation] = DOMImplementation.create(this);
+  }
+
+  override get [$nodeDocument](): Document {
+    return this;
   }
 
   override get nodeDocument(): Document {
@@ -320,7 +324,7 @@ export class Document extends Node implements IDocument {
     return new Comment(data);
   }
   createDocumentFragment(): DocumentFragment {
-    return new DocumentFragment();
+    return new DocumentFragment(this);
   }
 
   /**

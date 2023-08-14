@@ -6,7 +6,7 @@ import { createElement } from "./element.ts";
 import { appendNode } from "./mutation.ts";
 import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $document, $origin } from "./internal.ts";
+import { $document, $nodeDocument, $origin } from "./internal.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   [$document]!: Document;
@@ -46,8 +46,9 @@ export class DOMImplementation implements IDOMImplementation {
     doc._contentType = "text/html";
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
+    // TODO
     const docType = new DocumentType("html");
-    docType.nodeDocument = doc;
+    docType[$nodeDocument] = doc;
     appendNode(docType, doc);
 
     // 4. Append the result of creating an element given doc, html, and the HTML namespace, to doc.
