@@ -174,8 +174,13 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/dom.html#dom-document-head
+   * @note The specification also allows null to be returned.
+   */
   get head(): HTMLHeadElement {
-    throw new UnImplemented();
+    // return the head element of the document (a head element or null).
+    return this.getElementsByTagName("head")[0]! ?? null;
   }
 
   get hidden(): boolean {
