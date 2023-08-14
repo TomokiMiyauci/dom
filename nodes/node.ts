@@ -51,7 +51,12 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
+   */
   get ownerDocument(): Document | null {
+    // return null, if this is a document; otherwise this’s node document.
+    // Document should override this.
     return this[$nodeDocument];
   }
 
