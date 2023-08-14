@@ -12,15 +12,6 @@ import { $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
-  _data: string;
-
-  constructor(data: string, document: Document) {
-    super(document);
-
-    this._data = data;
-    this[$nodeDocument] = document;
-  }
-
   override get nodeType(): NodeType.TEXT_NODE {
     return NodeType.TEXT_NODE;
   }

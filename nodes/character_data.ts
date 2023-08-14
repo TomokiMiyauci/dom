@@ -8,10 +8,12 @@ import { $nodeDocument } from "./internal.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
   // override nodeDocument: Document = new Document();
-  abstract _data: string;
+  _data: string;
 
-  constructor(document: Document) {
+  constructor(data: string, document: Document) {
     super();
+
+    this._data = data;
     this[$nodeDocument] = document;
   }
 

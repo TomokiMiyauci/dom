@@ -3,13 +3,8 @@ import { Node, NodeType } from "./node.ts";
 import { CharacterData } from "./character_data.ts";
 import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
-import { $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
-  constructor(data: string, document: Document) {
-    super(document);
-  }
-
   override get nodeType(): NodeType.COMMENT_NODE {
     return NodeType.COMMENT_NODE;
   }
