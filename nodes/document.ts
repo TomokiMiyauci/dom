@@ -241,7 +241,11 @@ export class Document extends Node implements IDocument {
   onvisibilitychange: ((this: globalThis.Document, ev: Event) => any) | null =
     null;
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
+   */
   override get ownerDocument(): null {
+    // return null, if this is a document
     return null;
   }
 

@@ -106,7 +106,7 @@ export class Element extends Node implements IElement {
     this.attributes = new NamedNodeMap(this);
   }
 
-  override nodeDocument: Document;
+  override [$nodeDocument]: Document;
 
   override get nodeType(): NodeType.ELEMENT_NODE {
     return NodeType.ELEMENT_NODE;
@@ -207,10 +207,6 @@ export class Element extends Node implements IElement {
    */
   get tagName(): string {
     return this.#upperQualifiedName;
-  }
-
-  get ownerDocument(): Document {
-    return this[$nodeDocument];
   }
 
   get part(): DOMTokenList {
