@@ -91,7 +91,7 @@ export abstract class ListCore<T> {
 
   /** Return shallow copied list. O(n)
    *
-   * @see https://infra.spec.whatwg.org/#list-clone
+   * [Infra Living Standard](https://infra.spec.whatwg.org/#list-clone)
    */
   clone(): this {
     // create a new list clone, of the same designation,
@@ -118,6 +118,14 @@ export abstract class ListCore<T> {
   get size(): number {
     // A list’s size is the number of items the list contains.
     return this.list.length;
+  }
+
+  /**
+   * [Infra Living Standard](https://infra.spec.whatwg.org/#list-is-empty)
+   */
+  get isEmpty(): boolean {
+    // if its size is zero.
+    return !this.size;
   }
 
   /** Whether the {@linkcode index} is in range or not.

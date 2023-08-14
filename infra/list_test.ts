@@ -183,4 +183,12 @@ describe("List", () => {
 
     assertEquals(list[0], other[0]);
   });
+
+  it("should return true if size is 0", () => {
+    assert(new List().isEmpty);
+  });
+
+  it("should return false if size is not 0", () => {
+    assert(!new List([1]).isEmpty);
+  });
 });
