@@ -4,3 +4,5 @@ export const $localName = Symbol();
 export const $value = Symbol();
 export const $element = Symbol();
 export const $implementation = Symbol();
+export const $document = Symbol();
+export const $origin = Symbol();

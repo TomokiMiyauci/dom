@@ -14,8 +14,18 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find } from "../deps.ts";
-import { $implementation } from "./internal.ts";
+import { $implementation, $origin } from "./internal.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
+
+export type Origin = OpaqueOrigin | TupleOrigin;
+
+export interface OpaqueOrigin {
+  type: "opaque";
+}
+
+export interface TupleOrigin {
+  type: "tuple";
+}
 
 @ParentNode
 @NonElementParentNode
@@ -23,15 +33,19 @@ export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
 
-  /**
-   * @see https://dom.spec.whatwg.org/#interface-domimplementation
-   */
-  [$implementation]: DOMImplementation = new DOMImplementation();
+  [$implementation]: DOMImplementation;
+  [$origin]: Origin = { type: "opaque" };
 
   /**
    * @see https://momdo.github.io/html/dom.html#current-document-readiness
    */
   _currentDocumentReadiness: DocumentReadyState = "complete";
+
+  constructor() {
+    super();
+
+    this[$implementation] = DOMImplementation.create(this);
+  }
 
   override get nodeDocument(): Document {
     return this;
