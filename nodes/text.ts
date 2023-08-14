@@ -1,6 +1,11 @@
-import { type Node, NodeType } from "./node.ts";
+import { type Node, type NodeStates, NodeType } from "./node.ts";
 import { type Document } from "./document.ts";
-import { CharacterData, replaceData, substringData } from "./character_data.ts";
+import {
+  CharacterData,
+  type CharacterDataStates,
+  replaceData,
+  substringData,
+} from "./character_data.ts";
 import { isText, UnImplemented } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
 import { List } from "../infra/list.ts";
@@ -12,6 +17,16 @@ import { $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
+  static #create(
+    { data, nodeDocument }: CharacterDataStates & NodeStates,
+  ): Text {
+    const node = new Text(data);
+
+    node[$nodeDocument] = nodeDocument;
+
+    return node;
+  }
+
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-text
    */
@@ -32,8 +47,8 @@ export class Text extends CharacterData implements IText {
     throw new UnImplemented();
   }
 
-  protected override clone(document: Document): Node {
-    return new Text(this[$data], document);
+  protected override clone(document: Document): Text {
+    return Text.#create({ data: this[$data], nodeDocument: document });
   }
 
   /**

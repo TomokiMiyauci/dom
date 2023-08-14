@@ -1,12 +1,14 @@
 import { type Document } from "./document.ts";
 import { Node, NodeStates, NodeType } from "./node.ts";
-import { CharacterData, type CharacterDataState } from "./character_data.ts";
+import { CharacterData, type CharacterDataStates } from "./character_data.ts";
 import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
-  static #create({ data, nodeDocument }: CharacterDataState & NodeStates) {
+  static #create(
+    { data, nodeDocument }: CharacterDataStates & NodeStates,
+  ): Comment {
     const node = new Comment(data);
 
     node[$nodeDocument] = nodeDocument;

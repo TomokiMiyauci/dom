@@ -6,7 +6,7 @@ import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 
-export interface CharacterDataState {
+export interface CharacterDataStates {
   /**
    * @see https://dom.spec.whatwg.org/#concept-cd-data
    */
