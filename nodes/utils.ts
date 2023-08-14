@@ -1,3 +1,4 @@
+import { $data } from "./internal.ts";
 import { type Node } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./document.ts";
@@ -26,7 +27,7 @@ export function isElement(node: Node): node is Element {
 }
 
 export function isCharacterData(node: Node): node is CharacterData {
-  return "_data" in node;
+  return $data in node;
 }
 
 export function isAttr(node: Node): node is Attr {

@@ -8,7 +8,7 @@ import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { len } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
-import { $nodeDocument } from "./internal.ts";
+import { $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
 export class Text extends CharacterData implements IText {
@@ -25,7 +25,7 @@ export class Text extends CharacterData implements IText {
   }
 
   protected override clone(document: Document): Node {
-    return new Text(this.data, document);
+    return new Text(this[$data], document);
   }
 
   /**
@@ -96,7 +96,7 @@ export function splitText(node: Text, offset: number): Text {
  * @see https://triple-underscore.github.io/DOM4-ja.html#_concatenate-text-data
  */
 function concatTextData(list: List<Text>): string {
-  return [...imap(list, (text) => text._data)].join("");
+  return [...imap(list, (text) => text[$data])].join("");
 }
 
 /**

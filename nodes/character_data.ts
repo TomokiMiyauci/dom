@@ -4,23 +4,23 @@ import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { type Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
-import { $nodeDocument } from "./internal.ts";
+import { $data, $nodeDocument } from "./internal.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
   // override nodeDocument: Document = new Document();
-  _data: string;
+  [$data]: string;
 
   constructor(data: string, document: Document) {
     super();
 
-    this._data = data;
+    this[$data] = data;
     this[$nodeDocument] = document;
   }
 
   override [$nodeDocument]: Document;
 
   override get nodeValue(): string {
-    return this._data;
+    return this[$data];
   }
 
   override set nodeValue(value: string | null) {
@@ -31,7 +31,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this._data;
+    return this[$data];
   }
 
   override set textContent(value: string | null) {
@@ -47,7 +47,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this._data;
+    return this[$data];
   }
 
   /**
