@@ -18,6 +18,7 @@ import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceNode } from "./mutation.ts";
 import {
+  $create,
   $element,
   $isValue,
   $localName,
@@ -654,8 +655,9 @@ export function createElement(
   );
 
   // 5. If definition is non-null, and definition’s name is not equal to its local name (i.e., definition represents a customized built-in element), then:
-  if (definition !== null && definition.name !== definition.localName) {}
-  // 1. Let interface be the element interface for localName and the HTML namespace.
+  if (definition !== null && definition.name !== definition.localName) {
+    throw new Error();
+  } // 1. Let interface be the element interface for localName and the HTML namespace.
 
   // 2. Set result to a new element that implements interface, with no attributes, namespace set to the HTML namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "undefined", custom element definition set to null, is value set to is, and node document set to document.
 
@@ -672,8 +674,9 @@ export function createElement(
   // 4. Otherwise, enqueue a custom element upgrade reaction given result and definition.
 
   // 6. Otherwise, if definition is non-null, then:
-  else if (definition !== null) {}
-  // 1. If the synchronous custom elements flag is set, then run these steps while catching any exceptions:
+  else if (definition !== null) {
+    throw new Error();
+  } // 1. If the synchronous custom elements flag is set, then run these steps while catching any exceptions:
 
   // 1. Let C be definition’s constructor.
 
@@ -770,7 +773,9 @@ export function appendAttribute(attribute: Attr, element: Element): void {
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
  */
-export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {}
+export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
+  throw new Error();
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name
@@ -800,7 +805,9 @@ export function replaceAllString(string: string, parent: Node): void {
   let node = null;
 
   // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
-  if (string !== "") node = new Text(string, parent[$nodeDocument]);
+  if (string !== "") {
+    node = Text[$create]({ data: string, nodeDocument: parent[$nodeDocument] });
+  }
 
   // 3. Replace all with node within parent.
   replaceNode(node, parent);
