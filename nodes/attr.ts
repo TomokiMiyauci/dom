@@ -130,6 +130,16 @@ export class Attr extends Node implements IAttr {
     throw new UnImplemented();
   }
 
+  protected override clone(document: Document): Attr {
+    return new Attr({
+      namespace: this[$namespace],
+      namespacePrefix: this[$namespacePrefix],
+      localName: this[$localName],
+      value: this[$value],
+      nodeDocument: document,
+    });
+  }
+
   /**
    * @see https://dom.spec.whatwg.org/#dom-attr-namespaceuri
    */

@@ -34,6 +34,10 @@ export class Text extends CharacterData implements IText {
     throw new UnImplemented();
   }
 
+  protected override clone(document: Document): Node {
+    return new Text(this.data, document);
+  }
+
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-wholetext
    */

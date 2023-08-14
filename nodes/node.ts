@@ -1,4 +1,4 @@
-import { UnImplemented } from "./utils.ts";
+import { isDocument, UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
@@ -7,6 +7,7 @@ import { appendNode } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
+import { $namespace } from "./internal.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -93,8 +94,25 @@ export abstract class Node extends EventTarget implements INode {
   normalize(): void {}
 
   cloneNode(deep?: boolean | undefined): Node {
-    throw new UnImplemented();
+    let document = this.nodeDocument;
+    const copy = this.clone(document);
+
+    if (isDocument(copy)) document = copy;
+
+    if (deep) {
+      for (const child of copy._children) {
+        appendNode(this.clone.call(child, document), copy);
+      }
+    }
+
+    return copy;
   }
+
+  /** Clone instance.
+   * This API is used by {@linkcode cloneNode}.
+   * It is not public API, so should be mark private.
+   */
+  protected abstract clone(document: Document): Node;
 
   abstract isEqualNode(otherNode: Node | null): boolean;
 
@@ -234,10 +252,10 @@ export function getElementsByQualifiedName(
     return new HTMLCollection(root, (element) =>
       element !== root &&
         // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
-        (element._namespace === Namespace.HTML &&
+        (element[$namespace] === Namespace.HTML &&
           element._qualifiedName === qualifiedName.toLowerCase()) ||
       // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
-      (element._namespace !== Namespace.HTML &&
+      (element[$namespace] !== Namespace.HTML &&
         element._qualifiedName === qualifiedName));
   }
 

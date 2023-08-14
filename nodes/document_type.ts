@@ -9,15 +9,21 @@ export class DocumentType extends Node implements IDocumentType {
   #publicId: string;
   #systemId: string;
 
-  constructor(name: string, publicId: string, systemId: string) {
+  constructor(
+    name: string,
+    publicId: string,
+    systemId: string,
+    document: Document,
+  ) {
     super();
 
     this.#name = name;
     this.#publicId = publicId;
     this.#systemId = systemId;
+    this.nodeDocument = document;
   }
 
-  override nodeDocument: Document = new Document();
+  override nodeDocument: Document;
 
   get ownerDocument(): any {
     throw new UnImplemented();
@@ -52,6 +58,15 @@ export class DocumentType extends Node implements IDocumentType {
 
   override isEqualNode(otherNode: Node | null): boolean {
     throw new UnImplemented();
+  }
+
+  protected override clone(document: Document): DocumentType {
+    return new DocumentType(
+      this.#name,
+      this.#publicId,
+      this.#systemId,
+      document,
+    );
   }
 
   get name(): string {

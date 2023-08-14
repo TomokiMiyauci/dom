@@ -6,3 +6,4 @@ export const $element = Symbol();
 export const $implementation = Symbol();
 export const $document = Symbol();
 export const $origin = Symbol();
+export const $isValue = Symbol();

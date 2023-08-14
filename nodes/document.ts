@@ -78,6 +78,15 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  protected override clone(document: Document): Document {
+    const doc = new Document();
+
+    doc._type = document._type;
+    doc._contentType = document._contentType;
+
+    return doc;
+  }
+
   get URL(): string {
     throw new UnImplemented();
   }

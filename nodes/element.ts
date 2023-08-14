@@ -17,7 +17,14 @@ import { find } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceNode } from "./mutation.ts";
-import { $element, $localName, $namespace, $value } from "./internal.ts";
+import {
+  $element,
+  $isValue,
+  $localName,
+  $namespace,
+  $namespacePrefix,
+  $value,
+} from "./internal.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -32,13 +39,13 @@ enum CustomElementState {
 
 @ParentNode
 export class Element extends Node implements IElement {
-  _namespace: Namespace | null;
-  #namespacePrefix: string | null;
-  #localName: string;
+  [$namespace]: Namespace | null;
+  [$namespacePrefix]: string | null;
+  [$localName]: string;
   #customElementState: CustomElementState;
   #customElementDefinition: CustomElementDefinition | null;
   _attributeList: List<Attr>;
-  #isValue: string | null;
+  [$isValue]: string | null;
 
   _ID: string | null = null;
 
@@ -47,10 +54,10 @@ export class Element extends Node implements IElement {
    */
   get _qualifiedName(): string {
     // An element’s qualified name is its local name if its namespace prefix is null; otherwise its namespace prefix, followed by ":", followed by its local name.
-    const prefix = this.#namespacePrefix;
+    const prefix = this[$namespacePrefix];
     const qualifiedName = prefix === null
-      ? this.#localName
-      : `${prefix}:${this.#localName}`;
+      ? this[$localName]
+      : `${prefix}:${this[$localName]}`;
 
     return qualifiedName;
   }
@@ -64,7 +71,7 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this._namespace === Namespace.HTML && this.nodeDocument._type === "html"
+      this[$namespace] === Namespace.HTML && this.nodeDocument._type === "html"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -86,12 +93,12 @@ export class Element extends Node implements IElement {
   ) {
     super();
     this._attributeList = attributeList;
-    this._namespace = namespace;
-    this.#namespacePrefix = namespacePrefix;
-    this.#localName = localName;
+    this[$namespace] = namespace;
+    this[$namespacePrefix] = namespacePrefix;
+    this[$localName] = localName;
     this.#customElementState = customElementState;
     this.#customElementDefinition = customElementDefinition;
-    this.#isValue = isValue;
+    this[$isValue] = isValue;
     this.nodeDocument = document;
 
     this.attributes = new NamedNodeMap(this);
@@ -136,6 +143,22 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  protected override clone(document: Document): Element {
+    const copy = createElement(
+      document,
+      this[$localName],
+      this[$namespace],
+      this[$namespacePrefix],
+      this[$isValue],
+    );
+
+    for (const attribute of this._attributeList) {
+      appendAttribute(attribute.clone(document), copy);
+    }
+
+    return copy;
+  }
+
   get classList(): DOMTokenList {
     throw new UnImplemented();
   }
@@ -164,7 +187,7 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-localname
    */
   get localName(): string {
-    return this.#localName;
+    return this[$localName];
   }
 
   get namespaceURI(): string | null {
@@ -438,7 +461,7 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this._namespace === Namespace.HTML && this.nodeDocument._type !== "xml"
+      this[$namespace] === Namespace.HTML && this.nodeDocument._type !== "xml"
     ) qualifiedName = qualifiedName.toLowerCase();
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -760,7 +783,7 @@ export function getAttributeByName(
 ): Attr | null {
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
-    element._namespace === Namespace.HTML &&
+    element[$namespace] === Namespace.HTML &&
     element.nodeDocument._type !== "xml"
   ) qualifiedName = qualifiedName.toLowerCase();
 
