@@ -76,7 +76,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     systemId: string,
   ): void {
     if (!document.childNodes.length) {
-      const documentType = new DocumentType(name, publicId, systemId);
+      const documentType = new DocumentType(name, publicId, systemId, document);
 
       document.appendChild(documentType);
     }

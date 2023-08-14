@@ -47,7 +47,7 @@ export function insertNode(
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) {
     // 1. Adopt node into parent’s node document.
-    adoptNode(node, parent.ownerDocument);
+    adoptNode(node, parent[$nodeDocument]);
 
     // 2. If child is null, then append node to parent’s children.
     if (child === null) {

@@ -30,7 +30,7 @@ export interface NodeStates {
 
 @Treeable
 export abstract class Node extends EventTarget implements INode {
-  abstract [$nodeDocument]!: Document;
+  abstract [$nodeDocument]: Document;
 
   abstract get nodeType(): NodeType;
 
