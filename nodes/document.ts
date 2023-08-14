@@ -14,12 +14,19 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument, type IParentNode } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find } from "../deps.ts";
+import { $implementation } from "./internal.ts";
+import { DOMImplementation } from "./dom_implementation.ts";
 
 @ParentNode
 @NonElementParentNode
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
+
+  /**
+   * @see https://dom.spec.whatwg.org/#interface-domimplementation
+   */
+  [$implementation]: DOMImplementation = new DOMImplementation();
 
   /**
    * @see https://momdo.github.io/html/dom.html#current-document-readiness
@@ -165,8 +172,12 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-implementation
+   */
   get implementation(): DOMImplementation {
-    throw new UnImplemented();
+    // return the DOMImplementation object that is associated with this.
+    return this[$implementation];
   }
 
   get inputEncoding(): string {
