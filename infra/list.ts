@@ -1,7 +1,3 @@
-function eq(left: unknown, right: unknown): boolean {
-  return left === right;
-}
-
 /** A list is a specification type consisting of a finite ordered sequence of items.
  *
  * [Infra Living Standard](https://infra.spec.whatwg.org/#list)
@@ -9,11 +5,10 @@ function eq(left: unknown, right: unknown): boolean {
 export class List<T> {
   readonly [index: number]: T;
 
-  private equals: (left: T, right: T) => boolean;
   private list: T[] = [];
 
-  constructor() {
-    this.equals = eq;
+  constructor(iterable?: Iterable<T>) {
+    if (iterable) for (const item of iterable) this.list.push(item);
 
     return new Proxy(this, {
       get: (target, prop) => {
@@ -44,8 +39,6 @@ export class List<T> {
     for (const item of other) this.append(item);
   }
 
-  // extend(others: List<T>): void;
-
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-prepend)
    */
@@ -57,19 +50,21 @@ export class List<T> {
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-insert)
    */
-  insert(item: T, index: number): void {
-    // To insert an item into a list before an index is to add the given item to the list between the given index − 1 and the given index. If the given index is 0, then prepend the given item to the list.
-    this.list.splice(index, 0, item);
+  insert(index: number, item: T): void {
+    if (this.isInRange(index)) {
+      // To insert an item into a list before an index is to add the given item to the list between the given index − 1 and the given index. If the given index is 0, then prepend the given item to the list.
+      this.list.splice(index, 0, item);
+    }
   }
 
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-replace)
    */
-  replace(item: T, replacement: T): void {
+  replace(item: T, predicate: (item: T) => boolean): void {
     // To replace within a list that is not an ordered set is to replace all items from the list that match a given condition with the given item, or do nothing if none do.
     for (const [index, insertedItem] of this.list.entries()) {
-      if (this.equals(insertedItem, item)) {
-        this.list[index] = replacement;
+      if (predicate(insertedItem)) {
+        this.list[index] = item;
       }
     }
   }
@@ -77,9 +72,9 @@ export class List<T> {
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-remove)
    */
-  remove(item: T): void {
+  remove(predicate: (item: T) => boolean): void {
     // To remove zero or more items from a list is to remove all items from the list that match a given condition, or do nothing if none do.
-    this.list = this.list.filter((value) => this.equals(value, item));
+    this.list = this.list.filter((value) => !predicate(value));
   }
 
   /**
@@ -95,11 +90,22 @@ export class List<T> {
    */
   contains(item: T): boolean {
     // A list contains an item if it appears in the list. We can also denote this by saying that, for a list list and an index index, "list[index] exists".
-    for (const value of this.list) {
-      if (this.equals(value, item)) return true;
-    }
+    for (const value of this.list) if (item === value) return true;
 
     return false;
+  }
+
+  /**
+   * @see https://infra.spec.whatwg.org/#list-clone
+   */
+  clone(): this {
+    // create a new list clone, of the same designation,
+    const clone = new (this.constructor as typeof List<T>)() as this;
+
+    // and, for each item of list, append item to clone, so that clone contains the same items, in the same order as list.
+    for (const item of this) clone.append(item);
+
+    return clone;
   }
 
   /**
@@ -116,5 +122,11 @@ export class List<T> {
   get size(): number {
     // A list’s size is the number of items the list contains.
     return this.list.length;
+  }
+
+  /** Whether the {@linkcode index} is in range or not.
+   */
+  private isInRange(index: number): boolean {
+    return 0 <= index && index < this.size;
   }
 }
