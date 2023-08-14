@@ -1,16 +1,27 @@
-import { List } from "./list.ts";
+import { ListCore } from "./list.ts";
 
 /** An ordered set is a list with the additional semantic that it must not contain the same item twice.
  *
  * [Infra Living Standard](https://infra.spec.whatwg.org/#ordered-set)
  */
-export class OrderedSet<T> extends List<T> {
+export class OrderedSet<T> extends ListCore<T> {
+  #set: Set<T>;
+
+  constructor(iterable?: Iterable<T>) {
+    const set = new Set(iterable);
+    super(set);
+
+    this.#set = set;
+  }
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#set-append)
    */
   override append(item: T): void {
     // If the set contains the given item, then do nothing; otherwise, perform the normal list append operation.
-    if (!super.contains(item)) super.append(item);
+    if (!this.contains(item)) {
+      super.append(item);
+      this.#set.add(item);
+    }
   }
 
   /**
@@ -18,16 +29,71 @@ export class OrderedSet<T> extends List<T> {
    */
   override prepend(item: T): void {
     // If the set contains the given item, then do nothing; otherwise, perform the normal list prepend operation.
-    if (!super.contains(item)) super.prepend(item);
+    if (!this.contains(item)) {
+      super.prepend(item);
+      this.#set.add(item);
+    }
+  }
+
+  override contains(item: T): boolean {
+    return this.#set.has(item);
+  }
+
+  protected override create(): this {
+    return Object.assign(new OrderedSet());
   }
 
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#set-replace)
    */
-  override replace(): void {
-    // If set contains item or replacement, then replace the first instance of either with replacement and remove all other instances.
-    throw new Error("unimplemented");
+  replace(item: T, replacement: T): void {
+    const newList: T[] = [];
+    let step: Step = Step.Detecting;
+
+    for (const exist of this.list) {
+      switch (step) {
+        case Step.Detecting: {
+          if (exist === item) {
+            step = Step.MatchingLeft;
+            newList.push(replacement);
+            continue;
+          } else if (exist === replacement) {
+            step = Step.MatchingRight;
+            newList.push(replacement);
+            continue;
+          }
+
+          newList.push(exist);
+
+          continue;
+        }
+
+        case Step.MatchingLeft: {
+          if (replacement === exist) continue;
+
+          newList.push(exist);
+
+          continue;
+        }
+
+        case Step.MatchingRight: {
+          if (exist === item) continue;
+
+          newList.push(exist);
+
+          continue;
+        }
+      }
+    }
+
+    this.list = newList;
   }
+}
+
+const enum Step {
+  Detecting,
+  MatchingLeft,
+  MatchingRight,
 }
 
 export function intersection<T>(
