@@ -1,23 +1,71 @@
-import { Node, NodeType } from "./node.ts";
+import { type Document } from "./document.ts";
+import { Node, NodeStates, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
+import { type PartialBy } from "../deps.ts";
 import { type Element } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
+import {
+  $element,
+  $localName,
+  $namespace,
+  $namespacePrefix,
+  $value,
+} from "./internal.ts";
+
+export interface AttrStates {
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
+   */
+  namespace: string | null;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix
+   */
+  namespacePrefix: string | null;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-local-name
+   */
+  localName: string;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-value
+   */
+  value: string;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-element
+   */
+  element: Element | null;
+}
+
+type Optional = "namespace" | "namespacePrefix" | "value" | "element";
 
 export class Attr extends Node implements IAttr {
-  _namespace: string | null;
-  _namespacePrefix: string | null;
-  _localName: string;
-  _value = "";
-  _element: Element | null;
+  [$namespace]: string | null;
+  [$namespacePrefix]: string | null;
+  [$localName]: string;
+  [$value]: string;
+  [$element]: Element | null;
 
-  constructor(localName: string) {
+  constructor(
+    {
+      namespace = null,
+      localName,
+      namespacePrefix = null,
+      element = null,
+      value = "",
+      nodeDocument,
+    }: PartialBy<AttrStates, Optional> & NodeStates,
+  ) {
     super();
 
-    this._namespace = null;
-    this._namespacePrefix = null;
-    this._element = null;
-    this._value = "";
-    this._localName = localName;
+    this[$namespace] = namespace;
+    this[$namespacePrefix] = namespacePrefix;
+    this[$value] = value;
+    this[$localName] = localName;
+    this[$element] = element;
+    this.nodeDocument = nodeDocument;
   }
 
   /**
@@ -25,15 +73,15 @@ export class Attr extends Node implements IAttr {
    */
   get _qualifiedName(): string {
     // An attribute’s qualified name is its local name if its namespace prefix is null, and its namespace prefix, followed by ":", followed by its local name, otherwise.
-    const prefix = this._namespacePrefix;
+    const prefix = this[$namespacePrefix];
     const qualifiedName = prefix === null
       ? this.localName
-      : `${prefix}:${this._localName}`;
+      : `${prefix}:${this[$localName]}`;
 
     return qualifiedName;
   }
 
-  // override nodeDocument: Document = new Document();
+  override nodeDocument: Document;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodetype
@@ -51,7 +99,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this._value;
+    return this[$value];
   }
 
   /**
@@ -67,7 +115,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this._value;
+    return this[$value];
   }
 
   /**
@@ -87,7 +135,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this._namespace;
+    return this[$namespace];
   }
 
   /**
@@ -95,7 +143,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this._namespacePrefix;
+    return this[$namespacePrefix];
   }
 
   /**
@@ -103,7 +151,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this._localName;
+    return this[$localName];
   }
 
   /**
@@ -119,7 +167,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this._value;
+    return this[$value];
   }
 
   /**
@@ -135,7 +183,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this._element;
+    return this[$element];
   }
 
   /**
@@ -155,8 +203,8 @@ export function setAnExistingAttributeValue(
   value: string,
 ): void {
   // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (attribute._element === null) {
-    attribute._value = value;
+  if (attribute[$element] === null) {
+    attribute[$value] = value;
   } else {
     // 2. Otherwise, change attribute to value.
     changeAttributes(attribute, value);
@@ -168,13 +216,13 @@ export function setAnExistingAttributeValue(
  */
 export function changeAttributes(attribute: Attr, value: string): void {
   // 1. Let oldValue be attribute’s value.
-  const oldValue = attribute._value;
+  const oldValue = attribute[$value];
 
   // 2. Set attribute’s value to value.
-  attribute._value = value;
+  attribute[$value] = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  handleAttributesChanges(attribute, attribute._element, oldValue, value);
+  handleAttributesChanges(attribute, attribute[$element], oldValue, value);
 }
 
 /**

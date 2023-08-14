@@ -17,6 +17,7 @@ import { find } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceNode } from "./mutation.ts";
+import { $element, $localName, $namespace, $value } from "./internal.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -259,7 +260,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return attr._value;
+    return attr[$value];
   }
 
   getAttributeNS(namespace: string | null, localName: string): string | null {
@@ -448,9 +449,11 @@ export class Element extends Node implements IElement {
 
     // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
     if (attribute === null) {
-      const attribute = new Attr(qualifiedName);
-      attribute._value = value;
-      attribute.nodeDocument = this.nodeDocument;
+      const attribute = new Attr({
+        localName: qualifiedName,
+        value,
+        nodeDocument: this.nodeDocument,
+      });
 
       appendAttribute(attribute, this);
       return;
@@ -547,7 +550,7 @@ export interface Element
  */
 export function setAttribute(attr: Attr, element: Element): Attr | null {
   // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
-  if (!(attr._element === null || attr._element === element)) {
+  if (!(attr[$element] === null || attr[$element] === element)) {
     throw new DOMException(
       "The attribute is in use by another element",
       "InUseAttributeError",
@@ -556,8 +559,8 @@ export function setAttribute(attr: Attr, element: Element): Attr | null {
 
   // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
   const oldAttr = getAttributeByNamespaceAndLocalName(
-    attr._namespace,
-    attr._localName,
+    attr[$namespace],
+    attr[$localName],
     element,
   );
 
@@ -592,11 +595,14 @@ export function setAttributeValue(
 
   // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
   if (attribute === null) {
-    const attr = new Attr(localName);
-    attr._namespace = namespace;
-    attr._namespacePrefix = prefix;
-    attr._value = value;
-    attr.nodeDocument = element.nodeDocument;
+    const attr = new Attr({
+      namespace,
+      namespacePrefix: prefix,
+      localName,
+      value,
+      nodeDocument: element.nodeDocument,
+    });
+
     appendAttribute(attr, element);
     return;
   }
@@ -721,7 +727,8 @@ export function getAttributeByNamespaceAndLocalName(
   return find(
     element._attributeList,
     (attribute) =>
-      attribute._namespace === namespace && attribute._localName === localName,
+      attribute[$namespace] === namespace &&
+      attribute[$localName] === localName,
   ) ?? null;
 }
 
@@ -733,10 +740,10 @@ export function appendAttribute(attribute: Attr, element: Element): void {
   element._attributeList.append(attribute);
 
   // 2. Set attribute’s element to element.
-  attribute._element = element;
+  attribute[$element] = element;
 
   // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
-  handleAttributesChanges(attribute, element, null, attribute._value);
+  handleAttributesChanges(attribute, element, null, attribute[$value]);
 }
 
 /**

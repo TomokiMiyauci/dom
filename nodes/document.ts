@@ -269,7 +269,7 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
   createAttribute(localName: string): Attr {
-    return new Attr(localName);
+    return new Attr({ localName, nodeDocument: this });
   }
   createAttributeNS(namespace: string | null, qualifiedName: string): Attr {
     throw new UnImplemented();

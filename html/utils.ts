@@ -37,7 +37,9 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   ): Element {
     const document = new Document();
     const element = document.createElement(tagName);
-    const attributes = attrs.map(attrToAttribute);
+    const attributes = attrs.map((attribute) =>
+      attrToAttribute(attribute, document)
+    );
 
     attributes.forEach((attr) => {
       element.setAttributeNode(attr);
@@ -182,9 +184,12 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   updateNodeSourceCodeLocation(): void {}
 }
 
-function attrToAttribute(attr: Token.Attribute): Attr {
-  const attribute = new Attr(attr.name);
-  attribute.value = attr.value;
+function attrToAttribute(attr: Token.Attribute, document: Document): Attr {
+  const attribute = new Attr({
+    localName: attr.name,
+    value: attr.value,
+    nodeDocument: document,
+  });
 
   return attribute;
 }

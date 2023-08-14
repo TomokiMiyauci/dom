@@ -9,6 +9,11 @@ export { enumerate, find, ifilter, imap } from "npm:itertools";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 
+export type PartialBy<T, U = keyof T> = Omit<
+  Partial<Pick<T, U & keyof T>> & Omit<T, U & keyof T>,
+  never
+>;
+
 export function* tail<T>(iterable: IterableIterator<T>): IterableIterator<T> {
   const iterator = iterable[Symbol.iterator]();
 

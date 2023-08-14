@@ -23,6 +23,10 @@ export enum NodeType {
   NOTATION_NODE = 12,
 }
 
+export interface NodeStates {
+  nodeDocument: Document;
+}
+
 @Treeable
 export abstract class Node extends EventTarget implements INode {
   abstract nodeDocument: Document;
