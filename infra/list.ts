@@ -1,14 +1,10 @@
-/** A list is a specification type consisting of a finite ordered sequence of items.
- *
- * [Infra Living Standard](https://infra.spec.whatwg.org/#list)
- */
-export class List<T> {
+export class ListCore<T> {
   readonly [index: number]: T;
 
-  private list: T[] = [];
+  protected list: T[] = [];
 
   constructor(iterable?: Iterable<T>) {
-    if (iterable) for (const item of iterable) this.list.push(item);
+    if (iterable) for (const item of iterable) this.append(item);
 
     return new Proxy(this, {
       get: (target, prop) => {
@@ -23,7 +19,8 @@ export class List<T> {
     });
   }
 
-  /**
+  /** Add item to end of list. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-append)
    */
   append(item: T): void {
@@ -31,7 +28,8 @@ export class List<T> {
     this.list.push(item);
   }
 
-  /**
+  /** Add {@linkcode other} items to end of list. O(n)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-extend)
    */
   extend(other: List<T>): void {
@@ -39,7 +37,8 @@ export class List<T> {
     for (const item of other) this.append(item);
   }
 
-  /**
+  /** Add item to beginning of list. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-prepend)
    */
   prepend(item: T): void {
@@ -47,7 +46,8 @@ export class List<T> {
     this.list.unshift(item);
   }
 
-  /**
+  /** Add item between {@linkcode index} - 1 and {@linkcode index}. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-insert)
    */
   insert(index: number, item: T): void {
@@ -57,19 +57,8 @@ export class List<T> {
     }
   }
 
-  /**
-   * [Infra Living Standard](https://infra.spec.whatwg.org/#list-replace)
-   */
-  replace(item: T, predicate: (item: T) => boolean): void {
-    // To replace within a list that is not an ordered set is to replace all items from the list that match a given condition with the given item, or do nothing if none do.
-    for (const [index, insertedItem] of this.list.entries()) {
-      if (predicate(insertedItem)) {
-        this.list[index] = item;
-      }
-    }
-  }
-
-  /**
+  /** Remove all items that match the condition. O(n)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-remove)
    */
   remove(predicate: (item: T) => boolean): void {
@@ -77,7 +66,8 @@ export class List<T> {
     this.list = this.list.filter((value) => !predicate(value));
   }
 
-  /**
+  /** To be empty list. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-empty)
    */
   empty(): void {
@@ -85,7 +75,8 @@ export class List<T> {
     this.list.length = 0;
   }
 
-  /**
+  /** Whether the {@linkcode item} included in list or not. O(n)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-contain)
    */
   contains(item: T): boolean {
@@ -96,19 +87,6 @@ export class List<T> {
   }
 
   /**
-   * @see https://infra.spec.whatwg.org/#list-clone
-   */
-  clone(): this {
-    // create a new list clone, of the same designation,
-    const clone = new (this.constructor as typeof List<T>)() as this;
-
-    // and, for each item of list, append item to clone, so that clone contains the same items, in the same order as list.
-    for (const item of this) clone.append(item);
-
-    return clone;
-  }
-
-  /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-iterate)
    */
   *[Symbol.iterator](): IterableIterator<T> {
@@ -116,7 +94,8 @@ export class List<T> {
     yield* this.list;
   }
 
-  /**
+  /** Return list size. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-size)
    */
   get size(): number {
@@ -128,5 +107,38 @@ export class List<T> {
    */
   private isInRange(index: number): boolean {
     return 0 <= index && index < this.size;
+  }
+}
+
+/** A list is a specification type consisting of a finite ordered sequence of items.
+ *
+ * [Infra Living Standard](https://infra.spec.whatwg.org/#list)
+ */
+export class List<T> extends ListCore<T> {
+  /** Replace with {@linkcode item} if condition matches.
+   *
+   * [Infra Living Standard](https://infra.spec.whatwg.org/#list-replace)
+   */
+  replace(item: T, predicate: (item: T) => boolean): void {
+    // To replace within a list that is not an ordered set is to replace all items from the list that match a given condition with the given item, or do nothing if none do.
+    for (const [index, insertedItem] of this.list.entries()) {
+      if (predicate(insertedItem)) {
+        this.list[index] = item;
+      }
+    }
+  }
+
+  /** Return shallow copied list. O(n)
+   *
+   * @see https://infra.spec.whatwg.org/#list-clone
+   */
+  clone(): List<T> {
+    // create a new list clone, of the same designation,
+    const clone = new List<T>();
+
+    // and, for each item of list, append item to clone, so that clone contains the same items, in the same order as list.
+    for (const item of this) clone.append(item);
+
+    return clone;
   }
 }
