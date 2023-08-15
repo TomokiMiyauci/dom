@@ -47,8 +47,9 @@ enum CustomElementState {
 @ARIAMixin
 @Animatable
 @ChildNode
-@ParentNode
 @InnerHTML
+@NonDocumentTypeChildNode
+@ParentNode
 export class Element extends Node implements IElement {
   [$namespace]: Namespace | null;
   [$namespacePrefix]: string | null;
@@ -578,10 +579,10 @@ export interface Element
     ARIAMixin,
     Animatable,
     ChildNode,
+    InnerHTML,
     NonDocumentTypeChildNode,
     ParentNode,
-    Slottable,
-    InnerHTML {}
+    Slottable {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set

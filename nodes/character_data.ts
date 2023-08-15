@@ -14,6 +14,7 @@ export interface CharacterDataStates {
 }
 
 @ChildNode
+@NonDocumentTypeChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
   [$data]: string;
 
