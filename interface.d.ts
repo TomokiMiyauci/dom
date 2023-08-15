@@ -30,3 +30,4 @@ export type ICDATASection = CDATASection;
 export type IARIAMixin = ARIAMixin;
 export type IAnimatable = Animatable;
 export type IInnerHTML = InnerHTML;
+export type IGlobalEventHandlers = GlobalEventHandlers;
