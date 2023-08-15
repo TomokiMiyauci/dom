@@ -2,7 +2,7 @@ import { type Constructor } from "../deps.ts";
 import type { IARIAMixin } from "../interface.d.ts";
 
 export function ARIAMixin<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements IARIAMixin {
+  abstract class ARIAMixin extends Ctor implements IARIAMixin {
     get ariaAtomic(): string | null {
       throw new Error();
     }
@@ -232,7 +232,9 @@ export function ARIAMixin<T extends Constructor>(Ctor: T) {
     set role(value: string | null) {
       throw new Error();
     }
-  };
+  }
+
+  return ARIAMixin;
 }
 
 // deno-lint-ignore no-empty-interface

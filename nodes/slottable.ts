@@ -3,7 +3,7 @@ import { type Constructor } from "../deps.ts";
 import { UnImplemented } from "./utils.ts";
 
 export function Slottable<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements ISlottable {
+  abstract class Slottable extends Ctor implements ISlottable {
     get assignedSlot(): HTMLSlotElement | null {
       throw new UnImplemented();
     }
@@ -11,7 +11,9 @@ export function Slottable<T extends Constructor>(Ctor: T) {
     set assignedSlot(value: HTMLSlotElement | null) {
       throw new UnImplemented();
     }
-  };
+  }
+
+  return Slottable;
 }
 
 // deno-lint-ignore no-empty-interface

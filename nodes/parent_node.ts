@@ -7,8 +7,10 @@ import { matchScopedSelectorsString } from "../trees/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
 
 // deno-lint-ignore no-explicit-any
-export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
-  return class extends Ctor implements IParentNode {
+export function ParentNode<T extends abstract new (...args: any[]) => Node>(
+  Ctor: T,
+) {
+  abstract class ParentNode extends Ctor implements IParentNode {
     get childElementCount(): number {
       throw new UnImplemented();
     }
@@ -54,18 +56,12 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
     querySelector<K extends keyof HTMLElementDeprecatedTagNameMap>(
       selectors: K,
     ): HTMLElementDeprecatedTagNameMap[K] | null;
-    querySelector<E extends globalThis.Element = globalThis.Element>(
+    querySelector<E extends Element = Element>(
       selectors: string,
     ): E | null;
     querySelector(
       selectors: string,
-    ):
-      | E
-      | HTMLElementTagNameMap[K]
-      | SVGElementTagNameMap[K]
-      | MathMLElementTagNameMap[K]
-      | HTMLElementDeprecatedTagNameMap[K]
-      | null {
+    ): Element | null {
       // return the first result of running scope-match a selectors string selectors against this, if the result is not an empty list;
       return matchScopedSelectorsString(selectors, this)[0] ?? null;
     }
@@ -82,24 +78,17 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
     querySelectorAll<K extends keyof HTMLElementDeprecatedTagNameMap>(
       selectors: K,
     ): NodeListOf<HTMLElementDeprecatedTagNameMap[K]>;
-    querySelectorAll<E extends globalThis.Element = globalThis.Element>(
+    querySelectorAll<E extends Element = Element>(
       selectors: string,
     ): NodeListOf<E>;
-    querySelectorAll(selectors: string):
-      | NodeListOf<HTMLElementTagNameMap[Node]>
-      | NodeListOf<SVGElementTagNameMap[Node]>
-      | NodeListOf<MathMLElementTagNameMap[Node]>
-      | NodeListOf<HTMLElementDeprecatedTagNameMap[Node]>
-      | NodeListOf<Node>;
-    querySelectorAll(selectors: string):
-      | NodeListOf<HTMLElementTagNameMap[Node]>
-      | NodeListOf<SVGElementTagNameMap[Node]>
-      | NodeListOf<MathMLElementTagNameMap[Node]>
-      | NodeListOf<HTMLElementDeprecatedTagNameMap[Node]>
-      | NodeListOf<Node> {
+    querySelectorAll(
+      selectors: string,
+    ): NodeListOf<Element> {
       return new StaticNodeList(matchScopedSelectorsString(selectors, this));
     }
-  };
+  }
+
+  return ParentNode;
 }
 
 // deno-lint-ignore no-empty-interface

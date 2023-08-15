@@ -1,5 +1,6 @@
 import { isDocument, UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
+import type { Element } from "./element.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
@@ -8,8 +9,7 @@ import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
-
-import { IChildNode } from "../interface.d.ts";
+import { type OrderedSet } from "../infra/set.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -76,7 +76,7 @@ export abstract class Node extends EventTarget implements INode {
     >;
   }
 
-  get firstChild(): (IChildNode & INode) | null {
+  get firstChild(): (ChildNode & Node) | null {
     return this._firstChild as any;
   }
 
@@ -218,7 +218,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   appendChild<T>(node: T & Node): T {
-    return appendNode(node, this) as any;
+    return appendNode(node, this) as T;
   }
 
   replaceChild<T>(node: T & Node, child: T): T {
@@ -229,12 +229,15 @@ export abstract class Node extends EventTarget implements INode {
     return preRemoveChild(child, this);
   }
 
-  get parentElement(): any | null {
+  get parentElement(): HTMLElement | null {
     throw new UnImplemented();
   }
 }
 
-export interface Node extends Tree {}
+export interface Node extends Tree {
+  _parent: Node | null;
+  _children: OrderedSet<Node>;
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname

@@ -1,8 +1,10 @@
 import { type Constructor } from "../deps.ts";
 import type { IGlobalEventHandlers } from "../interface.d.ts";
 
-export function GlobalEventHandlers<T extends Constructor>(Ctor: T) {
-  return class extends Ctor
+export function GlobalEventHandlers<T extends Constructor>(
+  Ctor: T,
+) {
+  abstract class Mixin extends Ctor
     implements
       Omit<IGlobalEventHandlers, "addEventListener" | "removeEventListener"> {
     get onabort(): ((this: GlobalEventHandlers, ev: UIEvent) => any) | null {
@@ -876,8 +878,9 @@ export function GlobalEventHandlers<T extends Constructor>(Ctor: T) {
     ) {
       throw new Error();
     }
-  };
+  }
+
+  return Mixin;
 }
 
-// deno-lint-ignore no-empty-interface
 export interface GlobalEventHandlers extends IGlobalEventHandlers {}

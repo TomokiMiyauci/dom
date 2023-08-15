@@ -21,7 +21,7 @@ export class Comment extends CharacterData implements IComment {
    */
   constructor(data: string = "") {
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    super(data, globalThis.document);
+    super(data, globalThis.document as Document);
   }
 
   override get nodeType(): NodeType.COMMENT_NODE {

@@ -2,7 +2,7 @@ import { type Constructor } from "../deps.ts";
 import type { IAnimatable } from "../interface.d.ts";
 
 export function Animatable<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements IAnimatable {
+  abstract class Animatable extends Ctor implements IAnimatable {
     animate(
       keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
       options?: number | KeyframeAnimationOptions,
@@ -13,7 +13,9 @@ export function Animatable<T extends Constructor>(Ctor: T) {
     getAnimations(options?: GetAnimationsOptions): Animation[] {
       throw new Error();
     }
-  };
+  }
+
+  return Animatable;
 }
 
 // deno-lint-ignore no-empty-interface
