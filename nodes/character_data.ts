@@ -13,6 +13,7 @@ export interface CharacterDataStates {
   data: string;
 }
 
+@ChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
   [$data]: string;
 
@@ -110,6 +111,7 @@ export function replaceData(
   count: number,
   data: string,
 ) {
+  throw new Error();
   // 1 Let length be node’s length.
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.

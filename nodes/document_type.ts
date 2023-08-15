@@ -5,6 +5,7 @@ import { UnImplemented } from "./utils.ts";
 import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../interface.d.ts";
 
+@ChildNode
 export class DocumentType extends Node implements IDocumentType {
   #name: string;
   #publicId: string;
