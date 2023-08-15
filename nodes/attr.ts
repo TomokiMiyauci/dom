@@ -2,7 +2,7 @@ import { type Document } from "./document.ts";
 import { Node, NodeStates, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import { type PartialBy } from "../deps.ts";
-import { type Element } from "./element.ts";
+import { type Element, isCustom } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
 import {
   $element,
@@ -12,6 +12,8 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
+import { queueMutationRecord } from "./mutation_observer.ts";
+import { OrderedSet } from "../infra/set.ts";
 
 export interface AttrStates {
   /**
@@ -246,8 +248,20 @@ export function handleAttributesChanges(
   newValue: string,
 ): void {
   // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
+  queueMutationRecord(
+    "attributes",
+    element,
+    attribute[$localName],
+    attribute[$namespace],
+    oldValue,
+    new OrderedSet(),
+    new OrderedSet(),
+    null,
+    null,
+  );
 
   // 2. If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, oldValue, newValue, and attribute’s namespace.
+  if (element && isCustom(element)) throw new UnImplemented();
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
 }
