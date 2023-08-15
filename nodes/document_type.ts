@@ -57,7 +57,7 @@ export class DocumentType extends Node implements IDocumentType {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): any {
+  override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];

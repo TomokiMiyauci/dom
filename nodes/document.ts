@@ -726,6 +726,7 @@ export interface Document
     NonElementParentNode,
     XPathEvaluatorBase,
     GlobalEventHandlers {
+  getElementById(elementId: string): HTMLElement | null;
   addEventListener<K extends keyof DocumentEventMap>(
     type: K,
     listener: (this: Document, ev: DocumentEventMap[K]) => any,

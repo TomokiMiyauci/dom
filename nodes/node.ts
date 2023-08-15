@@ -53,7 +53,7 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
-  abstract get ownerDocument(): any | null;
+  abstract get ownerDocument(): Document | null;
 
   getRootNode(options?: GetRootNodeOptions | undefined): Node {
     throw new UnImplemented();
@@ -68,8 +68,10 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
-    throw new Error();
-    return new NodeList(this, () => true) as any as NodeListOf<
+    return new NodeList(
+      this,
+      (node) => this._children.contains(node),
+    ) as any as NodeListOf<
       Node & ChildNode
     >;
   }

@@ -156,7 +156,7 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): any {
+  override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];
@@ -371,8 +371,8 @@ export class Element extends Node implements IElement {
     localName: string,
   ): HTMLCollectionOf<globalThis.Element>;
   getElementsByTagNameNS(
-    namespace: unknown,
-    localName: unknown,
+    namespace: string | null,
+    localName: string,
   ):
     | HTMLCollectionOf<HTMLElement>
     | HTMLCollectionOf<SVGElement>
