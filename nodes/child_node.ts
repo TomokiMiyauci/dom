@@ -4,7 +4,7 @@ import type { IChildNode } from "../interface.d.ts";
 import { Constructor } from "../deps.ts";
 
 export function ChildNode<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements ChildNode {
+  abstract class ChildNode extends Ctor implements ChildNode {
     after(...nodes: (string | Node)[]): void {
       throw new UnImplemented();
     }
@@ -20,7 +20,9 @@ export function ChildNode<T extends Constructor>(Ctor: T) {
     remove(): void {
       throw new UnImplemented();
     }
-  };
+  }
+
+  return ChildNode;
 }
 
 // deno-lint-ignore no-empty-interface

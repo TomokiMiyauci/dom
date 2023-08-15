@@ -4,7 +4,8 @@ import type { Element } from "./element.ts";
 import { type Constructor } from "../deps.ts";
 
 export function NonDocumentTypeChildNode<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements INonDocumentTypeChildNode {
+  abstract class NonDocumentTypeChildNode extends Ctor
+    implements INonDocumentTypeChildNode {
     get nextElementSibling(): Element | null {
       throw new UnImplemented();
     }
@@ -20,7 +21,9 @@ export function NonDocumentTypeChildNode<T extends Constructor>(Ctor: T) {
     set previousElementSibling(value: Element | null) {
       throw new UnImplemented();
     }
-  };
+  }
+
+  return NonDocumentTypeChildNode;
 }
 
 // deno-lint-ignore no-empty-interface

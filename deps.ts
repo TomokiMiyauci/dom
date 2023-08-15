@@ -5,7 +5,7 @@ export {
   type TreeAdapter,
   type TreeAdapterTypeMap,
 } from "npm:parse5";
-export { enumerate, find, ifilter, imap } from "npm:itertools";
+export { enumerate, find, ifilter, imap, some, takewhile } from "npm:itertools";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 
@@ -26,4 +26,4 @@ export function isNotNull<T>(input: T): input is Exclude<T, null> {
   return input !== null;
 }
 
-export type Constructor = new (...args: any[]) => {};
+export type Constructor = abstract new (...args: any[]) => {};
