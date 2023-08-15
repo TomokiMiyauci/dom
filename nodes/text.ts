@@ -6,7 +6,7 @@ import {
   replaceData,
   substringData,
 } from "./character_data.ts";
-import { isText, UnImplemented } from "./utils.ts";
+import { isText } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
 import { List } from "../infra/list.ts";
 import { insertNode } from "./mutation.ts";
@@ -42,10 +42,6 @@ export class Text extends CharacterData implements IText {
 
   override get nodeName(): "#text" {
     return "#text";
-  }
-
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
   }
 
   protected override clone(document: Document): Text {

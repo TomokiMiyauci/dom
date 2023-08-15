@@ -77,8 +77,8 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     return this[$nodeDocument];
   }
 
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
+  protected override equals(): true {
+    return true;
   }
 
   protected override clone(document: Document): DocumentFragment {

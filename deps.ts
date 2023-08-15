@@ -5,7 +5,16 @@ export {
   type TreeAdapter,
   type TreeAdapterTypeMap,
 } from "npm:parse5";
-export { enumerate, find, ifilter, imap, some, takewhile } from "npm:itertools";
+export {
+  enumerate,
+  every,
+  find,
+  ifilter,
+  imap,
+  izip,
+  some,
+  takewhile,
+} from "npm:itertools";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 

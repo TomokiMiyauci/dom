@@ -1,6 +1,5 @@
 import { isDocument, UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
-import type { Element } from "./element.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
@@ -9,6 +8,7 @@ import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
+import { every, izip } from "../deps.ts";
 import { type OrderedSet } from "../infra/set.ts";
 
 export enum NodeType {
@@ -115,7 +115,26 @@ export abstract class Node extends EventTarget implements INode {
    */
   protected abstract clone(document: Document): Node;
 
-  abstract isEqualNode(otherNode: Node | null): boolean;
+  /** Equals to {@linkcode other} node.
+   * This is used for {@linkcode isEqualNode}.
+   */
+  protected abstract equals(other: this): boolean;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-isequalnode
+   */
+  isEqualNode(otherNode: Node | null): boolean {
+    // @optimized
+    // return true if otherNode is non-null and this equals otherNode; otherwise false.
+    return this === otherNode || (otherNode !== null &&
+      otherNode.constructor === this.constructor &&
+      this.equals(otherNode as this) &&
+      this._children.size === otherNode._children.size &&
+      every(
+        izip(this._children, otherNode._children),
+        ([left, right]) => this.isEqualNode.call(left, right),
+      ));
+  }
 
   isSameNode(otherNode: Node | null): boolean {
     throw new UnImplemented();

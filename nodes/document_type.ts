@@ -79,8 +79,10 @@ export class DocumentType extends Node implements IDocumentType {
     return this[$nodeDocument];
   }
 
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
+  protected override equals(other: this): boolean {
+    return this.#name === other.#name &&
+      this.#publicId === other.#publicId &&
+      this.#systemId === other.#systemId;
   }
 
   protected override clone(document: Document): DocumentType {
@@ -107,4 +109,5 @@ export class DocumentType extends Node implements IDocumentType {
   }
 }
 
+// deno-lint-ignore no-empty-interface
 export interface DocumentType extends ChildNode {}

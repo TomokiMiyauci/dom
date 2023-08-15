@@ -1,6 +1,11 @@
 import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
-import { Attr, changeAttributes, handleAttributesChanges } from "./attr.ts";
+import {
+  Attr,
+  changeAttributes,
+  equalsAttr,
+  handleAttributesChanges,
+} from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
@@ -12,7 +17,7 @@ import {
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { List } from "../infra/list.ts";
 import { descendantTextContent } from "./text.ts";
-import { find } from "../deps.ts";
+import { every, find, some } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
@@ -162,8 +167,19 @@ export class Element extends Node implements IElement {
     return this[$nodeDocument];
   }
 
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
+  protected override equals(other: this): boolean {
+    // Its namespace, namespace prefix, local name, and its attribute list’s size.
+    return this[$namespace] === other[$namespace] &&
+      this[$namespacePrefix] === other[$namespacePrefix] &&
+      this[$localName] === other[$localName] &&
+      this._attributeList.size === other._attributeList.size &&
+      // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
+      // TODO:(miyauci) improve performance. O(n²)
+      every(
+        this._attributeList,
+        (left) =>
+          some(other._attributeList, (right) => equalsAttr(left, right)),
+      );
   }
 
   protected override clone(document: Document): Element {

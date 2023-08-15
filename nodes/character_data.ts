@@ -55,6 +55,10 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return this[$nodeDocument];
   }
 
+  protected override equals(other: this): boolean {
+    return this[$data] === other[$data];
+  }
+
   get length(): number {
     throw new UnImplemented();
   }

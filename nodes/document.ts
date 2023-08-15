@@ -90,6 +90,10 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  protected override equals(): true {
+    return true;
+  }
+
   protected override clone(document: Document): Document {
     const doc = new Document();
 
@@ -323,9 +327,6 @@ export class Document extends Node implements IDocument {
 
   vlinkColor: string = "";
 
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
-  }
   adoptNode<T extends globalThis.Node>(node: T): T {
     throw new UnImplemented();
   }
