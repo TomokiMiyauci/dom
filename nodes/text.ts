@@ -16,6 +16,7 @@ import { orderTree } from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 
+@Slottable
 export class Text extends CharacterData implements IText {
   static [$create](
     { data, nodeDocument }: CharacterDataStates & NodeStates,
@@ -68,6 +69,7 @@ export class Text extends CharacterData implements IText {
   }
 }
 
+// deno-lint-ignore no-empty-interface
 export interface Text extends Slottable {}
 
 /**

@@ -3,7 +3,6 @@ import { UnImplemented } from "./utils.ts";
 import { Attr, changeAttributes, handleAttributesChanges } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
-import { Slottable } from "./slottable.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
 import { Document } from "./document.ts";
 import {
@@ -32,6 +31,7 @@ import { ARIAMixin } from "../wai_aria/aria_mixin.ts";
 import { Animatable } from "../web_animations/animatable.ts";
 import { InnerHTML } from "../domparsing/inner_html.ts";
 import { ChildNode } from "./child_node.ts";
+import { Slottable } from "./slottable.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -50,6 +50,7 @@ enum CustomElementState {
 @InnerHTML
 @NonDocumentTypeChildNode
 @ParentNode
+@Slottable
 export class Element extends Node implements IElement {
   [$namespace]: Namespace | null;
   [$namespacePrefix]: string | null;
