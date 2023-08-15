@@ -19,6 +19,7 @@ import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
 import {
   $create,
+  $customElementState,
   $element,
   $isValue,
   $localName,
@@ -44,7 +45,7 @@ export class Element extends Node implements IElement {
   [$namespace]: Namespace | null;
   [$namespacePrefix]: string | null;
   [$localName]: string;
-  #customElementState: CustomElementState;
+  [$customElementState]: CustomElementState;
   #customElementDefinition: CustomElementDefinition | null;
   _attributeList: List<Attr>;
   [$isValue]: string | null;
@@ -99,7 +100,7 @@ export class Element extends Node implements IElement {
     this[$namespace] = namespace;
     this[$namespacePrefix] = namespacePrefix;
     this[$localName] = localName;
-    this.#customElementState = customElementState;
+    this[$customElementState] = customElementState;
     this.#customElementDefinition = customElementDefinition;
     this[$isValue] = isValue;
     this[$nodeDocument] = document;
