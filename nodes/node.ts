@@ -9,6 +9,8 @@ import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
 
+import { IChildNode } from "../interface.d.ts";
+
 export enum NodeType {
   ELEMENT_NODE = 1,
   ATTRIBUTE_NODE = 2,
@@ -51,7 +53,7 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
-  abstract get ownerDocument(): Document | null;
+  abstract get ownerDocument(): any | null;
 
   getRootNode(options?: GetRootNodeOptions | undefined): Node {
     throw new UnImplemented();
@@ -66,15 +68,18 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
-    return new NodeList(this) as never as NodeListOf<Node & ChildNode>;
+    throw new Error();
+    return new NodeList(this, () => true) as any as NodeListOf<
+      Node & ChildNode
+    >;
   }
 
-  get firstChild(): (Node & ChildNode) | null {
-    return this._firstChild;
+  get firstChild(): (IChildNode & INode) | null {
+    return this._firstChild as any;
   }
 
   get lastChild(): (Node & ChildNode) | null {
-    return this._lastChild;
+    return this._lastChild as any;
   }
 
   get previousSibling(): (Node & ChildNode) | null {
@@ -206,19 +211,19 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
-  insertBefore<T extends Node>(node: T, child: Node | null): T {
+  insertBefore<T>(node: T & Node, child: Node | null): T {
     throw new UnImplemented();
   }
 
-  appendChild<T extends Node>(node: T): T {
-    return appendNode(node, this);
+  appendChild<T>(node: T & Node): T {
+    return appendNode(node, this) as any;
   }
 
-  replaceChild<T extends Node>(node: Node, child: T): T {
+  replaceChild<T>(node: T & Node, child: T): T {
     throw new UnImplemented();
   }
 
-  removeChild<T extends Node>(child: T): T {
+  removeChild<T>(child: T & Node): T {
     return preRemoveChild(child, this);
   }
 

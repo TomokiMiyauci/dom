@@ -9,32 +9,23 @@ import {
   $namespacePrefix,
   $value,
 } from "./internal.ts";
+import { Indexer } from "../utils.ts";
 
-export class HTMLCollection implements IHTMLCollection {
+export class HTMLCollection extends Indexer<Element | undefined>
+  implements IHTMLCollection {
   [index: number]: Element;
 
-  _root: Node;
-  _filter: (node: Element) => boolean;
+  private root: Element;
+  private filter: (node: Element) => boolean;
 
-  constructor(root: Node, filter: (node: Element) => boolean) {
-    this._root = root;
-    this._filter = filter;
-
-    return new Proxy(this, {
-      get: (target, propKey, receiver) => {
-        if (typeof propKey === "string") {
-          const number = Number.parseInt(propKey);
-
-          if (Number.isInteger(number)) return this.getItem(number);
-        }
-
-        return Reflect.get(target, propKey, receiver);
-      },
-    });
+  constructor(root: Element, filter: (node: Element) => boolean) {
+    super((index) => this.getItem(index));
+    this.root = root;
+    this.filter = filter;
   }
 
   get length(): number {
-    return getRepresent(this._root, this._filter).length;
+    return getRepresent(this.root, this.filter).length;
   }
 
   item(index: number): Element | null {
@@ -49,7 +40,7 @@ export class HTMLCollection implements IHTMLCollection {
     if (key === "") return null;
 
     // 2. Return the first element in the collection for which at least one of the following is true:
-    for (const node of getRepresent(this._root, this._filter)) {
+    for (const node of getRepresent(this.root, this.filter)) {
       if (
         // - it has an ID which is key;
         node._ID === key ||
@@ -69,11 +60,11 @@ export class HTMLCollection implements IHTMLCollection {
   }
 
   *[Symbol.iterator](): IterableIterator<Element> {
-    yield* getRepresent(this._root, this._filter);
+    yield* getRepresent(this.root, this.filter);
   }
 
   private getItem(index: number): Element | undefined {
-    return getRepresent(this._root, this._filter)[index];
+    return getRepresent(this.root, this.filter)[index];
   }
 }
 

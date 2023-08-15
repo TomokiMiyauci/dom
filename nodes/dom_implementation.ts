@@ -6,7 +6,7 @@ import { createElement } from "./element.ts";
 import { appendNode } from "./mutation.ts";
 import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $document, $nodeDocument, $origin } from "./internal.ts";
+import { $create, $document, $nodeDocument, $origin } from "./internal.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   [$document]!: Document;
@@ -37,7 +37,7 @@ export class DOMImplementation implements IDOMImplementation {
   /**
    * @see https://dom.spec.whatwg.org/#dom-domimplementation-createhtmldocument
    */
-  createHTMLDocument(title?: string | undefined): Document {
+  createHTMLDocument(title?: string | undefined): any {
     // 1. Let doc be a new document that is an HTML document.
     const doc = new Document();
     doc._type === "html";
@@ -66,7 +66,10 @@ export class DOMImplementation implements IDOMImplementation {
       appendNode(titleElement, headElement);
 
       // 2. Append a new Text node, with its data set to title (which could be the empty string) and its node document set to doc, to the title element created earlier.
-      appendNode(new Text(title, doc), titleElement);
+      appendNode(
+        Text[$create]({ data: title, nodeDocument: doc }),
+        titleElement,
+      );
     }
 
     // 7. Append the result of creating an element given doc, body, and the HTML namespace, to the html element created earlier.

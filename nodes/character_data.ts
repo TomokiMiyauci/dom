@@ -49,7 +49,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): Document {
+  override get ownerDocument(): any {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];
@@ -83,10 +83,6 @@ export abstract class CharacterData extends Node implements ICharacterData {
   }
 
   insertData(offset: number, data: string): void {
-    throw new UnImplemented();
-  }
-
-  replaceChild<T extends Node>(node: Node, child: T): T {
     throw new UnImplemented();
   }
 

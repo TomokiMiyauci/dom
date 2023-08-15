@@ -17,6 +17,7 @@ import { find } from "../deps.ts";
 import {
   $create,
   $implementation,
+  $localName,
   $nodeDocument,
   $origin,
   $URL,
@@ -99,7 +100,6 @@ export class Document extends Node implements IDocument {
   }
 
   get URL(): string {
-    console.log(333);
     throw new UnImplemented();
   }
 
@@ -118,7 +118,25 @@ export class Document extends Node implements IDocument {
   }
 
   bgColor: string = "";
-  body: HTMLElement;
+
+  /** */
+  get body(): HTMLElement {
+    // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
+    const documentElement = find(this._children, isElement);
+
+    if (!documentElement) return null;
+
+    if (documentElement[$localName] !== "html") return null;
+
+    return find(
+      documentElement._children,
+      (v) => ["body", "frameset"].includes(v[$localName]),
+    ) ?? null;
+  }
+
+  set body(value: HTMLElement) {
+    throw new UnImplemented();
+  }
 
   get characterSet(): string {
     throw new UnImplemented();
@@ -382,11 +400,8 @@ export class Document extends Node implements IDocument {
   ): HTMLElement;
   createElement(
     tagName: string,
-    options?: unknown,
-  ):
-    | HTMLElementTagNameMap[K]
-    | HTMLElementDeprecatedTagNameMap[K]
-    | HTMLElement {
+    options?: ElementCreationOptions | undefined,
+  ): Element {
     // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
     // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
 
@@ -439,16 +454,10 @@ export class Document extends Node implements IDocument {
     options?: string | ElementCreationOptions | undefined,
   ): Element;
   createElementNS(
-    namespace: Namespace | null,
+    namespace: string | null,
     qualifiedName: string,
-    options?: string | ElementCreationOptions,
-  ):
-    | HTMLElement
-    | Element
-    | SVGElementTagNameMap[K]
-    | SVGElement
-    | MathMLElementTagNameMap[K]
-    | MathMLElement {
+    options?: string | ElementCreationOptions | undefined,
+  ): Element {
     // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
     return internalCreateElement(this, namespace, qualifiedName, options);
   }
@@ -529,64 +538,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "WebGLContextEvent"): WebGLContextEvent;
   createEvent(eventInterface: "WheelEvent"): WheelEvent;
   createEvent(eventInterface: string): Event;
-  createEvent(eventInterface: unknown):
-    | Event
-    | AnimationEvent
-    | AnimationPlaybackEvent
-    | AudioProcessingEvent
-    | BeforeUnloadEvent
-    | BlobEvent
-    | ClipboardEvent
-    | CloseEvent
-    | CompositionEvent
-    | UIEvent
-    | CustomEvent<any>
-    | DeviceMotionEvent
-    | DeviceOrientationEvent
-    | DragEvent
-    | MouseEvent
-    | ErrorEvent
-    | FocusEvent
-    | FontFaceSetLoadEvent
-    | FormDataEvent
-    | GamepadEvent
-    | HashChangeEvent
-    | IDBVersionChangeEvent
-    | InputEvent
-    | KeyboardEvent
-    | MIDIConnectionEvent
-    | MIDIMessageEvent
-    | MediaEncryptedEvent
-    | MediaKeyMessageEvent
-    | MediaQueryListEvent
-    | MediaStreamTrackEvent
-    | MessageEvent<any>
-    | MutationEvent
-    | OfflineAudioCompletionEvent
-    | PageTransitionEvent
-    | PaymentMethodChangeEvent
-    | PaymentRequestUpdateEvent
-    | PictureInPictureEvent
-    | PointerEvent
-    | PopStateEvent
-    | ProgressEvent<EventTarget>
-    | PromiseRejectionEvent
-    | RTCDTMFToneChangeEvent
-    | RTCDataChannelEvent
-    | RTCErrorEvent
-    | RTCPeerConnectionIceErrorEvent
-    | RTCPeerConnectionIceEvent
-    | RTCTrackEvent
-    | SecurityPolicyViolationEvent
-    | SpeechSynthesisErrorEvent
-    | SpeechSynthesisEvent
-    | StorageEvent
-    | SubmitEvent
-    | TouchEvent
-    | TrackEvent
-    | TransitionEvent
-    | WebGLContextEvent
-    | WheelEvent {
+  createEvent(eventInterface: string): Event {
     throw new UnImplemented();
   }
 
@@ -669,14 +621,7 @@ export class Document extends Node implements IDocument {
     qualifiedName: K,
   ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
-  getElementsByTagName(
-    qualifiedName: string,
-  ):
-    | HTMLCollectionOf<HTMLElementTagNameMap[K]>
-    | HTMLCollectionOf<SVGElementTagNameMap[K]>
-    | HTMLCollectionOf<MathMLElementTagNameMap[K]>
-    | HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>
-    | HTMLCollectionOf<Element> {
+  getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element> {
     return getElementsByQualifiedName(qualifiedName, this);
   }
 
@@ -719,7 +664,7 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  importNode<T extends Node>(node: T, deep?: boolean | undefined): T {
+  importNode<T>(node: T & Node, deep?: boolean | undefined): T {
     throw new UnImplemented();
   }
 
@@ -780,7 +725,28 @@ export interface Document
     ParentNode,
     NonElementParentNode,
     XPathEvaluatorBase,
-    GlobalEventHandlers {}
+    GlobalEventHandlers {
+  addEventListener<K extends keyof DocumentEventMap>(
+    type: K,
+    listener: (this: Document, ev: DocumentEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  removeEventListener<K extends keyof DocumentEventMap>(
+    type: K,
+    listener: (this: Document, ev: DocumentEventMap[K]) => any,
+    options?: boolean | EventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void;
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps

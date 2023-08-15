@@ -1,34 +1,49 @@
 import { Node } from "./node.ts";
 import { enumerate, type Public } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
-import { type Element } from "./element.ts";
 
 export class NodeList implements INodeList {
   [k: number]: Node;
 
-  _root: Node;
-  _filter: (node: Node) => boolean;
+  #root: Node;
+  #filter: (node: Node) => boolean;
 
   constructor(root: Node, filter: (node: Node) => boolean) {
-    this._root = root;
-    this._filter = filter;
+    this.#root = root;
+    this.#filter = filter;
   }
 
   get length(): number {
-    return this._root._children.size;
+    return this.#root._children.size;
   }
 
   item(index: number): Node | null {
-    return this._root._children[index];
+    return this.#root._children[index] ?? null;
   }
 
   forEach(
     callbackfn: (value: Node, key: number, parent: Public<NodeList>) => void,
     thisArg?: any,
   ): void {
-    for (const [index, child] of enumerate(this._root._children)) {
+    for (const [index, child] of enumerate(this.#root._children)) {
       callbackfn.call(thisArg, child, index, this);
     }
+  }
+
+  entries(): IterableIterator<[number, Node]> {
+    throw new Error();
+  }
+
+  keys(): IterableIterator<number> {
+    throw new Error();
+  }
+
+  values(): IterableIterator<Node> {
+    throw new Error();
+  }
+
+  *[Symbol.iterator](): IterableIterator<Node> {
+    throw new Error();
   }
 }
 
@@ -39,16 +54,22 @@ export interface NodeListOf<T extends Node> extends Public<NodeList> {
     callbackfn: (value: T, key: number, parent: NodeListOf<T>) => void,
     thisArg?: any,
   ): void;
+  entries(): IterableIterator<[number, T]>;
+  keys(): IterableIterator<number>;
+  values(): IterableIterator<T>;
+  [Symbol.iterator](): IterableIterator<T>;
 }
 
 export class StaticNodeList implements INodeList {
-  #items: Element[];
+  [k: number]: Node;
 
-  constructor(ref: Element[]) {
+  #items: Node[];
+
+  constructor(ref: Node[]) {
     this.#items = ref;
   }
 
-  item(index: number): Element | null {
+  item(index: number): Node | null {
     return this.#items[index] ?? null;
   }
 
@@ -57,13 +78,28 @@ export class StaticNodeList implements INodeList {
   }
 
   forEach(
-    callbackfn: (value: Node, key: number, parent: any) => void,
+    callbackfn: (value: Node, key: number, parent: Public<NodeList>) => void,
     thisArg?: any,
   ): void {
-    this.#items.forEach(callbackfn, thisArg);
+    this.#items.forEach(
+      (node, index) => callbackfn(node, index, this),
+      thisArg,
+    );
   }
 
-  *[Symbol.iterator]() {
+  entries(): IterableIterator<[number, Node]> {
+    throw new Error();
+  }
+
+  keys(): IterableIterator<number> {
+    throw new Error();
+  }
+
+  values(): IterableIterator<Node> {
+    throw new Error();
+  }
+
+  *[Symbol.iterator](): IterableIterator<Node> {
     yield* this.#items;
   }
 }

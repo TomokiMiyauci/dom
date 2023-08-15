@@ -156,7 +156,7 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): Document {
+  override get ownerDocument(): any {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];
@@ -273,17 +273,12 @@ export class Element extends Node implements IElement {
   closest<K extends keyof MathMLElementTagNameMap>(
     selector: K,
   ): MathMLElementTagNameMap[K] | null;
-  closest<E extends globalThis.Element = globalThis.Element>(
+  closest<E extends Element = Element>(
     selectors: string,
   ): E | null;
-  closest(
-    selectors: unknown,
-  ):
-    | E
-    | HTMLElementTagNameMap[K]
-    | SVGElementTagNameMap[K]
-    | MathMLElementTagNameMap[K]
-    | null {
+  closest<E extends Element = Element>(
+    selectors: string,
+  ): E | null {
     throw new UnImplemented();
   }
 
@@ -352,15 +347,10 @@ export class Element extends Node implements IElement {
   ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
   getElementsByTagName(
     qualifiedName: string,
-  ): HTMLCollectionOf<globalThis.Element>;
+  ): HTMLCollectionOf<Element>;
   getElementsByTagName(
     qualifiedName: string,
-  ):
-    | HTMLCollectionOf<HTMLElementTagNameMap[K]>
-    | HTMLCollectionOf<SVGElementTagNameMap[K]>
-    | HTMLCollectionOf<MathMLElementTagNameMap[K]>
-    | HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>
-    | HTMLCollectionOf<globalThis.Element> {
+  ): HTMLCollectionOf<Element> {
     return getElementsByQualifiedName(qualifiedName, this);
   }
 
@@ -551,31 +541,35 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  addEventListener(
+  override addEventListener(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions | undefined,
   ): void;
-  addEventListener(
+  override addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions | undefined,
   ): void;
-  addEventListener(type: unknown, listener: unknown, options?: unknown): void {
+  override addEventListener(
+    type: unknown,
+    listener: unknown,
+    options?: unknown,
+  ): void {
     throw new UnImplemented();
   }
 
-  removeEventListener(
+  override removeEventListener(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
     options?: boolean | EventListenerOptions | undefined,
   ): void;
-  removeEventListener(
+  override removeEventListener(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
     options?: boolean | EventListenerOptions | undefined,
   ): void;
-  removeEventListener(
+  override removeEventListener(
     type: unknown,
     callback: unknown,
     options?: unknown,

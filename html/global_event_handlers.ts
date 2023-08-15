@@ -2,7 +2,9 @@ import { type Constructor } from "../deps.ts";
 import type { IGlobalEventHandlers } from "../interface.d.ts";
 
 export function GlobalEventHandlers<T extends Constructor>(Ctor: T) {
-  return class extends Ctor implements IGlobalEventHandlers {
+  return class extends Ctor
+    implements
+      Omit<IGlobalEventHandlers, "addEventListener" | "removeEventListener"> {
     get onabort(): ((this: GlobalEventHandlers, ev: UIEvent) => any) | null {
       throw new Error();
     }
@@ -874,33 +876,6 @@ export function GlobalEventHandlers<T extends Constructor>(Ctor: T) {
     ) {
       throw new Error();
     }
-
-    addEventListener<K extends keyof GlobalEventHandlersEventMap>(
-      type: K,
-      listener: (
-        this: GlobalEventHandlers,
-        ev: GlobalEventHandlersEventMap[K],
-      ) => any,
-      options?: boolean | AddEventListenerOptions,
-    ): void;
-    addEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | AddEventListenerOptions,
-    ): void;
-    removeEventListener<K extends keyof GlobalEventHandlersEventMap>(
-      type: K,
-      listener: (
-        this: GlobalEventHandlers,
-        ev: GlobalEventHandlersEventMap[K],
-      ) => any,
-      options?: boolean | EventListenerOptions,
-    ): void;
-    removeEventListener(
-      type: string,
-      listener: EventListenerOrEventListenerObject,
-      options?: boolean | EventListenerOptions,
-    ): void;
   };
 }
 
