@@ -29,3 +29,4 @@ export type INodeList = NodeList;
 export type IHTMLCollection = HTMLCollection;
 export type IDOMParser = DOMParser;
 export type IDOMImplementation = DOMImplementation;
+export type ICDATASection = CDATASection;
