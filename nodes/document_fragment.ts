@@ -5,6 +5,8 @@ import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { UnImplemented } from "./utils.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
 import { $create, $host, $nodeDocument } from "./internal.ts";
+import { descendantTextContent } from "./text.ts";
+import { replaceAllString } from "./element.ts";
 
 @ParentNode
 /**
@@ -52,15 +54,18 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
-  override get textContent(): null {
-    return null;
+  override get textContent(): string {
+    return descendantTextContent(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override set textContent(value: string | null) {
-    throw new UnImplemented();
+    value ??= "";
+
+    // String replace all with the given value within this.
+    replaceAllString(value, this);
   }
 
   override isEqualNode(otherNode: Node | null): boolean {
