@@ -22,6 +22,8 @@ import {
   $URL,
 } from "./internal.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
+import { CDATASection } from "./cdata_section.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -325,9 +327,30 @@ export class Document extends Node implements IDocument {
   createAttributeNS(namespace: string | null, qualifiedName: string): Attr {
     throw new UnImplemented();
   }
-  createCDATASection(data: string): any {
-    throw new UnImplemented();
+
+  /**
+   * @throws {@linkcode DOMException}
+   *
+   * @see https://dom.spec.whatwg.org/#dom-document-createcdatasection
+   */
+  createCDATASection(data: string): CDATASection {
+    // 1. If this is an HTML document, then throw a "NotSupportedError" DOMException.
+    if (isHTMLDocument(this)) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 2. If data contains the string "]]>", then throw an "InvalidCharacterError" DOMException.
+    if (data.includes("]]")) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
+
+    // 3. Return a new CDATASection node with its data set to data and node document set to this.
+    return CDATASection[$create]({ data, nodeDocument: this });
   }
+
   createComment(data: string): Comment {
     return new Comment(data);
   }
@@ -776,4 +799,12 @@ export function internalCreateElement(
 
   // 4. Return the result of creating an element given document, localName, namespace, prefix, is, and with the synchronous custom elements flag set.
   return createElement(document, localName, $namespace, prefix, is);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#html-document
+ */
+export function isHTMLDocument(document: Document): boolean {
+  // type is "xml"; otherwise an HTML document.
+  return document._type !== "xml";
 }
