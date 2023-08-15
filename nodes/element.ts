@@ -28,6 +28,7 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
+import { ARIAMixin } from "../wai_aria/aria_mixin.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -41,6 +42,7 @@ enum CustomElementState {
 }
 
 @ParentNode
+@ARIAMixin
 export class Element extends Node implements IElement {
   [$namespace]: Namespace | null;
   [$namespacePrefix]: string | null;
@@ -566,7 +568,7 @@ export class Element extends Node implements IElement {
 }
 
 export interface Element
-  extends NonDocumentTypeChildNode, ParentNode, Slottable {}
+  extends NonDocumentTypeChildNode, ParentNode, Slottable, ARIAMixin {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
