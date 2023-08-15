@@ -33,7 +33,7 @@ export class Text extends CharacterData implements IText {
    */
   constructor(data: string = "") {
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    super(data, globalThis.document);
+    super(data, globalThis.document as Document);
   }
 
   override get nodeType(): NodeType.TEXT_NODE {
@@ -90,7 +90,10 @@ export function splitText(node: Text, offset: number): Text {
   const newData = substringData(node, offset, count);
 
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
-  const newNode = new Text(newData, node[$nodeDocument]);
+  const newNode = Text[$create]({
+    data: newData,
+    nodeDocument: node[$nodeDocument],
+  });
 
   // 6 Let parent be node’s parent.
   const parent = node._parent;
