@@ -1,5 +1,18 @@
 import type { ISlottable } from "../interface.d.ts";
+import { type Constructor } from "../deps.ts";
+import { UnImplemented } from "./utils.ts";
 
-export class Slottable implements ISlottable {
-  assignedSlot: any | null;
+export function Slottable<T extends Constructor>(Ctor: T) {
+  return class extends Ctor implements ISlottable {
+    get assignedSlot(): HTMLSlotElement | null {
+      throw new UnImplemented();
+    }
+
+    set assignedSlot(value: HTMLSlotElement | null) {
+      throw new UnImplemented();
+    }
+  };
 }
+
+// deno-lint-ignore no-empty-interface
+export interface Slottable extends ISlottable {}
