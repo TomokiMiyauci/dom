@@ -775,7 +775,7 @@ export interface Document
   extends
     DocumentOrShadowRoot,
     FontFaceSource,
-    IParentNode,
+    ParentNode,
     NonElementParentNode,
     XPathEvaluatorBase {}
 

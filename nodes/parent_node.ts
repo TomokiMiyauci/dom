@@ -101,3 +101,6 @@ export function ParentNode<T extends { new (...args: any[]): Node }>(Ctor: T) {
     }
   };
 }
+
+// deno-lint-ignore no-empty-interface
+export interface ParentNode extends IParentNode {}
