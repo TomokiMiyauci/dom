@@ -813,3 +813,11 @@ export function replaceAllString(string: string, parent: Node): void {
   // 3. Replace all with node within parent.
   replaceAllNode(node, parent);
 }
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-custom
+ */
+export function isCustom(element: Element): boolean {
+  // An element whose custom element state is "custom
+  return element[$customElementState] === CustomElementState.Custom;
+}
