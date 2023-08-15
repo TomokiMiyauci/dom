@@ -1,28 +1,44 @@
-import { Node, NodeType } from "./node.ts";
+import { Node, NodeStates, NodeType } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
 import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../interface.d.ts";
+import type { PartialBy } from "../deps.ts";
+
+export interface DocumentTypeStates {
+  name: string;
+
+  /**
+   * @default ""
+   */
+  publicId: string;
+
+  /**
+   * @default ""
+   */
+  systemId: string;
+}
+
+type Optional = "publicId" | "systemId";
 
 @ChildNode
 export class DocumentType extends Node implements IDocumentType {
-  #name: string;
-  #publicId: string;
-  #systemId: string;
+  readonly #name: string;
+  readonly #publicId: string;
+  readonly #systemId: string;
 
   constructor(
-    name: string,
-    publicId: string,
-    systemId: string,
-    document: Document,
+    { name, publicId = "", systemId = "", nodeDocument }:
+      & PartialBy<DocumentTypeStates, Optional>
+      & NodeStates,
   ) {
     super();
 
     this.#name = name;
     this.#publicId = publicId;
     this.#systemId = systemId;
-    this[$nodeDocument] = document;
+    this[$nodeDocument] = nodeDocument;
   }
 
   override [$nodeDocument]: Document;
@@ -69,10 +85,12 @@ export class DocumentType extends Node implements IDocumentType {
 
   protected override clone(document: Document): DocumentType {
     return new DocumentType(
-      this.#name,
-      this.#publicId,
-      this.#systemId,
-      document,
+      {
+        name: this.#name,
+        publicId: this.#publicId,
+        systemId: this.#systemId,
+        nodeDocument: document,
+      },
     );
   }
 
