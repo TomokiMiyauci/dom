@@ -1,10 +1,10 @@
-import { Node, NodeType } from "./node.ts";
+import { Node, NodeStates, NodeType } from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { type Document } from "./document.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { UnImplemented } from "./utils.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
-import { $host, $nodeDocument } from "./internal.ts";
+import { $create, $host, $nodeDocument } from "./internal.ts";
 
 @ParentNode
 /**
@@ -12,12 +12,13 @@ import { $host, $nodeDocument } from "./internal.ts";
  */
 export class DocumentFragment extends Node implements IDocumentFragment {
   [$host]: Element | null = null;
-  override [$nodeDocument]: Document;
+  override [$nodeDocument]!: Document;
 
-  constructor(document: Document) {
-    super();
+  static [$create](states: NodeStates): DocumentFragment {
+    const node = new DocumentFragment();
+    node[$nodeDocument] = states.nodeDocument;
 
-    this[$nodeDocument] = document;
+    return node;
   }
 
   /**
@@ -67,7 +68,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   }
 
   protected override clone(document: Document): DocumentFragment {
-    return new DocumentFragment(document);
+    return DocumentFragment[$create]({ nodeDocument: document });
   }
 }
 

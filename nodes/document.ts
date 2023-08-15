@@ -354,8 +354,13 @@ export class Document extends Node implements IDocument {
   createComment(data: string): Comment {
     return new Comment(data);
   }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createdocumentfragment
+   */
   createDocumentFragment(): DocumentFragment {
-    return new DocumentFragment(this);
+    // return a new DocumentFragment node whose node document is this.
+    return DocumentFragment[$create]({ nodeDocument: this });
   }
 
   /**

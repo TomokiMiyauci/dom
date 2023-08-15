@@ -22,12 +22,14 @@ export type DOMTreeAdapterMap = TreeAdapterTypeMap<
 >;
 
 export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
+  constructor(public document: Document) {}
+
   createDocument(): Document {
-    return new Document();
+    return this.document;
   }
 
   createDocumentFragment(): DocumentFragment {
-    return new DocumentFragment();
+    return this.createDocumentFragment();
   }
 
   createElement(
@@ -35,10 +37,9 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     namespaceURI: html.NS,
     attrs: Token.Attribute[],
   ): Element {
-    const document = new Document();
-    const element = document.createElement(tagName);
+    const element = this.document.createElement(tagName);
     const attributes = attrs.map((attribute) =>
-      attrToAttribute(attribute, document)
+      attrToAttribute(attribute, this.document)
     );
 
     attributes.forEach((attr) => {
@@ -99,11 +100,9 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     newNode: ChildNode,
     referenceNode: ChildNode,
   ): void {
-    console.log(2);
   }
 
   adoptAttributes(recipient: Element, attrs: Token.Attribute[]): void {
-    console.log(2);
   }
 
   isTextNode(node: Node): node is Text {
@@ -127,7 +126,6 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     text: string,
     referenceNode: ChildNode,
   ): void {
-    console.log(2);
   }
 
   appendChild(parentNode: Element, newNode: ChildNode): void {
