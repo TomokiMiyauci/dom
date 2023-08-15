@@ -11,7 +11,7 @@ import { createElement } from "./element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
-import { type IDocument, type IParentNode } from "../interface.d.ts";
+import { type IDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find } from "../deps.ts";
 import {
@@ -24,6 +24,7 @@ import {
 import { DOMImplementation } from "./dom_implementation.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { CDATASection } from "./cdata_section.ts";
+import { GlobalEventHandlers } from "../html/global_event_handlers.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -37,6 +38,7 @@ export interface TupleOrigin {
 
 @ParentNode
 @NonElementParentNode
+@GlobalEventHandlers
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
@@ -777,7 +779,8 @@ export interface Document
     FontFaceSource,
     ParentNode,
     NonElementParentNode,
-    XPathEvaluatorBase {}
+    XPathEvaluatorBase,
+    GlobalEventHandlers {}
 
 /**
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps
