@@ -129,6 +129,15 @@ export class Attr extends Node implements IAttr {
     setAnExistingAttributeValue(this, value);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
+   */
+  override get ownerDocument(): Document {
+    // return null, if this is a document; otherwise this’s node document.
+    // Document should override this.
+    return this[$nodeDocument];
+  }
+
   override isEqualNode(otherNode: Node | null): boolean {
     throw new UnImplemented();
   }

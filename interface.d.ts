@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
-export type IDocument = Omit<Document, keyof GlobalEventHandlers>;
+export type IDocument = Document;
 export type IElement = Element;
 export type INode = Node;
 export type IAttr = Attr;

@@ -46,6 +46,15 @@ export abstract class CharacterData extends Node implements ICharacterData {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
+   */
+  override get ownerDocument(): Document {
+    // return null, if this is a document; otherwise this’s node document.
+    // Document should override this.
+    return this[$nodeDocument];
+  }
+
   get length(): number {
     throw new UnImplemented();
   }
