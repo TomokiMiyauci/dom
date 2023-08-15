@@ -30,6 +30,7 @@ import {
 } from "./internal.ts";
 import { ARIAMixin } from "../wai_aria/aria_mixin.ts";
 import { Animatable } from "../web_animations/animatable.ts";
+import { InnerHTML } from "../domparsing/inner_html.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -45,6 +46,7 @@ enum CustomElementState {
 @ParentNode
 @ARIAMixin
 @Animatable
+@InnerHTML
 export class Element extends Node implements IElement {
   [$namespace]: Namespace | null;
   [$namespacePrefix]: string | null;
@@ -575,7 +577,8 @@ export interface Element
     ParentNode,
     Slottable,
     ARIAMixin,
-    Animatable {}
+    Animatable,
+    InnerHTML {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set

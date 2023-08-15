@@ -2,10 +2,7 @@
 /// <reference lib="dom.iterable" />
 
 export type IDocument = Omit<Document, keyof GlobalEventHandlers>;
-export type IElement = Omit<
-  Element,
-  keyof InnerHTML
->;
+export type IElement = Element;
 export type INode = Node;
 export type IAttr = Attr;
 export type IText = Text;
