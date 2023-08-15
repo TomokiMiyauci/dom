@@ -4,9 +4,9 @@
 export type IDocument = Omit<Document, keyof GlobalEventHandlers>;
 export type IElement = Omit<
   Element,
-  keyof Animatable | keyof InnerHTML
+  keyof InnerHTML
 >;
-export type INode = Omit<Node, keyof EventTarget>;
+export type INode = Node;
 export type IAttr = Attr;
 export type IText = Text;
 export type IComment = Comment;
@@ -31,3 +31,4 @@ export type IDOMParser = DOMParser;
 export type IDOMImplementation = DOMImplementation;
 export type ICDATASection = CDATASection;
 export type IARIAMixin = ARIAMixin;
+export type IAnimatable = Animatable;
