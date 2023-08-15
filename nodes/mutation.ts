@@ -1,12 +1,21 @@
-import { isDocumentFragment } from "./utils.ts";
+import {
+  isCharacterData,
+  isDocument,
+  isDocumentFragment,
+  isDocumentType,
+  isElement,
+  isText,
+} from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { $nodeDocument } from "./internal.ts";
 import { OrderedSet } from "../infra/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { orderTreeChildren } from "../trees/tree.ts";
+import { hasParent, orderTreeChildren } from "../trees/tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
+import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
+import { ifilter, some, takewhile } from "../deps.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -91,7 +100,7 @@ export function insertNode(
   }
 
   // 6. Let previousSibling be child’s previous sibling or parent’s last child if child is null.
-  const previousSibling = child ? child.previousSibling : parent.lastChild;
+  const previousSibling = child ? child._previousSibling : parent._lastChild;
 
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) {
@@ -137,33 +146,69 @@ export function insertNode(
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-ensure-pre-insertion-validity
  */
-function ensurePreInsertionValidity(
+export function ensurePreInsertionValidity(
   node: Node,
   parent: Node,
   child: Child,
 ): never {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
+  if (
+    !(isDocument(parent) || isDocumentFragment(parent) || isElement(parent))
+  ) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
   // 2. If node is a host-including inclusive ancestor of parent, then throw a "HierarchyRequestError" DOMException.
+  if (isHostIncludingInclusiveAncestorOf(node, parent)) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
   // 3. If child is non-null and its parent is not parent, then throw a "NotFoundError" DOMException.
+  if (child !== null && child._parent !== parent) {
+    throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+  }
 
   // 4. If node is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
+  if (
+    !(isDocumentFragment(node) || isDocumentType(node) || isElement(node) ||
+      isCharacterData(node))
+  ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 5. If either node is a Text node and parent is a document, or node is a doctype and parent is not a document, then throw a "HierarchyRequestError" DOMException.
+  if (
+    (isText(node) && isDocument(parent)) ||
+    (isDocumentType(node) && !isDocument(parent))
+  ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 6. If parent is a document, and any of the statements below, switched on the interface node implements, are true, then throw a "HierarchyRequestError" DOMException.
+  if (isDocument(parent)) {
+    // DocumentFragment
+    if (isDocumentFragment(node)) {
+      const elementsCount = [...takewhile(node._children, isElement)].length;
 
-  // DocumentFragment
-  // If node has more than one element child or has a Text node child.
+      // If node has more than one element child or has a Text node child.
+      if (elementsCount > 1 || some(node._children, isText)) {
+        throw new DOMException();
+      }
 
-  // Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
+      // Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
+      if (
+        elementsCount === 1 &&
+        ([...(ifilter(ifilter(parent._children, isElement), isNotEqualsChild))]
+          .length) // TODO child is non-null and a doctype is following child.
+      ) throw new DOMException();
+      // Element
+    } else if (isElement(node)) {
+      // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
+    } // DocumentType
+    else if (isDocumentType(node)) {
+      // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
+    }
+  }
 
-  // Element
-  // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
-
-  // DocumentType
-  // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
+  function isNotEqualsChild(other: unknown) {
+    return child !== other;
+  }
 }
 
 /**
@@ -247,8 +292,9 @@ export function removeNode(
   suppressObservers: boolean | null = null,
 ) {
   // 1. Let parent be node’s parent.
+  const parent = node._parent;
   // 2. Assert: parent is non-null.
-  const parent = node._parent!;
+  if (!parent) return;
 
   // 3. Let index be node’s index.
   const index = node._index;
@@ -326,7 +372,7 @@ export function adoptNode(node: Node, document: Document): void {
   const oldDocument = node[$nodeDocument];
 
   // 2. If node’s parent is non-null, then remove node.
-  if (node._parent !== null) removeNode(node);
+  if (hasParent(node)) removeNode(node);
 
   // 3. If document is not oldDocument, then:
   if (document !== oldDocument) {
