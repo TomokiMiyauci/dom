@@ -6,6 +6,54 @@ import { OrderedSet } from "../infra/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { orderTreeChildren } from "../trees/tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
+import type { Child } from "./types.ts";
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-node-replace
+ */
+export function replaceChild(
+  child: Child,
+  node: Node,
+  parent: Node,
+): void {
+  // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
+
+  // 2. If node is a host-including inclusive ancestor of parent, then throw a "HierarchyRequestError" DOMException.
+
+  // 3. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
+
+  // 4. If node is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
+
+  // 5. If either node is a Text node and parent is a document, or node is a doctype and parent is not a document, then throw a "HierarchyRequestError" DOMException.
+
+  // 6. If parent is a document, and any of the statements below, switched on the interface node implements, are true, then throw a "HierarchyRequestError" DOMException.
+  // DocumentFragment
+  // If node has more than one element child or has a Text node child.
+
+  // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
+
+  // Element
+  // parent has an element child that is not child or a doctype is following child.
+
+  // DocumentType
+  // parent has a doctype child that is not child, or an element is preceding child.
+
+  // 7. Let referenceChild be child’s next sibling.
+
+  // 8. If referenceChild is node, then set referenceChild to node’s next sibling.
+
+  // 9. Let previousSibling be child’s previous sibling.
+
+  // 10. Let removedNodes be the empty set.
+
+  // 11. If child’s parent is non-null, then:
+
+  // 12. Set removedNodes to « child ».
+
+  // 13. Remove child with the suppress observers flag set.
+
+  throw new Error();
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-insert
@@ -17,8 +65,9 @@ export function insertNode(
   suppressObservers: boolean | null = null,
 ) {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
-  // TODO
-  const nodes = isDocumentFragment(node) ? node.children : new Set([node]);
+  const nodes = isDocumentFragment(node)
+    ? node._children
+    : new OrderedSet([node]);
 
   // 2. Let count be nodes’s size.
   const count = nodes.size;
@@ -29,9 +78,10 @@ export function insertNode(
   // 4. If node is a DocumentFragment node, then:
   if (isDocumentFragment(node)) {
     // 1. Remove its children with the suppress observers flag set.
-    removeNode(node._children, suppressObservers);
+    for (const child of node._children) removeNode(child, suppressObservers);
 
     // 2. Queue a tree mutation record for node with « », nodes, null, and null.
+    queueTreeMutationRecord(node, new OrderedSet(), nodes, null, null);
   }
 
   // 5. If child is non-null, then:
@@ -71,6 +121,15 @@ export function insertNode(
   }
 
   // 8. If suppress observers flag is unset, then queue a tree mutation record for parent with nodes, « », previousSibling, and child.
+  if (suppressObservers === null) {
+    queueTreeMutationRecord(
+      parent,
+      nodes,
+      new OrderedSet(),
+      previousSibling,
+      child,
+    );
+  }
 
   // 9. Run the children changed steps for parent.
 }
@@ -183,7 +242,10 @@ export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-remove
  */
-export function removeNode(node: Node, isSurpressObservers?: boolean) {}
+export function removeNode(
+  node: Node,
+  suppressObservers: boolean | null = null,
+) {}
 
 /** To append a node to a parent, pre-insert node into parent before null.
  * @see https://dom.spec.whatwg.org/#concept-node-append
