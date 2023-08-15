@@ -11,3 +11,4 @@ export const $nodeDocument = Symbol();
 export const $data = Symbol();
 export const $create = Symbol();
 export const $URL = Symbol();
+export const $host = Symbol();

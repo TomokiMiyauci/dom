@@ -103,7 +103,7 @@ export function insertNode(
       parent._children.append(node);
     } else {
       // 3. Otherwise, insert node into parent’s children before child’s index.
-      parent._children.insert(node, child.index);
+      parent._children.insert(child._index, node);
     }
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
@@ -203,7 +203,7 @@ export function replaceAllNode(node: Node | null, parent: Node): void {
   // 2. Let addedNodes be the empty set.
   // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
   const addNodes = !node
-    ? new OrderedSet()
+    ? new OrderedSet<Node>()
     : isDocumentFragment(node)
     ? node._children.clone()
     // 4. Otherwise, if node is non-null, set addedNodes to « node ».
@@ -245,7 +245,70 @@ export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
 export function removeNode(
   node: Node,
   suppressObservers: boolean | null = null,
-) {}
+) {
+  // 1. Let parent be node’s parent.
+  // 2. Assert: parent is non-null.
+  const parent = node._parent!;
+
+  // 3. Let index be node’s index.
+  const index = node._index;
+
+  // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).
+
+  // 5. For each live range whose end node is an inclusive descendant of node, set its end to (parent, index).
+
+  // 6. For each live range whose start node is parent and start offset is greater than index, decrease its start offset by 1.
+
+  // 7. For each live range whose end node is parent and end offset is greater than index, decrease its end offset by 1.
+
+  // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
+
+  // 9. Let oldPreviousSibling be node’s previous sibling.
+  const oldPreviousSibling = node._previousSibling;
+
+  // 10. Let oldNextSibling be node’s next sibling.
+  const oldNextSibling = node._nextSibling;
+
+  // 11. Remove node from its parent’s children.
+  parent._children.remove((target) => target === node);
+
+  // 12. If node is assigned, then run assign slottables for node’s assigned slot.
+
+  // 13. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
+
+  // 14. If node has an inclusive descendant that is a slot, then:
+
+  // 1. Run assign slottables for a tree with parent’s root.
+
+  // 2. Run assign slottables for a tree with node.
+
+  // 15. Run the removing steps with node and parent.
+
+  // 16. Let isParentConnected be parent’s connected.
+
+  // 17. If node is custom and isParentConnected is true, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list.
+
+  // 18. For each shadow-including descendant descendant of node, in shadow-including tree order, then:
+
+  // 19. Run the removing steps with descendant and null.
+
+  // 20. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
+
+  // 21. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
+
+  // 22. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
+  if (suppressObservers === null) {
+    queueTreeMutationRecord(
+      parent,
+      new OrderedSet(),
+      new OrderedSet([node]),
+      oldPreviousSibling,
+      oldNextSibling,
+    );
+  }
+
+  // 23. Run the children changed steps for parent.
+}
 
 /** To append a node to a parent, pre-insert node into parent before null.
  * @see https://dom.spec.whatwg.org/#concept-node-append
