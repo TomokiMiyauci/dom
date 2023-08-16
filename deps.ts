@@ -35,4 +35,4 @@ export function isNotNull<T>(input: T): input is Exclude<T, null> {
   return input !== null;
 }
 
-export type Constructor = abstract new (...args: any[]) => {};
+export type Constructor<R = {}> = abstract new (...args: any[]) => R;
