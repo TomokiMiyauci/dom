@@ -50,10 +50,10 @@ function validate(qualifiedName: string) {
  * @see https://dom.spec.whatwg.org/#validate-and-extract
  */
 export function validateAndExtract(
-  namespace: Namespace | null,
+  namespace: string | null,
   qualifiedName: string,
 ): {
-  namespace: Namespace | null;
+  namespace: string | null;
   prefix: string | null;
   localName: string;
 } {

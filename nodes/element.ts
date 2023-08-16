@@ -57,7 +57,7 @@ enum CustomElementState {
 @ParentNode
 @Slottable
 export class Element extends Node implements IElement {
-  [$namespace]: Namespace | null;
+  [$namespace]: string | null;
   [$namespacePrefix]: string | null;
   [$localName]: string;
   [$customElementState]: CustomElementState;
@@ -102,7 +102,7 @@ export class Element extends Node implements IElement {
   readonly attributes: NamedNodeMap;
   constructor(
     attributeList: List<Attr>,
-    namespace: Namespace | null,
+    namespace: string | null,
     namespacePrefix: string | null,
     localName: string,
     customElementState: CustomElementState,
@@ -675,7 +675,7 @@ export function setAttributeValue(
 export function createElement(
   document: Document,
   localName: string,
-  namespace: Namespace | null,
+  namespace: string | null,
   prefix: string | null = null, // 1. If prefix was not given, let prefix be null.
   is: string | null = null, // 2. If is was not given, let is be null.
   synchronousCustomElements: boolean | null = null,

@@ -756,7 +756,7 @@ export interface Document
  */
 export function internalCreateElement(
   document: Document,
-  namespace: Namespace | null,
+  namespace: string | null,
   qualifiedName: string,
   options?: string | ElementCreationOptions,
 ): Element {

@@ -264,7 +264,7 @@ export interface Node extends Tree {
  */
 export function getElementsByQualifiedName(
   qualifiedName: string,
-  root: Element,
+  root: Node,
 ): HTMLCollection {
   // 1. If qualifiedName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches only descendant elements.
   if (qualifiedName === "*") {
