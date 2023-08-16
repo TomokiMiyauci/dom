@@ -39,6 +39,11 @@ export function isNotNull<T>(input: T): input is Exclude<T, null> {
 
 export type Constructor<R = {}> = abstract new (...args: any[]) => R;
 
+/** Return number of yielding items. */
 export function len(iterable: Iterable<unknown>): number {
-  return [...iterable].length;
+  let count = 0;
+  const iterator = iterable[Symbol.iterator]();
+  while (!iterator.next().done) count++;
+
+  return count;
 }
