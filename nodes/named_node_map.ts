@@ -5,14 +5,18 @@ import { List } from "../infra/list.ts";
 import { type Element, setAttribute } from "./element.ts";
 import type { Attr } from "./attr.ts";
 import { $attributeList, $element } from "./internal.ts";
+import { Indexer } from "../utils.ts";
 
 export interface NamedNodeMapInits {
   element: Element;
   attributeList: List<Attr>;
 }
 
+@Indexer(function (this: NamedNodeMap, index: number): Attr | undefined {
+  return this[$attributeList][index];
+})
 export class NamedNodeMap implements INamedNodeMap {
-  [k: number]: Attr;
+  readonly [k: number]: Attr;
 
   [$attributeList]: List<Attr>;
   [$element]: Element;
