@@ -1,7 +1,6 @@
 import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
-import { FontFaceSource } from "./font_face_source.ts";
 import { XPathEvaluatorBase } from "./x_path_evaluator_base.ts";
 import { isDocumentType, isElement, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
@@ -26,6 +25,7 @@ import { DOMImplementation } from "./dom_implementation.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { CDATASection } from "./cdata_section.ts";
 import { GlobalEventHandlers } from "../html/global_event_handlers.ts";
+import { FontFaceSource } from "../css/css_font_loading/font_face_source.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -40,6 +40,7 @@ export interface TupleOrigin {
 @ParentNode
 @NonElementParentNode
 @GlobalEventHandlers
+@FontFaceSource
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
