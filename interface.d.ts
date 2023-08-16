@@ -21,6 +21,7 @@ export type INonElementParentNode = NonElementParentNode;
 export type IDocumentOrShadowRoot = DocumentOrShadowRoot;
 export type IFontFace = FontFace;
 export type IFontFaceSource = FontFaceSource;
+export type IFontFaceSet = FontFaceSet;
 export type IXPathEvaluatorBase = XPathEvaluatorBase;
 export type INodeList = NodeList;
 export type IHTMLCollection = HTMLCollection;
