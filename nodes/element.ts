@@ -310,9 +310,21 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  scrollLeft: number = 0;
+  get scrollLeft(): number {
+    throw new UnImplemented();
+  }
 
-  scrollTop: number = 0;
+  set scrollLeft(value: number) {
+    throw new UnImplemented();
+  }
+
+  get scrollTop(): number {
+    throw new UnImplemented();
+  }
+
+  set scrollTop(value: number) {
+    throw new UnImplemented();
+  }
 
   get scrollWidth(): number {
     throw new UnImplemented();
@@ -322,7 +334,13 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  slot: string = "";
+  get slot(): string {
+    throw new UnImplemented();
+  }
+
+  set slot(value: string) {
+    throw new UnImplemented();
+  }
 
   attachShadow(init: ShadowRootInit): ShadowRoot {
     throw new UnImplemented();

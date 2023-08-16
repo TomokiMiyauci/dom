@@ -122,9 +122,14 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  bgColor: string = "";
+  get bgColor(): string {
+    throw new UnImplemented();
+  }
 
-  /** */
+  set bgColor(value: string) {
+    throw new UnImplemented();
+  }
+
   get body(): HTMLElement {
     // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
     const documentElement = find(this._children, isElement);
@@ -147,7 +152,13 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  charset: string = "";
+  get charset(): string {
+    throw new UnImplemented();
+  }
+
+  set charset(value: string) {
+    throw new UnImplemented();
+  }
 
   get compatMode(): string {
     throw new UnImplemented();
@@ -157,7 +168,13 @@ export class Document extends Node implements IDocument {
     return this._contentType;
   }
 
-  cookie: string = "";
+  get cookie(): string {
+    throw new UnImplemented();
+  }
+
+  set cookie(value: string) {
+    throw new UnImplemented();
+  }
 
   get currentScript(): HTMLOrSVGScriptElement | null {
     throw new UnImplemented();
@@ -174,8 +191,21 @@ export class Document extends Node implements IDocument {
     // 2. Return this's browsing context's WindowProxy object.
   }
 
-  designMode: string = "";
-  dif = "";
+  get designMode(): string {
+    throw new UnImplemented();
+  }
+
+  set designMode(value: string) {
+    throw new UnImplemented();
+  }
+
+  get dir(): string {
+    throw new UnImplemented();
+  }
+
+  set dir(value: string) {
+    throw new UnImplemented();
+  }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-doctype
@@ -193,18 +223,29 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
-  get documentURI(): string {
+  get domain(): string {
     throw new UnImplemented();
   }
 
-  domain: string = "";
-  dir: string = "";
+  set domain(value: string) {
+    throw new UnImplemented();
+  }
+
+  get documentURI(): string {
+    throw new UnImplemented();
+  }
 
   get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
     throw new UnImplemented();
   }
 
-  fgColor: string = "";
+  get fgColor(): string {
+    throw new UnImplemented();
+  }
+
+  set fgColor(value: string) {
+    throw new UnImplemented();
+  }
 
   get forms(): HTMLCollectionOf<HTMLFormElement> {
     throw new UnImplemented();
@@ -251,7 +292,13 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  linkColor: string = "";
+  get linkColor(): string {
+    throw new UnImplemented();
+  }
+
+  set linkColor(value: string) {
+    throw new UnImplemented();
+  }
 
   get links(): HTMLCollectionOf<HTMLAnchorElement | HTMLAreaElement> {
     throw new UnImplemented();
@@ -320,13 +367,25 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  title: string = "";
+  get title(): string {
+    throw new UnImplemented();
+  }
+
+  set title(value: string) {
+    throw new UnImplemented();
+  }
 
   get visibilityState(): DocumentVisibilityState {
     throw new UnImplemented();
   }
 
-  vlinkColor: string = "";
+  get vlinkColor(): string {
+    throw new UnImplemented();
+  }
+
+  set vlinkColor(value: string) {
+    throw new UnImplemented();
+  }
 
   adoptNode<T extends globalThis.Node>(node: T): T {
     throw new UnImplemented();

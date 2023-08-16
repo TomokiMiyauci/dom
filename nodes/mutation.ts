@@ -5,6 +5,7 @@ import {
   isDocumentType,
   isElement,
   isText,
+  UnImplemented,
 } from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
@@ -145,12 +146,13 @@ export function insertNode(
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-ensure-pre-insertion-validity
+ * @throws {DOMException}
  */
 export function ensurePreInsertionValidity(
   node: Node,
   parent: Node,
   child: Child,
-): never {
+): void {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
   if (
     !(isDocument(parent) || isDocumentFragment(parent) || isElement(parent))
@@ -196,17 +198,25 @@ export function ensurePreInsertionValidity(
         elementsCount === 1 &&
         ([...(ifilter(ifilter(parent._children, isElement), isNotEqualsChild))]
           .length) // TODO child is non-null and a doctype is following child.
-      ) throw new DOMException();
+      ) throw new UnImplemented();
       // Element
     } else if (isElement(node)) {
       // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
+      // TODO
+      if (some(parent._children, isElement) && child && isDocumentType(child)) {
+        throw new UnImplemented();
+      }
     } // DocumentType
     else if (isDocumentType(node)) {
       // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
+      // TODO
+      if (some(parent._children, isDocumentType) && child !== null) {
+        throw new UnImplemented();
+      }
     }
   }
 
-  function isNotEqualsChild(other: unknown) {
+  function isNotEqualsChild(other: unknown): boolean {
     return child !== other;
   }
 }
