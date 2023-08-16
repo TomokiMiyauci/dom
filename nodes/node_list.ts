@@ -77,7 +77,7 @@ export class StaticNodeList<T extends Node> extends NodeList
   implements INodeList {
   private list: Iterable<T>;
   constructor(root: Node, list: Iterable<T>) {
-    super({ root, filter: () => true });
+    super({ root, filter: (_: Node): _ is Node => true });
 
     this.list = list;
   }

@@ -1,4 +1,5 @@
 import { type Element } from "./element.ts";
+import { type Node } from "./node.ts";
 import type { IHTMLCollection } from "../interface.d.ts";
 import { find, first, islice, len } from "../deps.ts";
 import { Namespace } from "../infra/namespace.ts";
@@ -9,7 +10,8 @@ import {
   $value,
 } from "./internal.ts";
 import { Indexer } from "../utils.ts";
-import { Collection, CollectionStates } from "./collection.ts";
+import { Collection } from "./collection.ts";
+import { isElement } from "./utils.ts";
 
 function getElementByIndex(
   this: HTMLCollection,
@@ -23,8 +25,18 @@ export class HTMLCollection extends Collection<Element>
   implements IHTMLCollection {
   [index: number]: Element;
 
-  constructor(options: CollectionStates<Element>) {
-    super(options);
+  constructor(
+    { root, filter }: { root: Node; filter?: (element: Element) => boolean },
+  ) {
+    super({
+      root,
+      filter: (node): node is Element => {
+        if (!isElement(node)) return false;
+
+        if (filter) return filter(node);
+        return true;
+      },
+    });
   }
 
   get length(): number {

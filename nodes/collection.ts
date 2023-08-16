@@ -5,27 +5,28 @@ import type { Node } from "./node.ts";
 /**
  * @see https://dom.spec.whatwg.org/#concept-collection
  */
-export interface CollectionStates<T extends Node> {
-  root: T;
-  filter: (node: T) => boolean;
+export interface CollectionStates<R extends Node = Node> {
+  root: Node;
+  filter: (node: Node) => node is R;
 }
 
 export type Mode = "live" | "static";
 
-export interface CollectionOptions<T extends Node> extends CollectionStates<T> {
+export interface CollectionOptions<R extends Node = Node>
+  extends CollectionStates<R> {
   /**
    * @default "live"
    */
   mode?: Mode;
 }
 
-export class Collection<T extends Node> {
-  #root: T;
-  #filter: (node: T) => boolean;
+export class Collection<R extends Node = Node> {
+  #root: Node;
+  #filter: (node: Node) => node is R;
 
-  constructor(options: CollectionOptions<T>) {
+  constructor(options: CollectionOptions<R>) {
     const root = options.mode === "static"
-      ? options.root.cloneNode(true) as T
+      ? options.root.cloneNode(true)
       : options.root;
     this.#root = root;
     this.#filter = options.filter;
@@ -34,7 +35,7 @@ export class Collection<T extends Node> {
   /**
    * @see https://dom.spec.whatwg.org/#represented-by-the-collection
    */
-  protected *represent(): Iterable<T> {
+  protected *represent(): Iterable<R> {
     yield* ifilter(orderTree(this.#root), this.#filter);
   }
 }
