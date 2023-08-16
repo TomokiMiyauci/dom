@@ -3,6 +3,7 @@ import { enumerate, first, islice, len, type Public } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
 import { Collection, CollectionOptions } from "./collection.ts";
 import { Indexer } from "../utils.ts";
+import { orderTreeChildren } from "../trees/tree.ts";
 
 function getElementByIndex(
   this: NodeList,
@@ -72,46 +73,16 @@ export interface NodeListOf<T extends Node> extends Public<NodeList> {
   [Symbol.iterator](): IterableIterator<T>;
 }
 
-export class StaticNodeList implements INodeList {
-  [k: number]: Node;
+export class StaticNodeList<T extends Node> extends NodeList
+  implements INodeList {
+  private list: Iterable<T>;
+  constructor(root: Node, list: Iterable<T>) {
+    super({ root, filter: () => true });
 
-  #items: Node[];
-
-  constructor(ref: Node[]) {
-    this.#items = ref;
+    this.list = list;
   }
 
-  item(index: number): Node | null {
-    return this.#items[index] ?? null;
-  }
-
-  get length(): number {
-    return this.#items.length;
-  }
-
-  forEach(
-    callbackfn: (value: Node, key: number, parent: Public<NodeList>) => void,
-    thisArg?: any,
-  ): void {
-    this.#items.forEach(
-      (node, index) => callbackfn(node, index, this),
-      thisArg,
-    );
-  }
-
-  entries(): IterableIterator<[number, Node]> {
-    throw new Error();
-  }
-
-  keys(): IterableIterator<number> {
-    throw new Error();
-  }
-
-  values(): IterableIterator<Node> {
-    throw new Error();
-  }
-
-  *[Symbol.iterator](): IterableIterator<Node> {
-    yield* this.#items;
+  protected override represent(): Iterable<T> {
+    return orderTreeChildren(this.list);
   }
 }
