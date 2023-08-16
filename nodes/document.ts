@@ -12,11 +12,12 @@ import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import { type IDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
-import { find } from "../deps.ts";
+import { find, html } from "../deps.ts";
 import {
   $create,
   $implementation,
   $localName,
+  $mode,
   $nodeDocument,
   $origin,
   $URL,
@@ -37,6 +38,8 @@ export interface TupleOrigin {
   type: "tuple";
 }
 
+export type CompatMode = "BackCompat" | "CSS1Compat";
+
 @DocumentOrShadowRoot
 @ParentNode
 @NonElementParentNode
@@ -50,6 +53,7 @@ export class Document extends Node implements IDocument {
   [$URL]: string = "about:blank";
   [$implementation]: DOMImplementation;
   [$origin]: Origin = { type: "opaque" };
+  [$mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
 
   /**
    * @see https://momdo.github.io/html/dom.html#current-document-readiness
@@ -162,8 +166,17 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  get compatMode(): string {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-compatmode
+   */
+  get compatMode(): CompatMode {
+    // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
+    switch (this[$mode]) {
+      case html.DOCUMENT_MODE.QUIRKS:
+        return "BackCompat";
+      default:
+        return "CSS1Compat";
+    }
   }
 
   get contentType(): string {
@@ -434,7 +447,11 @@ export class Document extends Node implements IDocument {
     return CDATASection[$create]({ data, nodeDocument: this });
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createcomment
+   */
   createComment(data: string): Comment {
+    // return a new Comment node whose data is data and node document is this.
     return Comment[$create]({ data, nodeDocument: this });
   }
 
