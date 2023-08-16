@@ -3,10 +3,10 @@ import { Node, NodeStates, NodeType } from "./node.ts";
 import { CharacterData, type CharacterDataStates } from "./character_data.ts";
 import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
-import { $data, $nodeDocument } from "./internal.ts";
+import { $create, $data, $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
-  static #create(
+  static [$create](
     { data, nodeDocument }: CharacterDataStates & NodeStates,
   ): Comment {
     const node = new Comment(data);
@@ -37,6 +37,6 @@ export class Comment extends CharacterData implements IComment {
   }
 
   protected override clone(document: Document): Comment {
-    return Comment.#create({ data: this[$data], nodeDocument: document });
+    return Comment[$create]({ data: this[$data], nodeDocument: document });
   }
 }

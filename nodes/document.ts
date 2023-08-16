@@ -435,7 +435,7 @@ export class Document extends Node implements IDocument {
   }
 
   createComment(data: string): Comment {
-    return new Comment(data);
+    return Comment[$create]({ data, nodeDocument: this });
   }
 
   /**
