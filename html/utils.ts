@@ -7,6 +7,7 @@ import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { DocumentType } from "../nodes/document_type.ts";
 import { Document } from "../nodes/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
+import { $mode } from "../nodes/internal.ts";
 
 export type DOMTreeAdapterMap = TreeAdapterTypeMap<
   Node,
@@ -39,12 +40,10 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   ): Element {
     const element = this.document.createElement(tagName);
     const attributes = attrs.map((attribute) =>
-      attrToAttribute(attribute, this.document)
+      AttrConvertor.to(attribute, this.document)
     );
 
-    attributes.forEach((attr) => {
-      element.setAttributeNode(attr);
-    });
+    attributes.forEach(element.setAttributeNode.bind(element));
 
     Object.defineProperty(element, "namespaceURI", { value: namespaceURI });
 
@@ -52,7 +51,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   createCommentNode(data: string): Comment {
-    return new Comment(data);
+    return this.document.createComment(data);
   }
 
   getCommentNodeContent(commentNode: Comment): string {
@@ -60,14 +59,14 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   setTemplateContent(
-    templateElement: HTMLTemplateElement,
+    templateElement: void,
     contentElement: DocumentFragment,
   ): void {
-    throw new Error("");
+    throw new Error("setTemplateContent");
   }
 
-  getTemplateContent(templateElement: HTMLTemplateElement): DocumentFragment {
-    throw new Error("");
+  getTemplateContent(templateElement: void): DocumentFragment {
+    throw new Error("getTemplateContent");
   }
 
   setDocumentType(
@@ -89,15 +88,15 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   setDocumentMode(document: Document, mode: html.DOCUMENT_MODE): void {
-    Object.defineProperty(document, "compatMode", { value: mode });
+    document[$mode] = mode;
   }
 
   getDocumentMode(document: Document): html.DOCUMENT_MODE {
-    return html.DOCUMENT_MODE.QUIRKS;
+    return document[$mode];
   }
 
   insertText(parentNode: Element, text: string): void {
-    parentNode.appendChild(new Text(text));
+    parentNode.appendChild(this.document.createTextNode(text));
   }
 
   insertBefore(
@@ -105,9 +104,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     newNode: ChildNode,
     referenceNode: ChildNode,
   ): void {
+    throw new Error("insertBefore");
   }
 
   adoptAttributes(recipient: Element, attrs: Token.Attribute[]): void {
+    throw new Error("adoptAttributes");
   }
 
   isTextNode(node: Node): node is Text {
@@ -131,6 +132,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     text: string,
     referenceNode: ChildNode,
   ): void {
+    throw new Error("insertTextBefore");
   }
 
   appendChild(parentNode: Element, newNode: ChildNode): void {
@@ -146,7 +148,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getAttrList(element: Element): Token.Attribute[] {
-    return [];
+    return [...element.attributes].map(AttrConvertor.from.bind(AttrConvertor));
   }
 
   getChildNodes(node: Element): ChildNode[] {
@@ -166,7 +168,12 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getNamespaceURI(element: Element): html.NS {
-    return html.NS.HTML;
+    if (element.namespaceURI === null) {
+      throw new Error("namespaceURL does not exist");
+    }
+    assertNamespaceURL(element.namespaceURI);
+
+    return element.namespaceURI;
   }
 
   getFirstChild(node: Element): ChildNode | null {
@@ -177,22 +184,55 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     return node.parentElement;
   }
 
-  detachNode(node: ChildNode): void {}
+  detachNode(node: ChildNode): void {
+    throw new Error("detachNode");
+  }
 
   getNodeSourceCodeLocation(): Token.ElementLocation | null | undefined {
     return undefined;
   }
-  setNodeSourceCodeLocation(): void {}
+  setNodeSourceCodeLocation(): void {
+    // noop
+  }
 
-  updateNodeSourceCodeLocation(): void {}
+  updateNodeSourceCodeLocation(): void {
+    // noop
+  }
 }
 
-function attrToAttribute(attr: Token.Attribute, document: Document): Attr {
-  const attribute = new Attr({
-    localName: attr.name,
-    value: attr.value,
-    nodeDocument: document,
-  });
+const namespaceURLs = new Set<string>(Object.values(html.NS));
 
-  return attribute;
+function assertNamespaceURL(
+  namespaceURL: string,
+): asserts namespaceURL is html.NS {
+  if (!namespaceURLs.has(namespaceURL)) {
+    throw new Error(`namespaceURL is invalid. ${namespaceURL}`);
+  }
+}
+
+class AttrConvertor {
+  static from(attr: Attr): Token.Attribute {
+    if (attr.namespaceURI === null || attr.prefix === null) {
+      throw new Error("attr namespaceURL or attr prefix is null");
+    }
+
+    return {
+      name: attr.localName,
+      namespace: attr.namespaceURI,
+      prefix: attr.prefix,
+      value: attr.value,
+    };
+  }
+
+  static to(attribute: Token.Attribute, document: Document): Attr {
+    const attr = new Attr({
+      namespace: attribute.namespace,
+      namespacePrefix: attribute.prefix,
+      localName: attribute.name,
+      value: attribute.value,
+      nodeDocument: document,
+    });
+
+    return attr;
+  }
 }
