@@ -10,13 +10,25 @@ export interface CollectionStates<T extends Node> {
   filter: (node: T) => boolean;
 }
 
+export type Mode = "live" | "static";
+
+export interface CollectionOptions<T extends Node> extends CollectionStates<T> {
+  /**
+   * @default "live"
+   */
+  mode?: Mode;
+}
+
 export class Collection<T extends Node> {
   #root: T;
   #filter: (node: T) => boolean;
 
-  constructor(states: CollectionStates<T>) {
-    this.#root = states.root;
-    this.#filter = states.filter;
+  constructor(options: CollectionOptions<T>) {
+    const root = options.mode === "static"
+      ? options.root.cloneNode(true) as T
+      : options.root;
+    this.#root = root;
+    this.#filter = options.filter;
   }
 
   /**
