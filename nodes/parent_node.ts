@@ -1,18 +1,23 @@
 import { type Node } from "./node.ts";
-import { UnImplemented } from "./utils.ts";
+import { isElement, UnImplemented } from "./utils.ts";
 import { type Element } from "./element.ts";
 import type { IParentNode } from "../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
 import { matchScopedSelectorsString } from "../trees/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
+import { ifilter, len } from "../deps.ts";
 
 // deno-lint-ignore no-explicit-any
 export function ParentNode<T extends abstract new (...args: any[]) => Node>(
   Ctor: T,
 ) {
   abstract class ParentNode extends Ctor implements IParentNode {
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-childelementcount
+     */
     get childElementCount(): number {
-      throw new UnImplemented();
+      // return the number of children of this that are elements.
+      return len(ifilter(this._children, isElement));
     }
 
     get children(): HTMLCollection {
