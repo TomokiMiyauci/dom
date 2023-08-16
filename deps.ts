@@ -9,8 +9,10 @@ export {
   enumerate,
   every,
   find,
+  first,
   ifilter,
   imap,
+  islice,
   izip,
   some,
   takewhile,
@@ -36,3 +38,7 @@ export function isNotNull<T>(input: T): input is Exclude<T, null> {
 }
 
 export type Constructor<R = {}> = abstract new (...args: any[]) => R;
+
+export function len(iterable: Iterable<unknown>): number {
+  return [...iterable].length;
+}
