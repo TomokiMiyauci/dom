@@ -1,7 +1,7 @@
 import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
-import { XPathEvaluatorBase } from "./x_path_evaluator_base.ts";
+import { XPathEvaluatorBase } from "../xpath/x_path_evaluator_base.ts";
 import { isDocumentType, isElement, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
@@ -42,6 +42,7 @@ export interface TupleOrigin {
 @NonElementParentNode
 @GlobalEventHandlers
 @FontFaceSource
+@XPathEvaluatorBase
 export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
