@@ -274,8 +274,12 @@ export class Element extends Node implements IElement {
     return this[$localName];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-namespaceuri
+   */
   get namespaceURI(): string | null {
-    throw new UnImplemented();
+    // return this’s namespace.
+    return this[$namespace];
   }
 
   onfullscreenchange: ((this: globalThis.Element, ev: Event) => any) | null =
