@@ -9,7 +9,7 @@ import {
   $value,
 } from "./internal.ts";
 import { Indexer } from "../utils.ts";
-import { Collection } from "./collection.ts";
+import { Collection, CollectionStates } from "./collection.ts";
 
 function getElementByIndex(
   this: HTMLCollection,
@@ -23,8 +23,8 @@ export class HTMLCollection extends Collection<Element>
   implements IHTMLCollection {
   [index: number]: Element;
 
-  constructor(root: Element, filter: (node: Element) => boolean) {
-    super({ root, filter });
+  constructor(options: CollectionStates<Element>) {
+    super(options);
   }
 
   get length(): number {

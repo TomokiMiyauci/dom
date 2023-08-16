@@ -16,8 +16,11 @@ export function ParentNode<T extends abstract new (...args: any[]) => Node>(
     }
 
     get children(): HTMLCollection {
-      return new HTMLCollection(this, (node) => {
-        return this._children.contains(node);
+      return new HTMLCollection({
+        root: this,
+        filter: (node) => {
+          return this._children.contains(node);
+        },
       });
     }
 

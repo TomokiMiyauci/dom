@@ -9,6 +9,7 @@ import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
 import { every, izip } from "../deps.ts";
+import type { Element } from "./element.ts";
 import { type OrderedSet } from "../infra/set.ts";
 
 export enum NodeType {
@@ -263,28 +264,32 @@ export interface Node extends Tree {
  */
 export function getElementsByQualifiedName(
   qualifiedName: string,
-  root: Node,
+  root: Element,
 ): HTMLCollection {
   // 1. If qualifiedName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches only descendant elements.
   if (qualifiedName === "*") {
-    return new HTMLCollection(root, (node) => node !== root);
+    return new HTMLCollection({ root, filter: (node) => node !== root });
   }
 
   // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
   if (root[$nodeDocument]._type !== "xml") {
-    return new HTMLCollection(root, (element) =>
-      element !== root &&
-        // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
-        (element[$namespace] === Namespace.HTML &&
-          element._qualifiedName === qualifiedName.toLowerCase()) ||
-      // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
-      (element[$namespace] !== Namespace.HTML &&
-        element._qualifiedName === qualifiedName));
+    return new HTMLCollection({
+      root,
+      filter: (element) =>
+        element !== root &&
+          // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
+          (element[$namespace] === Namespace.HTML &&
+            element._qualifiedName === qualifiedName.toLowerCase()) ||
+        // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
+        (element[$namespace] !== Namespace.HTML &&
+          element._qualifiedName === qualifiedName),
+    });
   }
 
   // 3. Otherwise, return an HTMLCollection rooted at root, whose filter matches descendant elements whose qualified name is qualifiedName.
-  return new HTMLCollection(
+  return new HTMLCollection({
     root,
-    (element) => element !== root && element._qualifiedName === qualifiedName,
-  );
+    filter: (element) =>
+      element !== root && element._qualifiedName === qualifiedName,
+  });
 }
