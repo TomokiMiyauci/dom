@@ -5,7 +5,7 @@ import type { IParentNode } from "../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
 import { matchScopedSelectorsString } from "../trees/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
-import { ifilter, len } from "../deps.ts";
+import { first, ifilter, len } from "../deps.ts";
 
 // deno-lint-ignore no-explicit-any
 export function ParentNode<T extends abstract new (...args: any[]) => Node>(
@@ -29,8 +29,12 @@ export function ParentNode<T extends abstract new (...args: any[]) => Node>(
       });
     }
 
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-firstelementchild
+     */
     get firstElementChild(): Element | null {
-      throw new UnImplemented();
+      // return the first child that is an element; otherwise null.
+      return first(ifilter(this._children, isElement)) ?? null;
     }
 
     get lastElementChild(): Element | null {
