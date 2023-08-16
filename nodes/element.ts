@@ -202,7 +202,13 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  className: string = "";
+  get className(): string {
+    throw new Error("className getter is not supported");
+  }
+
+  set className(value: string) {
+    throw new Error("className getter is not supported");
+  }
 
   get clientHeight(): number {
     throw new UnImplemented();
@@ -220,7 +226,20 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
-  id: string = "";
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-id
+   */
+  get id(): string {
+    // reflect "id".
+    return getAttributeValue(this, "id");
+  }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-id
+   */
+  set id(value: string) {
+    setAttributeValue(this, "id", value);
+  }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-localname
@@ -237,6 +256,7 @@ export class Element extends Node implements IElement {
     null;
   onfullscreenerror: ((this: globalThis.Element, ev: Event) => any) | null =
     null;
+
   outerHTML: string = "";
 
   /**
@@ -603,6 +623,28 @@ export interface Element
     NonDocumentTypeChildNode,
     ParentNode,
     Slottable {}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
+ */
+export function getAttributeValue(
+  element: Element,
+  localName: string,
+  namespace: string | null = null,
+): string {
+  // 1. Let attr be the result of getting an attribute given namespace, localName, and element.
+  const attr = getAttributeByNamespaceAndLocalName(
+    namespace,
+    localName,
+    element,
+  );
+
+  // 2. If attr is null, then return the empty string.
+  if (attr === null) return "";
+
+  // 3. Return attr’s value.
+  return attr[$value];
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
