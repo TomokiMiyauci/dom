@@ -69,10 +69,10 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
-    return new NodeList(
-      this,
-      (node) => this._children.contains(node),
-    ) as any as NodeListOf<
+    return new NodeList({
+      root: this,
+      filter: (node) => this._children.contains(node),
+    }) as any as NodeListOf<
       Node & ChildNode
     >;
   }

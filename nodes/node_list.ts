@@ -1,7 +1,7 @@
 import { Node } from "./node.ts";
 import { enumerate, first, islice, len, type Public } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
-import { Collection } from "./collection.ts";
+import { Collection, CollectionOptions } from "./collection.ts";
 import { Indexer } from "../utils.ts";
 
 function getElementByIndex(
@@ -15,8 +15,8 @@ function getElementByIndex(
 export class NodeList extends Collection<Node> implements INodeList {
   [k: number]: Node;
 
-  constructor(root: Node, filter: (node: Node) => boolean) {
-    super({ root, filter });
+  constructor(options: CollectionOptions<Node>) {
+    super(options);
   }
 
   protected getItem(index: number): Node | undefined {
