@@ -84,6 +84,11 @@ export class Element extends Node implements IElement {
   _ID: string | null = null;
 
   /**
+   * @see https://dom.spec.whatwg.org/#dom-element-attributes
+   */
+  readonly attributes: NamedNodeMap;
+
+  /**
    * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
    */
   get _qualifiedName(): string {
@@ -134,6 +139,10 @@ export class Element extends Node implements IElement {
     this[$isValue] = isValue;
     this[$nodeDocument] = nodeDocument;
     this[$attributeList] = attributeList;
+    this.attributes = new NamedNodeMap({
+      attributeList: this[$attributeList],
+      element: this,
+    });
   }
 
   override [$nodeDocument]: Document;
@@ -209,10 +218,6 @@ export class Element extends Node implements IElement {
     }
 
     return copy;
-  }
-
-  get attributes(): NamedNodeMap {
-    throw new UnImplemented();
   }
 
   get classList(): DOMTokenList {
