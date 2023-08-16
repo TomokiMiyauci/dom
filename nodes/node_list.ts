@@ -1,31 +1,43 @@
 import { Node } from "./node.ts";
-import { enumerate, type Public } from "../deps.ts";
+import { enumerate, first, islice, len, type Public } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
+import { Collection } from "./collection.ts";
+import { Indexer } from "../utils.ts";
 
-export class NodeList implements INodeList {
+function getElementByIndex(
+  this: NodeList,
+  index: number,
+): Node | undefined {
+  return this.getItem(index);
+}
+
+@Indexer(getElementByIndex)
+export class NodeList extends Collection<Node> implements INodeList {
   [k: number]: Node;
 
-  #root: Node;
-  #filter: (node: Node) => boolean;
-
   constructor(root: Node, filter: (node: Node) => boolean) {
-    this.#root = root;
-    this.#filter = filter;
+    super({ root, filter });
+  }
+
+  protected getItem(index: number): Node | undefined {
+    if (!Number.isInteger(index)) return undefined;
+
+    return first(islice(this.represent(), index, index + 1));
   }
 
   get length(): number {
-    return this.#root._children.size;
+    return len(this.represent());
   }
 
   item(index: number): Node | null {
-    return this.#root._children[index] ?? null;
+    return this.getItem(index) ?? null;
   }
 
   forEach(
     callbackfn: (value: Node, key: number, parent: Public<NodeList>) => void,
     thisArg?: any,
   ): void {
-    for (const [index, child] of enumerate(this.#root._children)) {
+    for (const [index, child] of enumerate(this.represent())) {
       callbackfn.call(thisArg, child, index, this);
     }
   }
