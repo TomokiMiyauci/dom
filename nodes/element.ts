@@ -202,12 +202,16 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-classname
+   */
   get className(): string {
-    throw new Error("className getter is not supported");
+    // TODO(miyauci): use auto-accessor and accessor decorator
+    return getAttributeValue(this, "class");
   }
 
   set className(value: string) {
-    throw new Error("className getter is not supported");
+    setAttributeValue(this, "class", value);
   }
 
   get clientHeight(): number {
