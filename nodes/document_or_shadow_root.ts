@@ -1,28 +1,52 @@
 import { UnImplemented } from "./utils.ts";
 import { type IDocumentOrShadowRoot } from "../interface.d.ts";
+import { Constructor } from "../deps.ts";
 
-export class DocumentOrShadowRoot implements IDocumentOrShadowRoot {
-  activeElement: any | null;
+export function DocumentOrShadowRoot<T extends Constructor>(Ctor: T) {
+  abstract class Mixin extends Ctor implements IDocumentOrShadowRoot {
+    get activeElement(): Element | null {
+      throw new UnImplemented();
+    }
 
-  adoptedStyleSheets: any[] = [];
+    get adoptedStyleSheets(): CSSStyleSheet[] {
+      throw new UnImplemented();
+    }
 
-  fullscreenElement: any | null;
+    set adoptedStyleSheets(value: CSSStyleSheet[]) {
+      throw new UnImplemented();
+    }
 
-  pictureInPictureElement: any | null;
+    get fullscreenElement(): Element | null {
+      throw new UnImplemented();
+    }
 
-  pointerLockElement: any | null;
+    get pictureInPictureElement(): Element | null {
+      throw new UnImplemented();
+    }
 
-  styleSheets: any;
+    get pointerLockElement(): Element | null {
+      throw new UnImplemented();
+    }
 
-  elementFromPoint(x: number, y: number): any | null {
-    throw new UnImplemented();
+    get styleSheets(): StyleSheetList {
+      throw new UnImplemented();
+    }
+
+    elementFromPoint(x: number, y: number): any | null {
+      throw new UnImplemented();
+    }
+
+    elementsFromPoint(x: number, y: number): any[] {
+      throw new UnImplemented();
+    }
+
+    getAnimations(): any[] {
+      throw new UnImplemented();
+    }
   }
 
-  elementsFromPoint(x: number, y: number): any[] {
-    throw new UnImplemented();
-  }
-
-  getAnimations(): any[] {
-    throw new UnImplemented();
-  }
+  return Mixin;
 }
+
+// deno-lint-ignore no-empty-interface
+export interface DocumentOrShadowRoot extends IDocumentOrShadowRoot {}

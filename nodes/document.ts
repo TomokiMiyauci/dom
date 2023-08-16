@@ -37,6 +37,7 @@ export interface TupleOrigin {
   type: "tuple";
 }
 
+@DocumentOrShadowRoot
 @ParentNode
 @NonElementParentNode
 @GlobalEventHandlers
