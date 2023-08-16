@@ -9,6 +9,7 @@ import { descendantTextContent } from "./text.ts";
 import { replaceAllString } from "./element.ts";
 
 @ParentNode
+@NonElementParentNode
 /**
  * @see https://dom.spec.whatwg.org/#interface-documentfragment
  */
