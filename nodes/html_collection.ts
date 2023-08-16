@@ -4,6 +4,7 @@ import type { IHTMLCollection } from "../interface.d.ts";
 import { find, first, islice, len } from "../deps.ts";
 import { Namespace } from "../infra/namespace.ts";
 import {
+  $attributeList,
   $localName,
   $namespace,
   $namespacePrefix,
@@ -62,7 +63,7 @@ export class HTMLCollection extends Collection<Element>
         // - it is in the HTML namespace and has a name attribute whose value is key;
         node.namespaceURI === Namespace.HTML &&
           find(
-            node._attributeList,
+            node[$attributeList],
             (attr) =>
               attr[$localName] === "name" && attr[$namespace] === null &&
               attr[$namespacePrefix] === null && attr[$value] === key,

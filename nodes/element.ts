@@ -22,6 +22,7 @@ import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
 import {
+  $attributeList,
   $create,
   $customElementState,
   $element,
@@ -62,7 +63,7 @@ export class Element extends Node implements IElement {
   [$localName]: string;
   [$customElementState]: CustomElementState;
   #customElementDefinition: CustomElementDefinition | null;
-  _attributeList: List<Attr>;
+  [$attributeList]: List<Attr>;
   [$isValue]: string | null;
 
   _ID: string | null = null;
@@ -99,7 +100,6 @@ export class Element extends Node implements IElement {
     return qualifiedName;
   }
 
-  readonly attributes: NamedNodeMap;
   constructor(
     attributeList: List<Attr>,
     namespace: string | null,
@@ -111,7 +111,7 @@ export class Element extends Node implements IElement {
     document: Document,
   ) {
     super();
-    this._attributeList = attributeList;
+    this[$attributeList] = attributeList;
     this[$namespace] = namespace;
     this[$namespacePrefix] = namespacePrefix;
     this[$localName] = localName;
@@ -119,8 +119,6 @@ export class Element extends Node implements IElement {
     this.#customElementDefinition = customElementDefinition;
     this[$isValue] = isValue;
     this[$nodeDocument] = document;
-
-    this.attributes = new NamedNodeMap(this);
   }
 
   override [$nodeDocument]: Document;
@@ -172,13 +170,13 @@ export class Element extends Node implements IElement {
     return this[$namespace] === other[$namespace] &&
       this[$namespacePrefix] === other[$namespacePrefix] &&
       this[$localName] === other[$localName] &&
-      this._attributeList.size === other._attributeList.size &&
+      this[$attributeList].size === other[$attributeList].size &&
       // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
       // TODO:(miyauci) improve performance. O(n²)
       every(
-        this._attributeList,
+        this[$attributeList],
         (left) =>
-          some(other._attributeList, (right) => equalsAttr(left, right)),
+          some(other[$attributeList], (right) => equalsAttr(left, right)),
       );
   }
 
@@ -191,11 +189,15 @@ export class Element extends Node implements IElement {
       this[$isValue],
     );
 
-    for (const attribute of this._attributeList) {
+    for (const attribute of this[$attributeList]) {
       appendAttribute(attribute.clone(document), copy);
     }
 
     return copy;
+  }
+
+  get attributes(): NamedNodeMap {
+    throw new UnImplemented();
   }
 
   get classList(): DOMTokenList {
@@ -261,7 +263,13 @@ export class Element extends Node implements IElement {
   onfullscreenerror: ((this: globalThis.Element, ev: Event) => any) | null =
     null;
 
-  outerHTML: string = "";
+  get outerHTML(): string {
+    throw new UnImplemented();
+  }
+
+  set outerHTML(value: string) {
+    throw new UnImplemented();
+  }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-tagname
@@ -515,7 +523,7 @@ export class Element extends Node implements IElement {
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
-      this._attributeList,
+      this[$attributeList],
       (attr) => attr._qualifiedName === qualifiedName,
     ) ?? null;
 
@@ -832,7 +840,7 @@ export function getAttributeByNamespaceAndLocalName(
 
   // 2. Return the attribute in element’s attribute list whose namespace is namespace and local name is localName, if any; otherwise null.
   return find(
-    element._attributeList,
+    element[$attributeList],
     (attribute) =>
       attribute[$namespace] === namespace &&
       attribute[$localName] === localName,
@@ -844,7 +852,7 @@ export function getAttributeByNamespaceAndLocalName(
  */
 export function appendAttribute(attribute: Attr, element: Element): void {
   // 1. Append attribute to element’s attribute list.
-  element._attributeList.append(attribute);
+  element[$attributeList].append(attribute);
 
   // 2. Set attribute’s element to element.
   attribute[$element] = element;
@@ -875,7 +883,7 @@ export function getAttributeByName(
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
   return find(
-    element._attributeList,
+    element[$attributeList],
     (attribute) => attribute._qualifiedName === qualifiedName,
   ) ?? null;
 }

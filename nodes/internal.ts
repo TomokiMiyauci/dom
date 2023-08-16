@@ -13,3 +13,4 @@ export const $create = Symbol();
 export const $URL = Symbol();
 export const $host = Symbol();
 export const $customElementState = Symbol();
+export const $attributeList = Symbol();
