@@ -1,4 +1,9 @@
-import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
+import {
+  getElementsByQualifiedName,
+  Node,
+  NodeStates,
+  NodeType,
+} from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import {
   Attr,
@@ -48,6 +53,16 @@ enum CustomElementState {
   Uncustomized = "uncustomized",
   Precustomized = "precustomized",
   Custom = "custom",
+}
+
+export interface AttributeInits {
+  namespace: string | null;
+  namespacePrefix: string | null;
+  localName: string;
+  customElementState: CustomElementState;
+  customElementDefinition: CustomElementDefinition | null;
+  isValue: string | null;
+  attributeList?: List<Attr>;
 }
 
 @ARIAMixin
@@ -100,25 +115,25 @@ export class Element extends Node implements IElement {
     return qualifiedName;
   }
 
-  constructor(
-    attributeList: List<Attr>,
-    namespace: string | null,
-    namespacePrefix: string | null,
-    localName: string,
-    customElementState: CustomElementState,
-    customElementDefinition: CustomElementDefinition | null,
-    isValue: string | null,
-    document: Document,
-  ) {
+  constructor({
+    namespace,
+    namespacePrefix,
+    localName,
+    customElementState,
+    customElementDefinition,
+    isValue,
+    nodeDocument,
+    attributeList = new List(),
+  }: AttributeInits & NodeStates) {
     super();
-    this[$attributeList] = attributeList;
     this[$namespace] = namespace;
     this[$namespacePrefix] = namespacePrefix;
     this[$localName] = localName;
     this[$customElementState] = customElementState;
     this.#customElementDefinition = customElementDefinition;
     this[$isValue] = isValue;
-    this[$nodeDocument] = document;
+    this[$nodeDocument] = nodeDocument;
+    this[$attributeList] = attributeList;
   }
 
   override [$nodeDocument]: Document;
@@ -809,16 +824,15 @@ export function createElement(
     const Interface = Element;
 
     // 2. Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document.
-    result = new Interface(
-      new List(),
+    result = new Interface({
       namespace,
-      prefix,
+      namespacePrefix: prefix,
       localName,
-      CustomElementState.Uncustomized,
-      null,
-      is,
-      document,
-    );
+      customElementState: CustomElementState.Uncustomized,
+      customElementDefinition: null,
+      isValue: is,
+      nodeDocument: document,
+    });
 
     // 3. If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined".
   }
