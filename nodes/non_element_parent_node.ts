@@ -1,15 +1,12 @@
 import { Element } from "./element.ts";
 import { type Node } from "./node.ts";
-import { Public } from "../deps.ts";
+import { Constructor } from "../deps.ts";
 import { descendant } from "../trees/tree.ts";
 import { isElement } from "./utils.ts";
 import type { INonElementParentNode } from "../interface.d.ts";
 
-export function NonElementParentNode<
-  // deno-lint-ignore no-explicit-any
-  T extends new (...args: any[]) => Public<Node>,
->(Ctor: T) {
-  return class extends Ctor implements NonElementParentNode {
+export function NonElementParentNode<T extends Constructor<Node>>(Ctor: T) {
+  abstract class Mixin extends Ctor implements NonElementParentNode {
     /**
      * @see https://dom.spec.whatwg.org/#dom-nonelementparentnode-getelementbyid
      */
@@ -21,7 +18,9 @@ export function NonElementParentNode<
 
       return null;
     }
-  };
+  }
+
+  return Mixin;
 }
 
 /**
