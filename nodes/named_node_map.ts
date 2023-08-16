@@ -22,27 +22,52 @@ export class NamedNodeMap implements INamedNodeMap {
     this[$element] = element;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-length
+   */
   get length(): number {
+    // return the attribute list’s size.
     return this[$attributeList].size;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-item
+   */
   item(index: number): Attr | null {
+    // 1. If index is equal to or greater than this’s attribute list’s size, then return null.
+    // 2. Otherwise, return this’s attribute list[index].
     return this[$attributeList][index] ?? null;
   }
 
+  /**
+   * https://dom.spec.whatwg.org/#dom-namednodemap-getnameditem
+   */
   getNamedItem(qualifiedName: string): Attr | null {
+    // return the result of getting an attribute given qualifiedName and element.
     return getAttributesByName(qualifiedName, this[$element]);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-getnameditemns
+   */
   getNamedItemNS(namespace: string | null, localName: string): Attr | null {
+    // return the result of getting an attribute given namespace, localName, and element.
     return getAttributeByNamespace(namespace, localName, this[$element]);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-setnameditem
+   */
   setNamedItem(attr: Attr): Attr | null {
+    // return the result of setting an attribute given attr and element.
     return setAttribute(attr, this[$element]);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-setnameditemns
+   */
   setNamedItemNS(attr: Attr): Attr | null {
+    // return the result of setting an attribute given attr and element.
     return setAttribute(attr, this[$element]);
   }
 
