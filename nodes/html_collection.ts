@@ -1,7 +1,6 @@
 import { type Element } from "./element.ts";
-import { type Node } from "./node.ts";
 import type { IHTMLCollection } from "../interface.d.ts";
-import { find } from "../deps.ts";
+import { find, first, islice, len } from "../deps.ts";
 import { Namespace } from "../infra/namespace.ts";
 import {
   $localName,
@@ -10,22 +9,26 @@ import {
   $value,
 } from "./internal.ts";
 import { Indexer } from "../utils.ts";
+import { Collection } from "./collection.ts";
 
-export class HTMLCollection extends Indexer<Element | undefined>
+function getElementByIndex(
+  this: HTMLCollection,
+  index: number,
+): Element | undefined {
+  return this.getItem(index);
+}
+
+@Indexer(getElementByIndex)
+export class HTMLCollection extends Collection<Element>
   implements IHTMLCollection {
   [index: number]: Element;
 
-  private root: Element;
-  private filter: (node: Element) => boolean;
-
   constructor(root: Element, filter: (node: Element) => boolean) {
-    super((index) => this.getItem(index));
-    this.root = root;
-    this.filter = filter;
+    super({ root, filter });
   }
 
   get length(): number {
-    return getRepresent(this.root, this.filter).length;
+    return len(this.represent());
   }
 
   item(index: number): Element | null {
@@ -40,7 +43,7 @@ export class HTMLCollection extends Indexer<Element | undefined>
     if (key === "") return null;
 
     // 2. Return the first element in the collection for which at least one of the following is true:
-    for (const node of getRepresent(this.root, this.filter)) {
+    for (const node of this.represent()) {
       if (
         // - it has an ID which is key;
         node._ID === key ||
@@ -60,25 +63,12 @@ export class HTMLCollection extends Indexer<Element | undefined>
   }
 
   *[Symbol.iterator](): IterableIterator<Element> {
-    yield* getRepresent(this.root, this.filter);
+    yield* this.represent();
   }
 
-  private getItem(index: number): Element | undefined {
-    return getRepresent(this.root, this.filter)[index];
+  protected getItem(index: number): Element | undefined {
+    if (!Number.isInteger(index)) return undefined;
+
+    return first(islice(this.represent(), index, index + 1));
   }
-}
-
-export function getRepresent<T extends Node>(
-  node: T,
-  filter: (node: T) => boolean,
-): T[] {
-  const nodes: T[] = [];
-
-  if (filter(node)) nodes.push(node);
-
-  for (const child of node._children) {
-    nodes.push(...getRepresent(child, filter));
-  }
-
-  return nodes;
 }
