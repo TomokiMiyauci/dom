@@ -1,4 +1,4 @@
-import { len } from "./deps.ts";
+import { last, len } from "./deps.ts";
 import { assertEquals, describe, it } from "./_dev_deps.ts";
 
 describe("len", () => {
@@ -18,6 +18,26 @@ describe("len", () => {
 
     table.forEach(([iterable, expected]) => {
       assertEquals(len(iterable), expected);
+    });
+  });
+});
+
+describe("last", () => {
+  it("should return last item", () => {
+    const table: [Iterable<unknown>, unknown][] = [
+      [[], undefined],
+      [[0], 0],
+      [[0, 1, 2], 2],
+      [{
+        *[Symbol.iterator]() {
+          yield "a";
+          yield "b";
+        },
+      }, "b"],
+    ];
+
+    table.forEach(([iterable, expected]) => {
+      assertEquals(last(iterable), expected);
     });
   });
 });

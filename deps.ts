@@ -47,3 +47,12 @@ export function len(iterable: Iterable<unknown>): number {
 
   return count;
 }
+
+/** Return last item of {@linkcode iterable}. */
+export function last<T>(iterable: Iterable<T>): T | undefined {
+  let lastItem: T | undefined;
+
+  for (const item of iterable) lastItem = item;
+
+  return lastItem;
+}
