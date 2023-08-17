@@ -155,12 +155,18 @@ export class Element extends Node implements IElement {
     return this.#upperQualifiedName;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
   override get nodeValue(): null {
     return null;
   }
 
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
+  override set nodeValue(_: unknown) {
+    // noop
   }
 
   /**
@@ -221,7 +227,7 @@ export class Element extends Node implements IElement {
   }
 
   get classList(): DOMTokenList {
-    throw new UnImplemented();
+    throw new UnImplemented("classList");
   }
 
   /**
@@ -306,8 +312,12 @@ export class Element extends Node implements IElement {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-prefix
+   */
   get prefix(): string | null {
-    throw new UnImplemented();
+    // return this’s namespace prefix.
+    return this[$namespacePrefix];
   }
 
   get scrollHeight(): number {
