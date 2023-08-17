@@ -92,12 +92,20 @@ export abstract class Node extends EventTarget implements INode {
     >;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-firstchild
+   */
   get firstChild(): (ChildNode & Node) | null {
-    return this._firstChild as any;
+    // return this’s first child.
+    return this._firstChild;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-lastchild
+   */
   get lastChild(): (Node & ChildNode) | null {
-    return this._lastChild as any;
+    // return this’s last child.
+    return this._lastChild;
   }
 
   get previousSibling(): (Node & ChildNode) | null {
