@@ -1,12 +1,14 @@
 import { UnImplemented } from "./utils.ts";
-import { Document } from "./document.ts";
+import { Document, internalCreateElement } from "./document.ts";
 import { DocumentType } from "./document_type.ts";
 import { Text } from "./text.ts";
+import type { Element } from "./element.ts";
 import { createElement } from "./element.ts";
 import { appendNode } from "./mutation.ts";
 import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $create, $document, $origin } from "./internal.ts";
+import { XMLDocument } from "./xml_document.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   [$document]!: Document;
@@ -26,12 +28,42 @@ export class DOMImplementation implements IDOMImplementation {
     throw new UnImplemented("createDocumentType");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocument
+   */
   createDocument(
     namespace: string | null,
     qualifiedName: string | null,
-    doctype?: DocumentType | null | undefined,
+    doctype: DocumentType | null = null,
   ): XMLDocument {
-    throw new UnImplemented("createDocument");
+    // LegacyNullToEmptyString
+    qualifiedName ??= "";
+
+    // 1. Let document be a new XMLDocument.
+    const document = new XMLDocument();
+
+    // 2. Let element be null.
+    let element: Element | null = null;
+
+    // 3. If qualifiedName is not the empty string, then set element to the result of running the internal createElementNS steps, given document, namespace, qualifiedName, and an empty dictionary.
+    if (qualifiedName !== "") {
+      element = internalCreateElement(document, namespace, qualifiedName, {});
+    }
+
+    // 4. If doctype is non-null, append doctype to document.
+    if (doctype !== null) appendNode(doctype, document);
+
+    // 5. If element is non-null, append element to document.
+    if (element !== null) appendNode(element, document);
+
+    // 6. document’s origin is this’s associated document’s origin.
+    document[$origin] = this[$document][$origin];
+
+    // 7. document’s content type is determined by namespace:
+    document._contentType = namespaceToContentType(namespace);
+
+    // 8. Return document.
+    return document;
   }
 
   /**
@@ -86,5 +118,16 @@ export class DOMImplementation implements IDOMImplementation {
   hasFeature(..._: readonly unknown[]): true {
     // return true
     return true;
+  }
+}
+
+function namespaceToContentType(namespace: string | null): string {
+  switch (namespace) {
+    case Namespace.HTML:
+      return "application/xhtml+xml";
+    case Namespace.SVG:
+      return "image/svg+xml";
+    default:
+      return "application/xml";
   }
 }
