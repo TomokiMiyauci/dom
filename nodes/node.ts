@@ -75,8 +75,12 @@ export abstract class Node extends EventTarget implements INode {
     return this._parent;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-haschildnodes
+   */
   hasChildNodes(): boolean {
-    throw new UnImplemented("hasChildNodes");
+    // return true if this has children; otherwise fals
+    return !this._children.isEmpty;
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
