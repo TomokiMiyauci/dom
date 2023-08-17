@@ -5,6 +5,7 @@ import { type Document } from "./document.ts";
 import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
+import { nodeLength } from "./node_tree.ts";
 
 export interface CharacterDataStates {
   /**
@@ -59,8 +60,12 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return this[$data] === other[$data];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-length
+   */
   get length(): number {
-    throw new UnImplemented();
+    // return this’s length.
+    return nodeLength(this);
   }
 
   /**

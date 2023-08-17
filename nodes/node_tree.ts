@@ -10,7 +10,7 @@ import { type CharacterData } from "./character_data.ts";
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
  */
-export function len(
+export function nodeLength(
   node:
     | Document
     | DocumentType

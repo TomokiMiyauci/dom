@@ -11,7 +11,7 @@ import { Slottable } from "./slottable.ts";
 import { List } from "../infra/list.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
-import { len } from "./node_tree.ts";
+import { nodeLength } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
@@ -73,7 +73,7 @@ export interface Text extends Slottable {}
  */
 export function splitText(node: Text, offset: number): Text {
   // 1 Let length be node’s length.
-  const length = len(node);
+  const length = nodeLength(node);
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.
   // TODO
