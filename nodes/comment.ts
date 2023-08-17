@@ -1,7 +1,6 @@
 import { type Document } from "./document.ts";
-import { Node, NodeStates, NodeType } from "./node.ts";
+import { NodeStates, NodeType } from "./node.ts";
 import { CharacterData, type CharacterDataStates } from "./character_data.ts";
-import { UnImplemented } from "./utils.ts";
 import { IComment } from "../interface.d.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 
@@ -32,8 +31,8 @@ export class Comment extends CharacterData implements IComment {
     return "#comment";
   }
 
-  override isEqualNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
+  protected override equals(other: this): boolean {
+    return this[$data] === other[$data];
   }
 
   protected override clone(document: Document): Comment {

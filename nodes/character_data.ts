@@ -2,7 +2,6 @@ import { Node } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { type Document } from "./document.ts";
-import { UnImplemented } from "./utils.ts";
 import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_tree.ts";
@@ -65,10 +64,6 @@ export abstract class CharacterData extends Node implements ICharacterData {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];
-  }
-
-  protected override equals(other: this): boolean {
-    return this[$data] === other[$data];
   }
 
   /**
@@ -146,7 +141,7 @@ export function substringData(
   offset: number,
   count: number,
 ): string {
-  throw new UnImplemented();
+  throw new Error("substringData");
 }
 
 /**
@@ -158,7 +153,7 @@ export function replaceData(
   count: number,
   data: string,
 ) {
-  throw new Error();
+  throw new Error("replaceData");
   // 1 Let length be node’s length.
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.
