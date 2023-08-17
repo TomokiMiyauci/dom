@@ -95,24 +95,44 @@ export abstract class CharacterData extends Node implements ICharacterData {
     replaceData(this, 0, nodeLength(this), value);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-appenddata
+   */
   appendData(data: string): void {
-    throw new UnImplemented();
+    // replace data with node this, offset this’s length, count 0, and data data
+    replaceData(this, nodeLength(this), 0, data);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-deletedata
+   */
   deleteData(offset: number, count: number): void {
-    throw new UnImplemented();
+    // replace data with node this, offset offset, count count, and data the empty string.
+    replaceData(this, offset, count, "");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-insertdata
+   */
   insertData(offset: number, data: string): void {
-    throw new UnImplemented();
+    // replace data with node this, offset offset, count 0, and data data.
+    replaceData(this, offset, 0, data);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-replacedata
+   */
   replaceData(offset: number, count: number, data: string): void {
-    throw new UnImplemented();
+    // replace data with node this, offset offset, count count, and data data.
+    replaceData(this, offset, count, data);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-characterdata-substringdata
+   */
   substringData(offset: number, count: number): string {
-    throw new UnImplemented();
+    // return the result of running substring data with node this, offset offset, and count count.
+    return substringData(this, offset, count);
   }
 }
 
