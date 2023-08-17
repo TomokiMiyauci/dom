@@ -2,7 +2,6 @@ import { Node, NodeStates, NodeType } from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { type Document } from "./document.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
-import { UnImplemented } from "./utils.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
 import { $create, $host, $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";
@@ -84,10 +83,6 @@ export class DocumentFragment extends Node implements IDocumentFragment {
 
   protected override clone(document: Document): DocumentFragment {
     return DocumentFragment[$create]({ nodeDocument: document });
-  }
-
-  getElementById(elementId: string): HTMLElement | null {
-    throw new UnImplemented();
   }
 }
 
