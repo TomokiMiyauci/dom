@@ -56,7 +56,7 @@ export class NodeList extends Collection<Node> implements INodeList {
   }
 
   *[Symbol.iterator](): IterableIterator<Node> {
-    throw new Error("iterator");
+    yield* this.represent();
   }
 }
 
