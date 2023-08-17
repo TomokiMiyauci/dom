@@ -6,11 +6,11 @@ import { isDocumentType, isElement, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
-import { createElement } from "./element.ts";
+import { createElement, type Element } from "./element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
-import { type IDocument } from "../interface.d.ts";
+import type { IDocument, IXMLDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find, html } from "../deps.ts";
 import {
@@ -828,6 +828,8 @@ export interface Document
     options?: boolean | EventListenerOptions,
   ): void;
 }
+
+export class XMLDocument extends Document implements IXMLDocument {}
 
 /**
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps

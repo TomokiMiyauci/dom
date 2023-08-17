@@ -1,5 +1,4 @@
-import { UnImplemented } from "./utils.ts";
-import { Document, internalCreateElement } from "./document.ts";
+import { Document, internalCreateElement, XMLDocument } from "./document.ts";
 import { DocumentType } from "./document_type.ts";
 import { Text } from "./text.ts";
 import type { Element } from "./element.ts";
@@ -8,7 +7,7 @@ import { appendNode } from "./mutation.ts";
 import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $create, $document, $origin } from "./internal.ts";
-import { XMLDocument } from "./xml_document.ts";
+import { validate } from "../infra/namespace.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   [$document]!: Document;
@@ -20,12 +19,24 @@ export class DOMImplementation implements IDOMImplementation {
     return instance;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocumenttype
+   */
   createDocumentType(
     qualifiedName: string,
     publicId: string,
     systemId: string,
   ): DocumentType {
-    throw new UnImplemented("createDocumentType");
+    // 1. Validate qualifiedName.
+    validate(qualifiedName);
+
+    // 2. Return a new doctype, with qualifiedName as its name, publicId as its public ID, and systemId as its system ID, and with its node document set to the associated document of this.
+    return new DocumentType({
+      name: qualifiedName,
+      publicId,
+      systemId,
+      nodeDocument: this[$document],
+    });
   }
 
   /**
