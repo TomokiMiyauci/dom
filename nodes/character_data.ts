@@ -28,12 +28,19 @@ export abstract class CharacterData extends Node implements ICharacterData {
 
   override [$nodeDocument]: Document;
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
   override get nodeValue(): string {
     return this[$data];
   }
 
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
+  override set nodeValue(value: string) {
+    // Replace data with node this, offset 0, count this’s length, and data the given value.
+    replaceData(this, 0, nodeLength(this), value);
   }
 
   /**
