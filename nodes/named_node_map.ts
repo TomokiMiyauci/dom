@@ -83,8 +83,10 @@ export class NamedNodeMap implements INamedNodeMap {
     throw new UnImplemented("removeNamedItemNS");
   }
 
+  // TODO(miyauci): Find the definition of WebIDL.
   *[Symbol.iterator](): IterableIterator<Attr> {
-    throw new UnImplemented("iterator");
+    const length = this.length;
+    for (let i = 0; i < length; i++) yield this[i]!;
   }
 }
 
