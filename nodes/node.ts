@@ -67,8 +67,12 @@ export abstract class Node extends EventTarget implements INode {
     return getRoot(this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-parentnode
+   */
   get parentNode(): (Node & ParentNode) | null {
-    throw new UnImplemented("parentNode");
+    // return this’s parent.
+    return this._parent;
   }
 
   hasChildNodes(): boolean {
