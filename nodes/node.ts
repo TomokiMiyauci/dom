@@ -5,7 +5,7 @@ import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
 import { appendNode, preInsertNode, preRemoveChild } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
-import { Tree, Treeable } from "../trees/tree.ts";
+import { getRoot, Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
 import { every, izip } from "../deps.ts";
@@ -55,8 +55,16 @@ export abstract class Node extends EventTarget implements INode {
 
   abstract get ownerDocument(): Document | null;
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-getrootnode
+   */
   getRootNode(options?: GetRootNodeOptions | undefined): Node {
-    throw new UnImplemented("getRootNode");
+    // return this’s shadow-including root if options["composed"] is true; otherwise this’s root.
+    if (options?.composed) {
+      throw new Error("getRootNode is not supported composed");
+    }
+
+    return getRoot(this);
   }
 
   get parentNode(): (Node & ParentNode) | null {
