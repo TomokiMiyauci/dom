@@ -14,7 +14,7 @@ import {
 import { ParentNode } from "./parent_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { Document } from "./document.ts";
+import { type Document, isHTMLDocument } from "./document.ts";
 import {
   CustomElementDefinition,
   lookUpCustomElementDefinition,
@@ -481,8 +481,19 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("getElementsByTagNameNS");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-hasattribute
+   */
   hasAttribute(qualifiedName: string): boolean {
-    throw new UnImplemented("hasAttribute");
+    // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
+    if (
+      this[$namespace] === Namespace.HTML && isHTMLDocument(this[$nodeDocument])
+    ) {
+      qualifiedName = qualifiedName.toLowerCase();
+    }
+
+    // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
+    return hasAttributeByQualifiedName(qualifiedName, this);
   }
 
   hasAttributeNS(namespace: string | null, localName: string): boolean {
@@ -925,4 +936,15 @@ export function replaceAllString(string: string, parent: Node): void {
 export function isCustom(element: Element): boolean {
   // An element whose custom element state is "custom
   return element[$customElementState] === CustomElementState.Custom;
+}
+
+export function hasAttributeByQualifiedName(
+  qualifiedName: string,
+  element: Element,
+): boolean {
+  for (const attr of element[$attributeList]) {
+    if (attr._qualifiedName === qualifiedName) return true;
+  }
+
+  return false;
 }
