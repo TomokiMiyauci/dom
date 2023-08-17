@@ -1,7 +1,6 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { Document } from "./document.ts";
-import { UnImplemented } from "./utils.ts";
 import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../interface.d.ts";
 import type { PartialBy } from "../deps.ts";
@@ -51,12 +50,18 @@ export class DocumentType extends Node implements IDocumentType {
     return this.#name;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
   override get nodeValue(): null {
     return null;
   }
 
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
+  override set nodeValue(_: unknown) {
+    // noop
   }
 
   /**
@@ -66,8 +71,11 @@ export class DocumentType extends Node implements IDocumentType {
     return null;
   }
 
-  override set textContent(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override set textContent(_: unknown) {
+    // noop
   }
 
   /**
