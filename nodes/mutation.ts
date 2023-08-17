@@ -228,7 +228,7 @@ export function preInsertNode(
   node: Node,
   parent: Node,
   child: Child,
-) {
+): Node {
   // 1. Ensure pre-insertion validity of node into parent before child.
   ensurePreInsertionValidity(node, parent, child);
 
@@ -237,7 +237,7 @@ export function preInsertNode(
 
   // 3. If referenceChild is node, then set referenceChild to node’s next sibling.
   if (referenceChild !== null) {
-    referenceChild = referenceChild!.nextSibling;
+    referenceChild = referenceChild.nextSibling;
   }
 
   // 4. Insert node into parent before referenceChild.

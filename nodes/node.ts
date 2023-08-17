@@ -3,7 +3,7 @@ import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
-import { appendNode, preRemoveChild } from "./mutation.ts";
+import { appendNode, preInsertNode, preRemoveChild } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
@@ -234,8 +234,12 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented("isDefaultNamespace");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-insertbefore
+   */
   insertBefore<T>(node: T & Node, child: Node | null): T {
-    throw new UnImplemented("insertBefore");
+    // return the result of pre-inserting node into this before child.
+    return preInsertNode(node, this, child);
   }
 
   appendChild<T>(node: T & Node): T {
