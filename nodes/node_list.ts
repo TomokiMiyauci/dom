@@ -44,19 +44,19 @@ export class NodeList extends Collection<Node> implements INodeList {
   }
 
   entries(): IterableIterator<[number, Node]> {
-    throw new Error();
+    throw new Error("entries");
   }
 
   keys(): IterableIterator<number> {
-    throw new Error();
+    throw new Error("keys");
   }
 
   values(): IterableIterator<Node> {
-    throw new Error();
+    throw new Error("values");
   }
 
   *[Symbol.iterator](): IterableIterator<Node> {
-    throw new Error();
+    throw new Error("iterator");
   }
 }
 

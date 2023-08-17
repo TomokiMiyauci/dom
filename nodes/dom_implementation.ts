@@ -23,7 +23,7 @@ export class DOMImplementation implements IDOMImplementation {
     publicId: string,
     systemId: string,
   ): DocumentType {
-    throw new UnImplemented();
+    throw new UnImplemented("createDocumentType");
   }
 
   createDocument(
@@ -31,7 +31,7 @@ export class DOMImplementation implements IDOMImplementation {
     qualifiedName: string | null,
     doctype?: DocumentType | null | undefined,
   ): XMLDocument {
-    throw new UnImplemented();
+    throw new UnImplemented("createDocument");
   }
 
   /**

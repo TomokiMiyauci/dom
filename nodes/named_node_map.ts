@@ -76,15 +76,15 @@ export class NamedNodeMap implements INamedNodeMap {
   }
 
   removeNamedItem(qualifiedName: string): Attr {
-    throw new UnImplemented();
+    throw new UnImplemented("removeNamedItem");
   }
 
   removeNamedItemNS(namespace: string | null, localName: string): Attr {
-    throw new UnImplemented();
+    throw new UnImplemented("removeNamedItemNS");
   }
 
   *[Symbol.iterator](): IterableIterator<Attr> {
-    throw new UnImplemented();
+    throw new UnImplemented("iterator");
   }
 }
 

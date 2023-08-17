@@ -6,19 +6,19 @@ import { Constructor } from "../deps.ts";
 export function ChildNode<T extends Constructor>(Ctor: T) {
   abstract class ChildNode extends Ctor implements ChildNode {
     after(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("after");
     }
 
     before(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("before");
     }
 
     replaceWith(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("replaceWith");
     }
 
     remove(): void {
-      throw new UnImplemented();
+      throw new UnImplemented("remove");
     }
   }
 

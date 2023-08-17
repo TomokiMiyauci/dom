@@ -17,7 +17,7 @@ export function parseFragment(
   const algorithm = contextElement[$nodeDocument]._type === "html"
     ? parseHTMLFragment
     : (() => {
-      throw new Error();
+      throw new Error("parseFragment");
     })();
 
   // 2. Let new children be the result of invoking algorithm with markup as the input, and context element as the context element.

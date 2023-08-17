@@ -1,6 +1,5 @@
 import { type Document } from "./document.ts";
 import { Node, NodeStates, NodeType } from "./node.ts";
-import { UnImplemented } from "./utils.ts";
 import { type PartialBy } from "../deps.ts";
 import { type Element, isCustom } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
@@ -270,7 +269,7 @@ export function handleAttributesChanges(
   );
 
   // 2. If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  if (element && isCustom(element)) throw new UnImplemented();
+  if (element && isCustom(element)) throw new Error("handleAttributesChanges");
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
 }

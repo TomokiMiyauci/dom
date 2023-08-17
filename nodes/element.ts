@@ -243,19 +243,19 @@ export class Element extends Node implements IElement {
   }
 
   get clientHeight(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("clientHeight");
   }
 
   get clientLeft(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("clientLeft");
   }
 
   get clientTop(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("clientTop");
   }
 
   get clientWidth(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("clientWidth");
   }
 
   /**
@@ -294,11 +294,11 @@ export class Element extends Node implements IElement {
     null;
 
   get outerHTML(): string {
-    throw new UnImplemented();
+    throw new UnImplemented("outerHTML");
   }
 
   set outerHTML(value: string) {
-    throw new UnImplemented();
+    throw new UnImplemented("outerHTML");
   }
 
   /**
@@ -309,7 +309,7 @@ export class Element extends Node implements IElement {
   }
 
   get part(): DOMTokenList {
-    throw new UnImplemented();
+    throw new UnImplemented("part");
   }
 
   /**
@@ -321,47 +321,47 @@ export class Element extends Node implements IElement {
   }
 
   get scrollHeight(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollHeight");
   }
 
   get scrollLeft(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollLeft getter");
   }
 
   set scrollLeft(value: number) {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollLeft setter");
   }
 
   get scrollTop(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollTop getter");
   }
 
   set scrollTop(value: number) {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollTop setter");
   }
 
   get scrollWidth(): number {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollWidth");
   }
 
   get shadowRoot(): ShadowRoot | null {
-    throw new UnImplemented();
+    throw new UnImplemented("shadowRoot");
   }
 
   get slot(): string {
-    throw new UnImplemented();
+    throw new UnImplemented("slot getter");
   }
 
   set slot(value: string) {
-    throw new UnImplemented();
+    throw new UnImplemented("slot setter");
   }
 
   attachShadow(init: ShadowRootInit): ShadowRoot {
-    throw new UnImplemented();
+    throw new UnImplemented("attachShadow");
   }
 
   checkVisibility(options?: CheckVisibilityOptions | undefined): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("checkVisibility");
   }
 
   closest<K extends keyof HTMLElementTagNameMap>(
@@ -379,11 +379,11 @@ export class Element extends Node implements IElement {
   closest<E extends Element = Element>(
     selectors: string,
   ): E | null {
-    throw new UnImplemented();
+    throw new UnImplemented("closest");
   }
 
   computedStyleMap(): StylePropertyMapReadOnly {
-    throw new UnImplemented();
+    throw new UnImplemented("computedStyleMap");
   }
 
   /**
@@ -401,33 +401,33 @@ export class Element extends Node implements IElement {
   }
 
   getAttributeNS(namespace: string | null, localName: string): string | null {
-    throw new UnImplemented();
+    throw new UnImplemented("getAttributeNS");
   }
 
   getAttributeNames(): string[] {
-    throw new UnImplemented();
+    throw new UnImplemented("getAttributeNames");
   }
 
   getAttributeNode(qualifiedName: string): Attr | null {
-    throw new UnImplemented();
+    throw new UnImplemented("getAttributeNode");
   }
 
   getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
-    throw new UnImplemented();
+    throw new UnImplemented("getAttributeNodeNS");
   }
 
   getBoundingClientRect(): DOMRect {
-    throw new UnImplemented();
+    throw new UnImplemented("getBoundingClientRect");
   }
 
   getClientRects(): DOMRectList {
-    throw new UnImplemented();
+    throw new UnImplemented("getClientRects");
   }
 
   getElementsByClassName(
     classNames: string,
   ): HTMLCollectionOf<globalThis.Element> {
-    throw new UnImplemented();
+    throw new UnImplemented("getElementsByClassName");
   }
 
   /**
@@ -478,88 +478,88 @@ export class Element extends Node implements IElement {
     | HTMLCollectionOf<SVGElement>
     | HTMLCollectionOf<MathMLElement>
     | HTMLCollectionOf<globalThis.Element> {
-    throw new UnImplemented();
+    throw new UnImplemented("getElementsByTagNameNS");
   }
 
   hasAttribute(qualifiedName: string): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("hasAttribute");
   }
 
   hasAttributeNS(namespace: string | null, localName: string): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("hasAttributeNS");
   }
 
   hasAttributes(): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("hasAttributes");
   }
 
   hasPointerCapture(pointerId: number): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("hasPointerCapture");
   }
 
   insertAdjacentElement(
     where: InsertPosition,
     element: globalThis.Element,
   ): globalThis.Element | null {
-    throw new UnImplemented();
+    throw new UnImplemented("insertAdjacentElement");
   }
 
   insertAdjacentHTML(position: InsertPosition, text: string): void {
-    throw new UnImplemented();
+    throw new UnImplemented("insertAdjacentHTML");
   }
 
   insertAdjacentText(where: InsertPosition, data: string): void {
-    throw new UnImplemented();
+    throw new UnImplemented("insertAdjacentText");
   }
 
   matches(selectors: string): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("matches");
   }
 
   releasePointerCapture(pointerId: number): void {
-    throw new UnImplemented();
+    throw new UnImplemented("releasePointerCapture");
   }
 
   removeAttribute(qualifiedName: string): void {
-    throw new UnImplemented();
+    throw new UnImplemented("removeAttribute");
   }
 
   removeAttributeNS(namespace: string | null, localName: string): void {
-    throw new UnImplemented();
+    throw new UnImplemented("removeAttributeNS");
   }
 
   removeAttributeNode(attr: Attr): Attr {
-    throw new UnImplemented();
+    throw new UnImplemented("removeAttributeNode");
   }
 
   requestFullscreen(options?: FullscreenOptions | undefined): Promise<void> {
-    throw new UnImplemented();
+    throw new UnImplemented("requestFullscreen");
   }
 
   requestPointerLock(): void {
-    throw new UnImplemented();
+    throw new UnImplemented("requestPointerLock");
   }
 
   scroll(options?: ScrollToOptions | undefined): void;
   scroll(x: number, y: number): void;
   scroll(x?: unknown, y?: unknown): void {
-    throw new UnImplemented();
+    throw new UnImplemented("scroll");
   }
 
   scrollBy(options?: ScrollToOptions | undefined): void;
   scrollBy(x: number, y: number): void;
   scrollBy(x?: unknown, y?: unknown): void {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollBy");
   }
 
   scrollIntoView(arg?: boolean | ScrollIntoViewOptions | undefined): void {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollIntoView");
   }
 
   scrollTo(options?: ScrollToOptions | undefined): void;
   scrollTo(x: number, y: number): void;
   scrollTo(x?: unknown, y?: unknown): void {
-    throw new UnImplemented();
+    throw new UnImplemented("scrollTo");
   }
 
   /**
@@ -630,51 +630,15 @@ export class Element extends Node implements IElement {
   }
 
   setPointerCapture(pointerId: number): void {
-    throw new UnImplemented();
+    throw new UnImplemented("setPointerCapture");
   }
 
   toggleAttribute(qualifiedName: string, force?: boolean | undefined): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("toggleAttribute");
   }
 
   webkitMatchesSelector(selectors: string): boolean {
-    throw new UnImplemented();
-  }
-
-  override addEventListener(
-    type: string,
-    callback: EventListenerOrEventListenerObject | null,
-    options?: boolean | AddEventListenerOptions | undefined,
-  ): void;
-  override addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject | null,
-    options?: boolean | AddEventListenerOptions | undefined,
-  ): void;
-  override addEventListener(
-    type: unknown,
-    listener: unknown,
-    options?: unknown,
-  ): void {
-    throw new UnImplemented();
-  }
-
-  override removeEventListener(
-    type: string,
-    callback: EventListenerOrEventListenerObject | null,
-    options?: boolean | EventListenerOptions | undefined,
-  ): void;
-  override removeEventListener(
-    type: string,
-    callback: EventListenerOrEventListenerObject | null,
-    options?: boolean | EventListenerOptions | undefined,
-  ): void;
-  override removeEventListener(
-    type: unknown,
-    callback: unknown,
-    options?: unknown,
-  ): void {
-    throw new UnImplemented();
+    throw new UnImplemented("webkitMatchesSelector");
   }
 }
 
@@ -799,7 +763,7 @@ export function createElement(
 
   // 5. If definition is non-null, and definition’s name is not equal to its local name (i.e., definition represents a customized built-in element), then:
   if (definition !== null && definition.name !== definition.localName) {
-    throw new Error();
+    throw new Error("createElement");
   } // 1. Let interface be the element interface for localName and the HTML namespace.
 
   // 2. Set result to a new element that implements interface, with no attributes, namespace set to the HTML namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "undefined", custom element definition set to null, is value set to is, and node document set to document.
@@ -818,7 +782,7 @@ export function createElement(
 
   // 6. Otherwise, if definition is non-null, then:
   else if (definition !== null) {
-    throw new Error();
+    throw new Error("createElement");
   } // 1. If the synchronous custom elements flag is set, then run these steps while catching any exceptions:
 
   // 1. Let C be definition’s constructor.
@@ -916,7 +880,7 @@ export function appendAttribute(attribute: Attr, element: Element): void {
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
  */
 export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
-  throw new Error();
+  throw new Error("replaceAttribute");
 }
 
 /**

@@ -7,19 +7,19 @@ export function NonDocumentTypeChildNode<T extends Constructor>(Ctor: T) {
   abstract class NonDocumentTypeChildNode extends Ctor
     implements INonDocumentTypeChildNode {
     get nextElementSibling(): Element | null {
-      throw new UnImplemented();
+      throw new UnImplemented("nextElementSibling");
     }
 
     set nextElementSibling(value: Element | null) {
-      throw new UnImplemented();
+      throw new UnImplemented("nextElementSibling");
     }
 
     get previousElementSibling(): Element | null {
-      throw new UnImplemented();
+      throw new UnImplemented("previousElementSibling");
     }
 
     set previousElementSibling(value: Element | null) {
-      throw new UnImplemented();
+      throw new UnImplemented("previousElementSibling");
     }
   }
 

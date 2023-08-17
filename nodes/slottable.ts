@@ -5,11 +5,11 @@ import { UnImplemented } from "./utils.ts";
 export function Slottable<T extends Constructor>(Ctor: T) {
   abstract class Slottable extends Ctor implements ISlottable {
     get assignedSlot(): HTMLSlotElement | null {
-      throw new UnImplemented();
+      throw new UnImplemented("assignedSlot");
     }
 
     set assignedSlot(value: HTMLSlotElement | null) {
-      throw new UnImplemented();
+      throw new UnImplemented("assignedSlot");
     }
   }
 

@@ -9,7 +9,6 @@ import { Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $namespace, $nodeDocument } from "./internal.ts";
 import { every, izip } from "../deps.ts";
-import type { Element } from "./element.ts";
 import { type OrderedSet } from "../infra/set.ts";
 
 export enum NodeType {
@@ -47,25 +46,25 @@ export abstract class Node extends EventTarget implements INode {
   abstract set textContent(value: string | null);
 
   get baseURI(): string {
-    throw new UnImplemented();
+    throw new UnImplemented("baseURI");
   }
 
   get isConnected(): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("isConnected");
   }
 
   abstract get ownerDocument(): Document | null;
 
   getRootNode(options?: GetRootNodeOptions | undefined): Node {
-    throw new UnImplemented();
+    throw new UnImplemented("getRootNode");
   }
 
   get parentNode(): (Node & ParentNode) | null {
-    throw new UnImplemented();
+    throw new UnImplemented("parentNode");
   }
 
   hasChildNodes(): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("hasChildNodes");
   }
 
   get childNodes(): NodeListOf<Node & ChildNode> {
@@ -86,14 +85,16 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get previousSibling(): (Node & ChildNode) | null {
-    throw new UnImplemented();
+    throw new UnImplemented("previousSibling");
   }
 
   get nextSibling(): (Node & ChildNode) | null {
-    throw new UnImplemented();
+    throw new UnImplemented("nextSibling");
   }
 
-  normalize(): void {}
+  normalize(): void {
+    throw new UnImplemented("normalize");
+  }
 
   cloneNode(deep?: boolean | undefined): Node {
     let document = this[$nodeDocument];
@@ -138,7 +139,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   isSameNode(otherNode: Node | null): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("isSameNode");
   }
 
   get DOCUMENT_POSITION_DISCONNECTED(): 1 {
@@ -218,23 +219,23 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   contains(other: Node | null): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("contains");
   }
 
   lookupPrefix(namespace: string | null): string | null {
-    throw new UnImplemented();
+    throw new UnImplemented("lookupPrefix");
   }
 
   lookupNamespaceURI(prefix: string | null): string | null {
-    throw new UnImplemented();
+    throw new UnImplemented("lookupNamespaceURI");
   }
 
   isDefaultNamespace(namespace: string | null): boolean {
-    throw new UnImplemented();
+    throw new UnImplemented("isDefaultNamespace");
   }
 
   insertBefore<T>(node: T & Node, child: Node | null): T {
-    throw new UnImplemented();
+    throw new UnImplemented("insertBefore");
   }
 
   appendChild<T>(node: T & Node): T {
@@ -242,7 +243,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   replaceChild<T>(node: T & Node, child: T): T {
-    throw new UnImplemented();
+    throw new UnImplemented("replaceChild");
   }
 
   removeChild<T>(child: T & Node): T {
@@ -250,7 +251,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get parentElement(): HTMLElement | null {
-    throw new UnImplemented();
+    throw new UnImplemented("parentElement");
   }
 }
 

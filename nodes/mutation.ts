@@ -62,7 +62,7 @@ export function replaceChild(
 
   // 13. Remove child with the suppress observers flag set.
 
-  throw new Error();
+  throw new Error("replaceChild");
 }
 
 /**
@@ -204,14 +204,14 @@ export function ensurePreInsertionValidity(
       // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
       // TODO
       if (some(parent._children, isElement) && child && isDocumentType(child)) {
-        throw new UnImplemented();
+        throw new UnImplemented("ensurePreInsertionValidity");
       }
     } // DocumentType
     else if (isDocumentType(node)) {
       // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
       // TODO
       if (some(parent._children, isDocumentType) && child !== null) {
-        throw new UnImplemented();
+        throw new UnImplemented("ensurePreInsertionValidity");
       }
     }
   }

@@ -15,6 +15,7 @@ import { nodeLength } from "./node_tree.ts";
 import { orderTree } from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
 
 @Slottable
 export class Text extends CharacterData implements IText {
@@ -81,7 +82,9 @@ export function splitText(node: Text, offset: number): Text {
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.
   // TODO
-  if (offset > length) throw 0;
+  if (offset > length) {
+    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+  }
 
   // 3 Let count be length minus offset.
   const count = length - offset;

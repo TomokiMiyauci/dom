@@ -46,15 +46,15 @@ export function ParentNode<T extends abstract new (...args: any[]) => Node>(
     }
 
     prepend(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("prepend");
     }
 
     append(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("append");
     }
 
     replaceChildren(...nodes: (string | Node)[]): void {
-      throw new UnImplemented();
+      throw new UnImplemented("replaceChildren");
     }
 
     /**

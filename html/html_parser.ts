@@ -23,5 +23,5 @@ export function parseHTMLFragment(
   context: Element,
   input: string,
 ): List<Node> {
-  throw new Error();
+  throw new Error("parseHTMLFragment");
 }

@@ -7,7 +7,7 @@ import { parseFragment } from "./fragment.ts";
 export function InnerHTML<T extends Constructor<Element>>(Ctor: T) {
   abstract class InnerHTML extends Ctor implements IInnerHTML {
     override get innerHTML(): string {
-      throw new Error();
+      throw new Error("innerHTML getter");
     }
 
     /**
