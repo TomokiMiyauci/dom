@@ -108,12 +108,30 @@ export abstract class Node extends EventTarget implements INode {
     return this._lastChild;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-previoussibling
+   */
   get previousSibling(): (Node & ChildNode) | null {
-    throw new UnImplemented("previousSibling");
+    // TODO(miyauci): O(1)
+    if (this._parent) {
+      const index = [...this._parent._children].indexOf(this);
+      if (index > 0) return this._parent._children[index - 1];
+    }
+
+    return null;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nextsibling
+   */
   get nextSibling(): (Node & ChildNode) | null {
-    throw new UnImplemented("nextSibling");
+    // TODO(miyauci): O(1)
+    if (this._parent) {
+      const index = [...this._parent._children].indexOf(this);
+      if (index > -1) return this._parent._children[index + 1];
+    }
+
+    return null;
   }
 
   normalize(): void {
