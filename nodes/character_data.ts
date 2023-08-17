@@ -91,7 +91,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-characterdata-data
    */
   set data(value: string) {
-    throw new UnImplemented();
+    // replace data with node this, offset 0, count this’s length, and data new value.
+    replaceData(this, 0, nodeLength(this), value);
   }
 
   appendData(data: string): void {
