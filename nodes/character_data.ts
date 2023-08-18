@@ -8,6 +8,7 @@ import { nodeLength } from "./node_tree.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { queueMutationRecord } from "./mutation_observer.ts";
 import { OrderedSet } from "../infra/set.ts";
+import { LegacyNullToEmptyString } from "../webidl/legacy_extended_attributes.ts";
 
 export interface CharacterDataStates {
   /**
@@ -88,6 +89,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-data
    */
+  @LegacyNullToEmptyString
   set data(value: string) {
     // replace data with node this, offset 0, count this’s length, and data new value.
     replaceData(this, 0, nodeLength(this), value);
@@ -119,6 +121,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-replacedata
+   * @throws {DOMException}
    */
   replaceData(offset: number, count: number, data: string): void {
     // replace data with node this, offset offset, count count, and data data.
@@ -127,8 +130,11 @@ export abstract class CharacterData extends Node implements ICharacterData {
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-substringdata
+   * @throws {TypeError}
+   * @throws {DOMException}
    */
   substringData(offset: number, count: number): string {
+    if (arguments.length < 2) throw new TypeError("<message>");
     // return the result of running substring data with node this, offset offset, and count count.
     return substringData(this, offset, count);
   }
@@ -149,7 +155,7 @@ export function substringData(
   const length = nodeLength(node);
 
   // 2. If offset is greater than length, then throw an "IndexSizeError" DOMException.
-  if (offset > length) {
+  if (offset < 0 || offset > length) { // offset < 0 is test requirement
     throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
   }
 
