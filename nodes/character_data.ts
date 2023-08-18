@@ -5,6 +5,9 @@ import { type Document } from "./document.ts";
 import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_tree.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
+import { queueMutationRecord } from "./mutation_observer.ts";
+import { OrderedSet } from "../infra/set.ts";
 
 export interface CharacterDataStates {
   /**
@@ -137,34 +140,64 @@ export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
  * @see https://dom.spec.whatwg.org/#concept-cd-substring
  */
 export function substringData(
-  node: Node,
+  node: CharacterData,
   offset: number,
   count: number,
 ): string {
-  throw new Error("substringData");
+  // 1. Let length be node’s length.
+  const length = nodeLength(node);
+
+  // 2. If offset is greater than length, then throw an "IndexSizeError" DOMException.
+  if (offset > length) {
+    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+  }
+
+  // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
+  if (offset + count > length) return node[$data].slice(offset);
+
+  // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
+  return node[$data].slice(offset, offset + count);
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace
  */
 export function replaceData(
-  node: Node,
+  node: CharacterData,
   offset: number,
   count: number,
   data: string,
 ) {
-  throw new Error("replaceData");
   // 1 Let length be node’s length.
+  const length = nodeLength(node);
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.
+  if (offset > length) {
+    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+  }
 
   // 3 If offset plus count is greater than length, then set count to length minus offset.
+  if (offset + count > length) count = length - offset;
 
   // 4 Queue a mutation record of "characterData" for node with null, null, node’s data, « », « », null, and null.
+  queueMutationRecord(
+    "characterData",
+    node,
+    null,
+    null,
+    node[$data],
+    new OrderedSet(),
+    new OrderedSet(),
+    null,
+    null,
+  );
 
   // 5 Insert data into node’s data after offset code units.
+  node[$data] = node[$data].substring(0, offset) + data +
+    node[$data].substring(offset + count);
 
   // 6 Let delete offset be offset + data’s length.
+  const deleteOffset = offset + node[$data].length;
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 
