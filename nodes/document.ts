@@ -131,8 +131,11 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
-  override set textContent(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-textcontent
+   */
+  override set textContent(_: unknown) {
+    // noop
   }
 
   protected override equals(): true {
