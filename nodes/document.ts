@@ -22,6 +22,7 @@ import {
   $origin,
   $URL,
 } from "./internal.ts";
+import { ProcessingInstruction } from "./processing_instruction.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { CDATASection } from "./cdata_section.ts";
@@ -443,11 +444,22 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createprocessinginstruction
+   */
   createProcessingInstruction(
     target: string,
     data: string,
   ): ProcessingInstruction {
-    throw new UnImplemented();
+    // 1. If target does not match the Name production, then throw an "InvalidCharacterError" DOMException.
+
+    // 2. If data contains the string "?>", then throw an "InvalidCharacterError" DOMException.
+    if (data.includes("?")) {
+      throw new DOMException("<message>", "InvalidCharacterError");
+    }
+
+    // 3. Return a new ProcessingInstruction node, with target set to target, data set to data, and node document set to this.
+    return new ProcessingInstruction({ data, target, nodeDocument: this });
   }
 
   createRange(): Range {
