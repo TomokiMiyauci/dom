@@ -15,6 +15,7 @@ import { type DocumentType } from "./document_type.ts";
 import { find, html } from "../deps.ts";
 import {
   $create,
+  $encoding,
   $implementation,
   $localName,
   $mode,
@@ -28,6 +29,11 @@ import { CDATASection } from "./cdata_section.ts";
 import { GlobalEventHandlers } from "../html/global_event_handlers.ts";
 import { FontFaceSource } from "../css/css_font_loading/font_face_source.ts";
 
+export interface Encoding {
+  name: string;
+  labels: string[];
+}
+
 export type Origin = OpaqueOrigin | TupleOrigin;
 
 export interface OpaqueOrigin {
@@ -37,6 +43,18 @@ export interface OpaqueOrigin {
 export interface TupleOrigin {
   type: "tuple";
 }
+
+const utf8: Encoding = {
+  name: "UTF-8",
+  labels: [
+    "unicode-1-1-utf-8",
+    "unicode11utf8",
+    "unicode20utf8",
+    "utf-8",
+    "utf8",
+    "x-unicode20utf8",
+  ],
+};
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
@@ -54,6 +72,7 @@ export class Document extends Node implements IDocument {
   [$implementation]: DOMImplementation;
   [$origin]: Origin = { type: "opaque" };
   [$mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
+  [$encoding]: Encoding = utf8;
 
   /**
    * @see https://momdo.github.io/html/dom.html#current-document-readiness
@@ -154,12 +173,20 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-characterset
+   */
   get characterSet(): string {
-    throw new UnImplemented();
+    // return this’s encoding’s name.
+    return this[$encoding].name;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-charset
+   */
   get charset(): string {
-    throw new UnImplemented();
+    // return this’s encoding’s name.
+    return this[$encoding].name;
   }
 
   set charset(value: string) {
@@ -299,8 +326,12 @@ export class Document extends Node implements IDocument {
     return this[$implementation];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-inputencoding
+   */
   get inputEncoding(): string {
-    throw new UnImplemented();
+    // return this’s encoding’s name.
+    return this[$encoding].name;
   }
 
   get lastModified(): string {
