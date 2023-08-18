@@ -1,4 +1,4 @@
-import { last, len } from "./deps.ts";
+import { divide, last, len } from "./deps.ts";
 import { assertEquals, describe, it } from "./_dev_deps.ts";
 
 describe("len", () => {
@@ -38,6 +38,23 @@ describe("last", () => {
 
     table.forEach(([iterable, expected]) => {
       assertEquals(last(iterable), expected);
+    });
+  });
+});
+
+describe("divide", () => {
+  it("should return divided tuple", () => {
+    const table: [string, string, [string, string]][] = [
+      ["abc", "", ["abc", ""]],
+      ["abc", "b", ["a", "c"]],
+      ["abcbc", "b", ["a", "cbc"]],
+      ["abcbc", "a", ["", "bcbc"]],
+      ["abcbc", "c", ["ab", "bc"]],
+      ["abcbc", "d", ["abcbc", ""]],
+    ];
+
+    table.forEach(([input, delimiter, expected]) => {
+      assertEquals(divide(input, delimiter), expected);
     });
   });
 });

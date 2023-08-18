@@ -2,7 +2,7 @@ import {
   DOMExceptionDescription,
   DOMExceptionName,
 } from "../webidl/exception.ts";
-import { isNotNull } from "../deps.ts";
+import { divide, isNotNull } from "../deps.ts";
 
 /**
  * [Infra Living Standard](https://infra.spec.whatwg.org/#namespaces)
@@ -42,7 +42,7 @@ export enum Namespace {
 /**
  * @see https://dom.spec.whatwg.org/#validate
  */
-function validate(qualifiedName: string) {
+export function validate(qualifiedName: string) {
   // throw an "InvalidCharacterError" DOMException if qualifiedName does not match the QName production.
 }
 
@@ -122,10 +122,4 @@ export function validateAndExtract(
 
   // 10. Return namespace, prefix, and localName.
   return { namespace, prefix, localName };
-}
-
-function divide(input: string, delimiter: string): [string, string] {
-  const pos = input.indexOf(delimiter);
-
-  return [input.slice(0, pos), input.slice(pos)];
 }
