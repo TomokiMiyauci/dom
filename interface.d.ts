@@ -2,6 +2,7 @@
 /// <reference lib="dom.iterable" />
 
 export type IDocument = Document;
+export type IXMLDocument = XMLDocument;
 export type IElement = Element;
 export type INode = Node;
 export type IAttr = Attr;
@@ -32,3 +33,5 @@ export type IARIAMixin = ARIAMixin;
 export type IAnimatable = Animatable;
 export type IInnerHTML = InnerHTML;
 export type IGlobalEventHandlers = GlobalEventHandlers;
+export type IProcessingInstruction = ProcessingInstruction;
+export type ILinkStyle = LinkStyle;
