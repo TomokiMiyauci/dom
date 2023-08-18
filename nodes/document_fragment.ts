@@ -24,6 +24,16 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   }
 
   /**
+   * @see https://dom.spec.whatwg.org/#dom-documentfragment-documentfragment
+   */
+  constructor() {
+    super();
+
+    // set this’s node document to current global object’s associated Document.
+    this[$nodeDocument] = globalThis.document as Document;
+  }
+
+  /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodetype
    */
   override get nodeType(): NodeType.DOCUMENT_FRAGMENT_NODE {
