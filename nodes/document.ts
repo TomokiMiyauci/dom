@@ -110,12 +110,18 @@ export class Document extends Node implements IDocument {
     return "#document";
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
   override get nodeValue(): null {
     return null;
   }
 
-  override set nodeValue(value: string | null) {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
+   */
+  override set nodeValue(_: unknown) {
+    // noop
   }
 
   /**
