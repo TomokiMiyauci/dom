@@ -28,6 +28,14 @@ import { CDATASection } from "./cdata_section.ts";
 import { GlobalEventHandlers } from "../html/global_event_handlers.ts";
 import { FontFaceSource } from "../css/css_font_loading/font_face_source.ts";
 import { Document_HTML } from "../html/document.ts";
+import { Document_CSSOM_View } from "../cssom_view/document.ts";
+import { Document_Picture_In_Picture } from "../picture_in_picture/document.ts";
+import { Document_Fullscreen } from "../fullscreen/document.ts";
+import { Document_Pointerlock } from "../pointerlock/document.ts";
+import { Document_Selection } from "../selection/document.ts";
+import { Document_Storage_Access_API } from "../storage_access_api/document.ts";
+import { Document_WebAnimation } from "../web_animations/document.ts";
+import { Document_SVG } from "../svg/document.ts";
 
 export interface Encoding {
   name: string;
@@ -59,7 +67,15 @@ const utf8: Encoding = {
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
 @Document_HTML
+@Document_CSSOM_View
+@Document_Picture_In_Picture
+@Document_Fullscreen
+@Document_Pointerlock
+@Document_Storage_Access_API
 @DocumentOrShadowRoot
+@Document_Selection
+@Document_WebAnimation
+@Document_SVG
 @ParentNode
 @NonElementParentNode
 @GlobalEventHandlers
@@ -186,14 +202,6 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  get fullscreen(): boolean {
-    throw new UnImplemented();
-  }
-
-  get fullscreenEnabled(): boolean {
-    throw new UnImplemented();
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-implementation
    */
@@ -210,21 +218,6 @@ export class Document extends Node implements IDocument {
     return this[$encoding].name;
   }
 
-  get location(): Location {
-    throw new UnImplemented();
-  }
-  set location(href: Location) {
-    throw new UnImplemented();
-  }
-  onfullscreenchange: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
-  onfullscreenerror: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
-  onpointerlockchange: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
-  onpointerlockerror: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
@@ -233,27 +226,7 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
-  get pictureInPictureEnabled(): boolean {
-    throw new UnImplemented();
-  }
-
-  get rootElement(): SVGSVGElement | null {
-    throw new UnImplemented();
-  }
-
-  get scrollingElement(): Element | null {
-    throw new UnImplemented();
-  }
-
-  get timeline(): DocumentTimeline {
-    throw new UnImplemented();
-  }
-
   adoptNode<T extends globalThis.Node>(node: T): T {
-    throw new UnImplemented();
-  }
-
-  caretRangeFromPoint(x: number, y: number): any | null {
     throw new UnImplemented();
   }
 
@@ -497,18 +470,6 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  exitFullscreen(): Promise<void> {
-    throw new UnImplemented();
-  }
-
-  exitPictureInPicture(): Promise<void> {
-    throw new UnImplemented();
-  }
-
-  exitPointerLock(): void {
-    throw new UnImplemented();
-  }
-
   getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
     throw new UnImplemented();
   }
@@ -560,19 +521,7 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  getSelection(): Selection | null {
-    throw new UnImplemented();
-  }
-
-  hasStorageAccess(): Promise<boolean> {
-    throw new UnImplemented();
-  }
-
   importNode<T>(node: T & Node, deep?: boolean | undefined): T {
-    throw new UnImplemented();
-  }
-
-  requestStorageAccess(): Promise<void> {
     throw new UnImplemented();
   }
 }
@@ -585,7 +534,15 @@ export interface Document
     NonElementParentNode,
     XPathEvaluatorBase,
     GlobalEventHandlers,
-    Document_HTML {
+    Document_HTML,
+    Document_CSSOM_View,
+    Document_Picture_In_Picture,
+    Document_Fullscreen,
+    Document_Pointerlock,
+    Document_Selection,
+    Document_Storage_Access_API,
+    Document_WebAnimation,
+    Document_SVG {
   getElementById(elementId: string): HTMLElement | null;
   addEventListener<K extends keyof DocumentEventMap>(
     type: K,

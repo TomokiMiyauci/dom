@@ -8,6 +8,8 @@ import { type Element } from "../nodes/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 
 type PartialDocument =
+  // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
+  | "location"
   | "domain"
   | "referrer"
   | "cookie"
@@ -58,6 +60,13 @@ export function Document_HTML<T extends Constructor<Node>>(
      * @see https://momdo.github.io/html/dom.html#current-document-readiness
      */
     _currentDocumentReadiness: DocumentReadyState = "complete";
+
+    get location(): Location {
+      throw new Error();
+    }
+    set location(href: Location) {
+      throw new Error();
+    }
 
     get domain(): string {
       throw new Error("domain#getter");
