@@ -1,8 +1,10 @@
 import { UnImplemented } from "./utils.ts";
 import { type IDocumentOrShadowRoot } from "../interface.d.ts";
 import { Constructor } from "../deps.ts";
+import { DocumentOrShadowRoot_Picture_In_Picture } from "../picture_in_picture/document_or_shadow_root.ts";
 
 export function DocumentOrShadowRoot<T extends Constructor>(Ctor: T) {
+  @DocumentOrShadowRoot_Picture_In_Picture
   abstract class Mixin extends Ctor implements IDocumentOrShadowRoot {
     get activeElement(): Element | null {
       throw new UnImplemented("activeElement");
@@ -18,10 +20,6 @@ export function DocumentOrShadowRoot<T extends Constructor>(Ctor: T) {
 
     get fullscreenElement(): Element | null {
       throw new UnImplemented("fullscreenElement");
-    }
-
-    get pictureInPictureElement(): Element | null {
-      throw new UnImplemented("pictureInPictureElement");
     }
 
     get pointerLockElement(): Element | null {
@@ -44,6 +42,9 @@ export function DocumentOrShadowRoot<T extends Constructor>(Ctor: T) {
       throw new UnImplemented("getAnimations");
     }
   }
+
+  // deno-lint-ignore no-empty-interface
+  interface Mixin extends DocumentOrShadowRoot_Picture_In_Picture {}
 
   return Mixin;
 }
