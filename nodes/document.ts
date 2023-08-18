@@ -7,7 +7,7 @@ import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
 import { createElement, type Element } from "./element.ts";
-import { Namespace, validateAndExtract } from "../infra/namespace.ts";
+import { Namespace, validate, validateAndExtract } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../interface.d.ts";
@@ -251,8 +251,24 @@ export class Document extends Node implements IDocument {
   createAttribute(localName: string): Attr {
     return new Attr({ localName, nodeDocument: this });
   }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createattributens
+   */
   createAttributeNS(namespace: string | null, qualifiedName: string): Attr {
-    throw new UnImplemented();
+    // 1. Let namespace, prefix, and localName be the result of passing namespace and qualifiedName to validate and extract.
+    const { namespace: ns, prefix, localName } = validateAndExtract(
+      namespace,
+      qualifiedName,
+    );
+
+    // 2. Return a new attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, and node document is this.
+    return new Attr({
+      localName,
+      namespacePrefix: prefix,
+      namespace: ns,
+      nodeDocument: this,
+    });
   }
 
   /**
