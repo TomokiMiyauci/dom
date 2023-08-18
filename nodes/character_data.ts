@@ -138,6 +138,7 @@ export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-substring
+ * @throws {DOMException}
  */
 export function substringData(
   node: CharacterData,
@@ -161,6 +162,7 @@ export function substringData(
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace
+ * @throws {DOMException}
  */
 export function replaceData(
   node: CharacterData,
@@ -172,7 +174,7 @@ export function replaceData(
   const length = nodeLength(node);
 
   // 2 If offset is greater than length, then throw an "IndexSizeError" DOMException.
-  if (offset > length) {
+  if (offset < 0 || offset > length) { // offset < 0 is test requirement
     throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
   }
 
