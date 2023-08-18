@@ -17,7 +17,6 @@ import {
   $create,
   $encoding,
   $implementation,
-  $localName,
   $mode,
   $nodeDocument,
   $origin,
@@ -28,6 +27,7 @@ import { DOMExceptionName } from "../webidl/exception.ts";
 import { CDATASection } from "./cdata_section.ts";
 import { GlobalEventHandlers } from "../html/global_event_handlers.ts";
 import { FontFaceSource } from "../css/css_font_loading/font_face_source.ts";
+import { Document_HTML } from "../html/document.ts";
 
 export interface Encoding {
   name: string;
@@ -58,6 +58,7 @@ const utf8: Encoding = {
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
+@Document_HTML
 @DocumentOrShadowRoot
 @ParentNode
 @NonElementParentNode
@@ -73,11 +74,6 @@ export class Document extends Node implements IDocument {
   [$origin]: Origin = { type: "opaque" };
   [$mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
   [$encoding]: Encoding = utf8;
-
-  /**
-   * @see https://momdo.github.io/html/dom.html#current-document-readiness
-   */
-  _currentDocumentReadiness: DocumentReadyState = "complete";
 
   constructor() {
     super();
@@ -133,46 +129,6 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  alinkColor: string = "";
-
-  get all(): HTMLAllCollection {
-    throw new UnImplemented();
-  }
-
-  get anchors(): HTMLCollectionOf<HTMLAnchorElement> {
-    throw new UnImplemented();
-  }
-
-  get applets(): HTMLCollection {
-    throw new UnImplemented();
-  }
-
-  get bgColor(): string {
-    throw new UnImplemented();
-  }
-
-  set bgColor(value: string) {
-    throw new UnImplemented();
-  }
-
-  get body(): HTMLElement {
-    // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
-    const documentElement = find(this._children, isElement);
-
-    if (!documentElement) return null;
-
-    if (documentElement[$localName] !== "html") return null;
-
-    return find(
-      documentElement._children,
-      (v) => ["body", "frameset"].includes(v[$localName]),
-    ) ?? null;
-  }
-
-  set body(value: HTMLElement) {
-    throw new UnImplemented();
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-characterset
    */
@@ -210,45 +166,6 @@ export class Document extends Node implements IDocument {
     return this._contentType;
   }
 
-  get cookie(): string {
-    throw new UnImplemented();
-  }
-
-  set cookie(value: string) {
-    throw new UnImplemented();
-  }
-
-  get currentScript(): HTMLOrSVGScriptElement | null {
-    throw new UnImplemented();
-  }
-
-  /**
-   * @see https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-defaultview
-   */
-  get defaultView(): (WindowProxy & typeof globalThis) | null {
-    // TODO
-    return globalThis;
-    // 1. If this's browsing context is null, then return null.
-
-    // 2. Return this's browsing context's WindowProxy object.
-  }
-
-  get designMode(): string {
-    throw new UnImplemented();
-  }
-
-  set designMode(value: string) {
-    throw new UnImplemented();
-  }
-
-  get dir(): string {
-    throw new UnImplemented();
-  }
-
-  set dir(value: string) {
-    throw new UnImplemented();
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-doctype
    */
@@ -265,31 +182,7 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
-  get domain(): string {
-    throw new UnImplemented();
-  }
-
-  set domain(value: string) {
-    throw new UnImplemented();
-  }
-
   get documentURI(): string {
-    throw new UnImplemented();
-  }
-
-  get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
-    throw new UnImplemented();
-  }
-
-  get fgColor(): string {
-    throw new UnImplemented();
-  }
-
-  set fgColor(value: string) {
-    throw new UnImplemented();
-  }
-
-  get forms(): HTMLCollectionOf<HTMLFormElement> {
     throw new UnImplemented();
   }
 
@@ -298,23 +191,6 @@ export class Document extends Node implements IDocument {
   }
 
   get fullscreenEnabled(): boolean {
-    throw new UnImplemented();
-  }
-
-  /**
-   * @see https://html.spec.whatwg.org/multipage/dom.html#dom-document-head
-   * @note The specification also allows null to be returned.
-   */
-  get head(): HTMLHeadElement {
-    // return the head element of the document (a head element or null).
-    return this.getElementsByTagName("head")[0]! ?? null;
-  }
-
-  get hidden(): boolean {
-    throw new UnImplemented();
-  }
-
-  get images(): HTMLCollectionOf<HTMLImageElement> {
     throw new UnImplemented();
   }
 
@@ -334,22 +210,6 @@ export class Document extends Node implements IDocument {
     return this[$encoding].name;
   }
 
-  get lastModified(): string {
-    throw new UnImplemented();
-  }
-
-  get linkColor(): string {
-    throw new UnImplemented();
-  }
-
-  set linkColor(value: string) {
-    throw new UnImplemented();
-  }
-
-  get links(): HTMLCollectionOf<HTMLAnchorElement | HTMLAreaElement> {
-    throw new UnImplemented();
-  }
-
   get location(): Location {
     throw new UnImplemented();
   }
@@ -364,10 +224,6 @@ export class Document extends Node implements IDocument {
     null;
   onpointerlockerror: ((this: globalThis.Document, ev: Event) => any) | null =
     null;
-  onreadystatechange: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
-  onvisibilitychange: ((this: globalThis.Document, ev: Event) => any) | null =
-    null;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
@@ -381,27 +237,7 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  get plugins(): HTMLCollectionOf<HTMLEmbedElement> {
-    throw new UnImplemented();
-  }
-
-  /**
-   * @see https://momdo.github.io/html/dom.html#dom-document-readystate
-   */
-  get readyState(): DocumentReadyState {
-    // to return this's current document readiness.
-    return this._currentDocumentReadiness;
-  }
-
-  get referrer(): string {
-    throw new UnImplemented();
-  }
-
   get rootElement(): SVGSVGElement | null {
-    throw new UnImplemented();
-  }
-
-  get scripts(): HTMLCollectionOf<HTMLScriptElement> {
     throw new UnImplemented();
   }
 
@@ -413,41 +249,14 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  get title(): string {
-    throw new UnImplemented();
-  }
-
-  set title(value: string) {
-    throw new UnImplemented();
-  }
-
-  get visibilityState(): DocumentVisibilityState {
-    throw new UnImplemented();
-  }
-
-  get vlinkColor(): string {
-    throw new UnImplemented();
-  }
-
-  set vlinkColor(value: string) {
-    throw new UnImplemented();
-  }
-
   adoptNode<T extends globalThis.Node>(node: T): T {
     throw new UnImplemented();
   }
-  captureEvents(): void {
-    throw new UnImplemented();
-  }
+
   caretRangeFromPoint(x: number, y: number): any | null {
     throw new UnImplemented();
   }
-  clear(): void {
-    throw new UnImplemented();
-  }
-  close(): void {
-    throw new UnImplemented();
-  }
+
   createAttribute(localName: string): Attr {
     return new Attr({ localName, nodeDocument: this });
   }
@@ -688,14 +497,6 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  execCommand(
-    commandId: string,
-    showUI?: boolean | undefined,
-    value?: string | undefined,
-  ): boolean {
-    throw new UnImplemented();
-  }
-
   exitFullscreen(): Promise<void> {
     throw new UnImplemented();
   }
@@ -705,10 +506,6 @@ export class Document extends Node implements IDocument {
   }
 
   exitPointerLock(): void {
-    throw new UnImplemented();
-  }
-
-  getElementsByName(elementName: string): NodeListOf<HTMLElement> {
     throw new UnImplemented();
   }
 
@@ -767,10 +564,6 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  hasFocus(): boolean {
-    throw new UnImplemented();
-  }
-
   hasStorageAccess(): Promise<boolean> {
     throw new UnImplemented();
   }
@@ -779,52 +572,7 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  open(
-    unused1?: string | undefined,
-    unused2?: string | undefined,
-  ): globalThis.Document;
-  open(url: string | URL, name: string, features: string): Window | null;
-  open(
-    url?: unknown,
-    name?: unknown,
-    features?: unknown,
-  ): globalThis.Document | Window | null {
-    throw new UnImplemented();
-  }
-
-  queryCommandEnabled(commandId: string): boolean {
-    throw new UnImplemented();
-  }
-
-  queryCommandIndeterm(commandId: string): boolean {
-    throw new UnImplemented();
-  }
-
-  queryCommandState(commandId: string): boolean {
-    throw new UnImplemented();
-  }
-
-  queryCommandSupported(commandId: string): boolean {
-    throw new UnImplemented();
-  }
-
-  queryCommandValue(commandId: string): string {
-    throw new UnImplemented();
-  }
-
-  releaseEvents(): void {
-    throw new UnImplemented();
-  }
-
   requestStorageAccess(): Promise<void> {
-    throw new UnImplemented();
-  }
-
-  write(...text: string[]): void {
-    throw new UnImplemented();
-  }
-
-  writeln(...text: string[]): void {
     throw new UnImplemented();
   }
 }
@@ -836,7 +584,8 @@ export interface Document
     ParentNode,
     NonElementParentNode,
     XPathEvaluatorBase,
-    GlobalEventHandlers {
+    GlobalEventHandlers,
+    Document_HTML {
   getElementById(elementId: string): HTMLElement | null;
   addEventListener<K extends keyof DocumentEventMap>(
     type: K,
