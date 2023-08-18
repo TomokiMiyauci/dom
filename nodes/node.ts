@@ -32,6 +32,26 @@ export interface NodeStates {
 
 @Treeable
 export abstract class Node extends EventTarget implements INode {
+  static DOCUMENT_POSITION_DISCONNECTED = 0x01 as const;
+  static DOCUMENT_POSITION_PRECEDING = 0x02 as const;
+  static DOCUMENT_POSITION_FOLLOWING = 0x04 as const;
+  static DOCUMENT_POSITION_CONTAINS = 0x08 as const;
+  static DOCUMENT_POSITION_CONTAINED_BY = 0x10 as const;
+  static DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20 as const;
+
+  static ELEMENT_NODE = NodeType.ELEMENT_NODE;
+  static ATTRIBUTE_NODE = NodeType.ATTRIBUTE_NODE;
+  static TEXT_NODE = NodeType.TEXT_NODE;
+  static CDATA_SECTION_NODE = NodeType.CDATA_SECTION_NODE;
+  static ENTITY_REFERENCE_NODE = NodeType.ENTITY_REFERENCE_NODE;
+  static ENTITY_NODE = NodeType.ENTITY_NODE;
+  static PROCESSING_INSTRUCTION_NODE = NodeType.PROCESSING_INSTRUCTION_NODE;
+  static COMMENT_NODE = NodeType.COMMENT_NODE;
+  static DOCUMENT_NODE = NodeType.DOCUMENT_NODE;
+  static DOCUMENT_TYPE_NODE = NodeType.DOCUMENT_TYPE_NODE;
+  static DOCUMENT_FRAGMENT_NODE = NodeType.DOCUMENT_FRAGMENT_NODE;
+  static NOTATION_NODE = NodeType.NOTATION_NODE;
+
   abstract [$nodeDocument]: Document;
 
   abstract get nodeType(): NodeType;
