@@ -86,7 +86,7 @@ export class Document extends Node implements IDocument {
   _type: "xml" | "html" = "xml";
   _contentType: string = "application/xml";
 
-  [$URL]: string = "about:blank";
+  [$URL]: URL = new URL("about:blank");
   [$implementation]: DOMImplementation;
   [$origin]: Origin = { type: "opaque" };
   [$mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
@@ -151,8 +151,12 @@ export class Document extends Node implements IDocument {
     return doc;
   }
 
+  /**
+   * @see https://triple-underscore.github.io/DOM4-ja.html#dom-document-url
+   */
   get URL(): string {
-    throw new UnImplemented();
+    // return this’s URL, serialized.
+    return this[$URL].href;
   }
 
   /**
@@ -208,8 +212,12 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-documenturi
+   */
   get documentURI(): string {
-    throw new UnImplemented();
+    // return this’s URL, serialized.
+    return this[$URL].href;
   }
 
   /**
