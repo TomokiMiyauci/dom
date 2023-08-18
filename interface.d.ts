@@ -35,3 +35,4 @@ export type IInnerHTML = InnerHTML;
 export type IGlobalEventHandlers = GlobalEventHandlers;
 export type IProcessingInstruction = ProcessingInstruction;
 export type ILinkStyle = LinkStyle;
+export type IShadowRoot = ShadowRoot;
