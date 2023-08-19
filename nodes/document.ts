@@ -1,4 +1,9 @@
-import { getElementsByQualifiedName, Node, NodeType } from "./node.ts";
+import {
+  getElementsByClassName,
+  getElementsByQualifiedName,
+  Node,
+  NodeType,
+} from "./node.ts";
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../xpath/x_path_evaluator_base.ts";
@@ -492,6 +497,12 @@ export class Document extends Node implements IDocument {
     data: string,
   ): ProcessingInstruction {
     // 1. If target does not match the Name production, then throw an "InvalidCharacterError" DOMException.
+    if (!ReName.test(target)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
 
     // 2. If data contains the string "?>", then throw an "InvalidCharacterError" DOMException.
     if (data.includes("?")) {
@@ -522,8 +533,12 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-getelementsbyclassname
+   */
   getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
-    throw new UnImplemented();
+    // return the list of elements with class names classNames for this.
+    return getElementsByClassName(classNames, this);
   }
 
   /**

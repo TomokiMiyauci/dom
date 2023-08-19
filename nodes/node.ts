@@ -360,3 +360,13 @@ export function getElementsByQualifiedName(
       element !== root && element._qualifiedName === qualifiedName,
   });
 }
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-getelementsbyclassname
+ */
+export function getElementsByClassName(
+  classNames: string,
+  root: Node,
+): HTMLCollection {
+  throw new Error("getElementsByClassName");
+}
