@@ -39,3 +39,4 @@ export type IShadowRoot = ShadowRoot;
 export type IElementContentEditable = ElementContentEditable;
 export type IHTMLOrSVGElement = HTMLOrSVGElement;
 export type IElementCSSInlineStyle = ElementCSSInlineStyle;
+export type IHTMLUnknownElement = HTMLUnknownElement;
