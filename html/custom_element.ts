@@ -1,4 +1,5 @@
 import type { Document } from "../nodes/document.ts";
+import { default as isPotentialCustomElementName } from "npm:is-potential-custom-element-name@1.0.1";
 
 /**
  * [HTML Living Standard](https://html.spec.whatwg.org/multipage/custom-elements.html#look-up-a-custom-element-definition)
@@ -21,6 +22,37 @@ export function lookUpCustomElementDefinition(
 
   // 6. Return null.
   return null;
+}
+
+const svgAndMathMLApplicableSpecifications = new Set<string>([
+  "annotation-xml",
+  "color-profile",
+  "font-face",
+  "font-face-src",
+  "font-face-uri",
+  "font-face-format",
+  "font-face-name",
+  "missing-glyph",
+]);
+
+/**
+ * @see https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
+ */
+export function isValidCustomElementName(name: string): boolean {
+  // - name must match the PotentialCustomElementName production:
+  //  PotentialCustomElementName ::= [a-z] (PCENChar)* '-' (PCENChar)*
+  //  PCENChar ::= "-" | "." | [0-9] | "_" | [a-z] | #xB7 | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x203F-#x2040] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+  // - name must not be any of the following:
+  //  - annotation-xml
+  //  - color-profile
+  //  - font-face
+  //  - font-face-src
+  //  - font-face-uri
+  //  - font-face-format
+  //  - font-face-name
+  //  - missing-glyph
+  return !svgAndMathMLApplicableSpecifications.has(name) &&
+    isPotentialCustomElementName(name);
 }
 
 // TODO:(miyauci) Lack of properties.
