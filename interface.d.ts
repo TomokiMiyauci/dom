@@ -37,3 +37,4 @@ export type IProcessingInstruction = ProcessingInstruction;
 export type ILinkStyle = LinkStyle;
 export type IShadowRoot = ShadowRoot;
 export type IElementContentEditable = ElementContentEditable;
+export type IHTMLOrSVGElement = HTMLOrSVGElement;
