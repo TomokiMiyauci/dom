@@ -83,7 +83,7 @@ export class DOMImplementation implements IDOMImplementation {
   createHTMLDocument(title?: string | undefined): Document {
     // 1. Let doc be a new document that is an HTML document.
     const doc = new Document();
-    doc._type === "html";
+    doc._type = "html";
 
     // 2. Set doc’s content type to "text/html".
     doc._contentType = "text/html";
