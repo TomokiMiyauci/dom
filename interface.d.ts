@@ -41,3 +41,4 @@ export type IHTMLOrSVGElement = HTMLOrSVGElement;
 export type IElementCSSInlineStyle = ElementCSSInlineStyle;
 export type IHTMLUnknownElement = HTMLUnknownElement;
 export type IHTMLHtmlElement = HTMLHtmlElement;
+export type IHTMLHeadElement = HTMLHeadElement;
