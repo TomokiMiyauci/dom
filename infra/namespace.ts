@@ -2,7 +2,7 @@ import {
   DOMExceptionDescription,
   DOMExceptionName,
 } from "../webidl/exception.ts";
-import { divide, isNotNull } from "../deps.ts";
+import { divide, isNotNull, xmlValidator } from "../deps.ts";
 
 /**
  * [Infra Living Standard](https://infra.spec.whatwg.org/#namespaces)
@@ -44,6 +44,12 @@ export enum Namespace {
  */
 export function validate(qualifiedName: string) {
   // throw an "InvalidCharacterError" DOMException if qualifiedName does not match the QName production.
+  if (!xmlValidator.qname(qualifiedName)) {
+    throw new DOMException(
+      "<message>",
+      DOMExceptionName.InvalidCharacterError,
+    );
+  }
 }
 
 /**

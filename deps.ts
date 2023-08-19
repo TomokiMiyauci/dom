@@ -17,6 +17,7 @@ export {
   some,
   takewhile,
 } from "npm:itertools";
+export { default as xmlValidator } from "npm:xml-name-validator@4.0.0";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 
