@@ -1,9 +1,13 @@
 import type { Element } from "../nodes/element.ts";
+import type { Node } from "../nodes/node.ts";
 import { $create, $nodeDocument } from "../nodes/internal.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { parseHTMLFragment } from "../html/html_parser.ts";
 import { orderTreeChildren } from "../trees/tree.ts";
 import { appendNode } from "../nodes/mutation.ts";
+import { isHTMLDocument } from "../nodes/document.ts";
+import { serialize } from "npm:parse5";
+import { DOMTreeAdapter, DOMTreeAdapterMap } from "../html/utils.ts";
 
 /**
  * @see https://w3c.github.io/DOM-Parsing/#dfn-fragment-parsing-algorithm
@@ -14,7 +18,7 @@ export function parseFragment(
 ): DocumentFragment {
   // 1. If the context element's node document is an HTML document: let algorithm be the HTML fragment parsing algorithm.
   //    If the context element's node document is an XML document: let algorithm be the XML fragment parsing algorithm.
-  const algorithm = contextElement[$nodeDocument]._type === "html"
+  const algorithm = isHTMLDocument(contextElement[$nodeDocument])
     ? parseHTMLFragment
     : (() => {
       throw new Error("parseFragment");
@@ -33,4 +37,25 @@ export function parseFragment(
 
   // 5. Return the value of fragment.
   return fragment;
+}
+
+/**
+ * @see https://w3c.github.io/DOM-Parsing/#dfn-fragment-serializing-algorithm
+ */
+export function serializeFragment(
+  node: Node,
+  requireWellFormed: boolean,
+): string {
+  // 1. Let context document be the value of node's node document.
+  const contextDocument = node[$nodeDocument];
+
+  // 2. If context document is an HTML document, return an HTML serialization of node.
+  if (isHTMLDocument(contextDocument)) {
+    return serialize<DOMTreeAdapterMap>(node, {
+      treeAdapter: new DOMTreeAdapter(contextDocument),
+    });
+  }
+
+  // 3. Otherwise, context document is an XML document; return an XML serialization of node passing the flag require well-formed.
+  throw new Error("XML serialization is not supported");
 }
