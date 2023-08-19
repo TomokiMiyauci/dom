@@ -4,7 +4,7 @@ import {
   NodeStates,
   NodeType,
 } from "./node.ts";
-import { UnImplemented } from "./utils.ts";
+import { getQualifiedName, UnImplemented } from "./utils.ts";
 import {
   Attr,
   changeAttributes,
@@ -88,14 +88,8 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
    */
-  get _qualifiedName(): string {
-    // An element’s qualified name is its local name if its namespace prefix is null; otherwise its namespace prefix, followed by ":", followed by its local name.
-    const prefix = this[$namespacePrefix];
-    const qualifiedName = prefix === null
-      ? this[$localName]
-      : `${prefix}:${this[$localName]}`;
-
-    return qualifiedName;
+  get #qualifiedName(): string {
+    return getQualifiedName(this);
   }
 
   /**
@@ -103,7 +97,7 @@ export class Element extends Node implements IElement {
    */
   get #upperQualifiedName(): string {
     // 1. Let qualifiedName be this’s qualified name.
-    let qualifiedName = this._qualifiedName;
+    let qualifiedName = this.#qualifiedName;
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
@@ -584,7 +578,7 @@ export class Element extends Node implements IElement {
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
       this[$attributeList],
-      (attr) => attr._qualifiedName === qualifiedName,
+      (attr) => getQualifiedName(attr) === qualifiedName,
     ) ?? null;
 
     // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
@@ -804,7 +798,7 @@ export function getAttributeByName(
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
   return find(
     element[$attributeList],
-    (attribute) => attribute._qualifiedName === qualifiedName,
+    (attribute) => getQualifiedName(attribute) === qualifiedName,
   ) ?? null;
 }
 
@@ -837,7 +831,7 @@ export function hasAttributeByQualifiedName(
   element: Element,
 ): boolean {
   for (const attr of element[$attributeList]) {
-    if (attr._qualifiedName === qualifiedName) return true;
+    if (getQualifiedName(attr) === qualifiedName) return true;
   }
 
   return false;

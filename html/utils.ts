@@ -1,6 +1,7 @@
 import { Node } from "../nodes/node.ts";
 import { Text } from "../nodes/text.ts";
 import { Attr } from "../nodes/attr.ts";
+import { getQualifiedName } from "../nodes/utils.ts";
 import { Comment } from "../nodes/comment.ts";
 import { Element } from "../nodes/element.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
@@ -140,7 +141,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTagName(element: Element): string {
-    return element._qualifiedName;
+    return getQualifiedName(element);
   }
 
   getTextNodeContent(textNode: Text): string {

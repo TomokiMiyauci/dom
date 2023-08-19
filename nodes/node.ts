@@ -1,4 +1,9 @@
-import { isDocument, isElement, UnImplemented } from "./utils.ts";
+import {
+  getQualifiedName,
+  isDocument,
+  isElement,
+  UnImplemented,
+} from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
@@ -349,10 +354,10 @@ export function getElementsByQualifiedName(
         element !== root &&
           // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
           (element[$namespace] === Namespace.HTML &&
-            element._qualifiedName === qualifiedName.toLowerCase()) ||
+            getQualifiedName(element) === qualifiedName.toLowerCase()) ||
         // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
         (element[$namespace] !== Namespace.HTML &&
-          element._qualifiedName === qualifiedName),
+          getQualifiedName(element) === qualifiedName),
     });
   }
 
@@ -360,7 +365,7 @@ export function getElementsByQualifiedName(
   return new HTMLCollection({
     root,
     filter: (element) =>
-      element !== root && element._qualifiedName === qualifiedName,
+      element !== root && getQualifiedName(element) === qualifiedName,
   });
 }
 

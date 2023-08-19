@@ -1,4 +1,4 @@
-import { $data } from "./internal.ts";
+import { $data, $localName, $namespacePrefix } from "./internal.ts";
 import { type Node } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./document.ts";
@@ -6,6 +6,7 @@ import { type DocumentFragment } from "./document_fragment.ts";
 import { type DocumentType } from "./document_type.ts";
 import { type Element } from "./element.ts";
 import { type Attr } from "./attr.ts";
+import { type Comment } from "./comment.ts";
 import { type CharacterData } from "./character_data.ts";
 
 export class UnImplemented extends Error {}
@@ -36,4 +37,28 @@ export function isAttr(node: Node): node is Attr {
 
 export function isText(node: Node): node is Text {
   return node.nodeType === node.TEXT_NODE;
+}
+
+export function isComment(node: Node): node is Comment {
+  return node.nodeType === node.COMMENT_NODE;
+}
+
+export function isProcessingInstruction(
+  node: Node,
+): node is ProcessingInstruction {
+  return node.nodeType === node.COMMENT_NODE;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-attribute-qualified-name
+ * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
+ */
+export function getQualifiedName(
+  input: Readonly<{ [$namespacePrefix]: string | null; [$localName]: string }>,
+): string {
+  return strQualifiedName(input[$localName], input[$namespacePrefix]);
+}
+
+export function strQualifiedName(localName: string, prefix?: unknown): string {
+  return typeof prefix === "string" ? `${prefix}:${localName}` : localName;
 }

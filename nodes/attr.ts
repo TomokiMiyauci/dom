@@ -3,6 +3,7 @@ import { Node, NodeStates, NodeType } from "./node.ts";
 import { type PartialBy } from "../deps.ts";
 import { type Element, isCustom } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
+import { getQualifiedName } from "./utils.ts";
 import {
   $element,
   $localName,
@@ -70,19 +71,6 @@ export class Attr extends Node implements IAttr {
     this[$nodeDocument] = nodeDocument;
   }
 
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-qualified-name
-   */
-  get _qualifiedName(): string {
-    // An attribute’s qualified name is its local name if its namespace prefix is null, and its namespace prefix, followed by ":", followed by its local name, otherwise.
-    const prefix = this[$namespacePrefix];
-    const qualifiedName = prefix === null
-      ? this.localName
-      : `${prefix}:${this[$localName]}`;
-
-    return qualifiedName;
-  }
-
   override [$nodeDocument]: Document;
 
   /**
@@ -93,7 +81,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return this._qualifiedName;
+    return getQualifiedName(this);
   }
 
   /**
@@ -180,7 +168,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return this._qualifiedName;
+    return getQualifiedName(this);
   }
 
   /**
