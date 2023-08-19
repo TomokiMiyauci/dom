@@ -42,3 +42,6 @@ export type IElementCSSInlineStyle = ElementCSSInlineStyle;
 export type IHTMLUnknownElement = HTMLUnknownElement;
 export type IHTMLHtmlElement = HTMLHtmlElement;
 export type IHTMLHeadElement = HTMLHeadElement;
+export type IHTMLTitleElement = HTMLTitleElement;
+export type IHTMLBodyElement = HTMLBodyElement;
+export type IWindowEventHandlers = WindowEventHandlers;
