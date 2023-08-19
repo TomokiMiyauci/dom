@@ -37,6 +37,7 @@ import { Document_Selection } from "../selection/document.ts";
 import { Document_Storage_Access_API } from "../storage_access_api/document.ts";
 import { Document_WebAnimation } from "../web_animations/document.ts";
 import { Document_SVG } from "../svg/document.ts";
+import { ReName } from "../xml/document.ts";
 
 export interface Encoding {
   name: string;
@@ -315,36 +316,42 @@ export class Document extends Node implements IDocument {
    */
   createElement<K extends keyof HTMLElementTagNameMap>(
     tagName: K,
-    options?: ElementCreationOptions | undefined,
+    options?: ElementCreationOptions,
   ): HTMLElementTagNameMap[K];
   createElement<K extends keyof HTMLElementDeprecatedTagNameMap>(
     tagName: K,
-    options?: ElementCreationOptions | undefined,
+    options?: ElementCreationOptions,
   ): HTMLElementDeprecatedTagNameMap[K];
   createElement(
     tagName: string,
-    options?: ElementCreationOptions | undefined,
+    options?: ElementCreationOptions,
   ): HTMLElement;
-  createElement(
-    tagName: string,
-    options?: ElementCreationOptions | undefined,
-  ): Element {
+  createElement(tagName: string, options?: ElementCreationOptions): Element {
     // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
+    if (!ReName.test(tagName)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
+
     // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
+    if (isHTMLDocument(this)) tagName = tagName.toLowerCase();
 
     // 3. Let is be null.
-    const is = null;
+    let is: string | null = null;
 
     // 4. If options is a dictionary and options["is"] exists, then set is to it.
+    if (options && typeof options.is === "string") is = options.is;
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (this._type !== "xml" || this._contentType === "application/xhtml+xml")
+      (isHTMLDocument(this) || this._contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
     // 6. Return the result of creating an element given this, localName, namespace, null, is, and with the synchronous custom elements flag set.
-    return createElement(this, tagName, namespace, null, is);
+    return createElement(this, tagName, namespace, null, is, true);
   }
 
   /**
