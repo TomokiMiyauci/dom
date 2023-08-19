@@ -1,4 +1,4 @@
-import { isDocument, UnImplemented } from "./utils.ts";
+import { isDocument, isElement, UnImplemented } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
@@ -316,8 +316,11 @@ export abstract class Node extends EventTarget implements INode {
     return preRemoveChild(child, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-parentelement
+   */
   get parentElement(): HTMLElement | null {
-    throw new UnImplemented("parentElement");
+    return getParentElement(this) as HTMLElement | null; // The specification is `Element`
   }
 }
 
@@ -369,4 +372,14 @@ export function getElementsByClassName(
   root: Node,
 ): HTMLCollection {
   throw new Error("getElementsByClassName");
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#parent-element
+ */
+export function getParentElement(node: Node): Element | null {
+  const parent = node._parent;
+
+  // If the node has a parent of a different type, its parent element is null.
+  return parent && isElement(parent) ? parent : null;
 }
