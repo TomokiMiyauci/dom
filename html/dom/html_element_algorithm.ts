@@ -1,5 +1,9 @@
 import { isValidCustomElementName } from "../custom_element.ts";
+import { HTMLHtmlElement } from "../semantics/html_html_element.ts";
+import { HTMLHeadElement } from "../semantics/html_head_element.ts";
+import { HTMLTitleElement } from "../semantics/html_title_element.ts";
 import { HTMLUnknownElement } from "./html_unknown_element.ts";
+import { HTMLBodyElement } from "../elements/html_body_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import { type Element } from "../../nodes/element.ts";
 import { HTMLElement } from "./html_element.ts";
@@ -43,6 +47,13 @@ export const HTMLInterfaceResolver: InterfaceResolver = {
   },
 };
 
+const tagNameMap: Record<string, typeof HTMLElement> = {
+  html: HTMLHtmlElement,
+  head: HTMLHeadElement,
+  title: HTMLTitleElement,
+  body: HTMLBodyElement,
+};
+
 /**
  * @see https://momdo.github.io/html/dom.html#htmlelement
  */
@@ -56,7 +67,7 @@ export function resolveInterface(name: string): typeof HTMLElement {
   // 3. If name is listing or xmp, then return HTMLPreElement.
   if (preElements.has(name)) throw new Error();
   // 4. Otherwise, if this specification defines an interface appropriate for the element type corresponding to the local name name, then return that interface.
-  else if (true) {}
+  else if (tagNameMap[name]) return tagNameMap[name]!;
 
   // 5. If other applicable specifications define an appropriate interface for name, then return the interface they define.
 
