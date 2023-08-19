@@ -140,7 +140,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTagName(element: Element): string {
-    return element.tagName;
+    return element._qualifiedName;
   }
 
   getTextNodeContent(textNode: Text): string {
@@ -212,14 +212,10 @@ function assertNamespaceURL(
 
 class AttrConvertor {
   static from(attr: Attr): Token.Attribute {
-    if (attr.namespaceURI === null || attr.prefix === null) {
-      throw new Error("attr namespaceURL or attr prefix is null");
-    }
-
     return {
       name: attr.localName,
-      namespace: attr.namespaceURI,
-      prefix: attr.prefix,
+      namespace: attr.namespaceURI ?? undefined,
+      prefix: attr.prefix ?? undefined,
       value: attr.value,
     };
   }
