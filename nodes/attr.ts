@@ -130,13 +130,7 @@ export class Attr extends Node implements IAttr {
   }
 
   protected override clone(document: Document): Attr {
-    return new Attr({
-      namespace: this[$namespace],
-      namespacePrefix: this[$namespacePrefix],
-      localName: this[$localName],
-      value: this[$value],
-      nodeDocument: document,
-    });
+    return cloneAttr(this, document);
   }
 
   /**
@@ -269,4 +263,14 @@ export function equalsAttr(left: Attr, right: Attr): boolean {
   return left === right || left[$namespace] === right[$namespace] &&
       left[$namespacePrefix] === right[$namespacePrefix] &&
       left[$localName] === right[$localName];
+}
+
+export function cloneAttr(attr: Attr, document: Document): Attr {
+  return new Attr({
+    namespace: attr[$namespace],
+    namespacePrefix: attr[$namespacePrefix],
+    localName: attr[$localName],
+    value: attr[$value],
+    nodeDocument: document,
+  });
 }

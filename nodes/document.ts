@@ -13,7 +13,7 @@ import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
 import { createElement } from "./element_algorithm.ts";
 import { type Element } from "./element.ts";
-import { Namespace, validate, validateAndExtract } from "../infra/namespace.ts";
+import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../interface.d.ts";
@@ -208,14 +208,21 @@ export class Document extends Node implements IDocument {
    */
   get doctype(): DocumentType | null {
     // return the child of this that is a doctype; otherwise null.
-    return find(this._children, isDocumentType) ?? null;
+    return (find(this._children, isDocumentType) ?? null) as
+      | DocumentType
+      | null;
   }
 
-  get documentElement(): HTMLElement {
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-documentelement
+   * @note May return `null` in the specification.
+   */
+  get documentElement(): HTMLElement { // Specification is Element | null
     for (const node of this._children) {
-      if (isElement(node)) return node as HTMLElement;
+      if (isElement(node)) return node as any as HTMLElement;
     }
 
+    // @ts-ignore This is legal under the specification.
     return null;
   }
 
@@ -332,7 +339,10 @@ export class Document extends Node implements IDocument {
     tagName: string,
     options?: ElementCreationOptions,
   ): HTMLElement;
-  createElement(tagName: string, options?: ElementCreationOptions): Element {
+  createElement(
+    tagName: string,
+    options?: ElementCreationOptions,
+  ): HTMLElement {
     // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
     if (!ReName.test(tagName)) {
       throw new DOMException(
@@ -357,7 +367,14 @@ export class Document extends Node implements IDocument {
         : null;
 
     // 6. Return the result of creating an element given this, localName, namespace, null, is, and with the synchronous custom elements flag set.
-    return createElement(this, tagName, namespace, null, is, true);
+    return createElement(
+      this,
+      tagName,
+      namespace,
+      null,
+      is,
+      true,
+    ) as any as HTMLElement;
   }
 
   /**
@@ -386,18 +403,18 @@ export class Document extends Node implements IDocument {
   createElementNS(
     namespaceURI: string | null,
     qualifiedName: string,
-    options?: ElementCreationOptions | undefined,
+    options?: ElementCreationOptions,
   ): Element;
   createElementNS(
     namespace: string | null,
     qualifiedName: string,
-    options?: string | ElementCreationOptions | undefined,
+    options?: string | ElementCreationOptions,
   ): Element;
   createElementNS(
     namespace: string | null,
     qualifiedName: string,
-    options?: string | ElementCreationOptions | undefined,
-  ): Element {
+    options?: string | ElementCreationOptions,
+  ): any {
     // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
     return internalCreateElement(this, namespace, qualifiedName, options);
   }

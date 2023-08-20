@@ -8,6 +8,7 @@ import { type Element } from "./element.ts";
 import { type Attr } from "./attr.ts";
 import { type Comment } from "./comment.ts";
 import { type CharacterData } from "./character_data.ts";
+import type { ProcessingInstruction } from "./processing_instruction.ts";
 
 export class UnImplemented extends Error {}
 

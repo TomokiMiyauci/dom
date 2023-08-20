@@ -8,6 +8,7 @@ import { getQualifiedName, UnImplemented } from "./utils.ts";
 import {
   Attr,
   changeAttributes,
+  cloneAttr,
   equalsAttr,
   handleAttributesChanges,
 } from "./attr.ts";
@@ -211,7 +212,7 @@ export class Element extends Node implements IElement {
     );
 
     for (const attribute of this[$attributeList]) {
-      appendAttribute(attribute.clone(document), copy);
+      appendAttribute(cloneAttr(attribute, document), copy);
     }
 
     return copy;

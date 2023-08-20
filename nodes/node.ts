@@ -111,7 +111,7 @@ export abstract class Node extends EventTarget implements INode {
   get childNodes(): NodeListOf<Node & ChildNode> {
     return new NodeList({
       root: this,
-      filter: (node) => this._children.contains(node),
+      filter: (node): node is Node => this._children.contains(node),
     }) as any as NodeListOf<
       Node & ChildNode
     >;
@@ -120,7 +120,7 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-firstchild
    */
-  get firstChild(): (ChildNode & Node) | null {
+  get firstChild(): (Node & ChildNode) | null {
     // return this’s first child.
     return this._firstChild;
   }
