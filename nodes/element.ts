@@ -41,6 +41,7 @@ import { Animatable } from "../web_animations/animatable.ts";
 import { InnerHTML } from "../domparsing/inner_html.ts";
 import { ChildNode } from "./child_node.ts";
 import { Slottable } from "./slottable.ts";
+import { DOMTokenList } from "./dom_token_list.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -218,8 +219,13 @@ export class Element extends Node implements IElement {
     return copy;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-classlist
+   */
+  @SameObject
   get classList(): DOMTokenList {
-    throw new UnImplemented("classList");
+    // return a DOMTokenList object whose associated element is this and whose associated attribute’s local name is class.
+    return new DOMTokenList({ element: this, localName: "class" });
   }
 
   /**
@@ -836,4 +842,24 @@ export function hasAttributeByQualifiedName(
   }
 
   return false;
+}
+
+function SameObject(
+  _: unknown,
+  ___: unknown,
+  descriptor: PropertyDescriptor,
+) {
+  if (descriptor.get) {
+    let cache: unknown;
+
+    descriptor.get = new Proxy(descriptor.get, {
+      apply: (target, p, receiver) => {
+        if (cache) return cache;
+
+        cache = Reflect.get(target, p, receiver);
+
+        return cache;
+      },
+    });
+  }
 }
