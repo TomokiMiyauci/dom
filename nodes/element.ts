@@ -42,6 +42,12 @@ import { InnerHTML } from "../domparsing/inner_html.ts";
 import { ChildNode } from "./child_node.ts";
 import { Slottable } from "./slottable.ts";
 import { DOMTokenList } from "./dom_token_list.ts";
+import { Element_CSSOMView } from "../cssom_view/element.ts";
+import { Element_CSSTypedOM } from "../css/css_typed_om/element.ts";
+import { Element_DomParsing } from "../domparsing/element.ts";
+import { Element_PointerEvents } from "../pointerevents/element.ts";
+import { Element_PointerLock } from "../pointerlock/element.ts";
+import { Element_Fullscreen } from "../fullscreen/element.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -71,6 +77,12 @@ export interface AttributeInits {
 @NonDocumentTypeChildNode
 @ParentNode
 @Slottable
+@Element_CSSOMView
+@Element_CSSTypedOM
+@Element_DomParsing
+@Element_PointerEvents
+@Element_PointerLock
+@Element_Fullscreen
 export class Element extends Node implements IElement {
   [$namespace]: string | null;
   [$namespacePrefix]: string | null;
@@ -240,22 +252,6 @@ export class Element extends Node implements IElement {
     setAttributeValue(this, "class", value);
   }
 
-  get clientHeight(): number {
-    throw new UnImplemented("clientHeight");
-  }
-
-  get clientLeft(): number {
-    throw new UnImplemented("clientLeft");
-  }
-
-  get clientTop(): number {
-    throw new UnImplemented("clientTop");
-  }
-
-  get clientWidth(): number {
-    throw new UnImplemented("clientWidth");
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-id
    */
@@ -286,19 +282,6 @@ export class Element extends Node implements IElement {
     return this[$namespace];
   }
 
-  onfullscreenchange: ((this: globalThis.Element, ev: Event) => any) | null =
-    null;
-  onfullscreenerror: ((this: globalThis.Element, ev: Event) => any) | null =
-    null;
-
-  get outerHTML(): string {
-    throw new UnImplemented("outerHTML");
-  }
-
-  set outerHTML(value: string) {
-    throw new UnImplemented("outerHTML");
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-tagname
    */
@@ -318,30 +301,6 @@ export class Element extends Node implements IElement {
     return this[$namespacePrefix];
   }
 
-  get scrollHeight(): number {
-    throw new UnImplemented("scrollHeight");
-  }
-
-  get scrollLeft(): number {
-    throw new UnImplemented("scrollLeft getter");
-  }
-
-  set scrollLeft(value: number) {
-    throw new UnImplemented("scrollLeft setter");
-  }
-
-  get scrollTop(): number {
-    throw new UnImplemented("scrollTop getter");
-  }
-
-  set scrollTop(value: number) {
-    throw new UnImplemented("scrollTop setter");
-  }
-
-  get scrollWidth(): number {
-    throw new UnImplemented("scrollWidth");
-  }
-
   get shadowRoot(): ShadowRoot | null {
     throw new UnImplemented("shadowRoot");
   }
@@ -356,10 +315,6 @@ export class Element extends Node implements IElement {
 
   attachShadow(init: ShadowRootInit): ShadowRoot {
     throw new UnImplemented("attachShadow");
-  }
-
-  checkVisibility(options?: CheckVisibilityOptions | undefined): boolean {
-    throw new UnImplemented("checkVisibility");
   }
 
   closest<K extends keyof HTMLElementTagNameMap>(
@@ -378,10 +333,6 @@ export class Element extends Node implements IElement {
     selectors: string,
   ): E | null {
     throw new UnImplemented("closest");
-  }
-
-  computedStyleMap(): StylePropertyMapReadOnly {
-    throw new UnImplemented("computedStyleMap");
   }
 
   /**
@@ -412,14 +363,6 @@ export class Element extends Node implements IElement {
 
   getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
     throw new UnImplemented("getAttributeNodeNS");
-  }
-
-  getBoundingClientRect(): DOMRect {
-    throw new UnImplemented("getBoundingClientRect");
-  }
-
-  getClientRects(): DOMRectList {
-    throw new UnImplemented("getClientRects");
   }
 
   getElementsByClassName(
@@ -502,19 +445,11 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("hasAttributes");
   }
 
-  hasPointerCapture(pointerId: number): boolean {
-    throw new UnImplemented("hasPointerCapture");
-  }
-
   insertAdjacentElement(
     where: InsertPosition,
     element: globalThis.Element,
   ): globalThis.Element | null {
     throw new UnImplemented("insertAdjacentElement");
-  }
-
-  insertAdjacentHTML(position: InsertPosition, text: string): void {
-    throw new UnImplemented("insertAdjacentHTML");
   }
 
   insertAdjacentText(where: InsertPosition, data: string): void {
@@ -523,10 +458,6 @@ export class Element extends Node implements IElement {
 
   matches(selectors: string): boolean {
     throw new UnImplemented("matches");
-  }
-
-  releasePointerCapture(pointerId: number): void {
-    throw new UnImplemented("releasePointerCapture");
   }
 
   removeAttribute(qualifiedName: string): void {
@@ -539,36 +470,6 @@ export class Element extends Node implements IElement {
 
   removeAttributeNode(attr: Attr): Attr {
     throw new UnImplemented("removeAttributeNode");
-  }
-
-  requestFullscreen(options?: FullscreenOptions | undefined): Promise<void> {
-    throw new UnImplemented("requestFullscreen");
-  }
-
-  requestPointerLock(): void {
-    throw new UnImplemented("requestPointerLock");
-  }
-
-  scroll(options?: ScrollToOptions | undefined): void;
-  scroll(x: number, y: number): void;
-  scroll(x?: unknown, y?: unknown): void {
-    throw new UnImplemented("scroll");
-  }
-
-  scrollBy(options?: ScrollToOptions | undefined): void;
-  scrollBy(x: number, y: number): void;
-  scrollBy(x?: unknown, y?: unknown): void {
-    throw new UnImplemented("scrollBy");
-  }
-
-  scrollIntoView(arg?: boolean | ScrollIntoViewOptions | undefined): void {
-    throw new UnImplemented("scrollIntoView");
-  }
-
-  scrollTo(options?: ScrollToOptions | undefined): void;
-  scrollTo(x: number, y: number): void;
-  scrollTo(x?: unknown, y?: unknown): void {
-    throw new UnImplemented("scrollTo");
   }
 
   /**
@@ -638,10 +539,6 @@ export class Element extends Node implements IElement {
     return setAttribute(attr, this);
   }
 
-  setPointerCapture(pointerId: number): void {
-    throw new UnImplemented("setPointerCapture");
-  }
-
   toggleAttribute(qualifiedName: string, force?: boolean | undefined): boolean {
     throw new UnImplemented("toggleAttribute");
   }
@@ -659,7 +556,13 @@ export interface Element
     InnerHTML,
     NonDocumentTypeChildNode,
     ParentNode,
-    Slottable {}
+    Slottable,
+    Element_CSSOMView,
+    Element_CSSTypedOM,
+    Element_DomParsing,
+    Element_PointerEvents,
+    Element_PointerLock,
+    Element_Fullscreen {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
