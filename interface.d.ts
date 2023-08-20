@@ -45,3 +45,5 @@ export type IHTMLHeadElement = HTMLHeadElement;
 export type IHTMLTitleElement = HTMLTitleElement;
 export type IHTMLBodyElement = HTMLBodyElement;
 export type IWindowEventHandlers = WindowEventHandlers;
+
+export type IDOMTokenList = DOMTokenList;
