@@ -76,7 +76,7 @@
   // "Element-remove.html",
   // "Element-removeAttribute.html",
   // "Element-removeAttributeNS.html",
-  // "Element-setAttribute-crbug-1138487.html",
+  "Element-setAttribute-crbug-1138487.html",
   "Element-setAttribute.html",
   // "Element-siblingElement-null.html",
   // "Element-tagName.html",
