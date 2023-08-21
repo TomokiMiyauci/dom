@@ -26,7 +26,6 @@ const include = new RegExp(
 );
 
 const entry = walk(wptRootURL, {
-  exts: [".html"],
   includeDirs: false,
   match: [include],
 });

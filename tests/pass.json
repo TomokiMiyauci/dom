@@ -1,0 +1,41 @@
+{
+  "description": "List of patterns that the test passes",
+
+  "passes": {
+    "Text constructor": [
+      "new Text(): null",
+      "new Text(): 42",
+      "new Text(): prototype chain",
+      "new Text(): two arguments"
+    ],
+    "Comment constructor": [
+      "new Comment(): null",
+      "new Comment(): 42",
+      "new Comment(): prototype chain",
+      "new Comment(): two arguments"
+    ],
+    "Document.createComment": [
+      "createComment(undefined)",
+      "createComment(null)"
+    ],
+    "Document.createTextNode": [
+      "createTextNode(null)",
+      "createTextNode(undefined)"
+    ],
+    "DOMImplementation.createHTMLDocument": [
+      "createHTMLDocument test 1: null,\"null\",\"null\""
+    ],
+    "document.getElementsByClassName(array): \"a\\n\"": [
+      "document.getElementsByClassName(array):"
+    ],
+    "document.getElementsByClassName(array): \"b\",\"a\"": [
+      "document.getElementsByClassName(array):"
+    ],
+    "document.getElementsByClassName(array): \"b a\"": [
+      "document.getElementsByClassName(array):"
+    ],
+    "element.getElementsByClassName(array): \"a\", \"b\"": [
+      "element.getElementsByClassName(array):"
+    ]
+  }
+}
