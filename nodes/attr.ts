@@ -5,6 +5,7 @@ import { type Element, isCustom } from "./element.ts";
 import type { IAttr } from "../interface.d.ts";
 import { getQualifiedName } from "./utils.ts";
 import {
+  $attributeChangeSteps,
   $element,
   $localName,
   $namespace,
@@ -225,7 +226,9 @@ export function changeAttributes(attribute: Attr, value: string): void {
   attribute[$value] = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  handleAttributesChanges(attribute, attribute[$element], oldValue, value);
+  if (attribute[$element]) {
+    handleAttributesChanges(attribute, attribute[$element], oldValue, value);
+  }
 }
 
 /**
@@ -233,7 +236,7 @@ export function changeAttributes(attribute: Attr, value: string): void {
  */
 export function handleAttributesChanges(
   attribute: Attr,
-  element: Element | null,
+  element: Element,
   oldValue: string | null,
   newValue: string,
 ): void {
@@ -251,9 +254,16 @@ export function handleAttributesChanges(
   );
 
   // 2. If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  if (element && isCustom(element)) throw new Error("handleAttributesChanges");
+  if (isCustom(element)) throw new Error("handleAttributesChanges");
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
+  element[$attributeChangeSteps].run({
+    element,
+    localName: attribute[$localName],
+    oldValue,
+    value: newValue,
+    namespace: attribute[$namespace],
+  });
 }
 
 /** Equals {@linkcode left} {@linkcode Attr} to {@linkcode right} {@linkcode Attr}.

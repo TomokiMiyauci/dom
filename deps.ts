@@ -14,10 +14,12 @@ export {
   imap,
   islice,
   izip,
+  range,
   some,
   takewhile,
 } from "npm:itertools";
 export { default as xmlValidator } from "npm:xml-name-validator@4.0.0";
+export { initLast } from "https://deno.land/x/seqtools@1.0.0/init_last.ts";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 

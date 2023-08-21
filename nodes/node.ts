@@ -15,6 +15,7 @@ import { Namespace } from "../infra/namespace.ts";
 import { $mode, $namespace, $nodeDocument } from "./internal.ts";
 import { every, html, izip } from "../deps.ts";
 import { type OrderedSet } from "../infra/set.ts";
+import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 
 export enum NodeType {
@@ -407,8 +408,4 @@ export function getParentElement(node: Node): Element | null {
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
-}
-
-function matchASCIICaseInsensitive(a: string, b: string): boolean {
-  return a.toLowerCase() === b.toLowerCase();
 }
