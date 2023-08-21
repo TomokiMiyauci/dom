@@ -21,7 +21,7 @@ import { CustomElementDefinition } from "../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { List } from "../infra/list.ts";
 import { descendantTextContent } from "./text.ts";
-import { every, find, some } from "../deps.ts";
+import { every, find, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
@@ -50,6 +50,7 @@ import { Element_DomParsing } from "../domparsing/element.ts";
 import { Element_PointerEvents } from "../pointerevents/element.ts";
 import { Element_PointerLock } from "../pointerlock/element.ts";
 import { Element_Fullscreen } from "../fullscreen/element.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -502,6 +503,12 @@ export class Element extends Node implements IElement {
    */
   setAttribute(qualifiedName: string, value: string): void {
     // 1. If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException.
+    if (!xmlValidator.name(qualifiedName)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
