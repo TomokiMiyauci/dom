@@ -7,7 +7,7 @@ import {
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../xpath/x_path_evaluator_base.ts";
-import { isDocumentType, isElement, UnImplemented } from "./utils.ts";
+import { isDocument, isDocumentType, UnImplemented } from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
@@ -44,6 +44,8 @@ import { Document_Storage_Access_API } from "../storage_access_api/document.ts";
 import { Document_WebAnimation } from "../web_animations/document.ts";
 import { Document_SVG } from "../svg/document.ts";
 import { ReName } from "../xml/document.ts";
+import { isShadowRoot } from "./shadow_root.ts";
+import { getDocumentElement } from "./document_tree.ts";
 
 export interface Encoding {
   name: string;
@@ -218,12 +220,7 @@ export class Document extends Node implements IDocument {
    * @note May return `null` in the specification.
    */
   get documentElement(): HTMLElement { // Specification is Element | null
-    for (const node of this._children) {
-      if (isElement(node)) return node as any as HTMLElement;
-    }
-
-    // @ts-ignore This is legal under the specification.
-    return null;
+    return getDocumentElement(this) as any as HTMLElement;
   }
 
   /**
@@ -607,7 +604,11 @@ export class Document extends Node implements IDocument {
   }
 
   importNode<T>(node: T & Node, deep?: boolean | undefined): T {
-    throw new UnImplemented();
+    if (isDocument(node) || isShadowRoot(node)) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    return this.cloneNode(deep) as T;
   }
 }
 

@@ -12,7 +12,7 @@ import { List } from "../infra/list.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { nodeLength } from "./node_tree.ts";
-import { orderTree } from "../trees/tree.ts";
+import { orderTree, orderTreeChildren } from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
@@ -131,6 +131,17 @@ function concatTextData(list: List<Text>): string {
 }
 
 /**
+ * @see https://dom.spec.whatwg.org/#concept-child-text-content
+ */
+export function getChildTextContent(node: Node): string {
+  // concatenation of the data of all the Text node children of node, in tree order.
+  return [...imap(
+    ifilter(orderTreeChildren(node._children), isText),
+    (text) => text[$data],
+  )].join("");
+}
+
+/**
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
 function contiguousTextNodes(node: Node): List<Text> {
@@ -145,13 +156,13 @@ export function contiguousSibling(
   node: Node,
   condition: (node: Node) => node is Text,
 ): List<Text> {
-  while (condition(node._previousSibling)) {
+  while (node._previousSibling && condition(node._previousSibling)) {
     node = node._previousSibling;
   }
 
   const list = new List<Text>();
 
-  while (condition(node)) {
+  while (node && condition(node)) {
     list.append(node);
 
     node = node._nextSibling;

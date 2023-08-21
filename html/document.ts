@@ -1,11 +1,16 @@
 // deno-lint-ignore-file no-empty-interface
 import { Constructor, first } from "../deps.ts";
-import { $localName } from "../nodes/internal.ts";
+import { $localName, $namespace } from "../nodes/internal.ts";
 import { find, ifilter } from "../deps.ts";
 import { isElement } from "../nodes/utils.ts";
 import { type Node } from "../nodes/node.ts";
 import { type Element } from "../nodes/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
+import { getDocumentElement } from "../nodes/document_tree.ts";
+import { orderTreeChildren } from "../trees/tree.ts";
+import { getChildTextContent } from "../nodes/text.ts";
+import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
+import { Namespace } from "../infra/namespace.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -100,8 +105,28 @@ export function Document_HTML<T extends Constructor<Node>>(
       return this._currentDocumentReadiness;
     }
 
+    /**
+     * @see https://html.spec.whatwg.org/multipage/dom.html#document.title
+     */
     get title(): string {
-      throw new Error("title#getter");
+      const documentElement = getDocumentElement(this);
+
+      if (!documentElement) return "";
+
+      const maybeTitle = documentElement[$localName] === "svg"
+        // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
+        ? first(
+          ifilter(
+            ifilter(documentElement._children, isElement),
+            isSVGTitle,
+          ),
+        )
+        // 2. Otherwise, let value be the child text content of the title element, or the empty string if the title element is null.
+        : getTitleElement(this);
+      const value = maybeTitle ? getChildTextContent(maybeTitle) : "";
+
+      // 3. Strip and collapse ASCII whitespace in value. 4. Return value.
+      return stripAndCollapseASCIIWhitespace(value);
     }
 
     set title(value: string) {
@@ -275,3 +300,19 @@ export function Document_HTML<T extends Constructor<Node>>(
 }
 
 export interface Document_HTML extends IDocument_HTML, Document_Obsolete {}
+
+/**
+ * @see https://html.spec.whatwg.org/multipage/dom.html#the-title-element-2
+ */
+export function getTitleElement(node: Node): Element | null {
+  // the first title element in the document (in tree order), if there is one, or null otherwise.
+  return first(ifilter(
+    ifilter(orderTreeChildren(node._children), isElement),
+    (element) => element[$localName] === "title",
+  )) ?? null;
+}
+
+function isSVGTitle(element: Element): boolean {
+  return element[$localName] === "title" &&
+    element[$namespace] === Namespace.SVG;
+}
