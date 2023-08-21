@@ -2,7 +2,7 @@ import { HTMLElement } from "../dom/html_element.ts";
 import type { IHTMLHtmlElement } from "../../interface.d.ts";
 
 /**
- * @see https://html.spec.whatwg.org/multipage/semantics.html#htmlhtmlelement
+ * @see https://html.spec.whatwg.org/multipage/semantics.html#the-html-element
  */
 export class HTMLHtmlElement extends HTMLElement implements IHTMLHtmlElement {
   get version(): string {
