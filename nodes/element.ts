@@ -235,16 +235,27 @@ export class Element extends Node implements IElement {
   }
 
   protected override clone(document: Document): Element {
-    const copy = createElement(
-      document,
-      this[$localName],
-      this[$namespace],
-      this[$namespacePrefix],
-      this[$isValue],
-    );
+    // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
+    // The specification calls for a createElement, but this is difficult to implement.
+    // `createElement` contains an import of an `HTMLElement` and it subclass, which is a circular reference in `Element`.
+    // Instead, use constructor. This works correctly as long as the subclass constants are not overridden.
+    const copy = new (this.constructor as typeof Element)({
+      namespace: this[$namespace],
+      namespacePrefix: this[$namespacePrefix],
+      localName: this[$localName],
+      isValue: this[$isValue],
+      customElementState: this[$customElementState],
+      customElementDefinition: this.#customElementDefinition,
+      nodeDocument: document,
+    });
 
+    // 2. For each attribute in node’s attribute list:
     for (const attribute of this[$attributeList]) {
-      appendAttribute(cloneAttr(attribute, document), copy);
+      // 1. Let copyAttribute be a clone of attribute.
+      const copyAttribute = cloneAttr(attribute, document);
+
+      // 2. Append copyAttribute to copy.
+      appendAttribute(copyAttribute, copy);
     }
 
     return copy;
