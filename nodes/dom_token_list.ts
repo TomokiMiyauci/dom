@@ -2,13 +2,16 @@ import { Iterable, iterable } from "../webidl/iterable.ts";
 import type { IDOMTokenList } from "../interface.d.ts";
 import { OrderedSet } from "../infra/set.ts";
 import {
+  AttributeChangeCallback,
   type Element,
   getAttributeValue,
   setAttributeValue,
 } from "./element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { $attributeList } from "./internal.ts";
-import { serializeOrderSet } from "../trees/ordered_set.ts";
+import { $attributeChangeSteps, $attributeList } from "./internal.ts";
+import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
+import { reAsciiWhitespace } from "../infra/code_point.ts";
+import { Indexer } from "../utils.ts";
 
 interface DOMTokenListInits {
   element: Element;
@@ -19,14 +22,26 @@ interface DOMTokenListInits {
  * @see https://dom.spec.whatwg.org/#interface-domtokenlist
  */
 @iterable
+@Indexer(function (this: DOMTokenList, index): string | undefined {
+  return this.tokenSet[index];
+})
 export class DOMTokenList implements IDOMTokenList {
   [k: number]: string;
 
-  #tokenSet: OrderedSet<string> = new OrderedSet();
+  private tokenSet: OrderedSet<string> = new OrderedSet();
   #element: Element;
   #localName: string;
 
   constructor({ element, localName }: DOMTokenListInits) {
+    const attributeChangeStep: AttributeChangeCallback = (ctx) => {
+      if (ctx.localName === localName && ctx.namespace === null) {
+        if (ctx.value === null) this.tokenSet.empty();
+        else this.tokenSet = parseOrderSet(value);
+      }
+    };
+    const steps = element[$attributeChangeSteps];
+    steps.define(attributeChangeStep);
+
     // 1. Let element be associated element.
     this.#element = element;
 
@@ -36,8 +51,8 @@ export class DOMTokenList implements IDOMTokenList {
     // 3. Let value be the result of getting an attribute value given element and localName.
     const value = getAttributeValue(element, localName);
 
-    // TODO(miyauci)
     // 4. Run the attribute change steps for element, localName, value, value, and null.
+    steps.run({ element, localName, oldValue: value, value, namespace: null });
   }
 
   /**
@@ -45,7 +60,7 @@ export class DOMTokenList implements IDOMTokenList {
    */
   get length(): number {
     // return this’s token set’s size.
-    return this.#tokenSet.size;
+    return this.tokenSet.size;
   }
 
   /**
@@ -56,12 +71,12 @@ export class DOMTokenList implements IDOMTokenList {
     if (!this.#isSupportedIndex(index)) return null;
 
     // 2. Return this’s token set[index].
-    return this.#tokenSet[index]!;
+    return this.tokenSet[index]!;
   }
 
   contains(token: string): boolean {
     // return true if this’s token set[token] exists; otherwise false.
-    return this.#tokenSet.contains(token);
+    return this.tokenSet.contains(token);
   }
 
   /**
@@ -73,7 +88,7 @@ export class DOMTokenList implements IDOMTokenList {
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
     // 2. For each token in tokens, append token to this’s token set.
-    for (const token of tokens) this.#tokenSet.append(token);
+    for (const token of tokens) this.tokenSet.append(token);
 
     // 3. Run the update steps.
     this.#updateSteps();
@@ -88,7 +103,7 @@ export class DOMTokenList implements IDOMTokenList {
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
     // 2. For each token in tokens, remove token from this’s token set.
-    for (const token of tokens) this.#tokenSet.remove((item) => item === token);
+    for (const token of tokens) this.tokenSet.remove((item) => item === token);
 
     // 3. Run the update steps.
     this.#updateSteps();
@@ -103,10 +118,10 @@ export class DOMTokenList implements IDOMTokenList {
     checkToken(token);
 
     // 3. If this’s token set[token] exists, then:
-    if (this.#tokenSet.contains(token)) {
+    if (this.tokenSet.contains(token)) {
       // 1. If force is either not given or is false, then remove token from this’s token set, run the update steps and return false.
       if (!force) {
-        this.#tokenSet.remove((item) => item === token);
+        this.tokenSet.remove((item) => item === token);
         this.#updateSteps();
 
         // 2. Return true.
@@ -118,7 +133,7 @@ export class DOMTokenList implements IDOMTokenList {
 
     // 4. Otherwise, if force not given or is true, append token to this’s token set, run the update steps, and return true.
     if (force === undefined || force) {
-      this.#tokenSet.append(token);
+      this.tokenSet.append(token);
       this.#updateSteps();
       return true;
     }
@@ -137,10 +152,10 @@ export class DOMTokenList implements IDOMTokenList {
     checkToken(newToken);
 
     // 3. If this’s token set does not contain token, then return false.
-    if (!this.#tokenSet.contains(token)) return false;
+    if (!this.tokenSet.contains(token)) return false;
 
     // 4. Replace token in this’s token set with newToken.
-    this.#tokenSet.replace(token, newToken);
+    this.tokenSet.replace(token, newToken);
 
     // 5. Run the update steps.
     this.#updateSteps();
@@ -182,7 +197,7 @@ export class DOMTokenList implements IDOMTokenList {
   }
 
   #isSupportedIndex(index: number): boolean {
-    return 0 <= index && index < this.#tokenSet.size;
+    return 0 <= index && index < this.tokenSet.size;
   }
 
   /**
@@ -190,7 +205,7 @@ export class DOMTokenList implements IDOMTokenList {
    */
   #updateSteps(): void {
     // 1. If the associated element does not have an associated attribute and token set is empty, then return.
-    if (this.#element[$attributeList].isEmpty && this.#tokenSet.isEmpty) {
+    if (this.#element[$attributeList].isEmpty && this.tokenSet.isEmpty) {
       return;
     }
 
@@ -198,7 +213,7 @@ export class DOMTokenList implements IDOMTokenList {
     setAttributeValue(
       this.#element,
       this.#localName,
-      serializeOrderSet(this.#tokenSet),
+      serializeOrderSet(this.tokenSet),
     );
   }
 
@@ -226,6 +241,3 @@ export function checkToken(token: string): void {
     new DOMException("<message>", DOMExceptionName.InvalidCharacterError);
   }
 }
-
-/** @see https://infra.spec.whatwg.org/#ascii-whitespace */
-const reAsciiWhitespace = /[\t\n\f\r ]/;

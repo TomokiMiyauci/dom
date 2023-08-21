@@ -12,9 +12,10 @@ import { appendNode, preInsertNode, preRemoveChild } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import { getRoot, Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $namespace, $nodeDocument } from "./internal.ts";
-import { every, izip } from "../deps.ts";
+import { $mode, $namespace, $nodeDocument } from "./internal.ts";
+import { every, html, izip } from "../deps.ts";
 import { type OrderedSet } from "../infra/set.ts";
+import { parseOrderSet } from "../trees/ordered_set.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -376,7 +377,26 @@ export function getElementsByClassName(
   classNames: string,
   root: Node,
 ): HTMLCollection {
-  throw new Error("getElementsByClassName");
+  const classes = parseOrderSet(classNames);
+
+  if (classes.isEmpty) return new HTMLCollection({ root, filter: () => false });
+
+  const match = root[$nodeDocument][$mode] === html.DOCUMENT_MODE.QUIRKS
+    ? matchASCIICaseInsensitive
+    : Object.is;
+
+  return new HTMLCollection({
+    root,
+    filter: (node) => {
+      if (node === root) return false;
+
+      return every(classes, (left) => {
+        for (const right of node.classList) if (match(left, right)) return true;
+
+        return false;
+      });
+    },
+  });
 }
 
 /**
@@ -387,4 +407,8 @@ export function getParentElement(node: Node): Element | null {
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
+}
+
+function matchASCIICaseInsensitive(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
 }

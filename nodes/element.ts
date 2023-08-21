@@ -1,4 +1,5 @@
 import {
+  getElementsByClassName,
   getElementsByQualifiedName,
   Node,
   NodeStates,
@@ -25,6 +26,7 @@ import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
 import {
+  $attributeChangeSteps,
   $attributeList,
   $create,
   $customElementState,
@@ -91,6 +93,7 @@ export class Element extends Node implements IElement {
   #customElementDefinition: CustomElementDefinition | null;
   [$attributeList]: List<Attr>;
   [$isValue]: string | null;
+  [$attributeChangeSteps] = new AttributeChangeSteps();
 
   _ID: string | null = null;
 
@@ -234,7 +237,6 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-classlist
    */
-  @SameObject
   get classList(): DOMTokenList {
     // return a DOMTokenList object whose associated element is this and whose associated attribute’s local name is class.
     return new DOMTokenList({ element: this, localName: "class" });
@@ -365,10 +367,14 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("getAttributeNodeNS");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getelementsbyclassname
+   */
   getElementsByClassName(
     classNames: string,
-  ): HTMLCollectionOf<globalThis.Element> {
-    throw new UnImplemented("getElementsByClassName");
+  ): HTMLCollectionOf<Element> {
+    // return the list of elements with class names classNames for this.
+    return getElementsByClassName(classNames, this);
   }
 
   /**
@@ -747,22 +753,25 @@ export function hasAttributeByQualifiedName(
   return false;
 }
 
-function SameObject(
-  _: unknown,
-  ___: unknown,
-  descriptor: PropertyDescriptor,
-) {
-  if (descriptor.get) {
-    let cache: unknown;
+export interface AttributesContext {
+  element: Element;
+  localName: string;
+  oldValue: string | null;
+  value: string | null;
+  namespace: string | null;
+}
 
-    descriptor.get = new Proxy(descriptor.get, {
-      apply: (target, p, receiver) => {
-        if (cache) return cache;
+export interface AttributeChangeCallback {
+  (ctx: AttributesContext): void;
+}
 
-        cache = Reflect.get(target, p, receiver);
+export class AttributeChangeSteps {
+  #callbacks = new Set<AttributeChangeCallback>();
+  define(callback: AttributeChangeCallback) {
+    this.#callbacks.add(callback);
+  }
 
-        return cache;
-      },
-    });
+  run(ctx: AttributesContext): void {
+    this.#callbacks.forEach((callback) => callback(ctx));
   }
 }
