@@ -65,7 +65,7 @@
   // "Element-getElementsByTagName.html",
   // "Element-getElementsByTagNameNS.html",
   "Element-hasAttribute.html",
-  // "Element-hasAttributes.html",
+  "Element-hasAttributes.html",
   // "Element-insertAdjacentElement.html",
   // "Element-insertAdjacentText.html",
   // "Element-lastElementChild.html",

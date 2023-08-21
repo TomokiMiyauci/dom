@@ -462,8 +462,12 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("hasAttributeNS");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-hasattributes
+   */
   hasAttributes(): boolean {
-    throw new UnImplemented("hasAttributes");
+    // return false if this’s attribute list is empty; otherwise true.
+    return !this[$attributeList].isEmpty;
   }
 
   insertAdjacentElement(
