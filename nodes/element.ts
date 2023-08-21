@@ -367,8 +367,22 @@ export class Element extends Node implements IElement {
     return attr[$value];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getattributens
+   */
   getAttributeNS(namespace: string | null, localName: string): string | null {
-    throw new UnImplemented("getAttributeNS");
+    // 1. Let attr be the result of getting an attribute given namespace, localName, and this.
+    const attr = getAttributeByNamespaceAndLocalName(
+      namespace,
+      localName,
+      this,
+    );
+
+    // 2. If attr is null, return null.
+    if (attr === null) return attr;
+
+    // 3. Return attr’s value.
+    return attr[$value];
   }
 
   getAttributeNames(): string[] {
