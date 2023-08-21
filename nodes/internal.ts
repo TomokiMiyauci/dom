@@ -17,3 +17,4 @@ export const $attributeList = Symbol();
 export const $mode = Symbol();
 export const $encoding = Symbol();
 export const $attributeChangeSteps = Symbol();
+export const $templateContents = Symbol();
