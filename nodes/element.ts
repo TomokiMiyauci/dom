@@ -93,7 +93,7 @@ export class Element extends Node implements IElement {
   #customElementDefinition: CustomElementDefinition | null;
   [$attributeList]: List<Attr>;
   [$isValue]: string | null;
-  [$attributeChangeSteps] = new AttributeChangeSteps();
+  [$attributeChangeSteps]: AttributeChangeSteps;
 
   _ID: string | null = null;
 
@@ -139,6 +139,21 @@ export class Element extends Node implements IElement {
     attributeList = new List(),
   }: AttributeInits & NodeStates) {
     super();
+
+    const attributeChangeStep: AttributeChangeCallback = (
+      { localName, namespace, value },
+    ) => {
+      // 1. If localName is id, namespace is null, and value is null or the empty string, then unset element’s ID.
+      if (localName === "id" && namespace === null) {
+        // 2. Otherwise, if localName is id, namespace is null, then set element’s ID to value.
+        this._ID = value ? value : null;
+      }
+    };
+
+    const steps = new AttributeChangeSteps();
+    steps.define(attributeChangeStep);
+
+    this[$attributeChangeSteps] = steps;
     this[$namespace] = namespace;
     this[$namespacePrefix] = namespacePrefix;
     this[$localName] = localName;

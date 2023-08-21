@@ -64,7 +64,7 @@
   // "Element-getElementsByTagName-change-document-HTMLNess.html",
   // "Element-getElementsByTagName.html",
   // "Element-getElementsByTagNameNS.html",
-  // "Element-hasAttribute.html",
+  "Element-hasAttribute.html",
   // "Element-hasAttributes.html",
   // "Element-insertAdjacentElement.html",
   // "Element-insertAdjacentText.html",
