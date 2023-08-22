@@ -39,12 +39,12 @@ export interface NodeStates {
 
 @Treeable
 export abstract class Node extends EventTarget implements INode {
-  static DOCUMENT_POSITION_DISCONNECTED = 0x01 as const;
-  static DOCUMENT_POSITION_PRECEDING = 0x02 as const;
-  static DOCUMENT_POSITION_FOLLOWING = 0x04 as const;
-  static DOCUMENT_POSITION_CONTAINS = 0x08 as const;
-  static DOCUMENT_POSITION_CONTAINED_BY = 0x10 as const;
-  static DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20 as const;
+  static DOCUMENT_POSITION_DISCONNECTED = 1 as const;
+  static DOCUMENT_POSITION_PRECEDING = 2 as const;
+  static DOCUMENT_POSITION_FOLLOWING = 4 as const;
+  static DOCUMENT_POSITION_CONTAINS = 8 as const;
+  static DOCUMENT_POSITION_CONTAINED_BY = 16 as const;
+  static DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32 as const;
 
   static ELEMENT_NODE = NodeType.ELEMENT_NODE;
   static ATTRIBUTE_NODE = NodeType.ATTRIBUTE_NODE;
@@ -58,6 +58,24 @@ export abstract class Node extends EventTarget implements INode {
   static DOCUMENT_TYPE_NODE = NodeType.DOCUMENT_TYPE_NODE;
   static DOCUMENT_FRAGMENT_NODE = NodeType.DOCUMENT_FRAGMENT_NODE;
   static NOTATION_NODE = NodeType.NOTATION_NODE;
+  readonly DOCUMENT_POSITION_DISCONNECTED = 1 as const;
+  readonly DOCUMENT_POSITION_PRECEDING = 2 as const;
+  readonly DOCUMENT_POSITION_FOLLOWING = 4 as const;
+  readonly DOCUMENT_POSITION_CONTAINS = 8 as const;
+  readonly DOCUMENT_POSITION_CONTAINED_BY = 16 as const;
+  readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32 as const;
+  readonly DOCUMENT_NODE = NodeType.DOCUMENT_NODE;
+  readonly DOCUMENT_TYPE_NODE = NodeType.DOCUMENT_TYPE_NODE;
+  readonly DOCUMENT_FRAGMENT_NODE = NodeType.DOCUMENT_FRAGMENT_NODE;
+  readonly ELEMENT_NODE = NodeType.ELEMENT_NODE;
+  readonly ENTITY_NODE = NodeType.ENTITY_NODE;
+  readonly ATTRIBUTE_NODE = NodeType.ATTRIBUTE_NODE;
+  readonly TEXT_NODE = NodeType.TEXT_NODE;
+  readonly CDATA_SECTION_NODE = NodeType.CDATA_SECTION_NODE;
+  readonly ENTITY_REFERENCE_NODE = NodeType.ENTITY_REFERENCE_NODE;
+  readonly COMMENT_NODE = NodeType.COMMENT_NODE;
+  readonly PROCESSING_INSTRUCTION_NODE = NodeType.PROCESSING_INSTRUCTION_NODE;
+  readonly NOTATION_NODE = NodeType.NOTATION_NODE;
 
   abstract [$nodeDocument]: Document;
 
@@ -213,78 +231,6 @@ export abstract class Node extends EventTarget implements INode {
   isSameNode(otherNode: Node | null): boolean {
     // return true if otherNode is this; otherwise false.
     return this === otherNode;
-  }
-
-  get DOCUMENT_POSITION_DISCONNECTED(): 1 {
-    return 1;
-  }
-
-  get DOCUMENT_POSITION_PRECEDING(): 2 {
-    return 2;
-  }
-
-  get DOCUMENT_POSITION_FOLLOWING(): 4 {
-    return 4;
-  }
-
-  get DOCUMENT_POSITION_CONTAINS(): 8 {
-    return 8;
-  }
-
-  get DOCUMENT_NODE(): 9 {
-    return 9;
-  }
-
-  get DOCUMENT_TYPE_NODE(): 10 {
-    return 10;
-  }
-
-  get DOCUMENT_FRAGMENT_NODE(): 11 {
-    return 11;
-  }
-
-  get DOCUMENT_POSITION_CONTAINED_BY(): 16 {
-    return 16;
-  }
-
-  get DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC(): 32 {
-    return 32;
-  }
-
-  get ELEMENT_NODE(): 1 {
-    return 1;
-  }
-
-  get ENTITY_NODE(): 6 {
-    return 6;
-  }
-
-  get ATTRIBUTE_NODE(): 2 {
-    return 2;
-  }
-
-  get TEXT_NODE(): 3 {
-    return 3;
-  }
-
-  get CDATA_SECTION_NODE(): 4 {
-    return 4;
-  }
-
-  get ENTITY_REFERENCE_NODE(): 5 {
-    return 5;
-  }
-
-  get COMMENT_NODE(): 8 {
-    return 8;
-  }
-
-  get PROCESSING_INSTRUCTION_NODE(): 7 {
-    return 7;
-  }
-
-  get NOTATION_NODE(): 12 {
-    return 12;
   }
 
   compareDocumentPosition(other: Node): number {
