@@ -6,7 +6,7 @@ import { parseHTMLFragment } from "../html/html_parser.ts";
 import { orderTreeChildren } from "../trees/tree.ts";
 import { appendNode } from "../nodes/mutation.ts";
 import { isHTMLDocument } from "../nodes/document.ts";
-import { serialize } from "npm:parse5";
+import { serialize } from "npm:parse5@7.1.2";
 import { DOMTreeAdapter, DOMTreeAdapterMap } from "../html/utils.ts";
 
 /**

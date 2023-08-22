@@ -63,7 +63,7 @@ enum CustomElementState {
   Custom = "custom",
 }
 
-export interface AttributeInits {
+export interface ElementInits {
   namespace: string | null;
   namespacePrefix: string | null;
   localName: string;
@@ -138,7 +138,7 @@ export class Element extends Node implements IElement {
     isValue,
     nodeDocument,
     attributeList = new List(),
-  }: AttributeInits & NodeStates) {
+  }: ElementInits & NodeStates) {
     super();
 
     const attributeChangeStep: AttributeChangeCallback = (
@@ -792,6 +792,9 @@ export function isCustom(element: Element): boolean {
   // An element whose custom element state is "custom
   return element[$customElementState] === CustomElementState.Custom;
 }
+
+export const reflectGet = getAttributeValue;
+export const reflectSet = setAttributeValue;
 
 export function hasAttributeByQualifiedName(
   qualifiedName: string,

@@ -106,5 +106,5 @@ export function createElement(
   }
 
   // 8. Return result.
-  return result!;
+  return result;
 }

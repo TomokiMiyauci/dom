@@ -4,7 +4,7 @@ export {
   Token,
   type TreeAdapter,
   type TreeAdapterTypeMap,
-} from "npm:parse5";
+} from "npm:parse5@7.1.2";
 export {
   enumerate,
   every,

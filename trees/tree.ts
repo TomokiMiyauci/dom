@@ -18,7 +18,7 @@ export function previousSibling<T extends Tree>(tree: T): T | null {
   for (const item of tree._parent._children) {
     if (tree === item) return prev;
 
-    prev = item;
+    prev = item as T;
   }
 
   return null;
@@ -34,7 +34,7 @@ export function nextSibling<T extends Tree>(tree: T): T | null {
       continue;
     }
 
-    if (hit) return item;
+    if (hit) return item as T;
   }
 
   return null;
