@@ -40,6 +40,7 @@ export enum Namespace {
 }
 
 /**
+ * @throws {DOMException}
  * @see https://dom.spec.whatwg.org/#validate
  */
 export function validate(qualifiedName: string) {
@@ -52,17 +53,20 @@ export function validate(qualifiedName: string) {
   }
 }
 
+export interface ExtractResult {
+  namespace: string | null;
+  prefix: string | null;
+  localName: string;
+}
+
 /**
+ * @throws {DOMException}
  * @see https://dom.spec.whatwg.org/#validate-and-extract
  */
 export function validateAndExtract(
   namespace: string | null,
   qualifiedName: string,
-): {
-  namespace: string | null;
-  prefix: string | null;
-  localName: string;
-} {
+): ExtractResult {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
 
@@ -115,16 +119,17 @@ export function validateAndExtract(
     );
   }
 
-  // 9. If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException.
-  if (
-    namespace === Namespace.XMLNS && (qualifiedName !== "xmlns") &&
-    prefix !== "xmlns"
-  ) {
-    throw new DOMException(
-      DOMExceptionDescription.NamespaceError,
-      DOMExceptionName.NamespaceError,
-    );
-  }
+  // Duplicate 8. It maybe be specification mistake.
+  // // 9. If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException.
+  // if (
+  //   namespace === Namespace.XMLNS && (qualifiedName !== "xmlns") &&
+  //   prefix !== "xmlns"
+  // ) {
+  //   throw new DOMException(
+  //     DOMExceptionDescription.NamespaceError,
+  //     DOMExceptionName.NamespaceError,
+  //   );
+  // }
 
   // 10. Return namespace, prefix, and localName.
   return { namespace, prefix, localName };
