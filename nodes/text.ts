@@ -12,7 +12,12 @@ import { List } from "../infra/data_structures/list.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { nodeLength } from "./node_tree.ts";
-import { orderTree, orderTreeChildren } from "../trees/tree.ts";
+import {
+  getNextSibling,
+  getPreviousSibling,
+  orderTree,
+  orderTreeChildren,
+} from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, tail } from "../deps.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
@@ -104,7 +109,7 @@ export function splitText(node: Text, offset: number): Text {
   // 7 If parent is not null, then:
   if (isNotNull(parent)) {
     // 1 Insert new node into parent before node’s next sibling.
-    insertNode(newNode, parent, node._nextSibling);
+    insertNode(newNode, parent, getNextSibling(node));
 
     // 2 For each live range whose start node is node and start offset is greater than offset, set its start node to new node and decrease its start offset by offset.
 
@@ -156,16 +161,18 @@ export function contiguousSibling(
   node: Node,
   condition: (node: Node) => node is Text,
 ): List<Text> {
-  while (node._previousSibling && condition(node._previousSibling)) {
-    node = node._previousSibling;
+  let n: Node | null = node;
+
+  while (n && condition(n)) {
+    n = getPreviousSibling(node);
   }
 
   const list = new List<Text>();
 
-  while (node && condition(node)) {
-    list.append(node);
+  while (n && condition(n)) {
+    list.append(n);
 
-    node = node._nextSibling;
+    n = getNextSibling(node);
   }
 
   return list;

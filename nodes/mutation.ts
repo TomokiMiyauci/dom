@@ -12,7 +12,14 @@ import { type Document } from "./document.ts";
 import { $nodeDocument } from "./internal.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { hasParent, orderTreeChildren } from "../trees/tree.ts";
+import {
+  getIndex,
+  getLastChild,
+  getNextSibling,
+  getPreviousSibling,
+  hasParent,
+  orderTreeChildren,
+} from "../trees/tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
@@ -101,7 +108,9 @@ export function insertNode(
   }
 
   // 6. Let previousSibling be child’s previous sibling or parent’s last child if child is null.
-  const previousSibling = child ? child._previousSibling : parent._lastChild;
+  const previousSibling = child
+    ? getPreviousSibling(child)
+    : getLastChild(parent);
 
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) {
@@ -113,7 +122,7 @@ export function insertNode(
       parent._children.append(node);
     } else {
       // 3. Otherwise, insert node into parent’s children before child’s index.
-      parent._children.insert(child._index, node);
+      parent._children.insert(getIndex(child), node);
     }
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
@@ -307,7 +316,7 @@ export function removeNode(
   if (!parent) return;
 
   // 3. Let index be node’s index.
-  const index = node._index;
+  const index = getIndex(node);
 
   // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).
 
@@ -320,10 +329,10 @@ export function removeNode(
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
 
   // 9. Let oldPreviousSibling be node’s previous sibling.
-  const oldPreviousSibling = node._previousSibling;
+  const oldPreviousSibling = getPreviousSibling(node);
 
   // 10. Let oldNextSibling be node’s next sibling.
-  const oldNextSibling = node._nextSibling;
+  const oldNextSibling = getNextSibling(node);
 
   // 11. Remove node from its parent’s children.
   parent._children.remove((target) => target === node);

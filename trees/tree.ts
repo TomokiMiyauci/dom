@@ -1,5 +1,5 @@
-import { OrderedSet } from "../infra/set.ts";
-import { type Constructor, enumerate, some } from "../deps.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
+import { enumerate, some } from "../deps.ts";
 
 export function hasParent<T>(
   tree: { _parent: T | null },
@@ -11,92 +11,71 @@ export function isSibling(a: Tree, b: Tree): boolean {
   return a._parent !== null && a._parent === b._parent;
 }
 
-export function previousSibling<T extends Tree>(tree: T): T | null {
-  if (!tree._parent) return null;
+export interface TreeNode {
+  _parent: TreeNode | null;
+  _children: OrderedSet<TreeNode>;
+}
 
-  let prev: T | null = null;
-  for (const item of tree._parent._children) {
-    if (tree === item) return prev;
+export interface Tree<
+  P extends TreeNode = TreeNode,
+  C extends TreeNode = TreeNode,
+> extends TreeNode {
+  _parent: P | null;
+  _children: OrderedSet<C>;
+}
 
-    prev = item as T;
+export function getFirstChild<C extends Tree>(
+  tree: Tree<TreeNode, C>,
+): C | null {
+  return tree._children[0] ?? null;
+}
+
+export function getLastChild<C extends Tree>(
+  tree: Tree<Tree, C>,
+): C | null {
+  return tree._children[tree._children.size - 1] ?? null;
+}
+
+export function getPreviousSibling<C extends Tree>(
+  tree: Tree<Tree, C>,
+): C | null {
+  if (tree._parent) {
+    const index = [...tree._parent._children].indexOf(
+      tree as unknown as Tree,
+    );
+    if (index > 0) return (tree._parent._children[index - 1] as C) ?? null;
   }
 
   return null;
 }
 
-export function nextSibling<T extends Tree>(tree: T): T | null {
-  if (!tree._parent) return null;
-
-  let hit = false;
-  for (const item of tree._parent._children) {
-    if (tree === item) {
-      hit = true;
-      continue;
-    }
-
-    if (hit) return item as T;
+export function getNextSibling<C extends Tree>(
+  tree: Tree<Tree, C>,
+): C | null {
+  if (tree._parent) {
+    const index = [...tree._parent._children].indexOf(
+      tree as unknown as Tree,
+    );
+    if (index > -1) return (tree._parent._children[index + 1] as C) ?? null;
   }
 
   return null;
 }
 
-export function Treeable<T extends Constructor>(Ctor: T) {
-  abstract class Mixin extends Ctor implements Tree {
-    _parent: this | null = null;
-
-    #children: OrderedSet<Tree> = new OrderedSet();
-
-    get _children(): OrderedSet<Tree> {
-      return this.#children;
-    }
-
-    get _firstChild(): Tree | null {
-      return this._children[0] ?? null;
-    }
-
-    get _lastChild(): Tree | null {
-      return this._children[this._children.size - 1] ?? null;
-    }
-
-    get _previousSibling(): Tree | null {
-      return previousSibling(this);
-    }
-
-    get _nextSibling(): Tree | null {
-      return nextSibling(this);
-    }
-
-    get _index(): number {
-      if (this._children) {
-        for (const [index, item] of enumerate(this._children)) {
-          if (this === item) return index;
-        }
-      }
-
-      return 0;
+export function getIndex(tree: Tree): number {
+  if (tree._children) {
+    for (const [index, item] of enumerate(tree._children)) {
+      if (tree === item) return index;
     }
   }
 
-  return Mixin;
-}
-
-export interface Tree extends TreeAlgorithm {
-  _parent: Tree | null;
-  _children: OrderedSet<Tree>;
-}
-
-interface TreeAlgorithm {
-  get _firstChild(): Tree | null;
-  get _lastChild(): Tree | null;
-  get _previousSibling(): Tree | null;
-  get _nextSibling(): Tree | null;
-  get _index(): number;
+  return 0;
 }
 
 export function getRoot<T extends Tree>(tree: T): T {
   if (tree._parent === null) return tree;
 
-  return getRoot<T>(tree._parent as T);
+  return getRoot(tree._parent as T);
 }
 
 /**

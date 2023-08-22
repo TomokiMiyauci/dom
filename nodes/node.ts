@@ -10,13 +10,20 @@ import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
 import { appendNode, preInsertNode, preRemoveChild } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
-import { getRoot, Tree, Treeable } from "../trees/tree.ts";
+import {
+  getFirstChild,
+  getLastChild,
+  getNextSibling,
+  getPreviousSibling,
+  getRoot,
+} from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $mode, $namespace, $nodeDocument } from "./internal.ts";
 import { every, html, izip } from "../deps.ts";
-import { type OrderedSet } from "../infra/data_structures/set.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
+import type { ParentNode } from "./parent_node.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -46,7 +53,6 @@ export interface NodeStates {
   nodeDocument: Document;
 }
 
-@Treeable
 export abstract class Node extends EventTarget implements INode {
   static DOCUMENT_POSITION_DISCONNECTED =
     Position.DOCUMENT_POSITION_DISCONNECTED;
@@ -104,6 +110,9 @@ export abstract class Node extends EventTarget implements INode {
   abstract get textContent(): string | null;
   abstract set textContent(value: string | null);
 
+  _parent: (Node & ParentNode) | null = null;
+  _children: OrderedSet<Node & ChildNode> = new OrderedSet();
+
   get baseURI(): string {
     throw new UnImplemented("baseURI");
   }
@@ -156,7 +165,7 @@ export abstract class Node extends EventTarget implements INode {
    */
   get firstChild(): (Node & ChildNode) | null {
     // return this’s first child.
-    return this._firstChild;
+    return getFirstChild(this);
   }
 
   /**
@@ -164,7 +173,7 @@ export abstract class Node extends EventTarget implements INode {
    */
   get lastChild(): (Node & ChildNode) | null {
     // return this’s last child.
-    return this._lastChild;
+    return getLastChild(this);
   }
 
   /**
@@ -172,12 +181,7 @@ export abstract class Node extends EventTarget implements INode {
    */
   get previousSibling(): (Node & ChildNode) | null {
     // TODO(miyauci): O(1)
-    if (this._parent) {
-      const index = [...this._parent._children].indexOf(this);
-      if (index > 0) return this._parent._children[index - 1];
-    }
-
-    return null;
+    return getPreviousSibling(this);
   }
 
   /**
@@ -185,12 +189,7 @@ export abstract class Node extends EventTarget implements INode {
    */
   get nextSibling(): (Node & ChildNode) | null {
     // TODO(miyauci): O(1)
-    if (this._parent) {
-      const index = [...this._parent._children].indexOf(this);
-      if (index > -1) return this._parent._children[index + 1];
-    }
-
-    return null;
+    return getNextSibling(this);
   }
 
   normalize(): void {
@@ -293,11 +292,6 @@ export abstract class Node extends EventTarget implements INode {
   get parentElement(): HTMLElement | null {
     return getParentElement(this) as HTMLElement | null; // The specification is `Element`
   }
-}
-
-export interface Node extends Tree {
-  _parent: Node | null;
-  _children: OrderedSet<Node>;
 }
 
 /**
