@@ -1,12 +1,9 @@
 import { isValidCustomElementName } from "../custom_element.ts";
-import { HTMLHtmlElement } from "../semantics/html_html_element.ts";
-import { HTMLHeadElement } from "../semantics/html_head_element.ts";
-import { HTMLTitleElement } from "../semantics/html_title_element.ts";
 import { HTMLUnknownElement } from "./html_unknown_element.ts";
-import { HTMLBodyElement } from "../elements/html_body_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import { type Element } from "../../nodes/element.ts";
 import { HTMLElement } from "./html_element.ts";
+import { tagNameMap } from "../tagname_map.ts";
 
 const unknowns = new Set<string>([
   "applet",
@@ -45,13 +42,6 @@ export const HTMLInterfaceResolver: InterfaceResolver = {
   resolve(name: string): typeof Element {
     return resolveInterface(name);
   },
-};
-
-const tagNameMap: Record<string, typeof HTMLElement> = {
-  html: HTMLHtmlElement,
-  head: HTMLHeadElement,
-  title: HTMLTitleElement,
-  body: HTMLBodyElement,
 };
 
 /**
