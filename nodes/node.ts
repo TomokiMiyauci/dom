@@ -198,12 +198,12 @@ export abstract class Node extends EventTarget implements INode {
     // @optimized
     // return true if otherNode is non-null and this equals otherNode; otherwise false.
     return this === otherNode || (otherNode !== null &&
-      otherNode.constructor === this.constructor &&
+      this.nodeType === otherNode.nodeType &&
       this.equals(otherNode as this) &&
       this._children.size === otherNode._children.size &&
       every(
         izip(this._children, otherNode._children),
-        ([left, right]) => this.isEqualNode.call(left, right),
+        ([left, right]) => Node.prototype.isEqualNode.call(left, right),
       ));
   }
 
