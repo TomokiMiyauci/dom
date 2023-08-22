@@ -182,9 +182,10 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     if (element.namespaceURI === null) {
       throw new Error("namespaceURL does not exist");
     }
-    assertNamespaceURL(element.namespaceURI);
 
-    return element.namespaceURI;
+    // TODO(miyauci) When the namespaceURI is not well-known, what should do.
+    // Since the parser accepts an unknown namespaceURI, should the serializer also do so?
+    return element.namespaceURI as html.NS;
   }
 
   getFirstChild(node: Element): ChildNode | null {
@@ -208,16 +209,6 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
 
   updateNodeSourceCodeLocation(): void {
     // noop
-  }
-}
-
-const namespaceURLs = new Set<string>(Object.values(html.NS));
-
-function assertNamespaceURL(
-  namespaceURL: string,
-): asserts namespaceURL is html.NS {
-  if (!namespaceURLs.has(namespaceURL)) {
-    throw new Error(`namespaceURL is invalid. ${namespaceURL}`);
   }
 }
 
