@@ -8,7 +8,7 @@ import {
 } from "./character_data.ts";
 import { isText } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
-import { List } from "../infra/list.ts";
+import { List } from "../infra/data_structures/list.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { nodeLength } from "./node_tree.ts";

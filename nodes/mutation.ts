@@ -10,7 +10,7 @@ import {
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { $nodeDocument } from "./internal.ts";
-import { OrderedSet } from "../infra/set.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { hasParent, orderTreeChildren } from "../trees/tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";

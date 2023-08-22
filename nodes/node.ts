@@ -14,7 +14,7 @@ import { getRoot, Tree, Treeable } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $mode, $namespace, $nodeDocument } from "./internal.ts";
 import { every, html, izip } from "../deps.ts";
-import { type OrderedSet } from "../infra/set.ts";
+import { type OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 

@@ -2,7 +2,7 @@ import type { Document } from "../nodes/document.ts";
 import type { Element } from "../nodes/element.ts";
 import type { Node } from "../nodes/node.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./utils.ts";
-import { List } from "../infra/list.ts";
+import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
 
 export class HTMLParser {

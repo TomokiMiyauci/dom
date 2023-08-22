@@ -1,7 +1,7 @@
 import type { INamedNodeMap } from "../interface.d.ts";
 import { find, html } from "../deps.ts";
 import { UnImplemented } from "./utils.ts";
-import { List } from "../infra/list.ts";
+import { List } from "../infra/data_structures/list.ts";
 import { type Element, setAttribute } from "./element.ts";
 import type { Attr } from "./attr.ts";
 import { $attributeList, $element } from "./internal.ts";

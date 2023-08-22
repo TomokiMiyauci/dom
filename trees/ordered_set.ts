@@ -1,4 +1,4 @@
-import { OrderedSet } from "../infra/set.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
 import { reAsciiWhitespace } from "../infra/code_point.ts";
 
 /**

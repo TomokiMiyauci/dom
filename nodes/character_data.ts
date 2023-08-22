@@ -7,7 +7,7 @@ import { $data, $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_tree.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { queueMutationRecord } from "./mutation_observer.ts";
-import { OrderedSet } from "../infra/set.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
 import { LegacyNullToEmptyString } from "../webidl/legacy_extended_attributes.ts";
 
 export interface CharacterDataStates {

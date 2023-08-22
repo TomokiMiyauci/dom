@@ -1,6 +1,6 @@
 import { Iterable, iterable } from "../webidl/iterable.ts";
 import type { IDOMTokenList } from "../interface.d.ts";
-import { OrderedSet } from "../infra/set.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
 import {
   AttributeChangeCallback,
   type Element,

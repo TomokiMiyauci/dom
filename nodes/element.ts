@@ -19,7 +19,7 @@ import { NamedNodeMap } from "./named_node_map.ts";
 import { type Document, isHTMLDocument } from "./document.ts";
 import { CustomElementDefinition } from "../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
-import { List } from "../infra/list.ts";
+import { List } from "../infra/data_structures/list.ts";
 import { descendantTextContent } from "./text.ts";
 import { every, find, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
