@@ -55,8 +55,8 @@ export class Attr extends Node implements IAttr {
   constructor(
     {
       namespace = null,
-      localName,
       namespacePrefix = null,
+      localName,
       element = null,
       value = "",
       nodeDocument,
@@ -270,9 +270,9 @@ export function handleAttributesChanges(
  * @see https://dom.spec.whatwg.org/#concept-node-equals
  */
 export function equalsAttr(left: Attr, right: Attr): boolean {
+  // Its namespace, local name, and value.
   return left === right || left[$namespace] === right[$namespace] &&
-      left[$namespacePrefix] === right[$namespacePrefix] &&
-      left[$localName] === right[$localName];
+      left[$localName] === right[$localName] && left[$value] === right[$value];
 }
 
 export function cloneAttr(attr: Attr, document: Document): Attr {
