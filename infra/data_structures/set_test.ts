@@ -5,7 +5,7 @@ import {
   assertFalse,
   describe,
   it,
-} from "../_dev_deps.ts";
+} from "../../_dev_deps.ts";
 
 describe("OrderedSet", () => {
   it("should not add item if the item exists", () => {

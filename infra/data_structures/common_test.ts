@@ -1,8 +1,14 @@
-import { List } from "./list.ts";
-import { assert, assertEquals, describe, it } from "../_dev_deps.ts";
+import { ListCore } from "./common.ts";
+import { assert, assertEquals, describe, it, assertFalse } from "../../_dev_deps.ts";
 import { isOdd } from "https://deno.land/x/isx@1.5.0/number/is_odd.ts";
 
-describe("List", () => {
+class List<T> extends ListCore<T> {
+  protected override create(): this {
+    return Object.assign(new List());
+  }
+}
+
+describe("ListCore", () => {
   it("should be size 0 by default", () => {
     assertEquals(new List().size, 0);
   });
@@ -57,82 +63,58 @@ describe("List", () => {
   it("insert always should not add if empty", () => {
     const list = new List();
 
-    list.insert(0, 1);
+    assertFalse(list.insert(0, 1));
     assertEquals([...list], []);
 
-    list.insert(1, 1);
+    assertFalse(list.insert(1, 1));
     assertEquals([...list], []);
 
-    list.insert(-1, 1);
+    assertFalse(list.insert(-1, 1));
     assertEquals([...list], []);
   });
 
   it("insert should add before that item if 0", () => {
     const list = new List([0]);
 
-    list.insert(0, 1);
+    assert(list.insert(0, 1));
     assertEquals([...list], [1, 0]);
   });
 
   it("insert should not add if the specified index exceed size", () => {
     const list = new List([0]);
 
-    list.insert(1, 1);
+    assertFalse(list.insert(1, 1));
     assertEquals([...list], [0]);
   });
 
   it("insert should add between", () => {
     const list = new List([0, 1, 2]);
 
-    list.insert(1, 3);
+    assert(list.insert(1, 3));
     assertEquals([...list], [0, 3, 1, 2]);
-  });
-
-  it("should replace items if match condition", () => {
-    const list = new List([0, 1, 2, 3, 4]);
-
-    list.replace(1, isOdd);
-
-    assertEquals([...list], [0, 1, 2, 1, 4]);
-  });
-
-  it("should should replace all if match condition is true", () => {
-    const list = new List([0, 1, 2, 3, 4]);
-
-    list.replace(1, () => true);
-
-    assertEquals([...list], [1, 1, 1, 1, 1]);
-  });
-
-  it("should should do nothing if match condition is false", () => {
-    const list = new List([0, 1, 2, 3, 4]);
-
-    list.replace(1, () => false);
-
-    assertEquals([...list], [0, 1, 2, 3, 4]);
   });
 
   it("should remove all items if condition is true", () => {
     const list = new List([0, 1, 2, 3, 4]);
 
-    list.remove(() => true);
-
+    assertEquals(list.remove(() => true), [[0, 0], [1, 1], [2, 2], [3, 3], [
+      4,
+      4,
+    ]]);
     assertEquals([...list], []);
   });
 
   it("should remove all items if condition is true", () => {
     const list = new List([0, 1, 2, 3, 4]);
 
-    list.remove(isOdd);
-
+    assertEquals(list.remove(isOdd), [[1, 1], [3, 3]]);
     assertEquals([...list], [0, 2, 4]);
   });
 
   it("should do nothing if condition is false", () => {
     const list = new List([0, 1, 2, 3, 4]);
 
-    list.remove(() => false);
-
+    assertEquals(list.remove(() => false), []);
     assertEquals([...list], [0, 1, 2, 3, 4]);
   });
 

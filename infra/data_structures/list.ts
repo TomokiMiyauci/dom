@@ -1,20 +1,14 @@
-import { enumerate, reduce } from "../deps.ts";
-import { Indexer } from "./utils.ts";
-
-export type Entry<T = unknown> = [index: number, item: T];
+import { Indexer } from "../utils.ts";
 
 export abstract class ListCore<T> extends Indexer<T | undefined> {
   readonly [index: number]: T;
 
-  protected list: T[];
+  protected list: T[] = [];
 
   constructor(iterable?: Iterable<T>) {
-    const list: T[] = [];
-    super((index) => list[index]);
+    super((index) => this.list[index]);
 
-    if (iterable) for (const item of iterable) list.push(item);
-
-    this.list = list;
+    if (iterable) for (const item of iterable) this.list.push(item);
   }
 
   protected abstract create(): this;
@@ -50,38 +44,21 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-insert)
    */
-  insert(index: number, item: T): boolean {
-    if (!this.isInRange(index)) return false;
-
-    // To insert an item into a list before an index is to add the given item to the list between the given index − 1 and the given index. If the given index is 0, then prepend the given item to the list.
-    if (!index) this.prepend(item);
-    else this.list.splice(index, 0, item);
-    return true;
+  insert(index: number, item: T): void {
+    if (this.isInRange(index)) {
+      // To insert an item into a list before an index is to add the given item to the list between the given index − 1 and the given index. If the given index is 0, then prepend the given item to the list.
+      if (!index) this.prepend(item);
+      else this.list.splice(index, 0, item);
+    }
   }
 
   /** Remove all items that match the condition. O(n)
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-remove)
    */
-  remove(
-    predicate: (item: T, index: number, list: this) => boolean,
-  ): Entry<T>[] {
-    const indexed = enumerate(this.list);
-    const reducer = (acc: Entry<T>[], [index, item]: Entry<T>): Entry<T>[] => {
-      if (predicate(item, index, this)) return acc.concat([[index, item]]);
-
-      return acc;
-    };
-    const matched = reduce(indexed, reducer, [] as Entry<T>[]);
-
+  remove(predicate: (item: T) => boolean): void {
     // To remove zero or more items from a list is to remove all items from the list that match a given condition, or do nothing if none do.
-    matched.forEach(([index], i) => {
-      const targetIndex = index - i;
-
-      this.list.splice(targetIndex, 1);
-    });
-
-    return matched;
+    this.list = this.list.filter((value) => !predicate(value));
   }
 
   /** To be empty list. O(n)
@@ -121,9 +98,9 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
   /**
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-iterate)
    */
-  [Symbol.iterator](): IterableIterator<T> {
+  *[Symbol.iterator](): IterableIterator<T> {
     // To iterate over a list, performing a set of steps on each item in order, use phrasing of the form "For each item of list", and then operate on item in the subsequent prose.
-    return this.list[Symbol.iterator]();
+    yield* this.list;
   }
 
   /** Return list size. O(1)
@@ -143,10 +120,33 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
     return !this.size;
   }
 
-  /** Whether the {@linkcode index} is in range or not. O(1)
+  /** Whether the {@linkcode index} is in range or not.
    */
   private isInRange(index: number): boolean {
     return 0 <= index && index < this.size;
+  }
+}
+
+/** A list is a specification type consisting of a finite ordered sequence of items.
+ *
+ * [Infra Living Standard](https://infra.spec.whatwg.org/#list)
+ */
+export class List<T> extends ListCore<T> {
+  /** Replace with {@linkcode item} if condition matches.
+   *
+   * [Infra Living Standard](https://infra.spec.whatwg.org/#list-replace)
+   */
+  replace(item: T, predicate: (item: T) => boolean): void {
+    // To replace within a list that is not an ordered set is to replace all items from the list that match a given condition with the given item, or do nothing if none do.
+    for (const [index, insertedItem] of this.list.entries()) {
+      if (predicate(insertedItem)) {
+        this.list[index] = item;
+      }
+    }
+  }
+
+  protected override create(): this {
+    return Object.assign(new List());
   }
 }
 
