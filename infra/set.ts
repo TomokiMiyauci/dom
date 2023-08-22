@@ -1,4 +1,9 @@
-import { ListCore } from "./list.ts";
+/** Reference implementation of OrderSet.
+ * The biggest difference with Build-in `Set` is that they can be index referenced.
+ * @module
+ */
+
+import { Entry, ListCore } from "./common.ts";
 
 /** An ordered set is a list with the additional semantic that it must not contain the same item twice.
  *
@@ -13,7 +18,9 @@ export class OrderedSet<T> extends ListCore<T> {
 
     this.#set = set;
   }
-  /**
+
+  /** Add item to end of set if the {@linkcode item} does not exist. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#set-append)
    */
   override append(item: T): void {
@@ -24,7 +31,8 @@ export class OrderedSet<T> extends ListCore<T> {
     }
   }
 
-  /**
+  /** Add item to begging of set if the {@linkcode item} does not exist. O(1)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#set-prepend)
    */
   override prepend(item: T): void {
@@ -35,65 +43,67 @@ export class OrderedSet<T> extends ListCore<T> {
     }
   }
 
+  /** Whether the {@linkcode item} does exist or not. O(1)
+   */
   override contains(item: T): boolean {
     return this.#set.has(item);
+  }
+
+  override insert(index: number, item: T): boolean {
+    if (!this.contains(item)) {
+      const result = super.insert(index, item);
+
+      if (result) this.#set.add(item);
+      return result;
+    }
+
+    return false;
   }
 
   protected override create(): this {
     return Object.assign(new OrderedSet());
   }
 
-  /**
+  /** Replace {@linkcode item} to {@linkcode replacement}. O(n)
+   *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#set-replace)
    */
   replace(item: T, replacement: T): void {
-    const newList: T[] = [];
-    let step: Step = Step.Detecting;
+    if (item === replacement) return;
 
-    for (const exist of this.list) {
-      switch (step) {
-        case Step.Detecting: {
-          if (exist === item) {
-            step = Step.MatchingLeft;
-            newList.push(replacement);
-            continue;
-          } else if (exist === replacement) {
-            step = Step.MatchingRight;
-            newList.push(replacement);
-            continue;
-          }
+    const hasLeft = this.contains(item);
 
-          newList.push(exist);
+    if (!hasLeft) return;
 
-          continue;
-        }
+    const hasRight = this.contains(replacement);
 
-        case Step.MatchingLeft: {
-          if (replacement === exist) continue;
+    this.#set.delete(item);
+    this.#set.add(replacement);
 
-          newList.push(exist);
+    const leftIndex = this.list.findIndex((value) => value === item);
 
-          continue;
-        }
-
-        case Step.MatchingRight: {
-          if (exist === item) continue;
-
-          newList.push(exist);
-
-          continue;
-        }
-      }
+    if (!hasRight) {
+      this.list[leftIndex] = replacement;
+      return;
     }
 
-    this.list = newList;
-  }
-}
+    const rightIndex = this.list.findIndex((value) => value === replacement);
 
-const enum Step {
-  Detecting,
-  MatchingLeft,
-  MatchingRight,
+    if (leftIndex < rightIndex) {
+      this.list.splice(rightIndex, 1);
+      this.list[leftIndex] = replacement;
+    } else this.list.splice(leftIndex, 1);
+  }
+
+  override remove(
+    predicate: (item: T, index: number, list: this) => boolean,
+  ): Entry<T>[] {
+    const entries = super.remove(predicate);
+
+    entries.forEach(([_, item]) => this.#set.delete(item));
+
+    return entries;
+  }
 }
 
 export function intersection<T>(
