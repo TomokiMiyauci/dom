@@ -207,8 +207,12 @@ export abstract class Node extends EventTarget implements INode {
       ));
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-issamenode
+   */
   isSameNode(otherNode: Node | null): boolean {
-    throw new UnImplemented("isSameNode");
+    // return true if otherNode is this; otherwise false.
+    return this === otherNode;
   }
 
   get DOCUMENT_POSITION_DISCONNECTED(): 1 {
