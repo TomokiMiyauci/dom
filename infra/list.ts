@@ -26,7 +26,7 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-extend)
    */
-  extend(other: List<T>): void {
+  extend(other: this): void {
     // To extend a list A with a list B, for each item of B, append item to A.
     for (const item of other) this.append(item);
   }
