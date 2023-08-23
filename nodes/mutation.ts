@@ -9,7 +9,7 @@ import {
   isText,
   UnImplemented,
 } from "./utils.ts";
-import { type Node } from "./node.ts";
+import { type Node, NodeType } from "./node.ts";
 import { type Document } from "./document.ts";
 import { $nodeDocument, $shadowRoot, $slotAssignment } from "./internal.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
@@ -32,48 +32,94 @@ import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
  */
-export function replaceChild(
-  child: Child,
+export function replaceChild<T extends Node>(
+  child: T,
   node: Node,
   parent: Node,
-): void {
+): T {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
+  if (
+    !(isDocument(parent) || isDocumentFragment(parent) || isElement(parent))
+  ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 2. If node is a host-including inclusive ancestor of parent, then throw a "HierarchyRequestError" DOMException.
 
   // 3. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
+  if (child._parent !== parent) {
+    throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+  }
 
   // 4. If node is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
+  if (!(isDocumentFragment(node) || isDocumentType(node) || isElement(node))) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
   // 5. If either node is a Text node and parent is a document, or node is a doctype and parent is not a document, then throw a "HierarchyRequestError" DOMException.
+  if (
+    (isText(node) && isDocument(parent)) ||
+    (isDocumentType(node) && !isDocument(parent))
+  ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 6. If parent is a document, and any of the statements below, switched on the interface node implements, are true, then throw a "HierarchyRequestError" DOMException.
-  // DocumentFragment
-  // If node has more than one element child or has a Text node child.
+  if (isDocument(parent) && checkNode(node)) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
-  // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
-
-  // Element
-  // parent has an element child that is not child or a doctype is following child.
-
-  // DocumentType
-  // parent has a doctype child that is not child, or an element is preceding child.
+  function checkNode(node: Node): boolean {
+    // TODO
+    switch (node.nodeType) {
+      case NodeType.ELEMENT_NODE:
+        // parent has an element child that is not child or a doctype is following child.
+      case NodeType.DOCUMENT_TYPE_NODE:
+        // parent has a doctype child that is not child, or an element is preceding child.
+      case NodeType.DOCUMENT_FRAGMENT_NODE:
+      // If node has more than one element child or has a Text node child.
+      // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
+      default:
+        return false;
+    }
+  }
 
   // 7. Let referenceChild be child’s next sibling.
+  let referenceChild = getNextSibling(child);
 
   // 8. If referenceChild is node, then set referenceChild to node’s next sibling.
+  if (referenceChild) referenceChild = getNextSibling(node);
 
   // 9. Let previousSibling be child’s previous sibling.
+  const previousSibling = getPreviousSibling(child);
 
   // 10. Let removedNodes be the empty set.
+  let removedNodes = new OrderedSet<Node>();
 
   // 11. If child’s parent is non-null, then:
+  if (child._parent) {
+    // 1. Set removedNodes to « child ».
+    removedNodes = new OrderedSet([child]);
 
-  // 12. Set removedNodes to « child ».
+    // 2. Remove child with the suppress observers flag set.
+    removeNode(child, true);
+  }
 
-  // 13. Remove child with the suppress observers flag set.
+  // 12. Let nodes be node’s children if node is a DocumentFragment node; otherwise « node ».
+  const nodes = isDocumentFragment(node)
+    ? node._children
+    : new OrderedSet([node]);
 
-  throw new Error("replaceChild");
+  // 13. Insert node into parent before referenceChild with the suppress observers flag set.
+  insertNode(node, parent, referenceChild, true);
+
+  // 14. Queue a tree mutation record for parent with nodes, removedNodes, previousSibling, and referenceChild.
+  queueTreeMutationRecord(
+    parent,
+    nodes,
+    removedNodes,
+    previousSibling,
+    referenceChild,
+  );
+
+  // 15. Return child.
+  return child;
 }
 
 /**

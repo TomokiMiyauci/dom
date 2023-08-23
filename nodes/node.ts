@@ -8,7 +8,12 @@ import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
-import { appendNode, preInsertNode, preRemoveChild } from "./mutation.ts";
+import {
+  appendNode,
+  preInsertNode,
+  preRemoveChild,
+  replaceChild,
+} from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import {
   getFirstChild,
@@ -375,7 +380,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   replaceChild<T>(node: T & Node, child: T): T {
-    throw new UnImplemented("replaceChild");
+    return replaceChild<T & Node>(child, node, this);
   }
 
   removeChild<T>(child: T & Node): T {
