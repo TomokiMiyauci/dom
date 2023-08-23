@@ -52,6 +52,7 @@ import { Element_DomParsing } from "../domparsing/element.ts";
 import { Element_PointerEvents } from "../pointerevents/element.ts";
 import { Element_PointerLock } from "../pointerlock/element.ts";
 import { Element_Fullscreen } from "../fullscreen/element.ts";
+import { Element_CSSShadowParts } from "../css/css_shadow_parts/element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 
 /**
@@ -88,6 +89,7 @@ export interface ElementInits {
 @Element_PointerEvents
 @Element_PointerLock
 @Element_Fullscreen
+@Element_CSSShadowParts
 export class Element extends Node implements IElement {
   [$namespace]: string | null;
   [$namespacePrefix]: string | null;
@@ -319,10 +321,6 @@ export class Element extends Node implements IElement {
    */
   get tagName(): string {
     return this.#upperQualifiedName;
-  }
-
-  get part(): DOMTokenList {
-    throw new UnImplemented("part");
   }
 
   /**
@@ -622,7 +620,8 @@ export interface Element
     Element_DomParsing,
     Element_PointerEvents,
     Element_PointerLock,
-    Element_Fullscreen {}
+    Element_Fullscreen,
+    Element_CSSShadowParts {}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
