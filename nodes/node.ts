@@ -24,6 +24,7 @@ import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 import type { ParentNode } from "./parent_node.ts";
+import { SameObject } from "../webidl/extended_attribute.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -151,10 +152,13 @@ export abstract class Node extends EventTarget implements INode {
     return !this._children.isEmpty;
   }
 
+  @SameObject
   get childNodes(): NodeListOf<Node & ChildNode> {
     return new NodeList({
       root: this,
-      filter: (node): node is Node => this._children.contains(node),
+      filter: (node): node is Node => {
+        return this._children.contains(node);
+      },
     }) as any as NodeListOf<
       Node & ChildNode
     >;
