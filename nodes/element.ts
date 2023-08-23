@@ -531,8 +531,11 @@ export class Element extends Node implements IElement {
     removeAttributeByName(qualifiedName, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-removeattributens
+   */
   removeAttributeNS(namespace: string | null, localName: string): void {
-    throw new UnImplemented("removeAttributeNS");
+    removeAttributeByNamespaceAndLocalName(namespace, localName, this);
   }
 
   removeAttributeNode(attr: Attr): Attr {
@@ -794,6 +797,28 @@ export function removeAttributeByName(
 ): Attr | null {
   // 1. Let attr be the result of getting an attribute given qualifiedName and element.
   const attr = getAttributeByName(qualifiedName, element);
+
+  // 2. If attr is non-null, then remove attr.
+  if (attr) removeAttribute(attr);
+
+  // 3. Return attr.
+  return attr;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-namespace
+ */
+export function removeAttributeByNamespaceAndLocalName(
+  namespace: string | null,
+  localName: string,
+  element: Element,
+): Attr | null {
+  // 1. Let attr be the result of getting an attribute given namespace, localName, and element.
+  const attr = getAttributeByNamespaceAndLocalName(
+    namespace,
+    localName,
+    element,
+  );
 
   // 2. If attr is non-null, then remove attr.
   if (attr) removeAttribute(attr);
