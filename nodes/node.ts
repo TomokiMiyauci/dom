@@ -348,8 +348,18 @@ export abstract class Node extends EventTarget implements INode {
     return locateNamespace(this, prefix);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-isdefaultnamespace
+   */
   isDefaultNamespace(namespace: string | null): boolean {
-    throw new UnImplemented("isDefaultNamespace");
+    // 1. If namespace is the empty string, then set it to null.
+    namespace ||= null;
+
+    // 2. Let defaultNamespace be the result of running locate a namespace for this using null.
+    const defaultNamespace = locateNamespace(this, null);
+
+    // 3. Return true if defaultNamespace is the same as namespace; otherwise false.
+    return defaultNamespace === namespace;
   }
 
   /**
