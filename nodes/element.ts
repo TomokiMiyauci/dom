@@ -413,8 +413,12 @@ export class Element extends Node implements IElement {
     return getAttributeByName(qualifiedName, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getattributenodens
+   */
   getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
-    throw new UnImplemented("getAttributeNodeNS");
+    // return the result of getting an attribute given namespace, localName, and this.
+    return getAttributeByNamespaceAndLocalName(namespace, localName, this);
   }
 
   /**
