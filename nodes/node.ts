@@ -259,8 +259,8 @@ export abstract class Node extends EventTarget implements INode {
     if (isDocument(copy)) document = copy;
 
     if (deep) {
-      for (const child of copy._children) {
-        appendNode(this.clone.call(child, document), copy);
+      for (const child of this._children) {
+        appendNode(Node.prototype.cloneNode.call(child, deep), copy);
       }
     }
 
