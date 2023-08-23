@@ -840,7 +840,25 @@ export function appendAttribute(attribute: Attr, element: Element): void {
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
  */
 export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
-  throw new Error("replaceAttribute");
+  // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
+  oldAttr[$element]?.[$attributeList].replace(
+    newAttr,
+    (attr) => attr === oldAttr,
+  );
+
+  // 2. Set newAttr’s element to oldAttr’s element.
+  newAttr[$element] = oldAttr[$element];
+
+  // 3. Set oldAttr’s element to null.
+  oldAttr[$element] = null;
+
+  // 4. Handle attribute changes for oldAttr with newAttr’s element, oldAttr’s value, and newAttr’s value.
+  newAttr[$element] && handleAttributesChanges(
+    oldAttr,
+    newAttr[$element],
+    oldAttr[$value],
+    newAttr[$value],
+  );
 }
 
 /**
