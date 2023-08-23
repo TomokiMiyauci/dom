@@ -524,8 +524,11 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("matches");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-removeattribute
+   */
   removeAttribute(qualifiedName: string): void {
-    throw new UnImplemented("removeAttribute");
+    removeAttributeByName(qualifiedName, this);
   }
 
   removeAttributeNS(namespace: string | null, localName: string): void {
@@ -761,6 +764,42 @@ export function appendAttribute(attribute: Attr, element: Element): void {
  */
 export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
   throw new Error("replaceAttribute");
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove
+ */
+export function removeAttribute(attribute: Attr): void {
+  // Unclear whether there is always a element in attribute.
+  // 1. Let element be attribute’s element.
+  const element = attribute[$element];
+
+  // 2. Remove attribute from element’s attribute list.
+  element?.[$attributeList].remove((attr) => attr === attribute);
+
+  // 3. Set attribute’s element to null.
+  attribute[$element] = null;
+
+  // 4. Handle attribute changes for attribute with element, attribute’s value, and null.
+  element &&
+    handleAttributesChanges(attribute, element, attribute[$value], null);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-name
+ */
+export function removeAttributeByName(
+  qualifiedName: string,
+  element: Element,
+): Attr | null {
+  // 1. Let attr be the result of getting an attribute given qualifiedName and element.
+  const attr = getAttributeByName(qualifiedName, element);
+
+  // 2. If attr is non-null, then remove attr.
+  if (attr) removeAttribute(attr);
+
+  // 3. Return attr.
+  return attr;
 }
 
 /**

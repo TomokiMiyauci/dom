@@ -238,7 +238,7 @@ export function handleAttributesChanges(
   attribute: Attr,
   element: Element,
   oldValue: string | null,
-  newValue: string,
+  newValue: string | null,
 ): void {
   // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
   queueMutationRecord(
