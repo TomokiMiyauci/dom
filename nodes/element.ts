@@ -405,8 +405,12 @@ export class Element extends Node implements IElement {
     return [...map(this[$attributeList], getQualifiedName)];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getattributenode
+   */
   getAttributeNode(qualifiedName: string): Attr | null {
-    throw new UnImplemented("getAttributeNode");
+    // return the result of getting an attribute given qualifiedName and this.
+    return getAttributeByName(qualifiedName, this);
   }
 
   getAttributeNodeNS(namespace: string | null, localName: string): Attr | null {
