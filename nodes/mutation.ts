@@ -4,12 +4,14 @@ import {
   isDocumentFragment,
   isDocumentType,
   isElement,
+  isShadowHost,
+  isShadowRoot,
   isText,
   UnImplemented,
 } from "./utils.ts";
 import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
-import { $nodeDocument } from "./internal.ts";
+import { $nodeDocument, $shadowRoot, $slotAssignment } from "./internal.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import {
@@ -17,6 +19,7 @@ import {
   getLastChild,
   getNextSibling,
   getPreviousSibling,
+  getRoot,
   hasParent,
   orderTreeChildren,
 } from "../trees/tree.ts";
@@ -24,6 +27,7 @@ import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
 import { ifilter, some, takewhile } from "../deps.ts";
+import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -84,7 +88,7 @@ export function insertNode(
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
     ? node._children
-    : new OrderedSet([node]);
+    : new OrderedSet<Node & ChildNode>([node]);
 
   // 2. Let count be nodes’s size.
   const count = nodes.size;
@@ -113,23 +117,29 @@ export function insertNode(
     : getLastChild(parent);
 
   // 7. For each node in nodes, in tree order:
-  for (const node of nodes) {
+  for (const node of orderTreeChildren(nodes)) {
     // 1. Adopt node into parent’s node document.
     adoptNode(node, parent[$nodeDocument]);
 
     // 2. If child is null, then append node to parent’s children.
-    if (child === null) {
-      parent._children.append(node);
-    } else {
-      // 3. Otherwise, insert node into parent’s children before child’s index.
-      parent._children.insert(getIndex(child), node);
-    }
+    if (child === null) parent._children.append(node);
+    // 3. Otherwise, insert node into parent’s children before child’s index.
+    else parent._children.insert(getIndex(child), node);
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
+    if (
+      isElement(parent) &&
+      isShadowHost(parent) &&
+      parent[$shadowRoot][$slotAssignment] === "named" &&
+      isSlottable(node)
+    ) assignSlot(node);
 
     // 5. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
+    // TODO
+    if (isShadowRoot(getRoot(parent))) signalSlotChange(parent);
 
     // 6. Run assign slottables for a tree with node’s root.
+    // assignSlottablesForTree(getRoot(node));
 
     // 7. For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order:
     //// 1. Run the insertion steps with inclusiveDescendant.

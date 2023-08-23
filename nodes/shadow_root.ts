@@ -2,6 +2,7 @@ import type { IShadowRoot } from "../interface.d.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { InnerHTML } from "../domparsing/inner_html.ts";
+import { $slotAssignment } from "./internal.ts";
 
 @DocumentOrShadowRoot
 @InnerHTML
@@ -9,6 +10,8 @@ import { InnerHTML } from "../domparsing/inner_html.ts";
  * @see https://dom.spec.whatwg.org/#interface-shadowroot
  */
 export class ShadowRoot extends DocumentFragment implements IShadowRoot {
+  [$slotAssignment]: SlotAssignmentMode = "named";
+
   get mode(): ShadowRootMode {
     throw new Error("mode");
   }

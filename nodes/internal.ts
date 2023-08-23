@@ -18,3 +18,5 @@ export const $mode = Symbol();
 export const $encoding = Symbol();
 export const $attributeChangeSteps = Symbol();
 export const $templateContents = Symbol();
+export const $shadowRoot = Symbol();
+export const $slotAssignment = Symbol();

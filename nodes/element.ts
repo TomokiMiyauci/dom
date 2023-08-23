@@ -25,6 +25,7 @@ import { every, find, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
+import { type ShadowRoot } from "./shadow_root.ts";
 import {
   $attributeChangeSteps,
   $attributeList,
@@ -36,6 +37,7 @@ import {
   $namespace,
   $namespacePrefix,
   $nodeDocument,
+  $shadowRoot,
   $value,
 } from "./internal.ts";
 import { ARIAMixin } from "../wai_aria/aria_mixin.ts";
@@ -95,6 +97,7 @@ export class Element extends Node implements IElement {
   [$attributeList]: List<Attr>;
   [$isValue]: string | null;
   [$attributeChangeSteps]: AttributeChangeSteps;
+  [$shadowRoot]: ShadowRoot | null = null;
 
   _ID: string | null = null;
 

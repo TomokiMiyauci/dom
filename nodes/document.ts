@@ -7,7 +7,12 @@ import {
 import { ParentNode } from "./parent_node.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../xpath/x_path_evaluator_base.ts";
-import { isDocument, isDocumentType, UnImplemented } from "./utils.ts";
+import {
+  isDocument,
+  isDocumentType,
+  isShadowRoot,
+  UnImplemented,
+} from "./utils.ts";
 import { Attr } from "./attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
@@ -44,7 +49,6 @@ import { Document_Storage_Access_API } from "../storage_access_api/document.ts";
 import { Document_WebAnimation } from "../web_animations/document.ts";
 import { Document_SVG } from "../svg/document.ts";
 import { ReName } from "../xml/document.ts";
-import { isShadowRoot } from "./shadow_root.ts";
 import { getDocumentElement } from "./document_tree.ts";
 
 export interface Encoding {
