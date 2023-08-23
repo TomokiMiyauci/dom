@@ -528,6 +528,7 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-removeattribute
    */
   removeAttribute(qualifiedName: string): void {
+    // remove an attribute given qualifiedName and this, and then return undefined.
     removeAttributeByName(qualifiedName, this);
   }
 
@@ -535,11 +536,24 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-removeattributens
    */
   removeAttributeNS(namespace: string | null, localName: string): void {
+    // remove an attribute given namespace, localName, and this, and then return undefined.
     removeAttributeByNamespaceAndLocalName(namespace, localName, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-removeattributenode
+   */
   removeAttributeNode(attr: Attr): Attr {
-    throw new UnImplemented("removeAttributeNode");
+    // 1. If this’s attribute list does not contain attr, then throw a "NotFoundError" DOMException.
+    if (!this[$attributeList].contains(attr)) {
+      throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+    }
+
+    // 2. Remove attr.
+    removeAttribute(attr);
+
+    // 3. Return attr.
+    return attr;
   }
 
   /**
