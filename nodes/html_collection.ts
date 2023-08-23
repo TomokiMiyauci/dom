@@ -21,7 +21,9 @@ function getElementByIndex(
   return this.getItem(index);
 }
 
-@Indexer(getElementByIndex)
+@Indexer({
+  get: getElementByIndex,
+})
 export class HTMLCollection extends Collection<Element>
   implements IHTMLCollection {
   [index: number]: Element;

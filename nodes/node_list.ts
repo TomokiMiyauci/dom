@@ -1,9 +1,9 @@
 import { Node } from "./node.ts";
-import { enumerate, first, islice, len, type Public } from "../deps.ts";
+import { first, islice, len } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
 import { Collection, CollectionOptions } from "./collection.ts";
 import { Indexer } from "../utils.ts";
-import { orderTreeChildren } from "../trees/tree.ts";
+import { Iterable, iterable } from "../webidl/iterable.ts";
 
 function getElementByIndex(
   this: NodeList,
@@ -12,7 +12,15 @@ function getElementByIndex(
   return this.getItem(index);
 }
 
-@Indexer(getElementByIndex)
+function hasElement(
+  this: NodeList,
+  index: number,
+): boolean {
+  return 0 <= index && index < this.length;
+}
+
+@Indexer({ get: getElementByIndex, has: hasElement })
+@iterable
 export class NodeList extends Collection<Node> implements INodeList {
   [k: number]: Node;
 
@@ -33,38 +41,13 @@ export class NodeList extends Collection<Node> implements INodeList {
   item(index: number): Node | null {
     return this.getItem(index) ?? null;
   }
-
-  forEach(
-    callbackfn: (value: Node, key: number, parent: Public<NodeList>) => void,
-    thisArg?: any,
-  ): void {
-    for (const [index, child] of enumerate(this.represent())) {
-      callbackfn.call(thisArg, child, index, this);
-    }
-  }
-
-  entries(): IterableIterator<[number, Node]> {
-    throw new Error("entries");
-  }
-
-  keys(): IterableIterator<number> {
-    throw new Error("keys");
-  }
-
-  values(): IterableIterator<Node> {
-    throw new Error("values");
-  }
-
-  *[Symbol.iterator](): IterableIterator<Node> {
-    yield* this.represent();
-  }
 }
 
-export interface NodeListOf<T extends Node> extends Public<NodeList> {
+export interface NodeListOf<T extends Node> extends NodeList {
   [index: number]: T;
   item(index: number): T;
   forEach(
-    callbackfn: (value: T, key: number, parent: NodeListOf<T>) => void,
+    callbackfn: (value: T, key: number, parent: this) => void,
     thisArg?: any,
   ): void;
   entries(): IterableIterator<[number, T]>;
@@ -72,6 +55,9 @@ export interface NodeListOf<T extends Node> extends Public<NodeList> {
   values(): IterableIterator<T>;
   [Symbol.iterator](): IterableIterator<T>;
 }
+
+// deno-lint-ignore no-empty-interface
+export interface NodeList extends Iterable<Node> {}
 
 export class StaticNodeList<T extends Node> extends NodeList
   implements INodeList {
@@ -83,6 +69,6 @@ export class StaticNodeList<T extends Node> extends NodeList
   }
 
   protected override represent(): Iterable<T> {
-    return orderTreeChildren(this.list);
+    return this.list;
   }
 }

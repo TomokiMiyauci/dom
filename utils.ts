@@ -1,9 +1,14 @@
 import { Constructor } from "./deps.ts";
 
+interface IndexHandlers<This, T> {
+  has?: (this: This, index: number) => boolean;
+  get?: (this: This, index: number) => T;
+}
+
 /** Class decorator factory for index reference. */
 // deno-lint-ignore ban-types
 export function Indexer<U extends {}, R = unknown>(
-  get: (this: U, index: number) => R,
+  handlers: IndexHandlers<U, R>,
 ) {
   function creteIndexer<T extends Constructor<U>>(Ctor: T) {
     // @ts-ignore Mixin satisfies U
@@ -14,16 +19,46 @@ export function Indexer<U extends {}, R = unknown>(
         super(...args);
 
         return new Proxy(this, {
-          get: (target, prop) => {
-            if (typeof prop === "string") {
-              const indexLike = Number(prop);
-
-              if (Number.isInteger(indexLike)) {
-                return get.call(target as never as U, indexLike);
-              }
+          get: (target, prop, receiver) => {
+            if (Reflect.has(target, prop)) {
+              return Reflect.get(target, prop, receiver);
             }
 
-            return target[prop as never];
+            if (typeof prop !== "string" || !handlers.get) return;
+
+            const index = Number.parseInt(prop);
+
+            if (!Number.isInteger(index)) return;
+
+            return handlers.get.call(target as never as U, index);
+          },
+
+          getOwnPropertyDescriptor: (target, prop) => {
+            const desc = Reflect.getOwnPropertyDescriptor(target, prop);
+
+            if (desc) return desc;
+
+            if (typeof prop !== "string" || !handlers.has) return;
+
+            const index = Number.parseInt(prop);
+
+            if (
+              !Number.isInteger(index) ||
+              !handlers.has.call(target as never as U, index)
+            ) return;
+
+            return { configurable: true };
+          },
+
+          has: (target, prop) => {
+            if (Reflect.has(target, prop)) return true;
+            if (typeof prop !== "string" || !handlers.has) return false;
+
+            const index = Number.parseInt(prop);
+
+            if (!Number.isInteger(index)) return false;
+
+            return handlers.has.call(target as never as U, index) ?? false;
           },
         });
       }
@@ -36,3 +71,13 @@ export function Indexer<U extends {}, R = unknown>(
 }
 
 export class UnImplemented extends Error {}
+
+export function debug(node: Node, depth = 0): string[] {
+  const inputs: string[] = [node.nodeName];
+
+  for (const child of node.childNodes) {
+    inputs.push(...debug(child, depth + 1));
+  }
+
+  return inputs;
+}

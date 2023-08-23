@@ -12,8 +12,10 @@ export interface NamedNodeMapInits {
   attributeList: List<Attr>;
 }
 
-@Indexer(function (this: NamedNodeMap, index: number): Attr | undefined {
-  return this[$attributeList][index];
+@Indexer({
+  get: function (this: NamedNodeMap, index: number): Attr | undefined {
+    return this[$attributeList][index];
+  },
 })
 export class NamedNodeMap implements INamedNodeMap {
   readonly [k: number]: Attr;

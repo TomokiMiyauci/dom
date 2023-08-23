@@ -22,8 +22,10 @@ interface DOMTokenListInits {
  * @see https://dom.spec.whatwg.org/#interface-domtokenlist
  */
 @iterable
-@Indexer(function (this: DOMTokenList, index): string | undefined {
-  return this.tokenSet[index];
+@Indexer({
+  get: function (this: DOMTokenList, index): string | undefined {
+    return this.tokenSet[index];
+  },
 })
 export class DOMTokenList implements IDOMTokenList {
   [k: number]: string;

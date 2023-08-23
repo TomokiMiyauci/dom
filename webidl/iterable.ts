@@ -1,46 +1,35 @@
-import { Constructor, enumerate, range } from "../deps.ts";
+import { Constructor } from "../deps.ts";
 
-interface IndexedProperty {
-  [k: number]: unknown;
+interface IndexedProperty<T = unknown> {
+  [k: number]: T;
   length: number;
 }
+
+const iterator = Array.prototype[Symbol.iterator];
+const { keys, values, entries, forEach } = Array.prototype;
 
 /** Iterable mixin.
  */
 export function iterable<T extends Constructor<IndexedProperty>>(Ctor: T) {
-  abstract class Iterator extends Ctor implements Iterable<unknown> {
-    *[Symbol.iterator](): IterableIterator<unknown> {
-      for (const index of this.keys()) yield this[index];
-    }
-
-    *keys(): IterableIterator<number> {
-      yield* range(0, this.length);
-    }
-
-    values(): IterableIterator<unknown> {
-      return this[Symbol.iterator]();
-    }
-
-    *entries(): IterableIterator<[number, unknown]> {
-      for (const [index, item] of enumerate(this.values())) yield [index, item];
-    }
-
-    forEach(
-      callbackfn: (value: unknown, key: number, parent: this) => void,
-    ): void {
-      for (const [index, value] of this.entries()) {
-        callbackfn(value, index, this);
-      }
-    }
+  abstract class Iterator extends Ctor implements Iterable {
+    [Symbol.iterator] = iterator;
+    keys = keys;
+    values = values;
+    entries = entries;
+    forEach = forEach;
   }
 
   return Iterator;
 }
 
-export interface Iterable<T> {
-  [Symbol.iterator](): IterableIterator<T>;
-  entries(): IterableIterator<[number, T]>;
-  keys(): IterableIterator<number>;
-  values(): IterableIterator<T>;
-  forEach(callbackfn: (value: T, key: number, parent: this) => void): void;
+export interface Iterable<T = unknown> extends
+  IndexedProperty<T>,
+  Pick<
+    Array<T>,
+    "entries" | "keys" | "values" | typeof Symbol.iterator
+  > {
+  forEach(
+    callbackfn: (value: T, key: number, parent: this) => void,
+    thisArg: any,
+  ): void;
 }
