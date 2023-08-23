@@ -28,7 +28,7 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
-import { every, find, html, izip } from "../deps.ts";
+import { every, find, html, izip, some } from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
@@ -337,8 +337,15 @@ export abstract class Node extends EventTarget implements INode {
     return null;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-lookupnamespaceuri
+   */
   lookupNamespaceURI(prefix: string | null): string | null {
-    throw new UnImplemented("lookupNamespaceURI");
+    // 1. If prefix is the empty string, then set it to null.
+    prefix ||= null;
+
+    // 2. Return the result of running locate a namespace for this using prefix.
+    return locateNamespace(this, prefix);
   }
 
   isDefaultNamespace(namespace: string | null): boolean {
@@ -496,4 +503,94 @@ export function locateNamespacePrefix(
 
   // 4. Return null.
   return null;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#locate-a-namespace
+ */
+export function locateNamespace(
+  node: Node,
+  prefix: string | null,
+): string | null {
+  // switch on the interface node implements:
+  switch (node.nodeType) {
+    case NodeType.ELEMENT_NODE: {
+      // 1. If prefix is "xml", then return the XML namespace.
+      if (prefix === "xml") return Namespace.XML;
+
+      // 2. If prefix is "xmlns", then return the XMLNS namespace.
+      if (prefix === "xmlns") return Namespace.XMLNS;
+
+      const element = node as Element;
+      const namespace = element[$namespace];
+
+      // 3. If its namespace is non-null and its namespace prefix is prefix, then return namespace.
+      if (namespace !== null && element[$namespacePrefix] === prefix) {
+        return namespace;
+      }
+
+      const attrList = element[$attributeList];
+
+      // 4. If it has an attribute whose namespace is the XMLNS namespace, namespace prefix is "xmlns", and local name is prefix,
+      const hasAttr = find(
+        attrList,
+        (attr) =>
+          attr[$namespace] === Namespace.XMLNS &&
+          attr[$namespacePrefix] === "xmlns" &&
+          attr[$localName] === prefix,
+      );
+      // or if prefix is null and it has an attribute whose namespace is the XMLNS namespace, namespace prefix is null, and local name is "xmlns",
+      const attribute = hasAttr ?? prefix === null
+        ? find(attrList, (attr) =>
+          attr[$namespace] === Namespace.XMLNS &&
+          attr[$namespacePrefix] === null &&
+          attr[$localName] === "xmlns")
+        : null;
+
+      // then return its value if it is not the empty string, and null otherwise.
+      if (attribute) return attribute[$value] || null;
+
+      const parentElement = getParentElement(element);
+
+      // 5. If its parent element is null, then return null.
+      if (parentElement === null) return null;
+
+      // 6. Return the result of running locate a namespace on its parent element using prefix.
+      return locateNamespace(parentElement, prefix);
+    }
+
+    case NodeType.DOCUMENT_NODE: {
+      const documentElement = getDocumentElement(node);
+      // 1. If its document element is null, then return null.
+      if (documentElement === null) return null;
+
+      // 2. Return the result of running locate a namespace on its document element using prefix.
+      return locateNamespace(documentElement, prefix);
+    }
+
+    case NodeType.DOCUMENT_TYPE_NODE:
+    case NodeType.DOCUMENT_FRAGMENT_NODE:
+      // Return null.
+      return null;
+
+    case NodeType.ATTRIBUTE_NODE: {
+      const element = (node as Attr)[$element];
+
+      // 1. If its element is null, then return null.
+      if (element === null) return null;
+
+      // 2. Return the result of running locate a namespace on its element using prefix.
+      return locateNamespace(element, prefix);
+    }
+
+    default: {
+      const parentElement = getParentElement(node);
+
+      // 1. If its parent element is null, then return null.
+      if (parentElement === null) return null;
+
+      // 2. Return the result of running locate a namespace on its parent element using prefix.
+      return locateNamespace(parentElement, prefix);
+    }
+  }
 }
