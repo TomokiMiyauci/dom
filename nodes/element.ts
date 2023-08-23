@@ -489,16 +489,25 @@ export class Element extends Node implements IElement {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$namespace] === Namespace.HTML && isHTMLDocument(this[$nodeDocument])
-    ) {
-      qualifiedName = qualifiedName.toLowerCase();
-    }
+    ) qualifiedName = qualifiedName.toLowerCase();
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
     return hasAttributeByQualifiedName(qualifiedName, this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-hasattributens
+   */
   hasAttributeNS(namespace: string | null, localName: string): boolean {
-    throw new UnImplemented("hasAttributeNS");
+    // 1. If namespace is the empty string, then set it to null.
+    namespace ||= null;
+
+    // 2. Return true if this has an attribute whose namespace is namespace and local name is localName; otherwise false.
+    return some(
+      this[$attributeList],
+      (attr) =>
+        attr[$namespace] === namespace && attr[$localName] === localName,
+    );
   }
 
   /**
