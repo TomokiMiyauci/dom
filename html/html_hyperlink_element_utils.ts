@@ -1,9 +1,41 @@
-import { Constructor } from "../deps.ts";
+import { Constructor, isOk, Result } from "../deps.ts";
+import { type Element } from "../nodes/element.ts";
 import type { IHTMLHyperlinkElementUtils } from "../interface.d.ts";
+import { $nodeDocument } from "../nodes/internal.ts";
 
-export function HTMLHyperlinkElementUtils<T extends Constructor>(Ctor: T) {
+export function HTMLHyperlinkElementUtils<T extends Constructor<Element>>(
+  Ctor: T,
+) {
   abstract class HTMLHyperlinkElementUtils extends Ctor
     implements IHTMLHyperlinkElementUtils {
+    #url: URL | null = null;
+
+    #reinitializeURL(): void {
+      const url = this.#url;
+      // 1. If element's url is non-null, its scheme is "blob", and it has an opaque path, then terminate these steps.
+      if (url && url.protocol === "blob" && hasOpaquePath(url)) return;
+
+      // 2. Set the url.
+      this.#setURL();
+    }
+
+    /**
+     * @see https://html.spec.whatwg.org/multipage/links.html#concept-hyperlink-url-set
+     */
+    #setURL(): void {
+      // 1. If this element's href content attribute is absent, set this element's url to null.
+      if (!this.hasAttribute("href")) this.#url = null;
+      // 2. Otherwise, parse this element's href content attribute value relative to this element's node document. If parsing is successful, set this element's url to the result; otherwise, set this element's url to null.
+      else {
+        const document = this[$nodeDocument];
+        const href = this.getAttribute("href")!;
+        const result = parseURL(href, document);
+
+        if (isOk(result)) this.#url = result.get.record;
+        else this.#url = null;
+      }
+    }
+
     get hash(): string {
       throw new Error("hash#getter");
     }
@@ -28,12 +60,32 @@ export function HTMLHyperlinkElementUtils<T extends Constructor>(Ctor: T) {
       throw new Error("hostname#setter");
     }
 
+    /**
+     * @see https://html.spec.whatwg.org/multipage/links.html#dom-hyperlink-href
+     */
     get href(): string {
-      throw new Error("href#getter");
+      // 1. Reinitialize url.
+      this.#reinitializeURL();
+
+      // 2. Let url be this's url.
+      const url = this.#url;
+
+      // 3. If url is null and this has no href content attribute, return the empty string.
+      if (url === null && !this.hasAttribute("href")) return "";
+
+      // 4. Otherwise, if url is null, return this's href content attribute's value.
+      if (url === null) return this.getAttribute("href")!;
+
+      // 5. Return url, serialized.
+      return url.href;
     }
 
+    /**
+     * @see https://html.spec.whatwg.org/multipage/links.html#dom-hyperlink-href
+     */
     set href(value: string) {
-      throw new Error("href#setter");
+      // set this's href content attribute's value to the given value.
+      this.setAttribute("href", value);
     }
 
     get origin(): string {
@@ -94,3 +146,25 @@ export function HTMLHyperlinkElementUtils<T extends Constructor>(Ctor: T) {
 
 // deno-lint-ignore no-empty-interface
 export interface HTMLHyperlinkElementUtils extends IHTMLHyperlinkElementUtils {}
+
+interface ParsedURL {
+  string: string;
+  record: URL;
+}
+
+/**
+ * @see https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
+ */
+export function parseURL(
+  url: string,
+  document: Document,
+): Result<ParsedURL, string> {
+  throw new Error("parseURL");
+}
+
+/**
+ * @see https://url.spec.whatwg.org/#url-opaque-path
+ */
+function hasOpaquePath(url: URL): boolean {
+  throw new Error("hasOpaquePath");
+}
