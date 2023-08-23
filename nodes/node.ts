@@ -18,13 +18,25 @@ import {
   getRoot,
 } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $mode, $namespace, $nodeDocument } from "./internal.ts";
-import { every, html, izip } from "../deps.ts";
+import {
+  $attributeList,
+  $element,
+  $localName,
+  $mode,
+  $namespace,
+  $namespacePrefix,
+  $nodeDocument,
+  $value,
+} from "./internal.ts";
+import { every, find, html, izip } from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 import type { ParentNode } from "./parent_node.ts";
 import { SameObject } from "../webidl/extended_attribute.ts";
+import { getDocumentElement } from "./document_tree.ts";
+import { type Attr } from "./attr.ts";
+import { type Element } from "./element.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -310,8 +322,19 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented("contains");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-lookupprefix
+   */
   lookupPrefix(namespace: string | null): string | null {
-    throw new UnImplemented("lookupPrefix");
+    // 1. If namespace is null or the empty string, then return null.
+    if (!namespace) return null;
+
+    // 2. Switch on the interface this implements:
+    const element = getInterface(this, this.nodeType);
+
+    if (element) return locateNamespacePrefix(element, namespace);
+
+    return null;
   }
 
   lookupNamespaceURI(prefix: string | null): string | null {
@@ -422,4 +445,55 @@ export function getParentElement(node: Node): Element | null {
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
+}
+
+function getInterface(node: Node, nodeType: NodeType): Element | null {
+  switch (nodeType) {
+    case NodeType.ELEMENT_NODE:
+      // Return the result of locating a namespace prefix for it using namespace.
+      return (node as Element);
+    case NodeType.DOCUMENT_NODE:
+      // Return the result of locating a namespace prefix for its document element, if its document element is non-null; otherwise null.
+      return getDocumentElement(node);
+    case NodeType.DOCUMENT_TYPE_NODE:
+    case NodeType.DOCUMENT_FRAGMENT_NODE:
+      // Return null.
+      return null;
+    case NodeType.ATTRIBUTE_NODE:
+      // Return the result of locating a namespace prefix for its element, if its element is non-null; otherwise null.
+      return (node as Attr)[$element];
+    default:
+      // Return the result of locating a namespace prefix for its parent element, if its parent element is non-null; otherwise null.
+      return getParentElement(node);
+  }
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#locate-a-namespace-prefix
+ */
+export function locateNamespacePrefix(
+  element: Element,
+  namespace: string,
+): string | null {
+  // 1. If element’s namespace is namespace and its namespace prefix is non-null, then return its namespace prefix.
+  if (element[$namespace] === namespace && element[$namespacePrefix] !== null) {
+    return element[$namespacePrefix];
+  }
+
+  // 2. If element has an attribute whose namespace prefix is "xmlns" and value is namespace, then return element’s first such attribute’s local name.
+  const attribute = find(
+    element[$attributeList],
+    (attr) =>
+      attr[$namespacePrefix] === Namespace.XMLNS && attr[$value] === namespace,
+  );
+
+  if (attribute) return attribute[$localName];
+
+  // 3. If element’s parent element is not null, then return the result of running locate a namespace prefix on that element using namespace.
+  const parent = getParentElement(element);
+
+  if (parent) return locateNamespacePrefix(parent, namespace);
+
+  // 4. Return null.
+  return null;
 }
