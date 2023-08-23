@@ -28,7 +28,7 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
-import { every, find, html, izip, some } from "../deps.ts";
+import { every, find, html, izip } from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
@@ -550,12 +550,13 @@ export function locateNamespace(
           attr[$localName] === prefix,
       );
       // or if prefix is null and it has an attribute whose namespace is the XMLNS namespace, namespace prefix is null, and local name is "xmlns",
-      const attribute = hasAttr ?? prefix === null
-        ? find(attrList, (attr) =>
-          attr[$namespace] === Namespace.XMLNS &&
-          attr[$namespacePrefix] === null &&
-          attr[$localName] === "xmlns")
-        : null;
+      const attribute = hasAttr ??
+        (prefix === null
+          ? find(attrList, (attr) =>
+            attr[$namespace] === Namespace.XMLNS &&
+            attr[$namespacePrefix] === null &&
+            attr[$localName] === "xmlns")
+          : null);
 
       // then return its value if it is not the empty string, and null otherwise.
       if (attribute) return attribute[$value] || null;
