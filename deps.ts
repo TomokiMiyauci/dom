@@ -14,6 +14,7 @@ export {
   imap,
   islice,
   izip,
+  map,
   range,
   reduce,
   some,

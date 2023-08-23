@@ -21,7 +21,7 @@ import { CustomElementDefinition } from "../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { descendantTextContent } from "./text.ts";
-import { every, find, some, xmlValidator } from "../deps.ts";
+import { every, find, map, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { replaceAllNode } from "./mutation.ts";
@@ -397,8 +397,12 @@ export class Element extends Node implements IElement {
     return attr[$value];
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getattributenames
+   */
   getAttributeNames(): string[] {
-    throw new UnImplemented("getAttributeNames");
+    // return the qualified names of the attributes in this’s attribute list, in order; otherwise a new list.
+    return [...map(this[$attributeList], getQualifiedName)];
   }
 
   getAttributeNode(qualifiedName: string): Attr | null {
