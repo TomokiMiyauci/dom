@@ -76,27 +76,79 @@ export abstract class Node extends EventTarget implements INode {
   static DOCUMENT_TYPE_NODE = NodeType.DOCUMENT_TYPE_NODE;
   static DOCUMENT_FRAGMENT_NODE = NodeType.DOCUMENT_FRAGMENT_NODE;
   static NOTATION_NODE = NodeType.NOTATION_NODE;
-  readonly DOCUMENT_POSITION_DISCONNECTED =
-    Position.DOCUMENT_POSITION_DISCONNECTED;
-  readonly DOCUMENT_POSITION_PRECEDING = Position.DOCUMENT_POSITION_PRECEDING;
-  readonly DOCUMENT_POSITION_FOLLOWING = Position.DOCUMENT_POSITION_FOLLOWING;
-  readonly DOCUMENT_POSITION_CONTAINS = Position.DOCUMENT_POSITION_CONTAINS;
-  readonly DOCUMENT_POSITION_CONTAINED_BY =
-    Position.DOCUMENT_POSITION_CONTAINED_BY;
-  readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC =
-    Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
-  readonly DOCUMENT_NODE = NodeType.DOCUMENT_NODE;
-  readonly DOCUMENT_TYPE_NODE = NodeType.DOCUMENT_TYPE_NODE;
-  readonly DOCUMENT_FRAGMENT_NODE = NodeType.DOCUMENT_FRAGMENT_NODE;
-  readonly ELEMENT_NODE = NodeType.ELEMENT_NODE;
-  readonly ENTITY_NODE = NodeType.ENTITY_NODE;
-  readonly ATTRIBUTE_NODE = NodeType.ATTRIBUTE_NODE;
-  readonly TEXT_NODE = NodeType.TEXT_NODE;
-  readonly CDATA_SECTION_NODE = NodeType.CDATA_SECTION_NODE;
-  readonly ENTITY_REFERENCE_NODE = NodeType.ENTITY_REFERENCE_NODE;
-  readonly COMMENT_NODE = NodeType.COMMENT_NODE;
-  readonly PROCESSING_INSTRUCTION_NODE = NodeType.PROCESSING_INSTRUCTION_NODE;
-  readonly NOTATION_NODE = NodeType.NOTATION_NODE;
+
+  // Because it needs to be defined in prototype, use getter instead of data property.
+  get DOCUMENT_POSITION_DISCONNECTED(): 1 {
+    return Position.DOCUMENT_POSITION_DISCONNECTED;
+  }
+
+  get DOCUMENT_POSITION_PRECEDING(): 2 {
+    return Position.DOCUMENT_POSITION_PRECEDING;
+  }
+
+  get DOCUMENT_POSITION_FOLLOWING(): 4 {
+    return Position.DOCUMENT_POSITION_FOLLOWING;
+  }
+
+  get DOCUMENT_POSITION_CONTAINS(): 8 {
+    return Position.DOCUMENT_POSITION_CONTAINS;
+  }
+
+  get DOCUMENT_NODE(): 9 {
+    return NodeType.DOCUMENT_NODE;
+  }
+
+  get DOCUMENT_TYPE_NODE(): 10 {
+    return NodeType.DOCUMENT_TYPE_NODE;
+  }
+
+  get DOCUMENT_FRAGMENT_NODE(): 11 {
+    return NodeType.DOCUMENT_FRAGMENT_NODE;
+  }
+
+  get DOCUMENT_POSITION_CONTAINED_BY(): 16 {
+    return Position.DOCUMENT_POSITION_CONTAINED_BY;
+  }
+
+  get DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC(): 32 {
+    return Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
+  }
+
+  get ELEMENT_NODE(): 1 {
+    return NodeType.ELEMENT_NODE;
+  }
+
+  get ENTITY_NODE(): 6 {
+    return NodeType.ENTITY_NODE;
+  }
+
+  get ATTRIBUTE_NODE(): 2 {
+    return NodeType.ATTRIBUTE_NODE;
+  }
+
+  get TEXT_NODE(): 3 {
+    return NodeType.TEXT_NODE;
+  }
+
+  get CDATA_SECTION_NODE(): 4 {
+    return NodeType.CDATA_SECTION_NODE;
+  }
+
+  get ENTITY_REFERENCE_NODE(): 5 {
+    return NodeType.ENTITY_REFERENCE_NODE;
+  }
+
+  get COMMENT_NODE(): 8 {
+    return NodeType.COMMENT_NODE;
+  }
+
+  get PROCESSING_INSTRUCTION_NODE(): 7 {
+    return NodeType.PROCESSING_INSTRUCTION_NODE;
+  }
+
+  get NOTATION_NODE(): 12 {
+    return NodeType.NOTATION_NODE;
+  }
 
   abstract [$nodeDocument]: Document;
 
