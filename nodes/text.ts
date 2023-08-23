@@ -42,11 +42,11 @@ export class Text extends CharacterData implements IText {
     super(data, globalThis.document as Document);
   }
 
-  override get nodeType(): NodeType.TEXT_NODE {
+  override get nodeType(): NodeType.TEXT_NODE | NodeType.CDATA_SECTION_NODE {
     return NodeType.TEXT_NODE;
   }
 
-  override get nodeName(): "#text" {
+  override get nodeName(): "#text" | "#cdata-section" {
     return "#text";
   }
 
