@@ -638,8 +638,59 @@ export class Element extends Node implements IElement {
     return setAttribute(attr, this);
   }
 
-  toggleAttribute(qualifiedName: string, force?: boolean | undefined): boolean {
-    throw new UnImplemented("toggleAttribute");
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-toggleattribute
+   */
+  toggleAttribute(qualifiedName: string, force?: boolean): boolean {
+    // 1. If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException.
+    if (!xmlValidator.name(qualifiedName)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
+
+    // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
+    if (
+      this[$namespace] === Namespace.HTML && isHTMLDocument(this[$nodeDocument])
+    ) qualifiedName = qualifiedName.toLowerCase();
+
+    // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
+    const attribute = find(
+      this[$attributeList],
+      (attr) => getQualifiedName(attr) === qualifiedName,
+    ) ?? null;
+
+    // 4. If attribute is null, then:
+    if (!attribute) {
+      // 1. If force is not given or is true,
+      if (typeof force === "undefined" || force) {
+        // create an attribute whose local name is qualifiedName, value is the empty string, and node document is this’s node document,
+        const attr = new Attr({
+          localName: qualifiedName,
+          value: "",
+          nodeDocument: this[$nodeDocument],
+        });
+
+        // then append this attribute to this,
+        appendAttribute(attr, this);
+
+        // and then return true.
+        return true;
+      }
+
+      // 2. Return false.
+      return false;
+    }
+
+    // 5. Otherwise, if force is not given or is false, remove an attribute given qualifiedName and this, and then return false.
+    if (!force) {
+      removeAttributeByName(qualifiedName, this);
+      return false;
+    }
+
+    // 6. Return true.
+    return true;
   }
 
   webkitMatchesSelector(selectors: string): boolean {
