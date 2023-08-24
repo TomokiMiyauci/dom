@@ -118,8 +118,20 @@ export class NamedNodeMap implements INamedNodeMap {
     return setAttribute(attr, this[$element]);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditem
+   */
   removeNamedItem(qualifiedName: string): Attr {
-    throw new UnImplemented("removeNamedItem");
+    // 1. Let attr be the result of removing an attribute given qualifiedName and element.
+    const attr = removeAttributeByName(qualifiedName, this[$element]);
+
+    // 2. If attr is null, then throw a "NotFoundError" DOMException.
+    if (!attr) {
+      throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+    }
+
+    // 3. Return attr.
+    return attr;
   }
 
   removeNamedItemNS(namespace: string | null, localName: string): Attr {
