@@ -5,6 +5,7 @@ import { List } from "../infra/data_structures/list.ts";
 import {
   type Element,
   removeAttributeByName,
+  removeAttributeByNamespaceAndLocalName,
   setAttribute,
 } from "./element.ts";
 import type { Attr } from "./attr.ts";
@@ -134,8 +135,24 @@ export class NamedNodeMap implements INamedNodeMap {
     return attr;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditemns
+   */
   removeNamedItemNS(namespace: string | null, localName: string): Attr {
-    throw new UnImplemented("removeNamedItemNS");
+    // 1. Let attr be the result of removing an attribute given namespace, localName, and element.
+    const attr = removeAttributeByNamespaceAndLocalName(
+      namespace,
+      localName,
+      this[$element],
+    );
+
+    // 2. If attr is null, then throw a "NotFoundError" DOMException.
+    if (!attr) {
+      throw new DOMException("<message>", DOMExceptionName.NotFoundError);
+    }
+
+    // 3. Return attr.
+    return attr;
   }
 
   // TODO(miyauci): Find the definition of WebIDL.
