@@ -1,20 +1,61 @@
 import type { INamedNodeMap } from "../interface.d.ts";
-import { find, html } from "../deps.ts";
-import { UnImplemented } from "./utils.ts";
+import { find, html, map } from "../deps.ts";
+import { getQualifiedName, UnImplemented } from "./utils.ts";
 import { List } from "../infra/data_structures/list.ts";
-import { type Element, setAttribute } from "./element.ts";
+import {
+  type Element,
+  removeAttributeByName,
+  setAttribute,
+} from "./element.ts";
 import type { Attr } from "./attr.ts";
-import { $attributeList, $element } from "./internal.ts";
+import {
+  $attributeList,
+  $element,
+  $namespace,
+  $nodeDocument,
+} from "./internal.ts";
 import { Indexer } from "../utils.ts";
+import { NamedProperties } from "../webidl/idl.ts";
+import { Namespace } from "../infra/namespace.ts";
+import { isHTMLDocument } from "./document.ts";
+import { DOMExceptionName } from "../webidl/exception.ts";
 
 export interface NamedNodeMapInits {
   element: Element;
   attributeList: List<Attr>;
 }
 
-@Indexer({
-  get: function (this: NamedNodeMap, index: number): Attr | undefined {
-    return this[$attributeList][index];
+// @Indexer({
+//   get: function (this: NamedNodeMap, index: number): Attr | undefined {
+//     return this[$attributeList][index];
+//   },
+// })
+@NamedProperties<NamedNodeMap>({
+  getSupportedPropertyNames: function () {
+    // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
+    const qualifiedNames = map(this[$attributeList], getQualifiedName);
+    const names = new Set(qualifiedNames);
+
+    // 2. If this NamedNodeMap object’s element is in the HTML namespace and its node document is an HTML document, then for each name in names:
+    const element = this[$element];
+    if (
+      element[$namespace] === Namespace.HTML &&
+      isHTMLDocument(element[$nodeDocument])
+    ) {
+      names.forEach((name) => {
+        // 1. Let lowercaseName be name, in ASCII lowercase.
+        const lowercaseName = name.toLowerCase();
+
+        // 2. If lowercaseName is not equal to name, remove name from names.
+        if (lowercaseName !== name) names.delete(name);
+      });
+    }
+
+    // 3. Return names.
+    return names;
+  },
+  getter: function (prop) {
+    return this.getNamedItem(prop) ?? undefined;
   },
 })
 export class NamedNodeMap implements INamedNodeMap {
