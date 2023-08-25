@@ -187,7 +187,10 @@
   // "dom/nodes/remove-unscopable.html",
   // "dom/nodes/rootNode.html",
   // "dom/nodes/svg-template-querySelector.html",
-  "dom/nodes/Text-constructor.html"
+  "dom/nodes/Text-constructor.html",
   // "dom/nodes/Text-splitText.html",
-  // "dom/nodes/Text-wholeText.html"
+  // "dom/nodes/Text-wholeText.html",
+  "dom/lists/DOMTokenList-value.html"
+  // webidl
+  // "webidl/ecmascript-binding/legacy-platform-object/GetOwnProperty.html"
 ]

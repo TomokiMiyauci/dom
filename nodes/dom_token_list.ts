@@ -56,6 +56,7 @@ export class DOMTokenList extends LegacyPlatformObject
     steps.run({ element, localName, oldValue: value, value, namespace: null });
   }
 
+  [Symbol.toStringTag] = "DOMTokenList";
   [WebIDL.supportedIndexes](): Set<number> {
     return new Set(range(0, this.length));
   }
