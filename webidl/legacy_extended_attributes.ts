@@ -1,4 +1,5 @@
 import { Constructor, isNegativeZero } from "../deps.ts";
+import { WebIDL } from "./idl.ts";
 import {
   CanonicalNumericIndexString,
   OrdinaryGetOwnProperty,
@@ -37,25 +38,73 @@ export function LegacyUnenumerableNamedProperties<T extends Constructor>(
   return LegacyUnenumerableNamedPropertiesMixin;
 }
 
-export class WebIDL {
-  static readonly isSupportedIndex = Symbol();
-  static readonly getIndex = Symbol();
-  static readonly isSupportedNamedProperty = Symbol();
-  static readonly getNamedProperty = Symbol();
-  static readonly namedPropertySetter = Symbol();
-  static readonly LegacyUnenumerableNamedProperties = Symbol();
-  static readonly LegacyOverrideBuiltIns = Symbol();
+export abstract class LegacyPlatformObject {
+  constructor() {
+    return new Proxy(this, {
+      get: (target, prop, receiver) => {
+        if (Reflect.has(target, prop)) {
+          return Reflect.get(target, prop, receiver);
+        }
+
+        const desc = LegacyPlatformObjectGetOwnProperty(target, prop, false);
+
+        if (!desc) return;
+        if (Object.hasOwn(desc, "value")) return desc.value;
+        return desc.get?.call(target);
+      },
+      has: (target, prop) => {
+        if (Reflect.has(target, prop)) return true;
+
+        const desc = LegacyPlatformObjectGetOwnProperty(target, prop, false);
+
+        return !!desc;
+      },
+      getOwnPropertyDescriptor: (target, prop) => {
+        return LegacyPlatformObjectGetOwnProperty(target, prop, false);
+      },
+      preventExtensions: () => false,
+      ownKeys: (target) => {
+        const set = new Set<string | symbol>();
+        const supportedIndexes = target[WebIDL.supportedIndexes];
+
+        if (supportedIndexes) {
+          for (const index of supportedIndexes.call(target)) {
+            set.add(String(index));
+          }
+        }
+
+        if (isNamedProperty(target)) {
+          for (
+            const name of target[WebIDL.supportedNamedProperties].call(target)
+          ) {
+            if (runNamedPropertyVisibilityAlgorithm(name, target)) {
+              set.add(name);
+            }
+          }
+        }
+
+        Object.getOwnPropertyNames(target).forEach(set.add.bind(set));
+        Object.getOwnPropertySymbols(target).forEach(set.add.bind(set));
+
+        return Array.from(set);
+      },
+    });
+  }
+
+  abstract [WebIDL.supportedIndexes]?(): Set<number>;
+  abstract [WebIDL.supportedNamedProperties]?(): Set<string>;
 }
 
 export interface IndexedProperties {
-  [WebIDL.isSupportedIndex]: () => Iterable<number>;
-  [WebIDL.getIndex]: (index: number) => unknown;
+  [WebIDL.supportedIndexes]: () => Set<number>;
+  [WebIDL.indexGetter]: (index: number) => unknown;
+  [WebIDL.indexSetter]?: (index: number) => void;
 }
 
 export interface NamedProperties {
-  [WebIDL.isSupportedNamedProperty]: (index: string) => boolean;
-  [WebIDL.getNamedProperty]: (index: string) => unknown;
-  [WebIDL.namedPropertySetter]?: (index: string) => void;
+  [WebIDL.supportedNamedProperties]: () => Set<string>;
+  [WebIDL.namedPropertyGetter]: (name: string) => unknown;
+  [WebIDL.namedPropertySetter]?: (name: string) => void;
 }
 
 /**
@@ -68,11 +117,11 @@ export function LegacyPlatformObjectGetOwnProperty(
   prop: PropertyKey,
   ignoreNamedProps: boolean,
 ): PropertyDescriptor | undefined {
-  if (WebIDL.isSupportedIndex in object && isArrayIndex(prop)) {
+  if (isIndexedProperty(object) && isArrayIndex(prop)) {
     const index = ToUnit32(prop);
 
-    if (new Set(object[WebIDL.isSupportedIndex]()).has(index)) {
-      const operation = object[WebIDL.getIndex];
+    if (object[WebIDL.supportedIndexes].call(object).has(index)) {
+      const operation = object[WebIDL.indexGetter];
       const value = operation.call(object, index);
       const desc: PropertyDescriptor = {
         configurable: true,
@@ -87,13 +136,13 @@ export function LegacyPlatformObjectGetOwnProperty(
   }
 
   if (
-    WebIDL.isSupportedNamedProperty in object &&
+    isNamedProperty(object) &&
     !ignoreNamedProps &&
     typeof prop === "string" &&
     runNamedPropertyVisibilityAlgorithm(prop, object)
   ) {
     // 1. Let operation be the operation used to declare the named property getter.
-    const operation = object[WebIDL.getNamedProperty];
+    const operation = object[WebIDL.namedPropertyGetter];
 
     // 2. Let value be an uninitialized variable.
 
@@ -145,7 +194,9 @@ export function runNamedPropertyVisibilityAlgorithm(
   prop: string,
   object: NamedProperties,
 ): boolean {
-  // if (!object[WebIDL.isSupportedNamedProperty](prop)) return false;
+  if (!object[WebIDL.supportedNamedProperties].call(object).has(prop)) {
+    return false;
+  }
   if (Object.hasOwn(object, prop)) return false;
 
   if (WebIDL.LegacyOverrideBuiltIns in object) return true;
@@ -159,4 +210,13 @@ export function runNamedPropertyVisibilityAlgorithm(
   }
 
   return true;
+}
+
+function isIndexedProperty(
+  object: object,
+): object is IndexedProperties {
+  return WebIDL.supportedIndexes in object;
+}
+function isNamedProperty(object: object): object is NamedProperties {
+  return WebIDL.supportedNamedProperties in object;
 }

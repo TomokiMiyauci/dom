@@ -15,10 +15,10 @@ import {
   $namespace,
   $nodeDocument,
 } from "./internal.ts";
-import { Getter, getter, LegacyPlatformObject } from "../webidl/idl.ts";
+import { Getter, getter, WebIDL } from "../webidl/idl.ts";
 import {
+  LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-  WebIDL,
 } from "../webidl/legacy_extended_attributes.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { isHTMLDocument } from "./document.ts";
@@ -43,11 +43,11 @@ export class NamedNodeMap extends LegacyPlatformObject
     this[$element] = element;
   }
 
-  [WebIDL.isSupportedIndex]() {
-    return range(0, this.length);
+  [WebIDL.supportedIndexes](): Set<number> {
+    return new Set(range(0, this.length));
   }
 
-  [WebIDL.isSupportedNamedProperty]() {
+  [WebIDL.supportedNamedProperties](): Set<string> {
     // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
     const qualifiedNames = map(this[$attributeList], getQualifiedName);
     const names = new Set(qualifiedNames);
@@ -165,7 +165,7 @@ export class NamedNodeMap extends LegacyPlatformObject
   }
 }
 
-export interface NamedNodeMap extends Getter<["index", "name"]> {}
+export interface NamedNodeMap extends Getter<"index">, Getter<"name"> {}
 
 function getAttributesByName(
   qualifiedName: string,
