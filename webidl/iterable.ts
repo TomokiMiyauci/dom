@@ -5,14 +5,13 @@ interface IndexedProperty<T = unknown> {
   length: number;
 }
 
-const iterator = Array.prototype[Symbol.iterator];
 const { keys, values, entries, forEach } = Array.prototype;
 
 /** Iterable mixin.
  */
 export function iterable<T extends Constructor<IndexedProperty>>(Ctor: T) {
   abstract class Iterator extends Ctor implements Iterable {
-    [Symbol.iterator] = iterator;
+    [Symbol.iterator] = values;
     keys = keys;
     values = values;
     entries = entries;

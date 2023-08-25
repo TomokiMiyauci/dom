@@ -28,9 +28,10 @@ export class DOMTokenList extends LegacyPlatformObject
   implements IDOMTokenList {
   [k: number]: string;
 
-  private tokenSet: OrderedSet<string> = new OrderedSet();
   #element: Element;
   #localName: string;
+
+  private tokenSet: OrderedSet<string> = new OrderedSet();
 
   constructor({ element, localName }: DOMTokenListInits) {
     super();
@@ -76,7 +77,7 @@ export class DOMTokenList extends LegacyPlatformObject
   @getter("index")
   item(index: number): string | null {
     // 1. If index is equal to or greater than this’s token set’s size, then return null.
-    if (!this.#isSupportedIndex(index)) return null;
+    if (!this.isSupportedIndex(index)) return null;
 
     // 2. Return this’s token set[index].
     return this.tokenSet[index]!;
@@ -198,7 +199,7 @@ export class DOMTokenList extends LegacyPlatformObject
     setAttributeValue(this.#element, this.#localName, value);
   }
 
-  #isSupportedIndex(index: number): boolean {
+  private isSupportedIndex(index: number): boolean {
     return this[WebIDL.supportedIndexes]().has(index);
   }
 
