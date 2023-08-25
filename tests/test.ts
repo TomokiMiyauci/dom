@@ -19,11 +19,7 @@ const passMap = new Map(
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));
 
-const include = new RegExp(
-  testList.map((pattern) => "/dom/nodes/" + pattern).map(escape).join(
-    "|",
-  ),
-);
+const include = new RegExp(testList.map(escape).join("|"));
 
 const entry = walk(wptRootURL, {
   includeDirs: false,
