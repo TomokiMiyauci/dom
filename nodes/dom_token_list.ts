@@ -11,7 +11,9 @@ import { DOMExceptionName } from "../webidl/exception.ts";
 import { $attributeChangeSteps, $attributeList } from "./internal.ts";
 import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
 import { reAsciiWhitespace } from "../infra/code_point.ts";
-import { Indexer } from "../utils.ts";
+import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
+import { getter, WebIDL } from "../webidl/idl.ts";
+import { range } from "../deps.ts";
 
 interface DOMTokenListInits {
   element: Element;
@@ -22,12 +24,8 @@ interface DOMTokenListInits {
  * @see https://dom.spec.whatwg.org/#interface-domtokenlist
  */
 @iterable
-@Indexer({
-  get: function (this: DOMTokenList, index): string | undefined {
-    return this.tokenSet[index];
-  },
-})
-export class DOMTokenList implements IDOMTokenList {
+export class DOMTokenList extends LegacyPlatformObject
+  implements IDOMTokenList {
   [k: number]: string;
 
   private tokenSet: OrderedSet<string> = new OrderedSet();
@@ -35,6 +33,7 @@ export class DOMTokenList implements IDOMTokenList {
   #localName: string;
 
   constructor({ element, localName }: DOMTokenListInits) {
+    super();
     const attributeChangeStep: AttributeChangeCallback = (ctx) => {
       if (ctx.localName === localName && ctx.namespace === null) {
         if (ctx.value === null) this.tokenSet.empty();
@@ -57,6 +56,11 @@ export class DOMTokenList implements IDOMTokenList {
     steps.run({ element, localName, oldValue: value, value, namespace: null });
   }
 
+  [WebIDL.supportedIndexes](): Set<number> {
+    return new Set(range(0, this.length));
+  }
+  [WebIDL.supportedNamedProperties] = undefined;
+
   /**
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-length
    */
@@ -68,6 +72,7 @@ export class DOMTokenList implements IDOMTokenList {
   /**
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-item
    */
+  @getter("index")
   item(index: number): string | null {
     // 1. If index is equal to or greater than this’s token set’s size, then return null.
     if (!this.#isSupportedIndex(index)) return null;
@@ -177,13 +182,6 @@ export class DOMTokenList implements IDOMTokenList {
   }
 
   /**
-   * @see https://dom.spec.whatwg.org/#DOMTokenList-stringification-behavior
-   */
-  toString(): string {
-    return this.value;
-  }
-
-  /**
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
    */
   get value(): string {
@@ -199,7 +197,7 @@ export class DOMTokenList implements IDOMTokenList {
   }
 
   #isSupportedIndex(index: number): boolean {
-    return 0 <= index && index < this.tokenSet.size;
+    return this[WebIDL.supportedIndexes]().has(index);
   }
 
   /**

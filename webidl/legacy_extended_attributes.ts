@@ -215,8 +215,9 @@ export function runNamedPropertyVisibilityAlgorithm(
 function isIndexedProperty(
   object: object,
 ): object is IndexedProperties {
-  return WebIDL.supportedIndexes in object;
+  return WebIDL.supportedIndexes in object && !!object[WebIDL.supportedIndexes];
 }
 function isNamedProperty(object: object): object is NamedProperties {
-  return WebIDL.supportedNamedProperties in object;
+  return WebIDL.supportedNamedProperties in object &&
+    !!object[WebIDL.supportedNamedProperties];
 }
