@@ -63,3 +63,24 @@ export function OrdinaryGetOwnProperty(
 
   return desc;
 }
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-createmethodproperty
+ */
+export function CreateMethodProperty(
+  O: object,
+  P: PropertyKey,
+  V: unknown,
+): void {
+  // 1. Assert: O is an ordinary, extensible object with no non-configurable properties.
+  // 2. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: false, [[Configurable]]: true }.
+  const newDesc: PropertyDescriptor = {
+    value: V,
+    writable: true,
+    enumerable: false,
+    configurable: true,
+  };
+  // 3. Perform ! DefinePropertyOrThrow(O, P, newDesc).
+  Object.defineProperty(O, P, newDesc);
+  // 4. Return unused.
+}

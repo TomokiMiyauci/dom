@@ -1,4 +1,5 @@
 import { Constructor } from "../deps.ts";
+import { CreateMethodProperty } from "../ecma/abstract_operations.ts";
 
 interface IndexedProperty<T = unknown> {
   [k: number]: T;
@@ -7,18 +8,13 @@ interface IndexedProperty<T = unknown> {
 
 const { keys, values, entries, forEach } = Array.prototype;
 
-/** Iterable mixin.
- */
+/** Iterable decorator. */
 export function iterable<T extends Constructor<IndexedProperty>>(Ctor: T) {
-  abstract class Iterator extends Ctor implements Iterable {
-    [Symbol.iterator] = values;
-    keys = keys;
-    values = values;
-    entries = entries;
-    forEach = forEach;
-  }
-
-  return Iterator;
+  CreateMethodProperty(Ctor.prototype, Symbol.iterator, values);
+  CreateMethodProperty(Ctor.prototype, "values", values);
+  CreateMethodProperty(Ctor.prototype, "keys", keys);
+  CreateMethodProperty(Ctor.prototype, "entries", entries);
+  CreateMethodProperty(Ctor.prototype, "forEach", forEach);
 }
 
 export interface Iterable<T = unknown> extends
