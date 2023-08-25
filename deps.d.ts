@@ -5,3 +5,7 @@ declare module "npm:xml-name-validator@4.0.0" {
   };
   export default validator;
 }
+
+declare module "npm:is-negative-zero" {
+  export default function (input: unknown): boolean;
+}

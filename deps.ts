@@ -29,6 +29,7 @@ export {
   Ok,
   type Result,
 } from "https://deno.land/x/result_js@2.0.0/mod.ts";
+export { default as isNegativeZero } from "npm:is-negative-zero";
 
 export type Public<T> = { [k in keyof T]: T[k] };
 
