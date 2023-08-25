@@ -24,6 +24,26 @@ export function getter(type: "index" | "name") {
   };
 }
 
+/**
+ * @throws {TypeError}
+ */
+export function stringifier(
+  object: object,
+  _: unknown,
+  descriptor: PropertyDescriptor,
+) {
+  const getter = descriptor.get;
+
+  if (!getter) throw new TypeError("stringifier must use with getter");
+
+  Object.defineProperty(object, "toString", {
+    enumerable: true,
+    writable: true,
+    configurable: true,
+    value: getter,
+  });
+}
+
 export type Getter<
   T extends "index" | "name",
 > = T extends ["name"] ? { [WebIDL.namedPropertyGetter](name: string): unknown }
