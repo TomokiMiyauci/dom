@@ -190,7 +190,8 @@
   "dom/nodes/Text-constructor.html",
   // "dom/nodes/Text-splitText.html",
   // "dom/nodes/Text-wholeText.html",
-  "dom/lists/DOMTokenList-value.html"
+  "dom/lists/DOMTokenList-value.html",
+  "dom/lists/DOMTokenList-stringifier.html"
   // webidl
   // "webidl/ecmascript-binding/legacy-platform-object/GetOwnProperty.html"
 ]
