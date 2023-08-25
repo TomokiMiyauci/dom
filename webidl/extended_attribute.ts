@@ -22,3 +22,28 @@ export function SameObject(
 
   descriptor.get = cachedGetter;
 }
+
+/**
+ * @see https://webidl.spec.whatwg.org/#PutForwards
+ */
+export function PutForwards<T extends object>(identifier: keyof T) {
+  return (
+    _: unknown,
+    prop: string,
+    descriptor: { get?: () => T },
+  ) => {
+    const getter = descriptor.get;
+
+    if (!getter) throw new Error("it should be getter");
+
+    function setter(this: unknown, value: unknown): void {
+      const q = getter!.call(this);
+
+      Reflect.set(q, identifier, value);
+    }
+    const name = `set ${prop}`;
+
+    Object.defineProperty(setter, "name", { value: name });
+    Object.defineProperty(descriptor, "set", { value: setter });
+  };
+}
