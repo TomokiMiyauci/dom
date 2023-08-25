@@ -54,6 +54,7 @@ import { Element_PointerLock } from "../pointerlock/element.ts";
 import { Element_Fullscreen } from "../fullscreen/element.ts";
 import { Element_CSSShadowParts } from "../css/css_shadow_parts/element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
+import { PutForwards, SameObject } from "../webidl/extended_attribute.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -269,6 +270,8 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-classlist
    */
+  @SameObject
+  @PutForwards("value")
   get classList(): DOMTokenList {
     // return a DOMTokenList object whose associated element is this and whose associated attribute’s local name is class.
     return new DOMTokenList({ element: this, localName: "class" });
