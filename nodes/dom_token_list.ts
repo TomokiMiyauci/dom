@@ -12,7 +12,7 @@ import { $attributeChangeSteps, $attributeList } from "./internal.ts";
 import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
 import { reAsciiWhitespace } from "../infra/code_point.ts";
 import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
-import { getter, WebIDL } from "../webidl/idl.ts";
+import { getter, stringifier, WebIDL } from "../webidl/idl.ts";
 import { range } from "../deps.ts";
 
 interface DOMTokenListInits {
@@ -185,6 +185,7 @@ export class DOMTokenList extends LegacyPlatformObject
   /**
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
    */
+  @stringifier
   get value(): string {
     return this.#serializeSteps();
   }
