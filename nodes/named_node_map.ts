@@ -1,6 +1,6 @@
 import type { INamedNodeMap } from "../interface.d.ts";
-import { find, html, map } from "../deps.ts";
-import { getQualifiedName, UnImplemented } from "./utils.ts";
+import { find, html, map, range } from "../deps.ts";
+import { getQualifiedName } from "./utils.ts";
 import { List } from "../infra/data_structures/list.ts";
 import {
   type Element,
@@ -15,8 +15,11 @@ import {
   $namespace,
   $nodeDocument,
 } from "./internal.ts";
-import { Indexer } from "../utils.ts";
-import { NamedProperties } from "../webidl/idl.ts";
+import { Getter, getter, LegacyPlatformObject } from "../webidl/idl.ts";
+import {
+  LegacyUnenumerableNamedProperties,
+  WebIDL,
+} from "../webidl/legacy_extended_attributes.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { isHTMLDocument } from "./document.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
@@ -26,13 +29,25 @@ export interface NamedNodeMapInits {
   attributeList: List<Attr>;
 }
 
-// @Indexer({
-//   get: function (this: NamedNodeMap, index: number): Attr | undefined {
-//     return this[$attributeList][index];
-//   },
-// })
-@NamedProperties<NamedNodeMap>({
-  getSupportedPropertyNames: function () {
+@LegacyUnenumerableNamedProperties
+export class NamedNodeMap extends LegacyPlatformObject
+  implements INamedNodeMap {
+  readonly [k: number]: Attr;
+
+  [$attributeList]: List<Attr>;
+  [$element]: Element;
+
+  constructor({ attributeList, element }: NamedNodeMapInits) {
+    super();
+    this[$attributeList] = attributeList;
+    this[$element] = element;
+  }
+
+  [WebIDL.isSupportedIndex]() {
+    return range(0, this.length);
+  }
+
+  [WebIDL.isSupportedNamedProperty]() {
     // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
     const qualifiedNames = map(this[$attributeList], getQualifiedName);
     const names = new Set(qualifiedNames);
@@ -54,20 +69,6 @@ export interface NamedNodeMapInits {
 
     // 3. Return names.
     return names;
-  },
-  getter: function (prop) {
-    return this.getNamedItem(prop) ?? undefined;
-  },
-})
-export class NamedNodeMap implements INamedNodeMap {
-  readonly [k: number]: Attr;
-
-  [$attributeList]: List<Attr>;
-  [$element]: Element;
-
-  constructor({ attributeList, element }: NamedNodeMapInits) {
-    this[$attributeList] = attributeList;
-    this[$element] = element;
   }
 
   /**
@@ -81,6 +82,7 @@ export class NamedNodeMap implements INamedNodeMap {
   /**
    * @see https://dom.spec.whatwg.org/#dom-namednodemap-item
    */
+  @getter("index")
   item(index: number): Attr | null {
     // 1. If index is equal to or greater than this’s attribute list’s size, then return null.
     // 2. Otherwise, return this’s attribute list[index].
@@ -90,6 +92,7 @@ export class NamedNodeMap implements INamedNodeMap {
   /**
    * https://dom.spec.whatwg.org/#dom-namednodemap-getnameditem
    */
+  @getter("name")
   getNamedItem(qualifiedName: string): Attr | null {
     // return the result of getting an attribute given qualifiedName and element.
     return getAttributesByName(qualifiedName, this[$element]);
@@ -162,17 +165,17 @@ export class NamedNodeMap implements INamedNodeMap {
   }
 }
 
+export interface NamedNodeMap extends Getter<["index", "name"]> {}
+
 function getAttributesByName(
   qualifiedName: string,
   element: Element,
 ): Attr | null {
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
-    element.namespaceURI === html.NS.HTML
-    // TODO
-  ) {
-    qualifiedName = qualifiedName.toLowerCase();
-  }
+    element.namespaceURI === html.NS.HTML &&
+    isHTMLDocument(element[$nodeDocument])
+  ) qualifiedName = qualifiedName.toLowerCase();
 
   return find(element[$attributeList], (attr) => {
     const q = attr.prefix === null
