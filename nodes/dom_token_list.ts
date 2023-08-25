@@ -15,6 +15,8 @@ import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
 import { getter, stringifier, WebIDL } from "../webidl/idl.ts";
 import { range } from "../deps.ts";
 
+const $tokenSet = Symbol();
+
 interface DOMTokenListInits {
   element: Element;
   localName: string;
@@ -31,14 +33,14 @@ export class DOMTokenList extends LegacyPlatformObject
   #element: Element;
   #localName: string;
 
-  private tokenSet: OrderedSet<string> = new OrderedSet();
+  [$tokenSet]: OrderedSet<string> = new OrderedSet();
 
   constructor({ element, localName }: DOMTokenListInits) {
     super();
     const attributeChangeStep: AttributeChangeCallback = (ctx) => {
       if (ctx.localName === localName && ctx.namespace === null) {
-        if (ctx.value === null) this.tokenSet.empty();
-        else this.tokenSet = parseOrderSet(value);
+        if (ctx.value === null) this[$tokenSet].empty();
+        else this[$tokenSet] = parseOrderSet(value);
       }
     };
     const steps = element[$attributeChangeSteps];
@@ -68,7 +70,7 @@ export class DOMTokenList extends LegacyPlatformObject
    */
   get length(): number {
     // return this’s token set’s size.
-    return this.tokenSet.size;
+    return this[$tokenSet].size;
   }
 
   /**
@@ -80,12 +82,12 @@ export class DOMTokenList extends LegacyPlatformObject
     if (!this.isSupportedIndex(index)) return null;
 
     // 2. Return this’s token set[index].
-    return this.tokenSet[index]!;
+    return this[$tokenSet][index]!;
   }
 
   contains(token: string): boolean {
     // return true if this’s token set[token] exists; otherwise false.
-    return this.tokenSet.contains(token);
+    return this[$tokenSet].contains(token);
   }
 
   /**
@@ -97,7 +99,7 @@ export class DOMTokenList extends LegacyPlatformObject
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
     // 2. For each token in tokens, append token to this’s token set.
-    for (const token of tokens) this.tokenSet.append(token);
+    for (const token of tokens) this[$tokenSet].append(token);
 
     // 3. Run the update steps.
     this.#updateSteps();
@@ -112,7 +114,9 @@ export class DOMTokenList extends LegacyPlatformObject
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
     // 2. For each token in tokens, remove token from this’s token set.
-    for (const token of tokens) this.tokenSet.remove((item) => item === token);
+    for (const token of tokens) {
+      this[$tokenSet].remove((item) => item === token);
+    }
 
     // 3. Run the update steps.
     this.#updateSteps();
@@ -127,10 +131,10 @@ export class DOMTokenList extends LegacyPlatformObject
     checkToken(token);
 
     // 3. If this’s token set[token] exists, then:
-    if (this.tokenSet.contains(token)) {
+    if (this[$tokenSet].contains(token)) {
       // 1. If force is either not given or is false, then remove token from this’s token set, run the update steps and return false.
       if (!force) {
-        this.tokenSet.remove((item) => item === token);
+        this[$tokenSet].remove((item) => item === token);
         this.#updateSteps();
 
         // 2. Return true.
@@ -142,7 +146,7 @@ export class DOMTokenList extends LegacyPlatformObject
 
     // 4. Otherwise, if force not given or is true, append token to this’s token set, run the update steps, and return true.
     if (force === undefined || force) {
-      this.tokenSet.append(token);
+      this[$tokenSet].append(token);
       this.#updateSteps();
       return true;
     }
@@ -161,10 +165,10 @@ export class DOMTokenList extends LegacyPlatformObject
     checkToken(newToken);
 
     // 3. If this’s token set does not contain token, then return false.
-    if (!this.tokenSet.contains(token)) return false;
+    if (!this[$tokenSet].contains(token)) return false;
 
     // 4. Replace token in this’s token set with newToken.
-    this.tokenSet.replace(token, newToken);
+    this[$tokenSet].replace(token, newToken);
 
     // 5. Run the update steps.
     this.#updateSteps();
@@ -208,7 +212,7 @@ export class DOMTokenList extends LegacyPlatformObject
    */
   #updateSteps(): void {
     // 1. If the associated element does not have an associated attribute and token set is empty, then return.
-    if (this.#element[$attributeList].isEmpty && this.tokenSet.isEmpty) {
+    if (this.#element[$attributeList].isEmpty && this[$tokenSet].isEmpty) {
       return;
     }
 
@@ -216,7 +220,7 @@ export class DOMTokenList extends LegacyPlatformObject
     setAttributeValue(
       this.#element,
       this.#localName,
-      serializeOrderSet(this.tokenSet),
+      serializeOrderSet(this[$tokenSet]),
     );
   }
 
