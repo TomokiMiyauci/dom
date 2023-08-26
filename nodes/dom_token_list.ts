@@ -13,6 +13,7 @@ import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
 import { reAsciiWhitespace } from "../infra/code_point.ts";
 import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
 import { getter, stringifier, WebIDL } from "../webidl/idl.ts";
+import { convert, DOMString } from "../webidl/types.ts";
 import { range } from "../deps.ts";
 
 const $tokenSet = Symbol();
@@ -40,7 +41,7 @@ export class DOMTokenList extends LegacyPlatformObject
     const attributeChangeStep: AttributeChangeCallback = (ctx) => {
       if (ctx.localName === localName && ctx.namespace === null) {
         if (ctx.value === null) this[$tokenSet].empty();
-        else this[$tokenSet] = parseOrderSet(value);
+        else this[$tokenSet] = parseOrderSet(ctx.value);
       }
     };
     const steps = element[$attributeChangeSteps];
@@ -87,14 +88,15 @@ export class DOMTokenList extends LegacyPlatformObject
 
   contains(token: string): boolean {
     // return true if this’s token set[token] exists; otherwise false.
-    return this[$tokenSet].contains(token);
+    return this[$tokenSet].contains(String(token));
   }
 
   /**
    * @throws {DOMException}
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-add
    */
-  add(...tokens: readonly string[]): void {
+  @convert
+  add(@DOMString ...tokens: readonly string[]): void {
     // 1. For each token in tokens:
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
@@ -109,7 +111,8 @@ export class DOMTokenList extends LegacyPlatformObject
    * @throws {DOMException}
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-remove
    */
-  remove(...tokens: readonly string[]): void {
+  @convert
+  remove(@DOMString ...tokens: readonly string[]): void {
     // 1. For each token in tokens:
     for (const token of tokens) checkToken(token); // 1. If token is the empty string, then throw a "SyntaxError" DOMException. // 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
 
@@ -126,7 +129,8 @@ export class DOMTokenList extends LegacyPlatformObject
    * @throws {DOMException}
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
    */
-  toggle(token: string, force?: boolean): boolean {
+  @convert
+  toggle(@DOMString token: string, force?: boolean): boolean {
     // 1. If token is the empty string, then throw a "SyntaxError" DOMException. 2. If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMExcepti
     checkToken(token);
 
@@ -159,10 +163,20 @@ export class DOMTokenList extends LegacyPlatformObject
    * @throws {DOMException}
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-replace
    */
-  replace(token: string, newToken: string): boolean {
-    // 1. If either token or newToken is the empty string, then throw a "SyntaxError" DOMException. 2. If either token or newToken contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
-    checkToken(token);
-    checkToken(newToken);
+  @convert
+  replace(@DOMString token: string, @DOMString newToken: string): boolean {
+    // 1. If either token or newToken is the empty string, then throw a "SyntaxError" DOMException.
+    if (token === "" || newToken === "") {
+      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
+    }
+
+    // 2. If either token or newToken contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
+    if (reAsciiWhitespace.test(token) || reAsciiWhitespace.test(newToken)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
 
     // 3. If this’s token set does not contain token, then return false.
     if (!this[$tokenSet].contains(token)) return false;
@@ -178,13 +192,31 @@ export class DOMTokenList extends LegacyPlatformObject
   }
 
   /**
+   * @throws {TypeError}
    * @see https://dom.spec.whatwg.org/#dom-domtokenlist-supports
    */
   supports(token: string): boolean {
-    throw new Error("supports");
     // 1. Let result be the return value of validation steps called with token.
+    const result = this.#validationStep(token);
 
     // 2. Return result.
+    return result;
+  }
+
+  /**
+   * @throws {TypeError}
+   * @see https://dom.spec.whatwg.org/#concept-domtokenlist-validation
+   */
+  #validationStep(token: string) {
+    const tokenSet = this[$tokenSet];
+    // 1. If the associated attribute’s local name does not define supported tokens, throw a TypeError.
+    if (tokenSet.isEmpty) throw new TypeError("<message>");
+
+    // 2. Let lowercase token be a copy of token, in ASCII lowercase.
+    const lowercaseToken = token.toLowerCase();
+
+    // 3. If lowercase token is present in supported tokens, return true. // 4. Return false.
+    return tokenSet.contains(lowercaseToken);
   }
 
   /**
@@ -238,13 +270,13 @@ export interface DOMTokenList extends Iterable<string> {}
 /**
  * @throws {DOMException}
  */
-export function checkToken(token: string): void {
+function checkToken(token: string): void {
   if (token === "") {
     throw new DOMException("<message>", DOMExceptionName.SyntaxError);
   }
 
   // If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException.
   if (reAsciiWhitespace.test(token)) {
-    new DOMException("<message>", DOMExceptionName.InvalidCharacterError);
+    throw new DOMException("<message>", DOMExceptionName.InvalidCharacterError);
   }
 }
