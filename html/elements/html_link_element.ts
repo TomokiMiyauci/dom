@@ -1,6 +1,9 @@
 import type { IHTMLLinkElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
+import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { reflect } from "../infrastructure.ts";
+import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
 @LinkStyle
 export class HTMLLinkElement extends HTMLElement implements IHTMLLinkElement {
@@ -84,8 +87,14 @@ export class HTMLLinkElement extends HTMLElement implements IHTMLLinkElement {
     throw new Error("rel#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/semantics.html#dom-link-rellist
+   */
+  @SameObject
+  @PutForwards("value")
   get relList(): DOMTokenList {
-    throw new Error("relList");
+    // reflect the rel content attribute.
+    return reflect(this, DOMTokenList, "rel");
   }
 
   get rev(): string {
@@ -95,8 +104,14 @@ export class HTMLLinkElement extends HTMLElement implements IHTMLLinkElement {
     throw new Error("rev#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/semantics.html#dom-link-sizes
+   */
+  @SameObject
+  @PutForwards("value")
   get sizes(): DOMTokenList {
-    throw new Error("sizes");
+    // reflect the respective content attributes of the same name.
+    return reflect(this, DOMTokenList, "sizes");
   }
 
   get target(): string {

@@ -1,6 +1,9 @@
 import type { IHTMLAreaElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLHyperlinkElementUtils } from "../html_hyperlink_element_utils.ts";
+import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { reflect } from "../infrastructure.ts";
+import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
 @HTMLHyperlinkElementUtils
 export class HTMLAreaElement extends HTMLElement implements IHTMLAreaElement {
@@ -60,8 +63,14 @@ export class HTMLAreaElement extends HTMLElement implements IHTMLAreaElement {
     throw new Error("rel#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/image-maps.html#dom-area-rellist
+   */
+  @SameObject
+  @PutForwards("value")
   get relList(): DOMTokenList {
-    throw new Error("rel#getter");
+    // reflect the rel content attribute.
+    return reflect(this, DOMTokenList, "rel");
   }
 
   get shape(): string {

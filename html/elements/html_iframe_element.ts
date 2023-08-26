@@ -1,5 +1,8 @@
 import type { IHTMLIFrameElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { reflect } from "../infrastructure.ts";
+import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
@@ -84,8 +87,15 @@ export class HTMLIFrameElement extends HTMLElement
   set referrerPolicy(value: ReferrerPolicy) {
     throw new Error("referrerPolicy#setter");
   }
+
+  /**
+   * @see https://html.spec.whatwg.org/multipage/iframe-embed-object.html#dom-iframe-sandbox
+   */
+  @SameObject
+  @PutForwards("value")
   get sandbox(): DOMTokenList {
-    throw new Error("sandbox");
+    //  reflect the respective content attributes of the same name.
+    return reflect(this, DOMTokenList, "sandbox");
   }
 
   get scrolling(): string {

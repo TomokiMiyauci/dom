@@ -1,5 +1,8 @@
 import type { IHTMLOutputElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { reflect } from "../infrastructure.ts";
+import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
 export class HTMLOutputElement extends HTMLElement
   implements IHTMLOutputElement {
@@ -15,8 +18,14 @@ export class HTMLOutputElement extends HTMLElement
     throw new Error("form#getter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/form-elements.html#dom-output-htmlfor
+   */
+  @SameObject
+  @PutForwards("value")
   get htmlFor(): DOMTokenList {
-    throw new Error("htmlFor#getter");
+    // reflect the for content attribute.
+    return reflect(this, DOMTokenList, "for");
   }
 
   get labels(): NodeListOf<HTMLLabelElement> {
