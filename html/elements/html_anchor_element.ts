@@ -1,6 +1,9 @@
 import type { IHTMLAnchorElement } from "../../interface.d.ts";
 import { HTMLHyperlinkElementUtils } from "../html_hyperlink_element_utils.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { reflect } from "../infrastructure.ts";
+import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
 @HTMLHyperlinkElementUtils
 export class HTMLAnchorElement extends HTMLElement
@@ -69,8 +72,14 @@ export class HTMLAnchorElement extends HTMLElement
     throw new Error("rel#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html#dom-a-rellist
+   */
+  @SameObject
+  @PutForwards("value")
   get relList(): DOMTokenList {
-    throw new Error("relList#getter");
+    // reflect the rel content attribute.
+    return reflect(this, DOMTokenList, "rel");
   }
 
   get rev(): string {

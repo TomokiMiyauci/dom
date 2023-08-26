@@ -28,7 +28,7 @@ import { HTMLFrameElement } from "./elements/html_frame_element.ts";
 import { HTMLFrameSetElement } from "./elements/html_frame_set_element.ts";
 import { HTMLHeadingElement } from "./elements/html_heading_element.ts";
 import { HTMLHRElement } from "./elements/html_hr_element.ts";
-import { HTMLIFrameElement } from "./elements/html_li_frame_element.ts";
+import { HTMLIFrameElement } from "./elements/html_iframe_element.ts";
 import { HTMLImageElement } from "./elements/html_image_element.ts";
 import { HTMLInputElement } from "./elements/html_input_element.ts";
 import { HTMLLabelElement } from "./elements/html_label_element.ts";
