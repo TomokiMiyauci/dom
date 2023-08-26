@@ -3,8 +3,6 @@ import { escape } from "https://deno.land/std@0.190.0/regexp/mod.ts";
 import { toFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
 import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
 import { run } from "./wpt-runner.ts";
-import { describe, it } from "../_dev_deps.ts";
-import type { TestReport } from "./types.ts";
 import pass from "./pass.json" assert { type: "json" };
 
 const testList = await Deno.readTextFile(
@@ -18,9 +16,7 @@ const passMap = new Map(
 );
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));
-
 const include = new RegExp(testList.map(escape).join("|"));
-
 const entry = walk(wptRootURL, {
   includeDirs: false,
   match: [include],
@@ -28,39 +24,28 @@ const entry = walk(wptRootURL, {
 
 const cache = new Map();
 
-for await (const { path } of entry) {
-  const url = toFileUrl(path);
+Deno.test("wpt testing", async (t) => {
+  for await (const { path } of entry) {
+    const url = toFileUrl(path);
 
-  const result = await run(url, wptRootURL, cache).catch((e: string) => {
-    const test: TestReport = {
-      title: "unknown",
-      description: "unknown",
-      isSuccess: false,
-      message: e,
-      stack: "",
-    };
+    await t.step({
+      name: url.href,
+      fn: async (t) => {
+        const result = await run(url, wptRootURL, cache);
 
-    return [test];
-  });
+        // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
-  describe(url.href, () => {
-    for (const test of result) {
-      if (test.isSuccess) {
-        it(test.description, () => {});
-        continue;
-      }
+        await t.step(result[0]!.title, async (t) => {
+          for (const test of result) {
+            await t.step(test.description, () => {
+              if (test.isSuccess) return;
 
-      if (
-        (passMap.has(test.title) &&
-          passMap.get(test.title)!.has(test.description))
-      ) {
-        it(test.description, { ignore: true }, () => {});
-        continue;
-      }
-
-      it(test.description, () => {
-        throw new Error(test.message || test.stack);
-      });
-    }
-  });
-}
+              throw new Error(test.message, { cause: test.stack });
+            });
+          }
+        });
+      },
+    });
+  }
+});

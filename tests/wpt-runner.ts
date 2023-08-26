@@ -38,8 +38,6 @@ export async function run(
   const worker = new Worker(url, { type: "module" });
   const message: Message = { source, scripts, title };
 
-  worker.postMessage(message);
-
   return new Promise<TestReport[]>((resolve, reject) => {
     worker.addEventListener("error", (event) => {
       event.preventDefault();
@@ -53,6 +51,9 @@ export async function run(
         worker.terminate();
         resolve(data);
       },
+      { once: true },
     );
+
+    worker.postMessage(message);
   });
 }
