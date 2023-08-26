@@ -56,7 +56,7 @@
   // "dom/nodes/Element-childElementCount-nochild.html",
   // "dom/nodes/Element-childElementCount.html",
   // "dom/nodes/Element-children.html",
-  // "dom/nodes/Element-classlist.html",
+  "dom/nodes/Element-classlist.html",
   // "dom/nodes/Element-closest.html",
   // "dom/nodes/Element-firstElementChild-namespace.html",
   // "dom/nodes/Element-firstElementChild.html",
@@ -114,7 +114,7 @@
   // "dom/nodes/getElementsByClassName-32.html",
   "dom/nodes/getElementsByClassName-empty-set.html",
   "dom/nodes/getElementsByClassName-whitespace-class-names.html",
-  // "dom/nodes/getElementsByClassNameFrame.htm",
+  "dom/nodes/getElementsByClassNameFrame.htm",
   // "dom/nodes/insert-adjacent.html",
   // "dom/nodes/MutationObserver-attributes.html",
   // "dom/nodes/MutationObserver-callback-arguments.html",
@@ -130,7 +130,7 @@
   // "dom/nodes/Node-appendChild.html",
   // "dom/nodes/Node-baseURI.html",
   "dom/nodes/Node-childNodes.html",
-  // "dom/nodes/Node-cloneNode-document-with-doctype.html",
+  "dom/nodes/Node-cloneNode-document-with-doctype.html",
   // "dom/nodes/Node-cloneNode-external-stylesheet-no-bc.sub.html",
   // "dom/nodes/Node-cloneNode-on-inactive-document-crash.html",
   // "dom/nodes/Node-cloneNode-svg.html",
@@ -190,8 +190,12 @@
   "dom/nodes/Text-constructor.html",
   // "dom/nodes/Text-splitText.html",
   // "dom/nodes/Text-wholeText.html",
+  "dom/lists/DOMTokenList-coverage-for-attributes.html",
+  "dom/lists/DOMTokenList-iterable.html",
+  "dom/lists/DOMTokenList-iteration.html",
   "dom/lists/DOMTokenList-value.html",
-  "dom/lists/DOMTokenList-stringifier.html"
+  "dom/lists/DOMTokenList-stringifier.html",
   // webidl
-  // "webidl/ecmascript-binding/legacy-platform-object/GetOwnProperty.html"
+  "webidl/ecmascript-binding/legacy-platform-object/GetOwnProperty.html",
+  "webidl/ecmascript-binding/legacy-platform-object/OwnPropertyKeys.html"
 ]
