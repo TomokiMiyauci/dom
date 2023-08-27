@@ -112,3 +112,4 @@ export type ISVGGraphicsElement = SVGGraphicsElement;
 export type ISVGAElement = SVGAElement;
 export type ISVGTests = SVGTests;
 export type ISVGURIReference = SVGURIReference;
+export type ICSSStyleDeclaration = CSSStyleDeclaration;
