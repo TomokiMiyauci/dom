@@ -10,6 +10,36 @@
       {
         "name": "createHTMLDocument(): URL parsing",
         "reason": "HTMLAnchorElement#href getter is not supported"
+      },
+      {
+        "name": "createHTMLDocument test 2: undefined,undefined,\"\"",
+        "reason": "DOMString with undefined is not supported"
+      }
+    ],
+    "dom/nodes/Text-constructor.html": [
+      {
+        "name": "new Text() should get the correct ownerDocument across globals",
+        "reason": "Not supported onload event handler attribute"
+      },
+      {
+        "name": "new Text(): prototype chain",
+        "reason": "Prototype chain is wrong"
+      }
+    ],
+    "dom/nodes/Comment-constructor.html": [
+      {
+        "name": "new Comment() should get the correct ownerDocument across globals",
+        "reason": "Not supported onload event handler attribute"
+      },
+      {
+        "name": "new Comment(): prototype chain",
+        "reason": "Prototype chain is wrong"
+      }
+    ],
+    "dom/nodes/Node-cloneNode.html": [
+      {
+        "name": "Node with custom prototype",
+        "reason": "Prototype chain is wrong"
       }
     ]
   }

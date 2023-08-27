@@ -308,7 +308,8 @@ export class Document extends Node implements IDocument {
    *
    * @see https://dom.spec.whatwg.org/#dom-document-createcdatasection
    */
-  createCDATASection(data: string): CDATASection {
+  @convert
+  createCDATASection(@DOMString data: string): CDATASection {
     // 1. If this is an HTML document, then throw a "NotSupportedError" DOMException.
     if (isHTMLDocument(this)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
@@ -329,7 +330,9 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createcomment
    */
-  createComment(data: string): Comment {
+
+  @convert
+  createComment(@DOMString data: string): Comment {
     // return a new Comment node whose data is data and node document is this.
     return Comment[$create]({ data, nodeDocument: this });
   }
@@ -528,9 +531,10 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createprocessinginstruction
    */
+  @convert
   createProcessingInstruction(
-    target: string,
-    data: string,
+    @DOMString target: string,
+    @DOMString data: string,
   ): ProcessingInstruction {
     // 1. If target does not match the Name production, then throw an "InvalidCharacterError" DOMException.
     if (!ReName.test(target)) {
@@ -556,7 +560,8 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createtextnode
    */
-  createTextNode(data: string): Text {
+  @convert
+  createTextNode(@DOMString data: string): Text {
     // return a new Text node whose data is data and node document is this.
     return Text[$create]({ data, nodeDocument: this });
   }

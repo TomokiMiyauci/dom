@@ -2,7 +2,7 @@ import { Node } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
 import { type Document } from "./document.ts";
-import { type ICharacterData, INode } from "../interface.d.ts";
+import { type ICharacterData } from "../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_tree.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
