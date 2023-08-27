@@ -55,6 +55,7 @@ import { Element_Fullscreen } from "../fullscreen/element.ts";
 import { Element_CSSShadowParts } from "../css/css_shadow_parts/element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { PutForwards, SameObject } from "../webidl/extended_attribute.ts";
+import { convert, DOMString } from "../webidl/types.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -427,8 +428,9 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-getelementsbyclassname
    */
+  @convert
   getElementsByClassName(
-    classNames: string,
+    @DOMString classNames: string,
   ): HTMLCollectionOf<Element> {
     // return the list of elements with class names classNames for this.
     return getElementsByClassName(classNames, this);

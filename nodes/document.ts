@@ -572,7 +572,10 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-getelementsbyclassname
    */
-  getElementsByClassName(classNames: string): HTMLCollectionOf<Element> {
+  @convert
+  getElementsByClassName(
+    @DOMString classNames: string,
+  ): HTMLCollectionOf<Element> {
     // return the list of elements with class names classNames for this.
     return getElementsByClassName(classNames, this);
   }
