@@ -23,7 +23,7 @@ import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
-import { find, html } from "../deps.ts";
+import { find, html, xmlValidator } from "../deps.ts";
 import {
   $create,
   $encoding,
@@ -50,6 +50,7 @@ import { Document_WebAnimation } from "../web_animations/document.ts";
 import { Document_SVG } from "../svg/document.ts";
 import { ReName } from "../xml/document.ts";
 import { getDocumentElement } from "./document_tree.ts";
+import { convert, DOMString } from "../webidl/types.ts";
 
 export interface Encoding {
   name: string;
@@ -263,7 +264,23 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  createAttribute(localName: string): Attr {
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createattribute
+   */
+  @convert
+  createAttribute(@DOMString localName: string): Attr {
+    // 1. If localName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException.
+    if (!xmlValidator.name(localName)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidCharacterError,
+      );
+    }
+
+    // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
+    if (isHTMLDocument(this)) localName = localName.toLowerCase();
+
+    // 3. Return a new attribute whose local name is localName and node document is this.
     return new Attr({ localName, nodeDocument: this });
   }
 
