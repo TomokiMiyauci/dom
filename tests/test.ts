@@ -2,7 +2,7 @@ import { walk } from "https://deno.land/std@0.190.0/fs/walk.ts";
 import { escape } from "https://deno.land/std@0.190.0/regexp/mod.ts";
 import { toFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
 import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
-import { run } from "./wpt-runner.ts";
+import { extractMetadata, runTest } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
 
 const testList = await Deno.readTextFile(
@@ -24,28 +24,28 @@ const entry = walk(wptRootURL, {
 
 const cache = new Map();
 
-Deno.test("wpt testing", async (t) => {
+Deno.test("wpt", async (t) => {
   for await (const { path } of entry) {
     const url = toFileUrl(path);
 
-    await t.step({
-      name: url.href,
-      fn: async (t) => {
-        const result = await run(url, wptRootURL, cache);
+    await t.step(url.href, async (t) => {
+      const metadata = await extractMetadata(url, wptRootURL, cache);
 
-        // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
-        await new Promise((resolve) => setTimeout(resolve, 0));
+      await t.step(metadata.title, async (t) => {
+        const reports = runTest(metadata);
 
-        await t.step(result[0]!.title, async (t) => {
-          for (const test of result) {
-            await t.step(test.description, () => {
-              if (test.isSuccess) return;
+        for await (const report of reports) {
+          // // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
+          await new Promise((resolve) => setTimeout(resolve, 0));
 
-              throw new Error(test.message, { cause: test.stack });
-            });
-          }
-        });
-      },
+          await t.step({
+            name: report.name,
+            fn: () => {
+              if (report.status) throw new Error(report.message);
+            },
+          });
+        }
+      });
     });
   }
 });
