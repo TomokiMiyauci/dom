@@ -1,7 +1,7 @@
 import type { IHTMLLinkElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
-import { DOMTokenList } from "../../nodes/dom_token_list.ts";
+import { DOMTokenList } from "../../sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 

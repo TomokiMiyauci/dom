@@ -1,4 +1,4 @@
-import { DOMTokenList } from "../nodes/dom_token_list.ts";
+import { DOMTokenList } from "../sets/dom_token_list.ts";
 import { Element } from "../nodes/element.ts";
 
 export function reflect<T extends Element>(

@@ -45,7 +45,7 @@ import { Animatable } from "../web_animations/animatable.ts";
 import { InnerHTML } from "../domparsing/inner_html.ts";
 import { ChildNode } from "./child_node.ts";
 import { Slottable } from "./slottable.ts";
-import { DOMTokenList } from "./dom_token_list.ts";
+import { DOMTokenList } from "../sets/dom_token_list.ts";
 import { Element_CSSOMView } from "../cssom_view/element.ts";
 import { Element_CSSTypedOM } from "../css/css_typed_om/element.ts";
 import { Element_DomParsing } from "../domparsing/element.ts";

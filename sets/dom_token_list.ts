@@ -6,9 +6,9 @@ import {
   type Element,
   getAttributeValue,
   setAttributeValue,
-} from "./element.ts";
+} from "../nodes/element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { $attributeChangeSteps, $attributeList } from "./internal.ts";
+import { $attributeChangeSteps, $attributeList } from "../nodes/internal.ts";
 import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
 import { reAsciiWhitespace } from "../infra/code_point.ts";
 import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
