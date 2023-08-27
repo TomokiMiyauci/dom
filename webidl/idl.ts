@@ -48,3 +48,21 @@ export type Getter<
   T extends "index" | "name",
 > = T extends ["name"] ? { [WebIDL.namedPropertyGetter](name: string): unknown }
   : { [WebIDL.indexGetter](index: number): unknown };
+
+export type PrimitiveType = boolean | number;
+
+/**
+ * @see https://webidl.spec.whatwg.org/#idl-constants
+ */
+export function constant<T extends string>(
+  target: { prototype: object } & { [k in T]: PrimitiveType },
+  prop: T,
+): void {
+  const value = target[prop];
+
+  Object.defineProperty(target.prototype, prop, { value });
+}
+
+export type Const<I extends string, T extends PrimitiveType> = {
+  readonly [k in I]: T;
+};
