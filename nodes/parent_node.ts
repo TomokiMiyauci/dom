@@ -2,7 +2,7 @@ import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { Text } from "./text.ts";
-import { isElement, isText, UnImplemented } from "./utils.ts";
+import { isElement, UnImplemented } from "./utils.ts";
 import { type Element } from "./element.ts";
 import type { IParentNode } from "../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
@@ -18,7 +18,8 @@ import {
   map,
 } from "../deps.ts";
 import { $create, $nodeDocument } from "./internal.ts";
-import { appendNode } from "./mutation.ts";
+import { appendNode, preInsertNode } from "./mutation.ts";
+import { getFirstChild } from "../trees/tree.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
   Ctor: T,
@@ -57,13 +58,25 @@ export function ParentNode<T extends Constructor<Node>>(
       return last(ifilter(this._children, isElement)) ?? null;
     }
 
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-prepend
+     */
     prepend(...nodes: (string | Node)[]): void {
-      throw new UnImplemented("prepend");
-    }
-
-    append(...nodes: (string | Node)[]): void {
+      // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
       const node = convertNodesToNode(nodes, this[$nodeDocument]);
 
+      // 2. Pre-insert node into this before this’s first child.
+      preInsertNode(node, this, getFirstChild(this));
+    }
+
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-append
+     */
+    append(...nodes: (string | Node)[]): void {
+      // Let node be the result of converting nodes into a node given nodes and this’s node document.
+      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+
+      // Append node to this.
       appendNode(node, this);
     }
 
