@@ -1,9 +1,10 @@
 import { type Node } from "./node.ts";
 import { UnImplemented } from "./utils.ts";
 import type { IChildNode } from "../interface.d.ts";
-import { Constructor } from "../deps.ts";
+import { type Constructor } from "../deps.ts";
+import { removeNode } from "./mutation.ts";
 
-export function ChildNode<T extends Constructor>(Ctor: T) {
+export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class ChildNode extends Ctor implements ChildNode {
     after(...nodes: (string | Node)[]): void {
       throw new UnImplemented("after");
@@ -17,8 +18,15 @@ export function ChildNode<T extends Constructor>(Ctor: T) {
       throw new UnImplemented("replaceWith");
     }
 
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-childnode-remove
+     */
     remove(): void {
-      throw new UnImplemented("remove");
+      // If this’s parent is null, then return.
+      if (!this._parent) return;
+
+      // Remove this.
+      removeNode(this);
     }
   }
 
