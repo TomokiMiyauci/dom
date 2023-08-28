@@ -9,6 +9,7 @@ import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../xpath/x_path_evaluator_base.ts";
 import {
   isDocument,
+  isDocumentFragment,
   isDocumentType,
   isShadowRoot,
   UnImplemented,
@@ -27,6 +28,7 @@ import { find, html, xmlValidator } from "../deps.ts";
 import {
   $create,
   $encoding,
+  $host,
   $implementation,
   $mode,
   $nodeDocument,
@@ -51,6 +53,7 @@ import { Document_SVG } from "../svg/document.ts";
 import { ReName } from "../xml/document.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { convert, DOMString } from "../webidl/types.ts";
+import { adoptNode } from "./mutation.ts";
 
 export interface Encoding {
   name: string;
@@ -189,10 +192,6 @@ export class Document extends Node implements IDocument {
     return this[$encoding].name;
   }
 
-  set charset(value: string) {
-    throw new UnImplemented();
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-compatmode
    */
@@ -260,8 +259,31 @@ export class Document extends Node implements IDocument {
     return null;
   }
 
-  adoptNode<T extends globalThis.Node>(node: T): T {
-    throw new UnImplemented();
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-adoptnode
+   */
+  adoptNode<T>(node: T & Node): T {
+    // 1. If node is a document, then throw a "NotSupportedError" DOMException.
+    if (isDocument(node)) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 2. If node is a shadow root, then throw a "HierarchyRequestError" DOMException.
+    if (isShadowRoot(node)) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.HierarchyRequestError,
+      );
+    }
+
+    // 3. If node is a DocumentFragment node whose host is non-null, then return.
+    if (isDocumentFragment(node) && node[$host]) return node; // TODO(miyauci): Check return null or not.
+
+    // 4. Adopt node into this.
+    adoptNode(node, this);
+
+    // 5. Return node.
+    return node;
   }
 
   /**
