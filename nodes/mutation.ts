@@ -163,7 +163,7 @@ export function insertNode(
     : getLastChild(parent);
 
   // 7. For each node in nodes, in tree order:
-  for (const node of orderTreeChildren(nodes)) {
+  for (const node of nodes) { // The iteration order of nodes is tree order
     // 1. Adopt node into parent’s node document.
     adoptNode(node, parent[$nodeDocument]);
 
@@ -171,6 +171,10 @@ export function insertNode(
     if (child === null) parent._children.append(node);
     // 3. Otherwise, insert node into parent’s children before child’s index.
     else parent._children.insert(getIndex(child), node);
+    // sync parent
+    node._parent = parent;
+
+    // console.log("size", parent._children.size);
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -392,6 +396,8 @@ export function removeNode(
 
   // 11. Remove node from its parent’s children.
   parent._children.remove((target) => target === node);
+  // sync parent
+  node._parent = null;
 
   // 12. If node is assigned, then run assign slottables for node’s assigned slot.
 
