@@ -86,16 +86,14 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     publicId: string,
     systemId: string,
   ): void {
-    if (!document.childNodes.length) {
-      const documentType = new DocumentType({
-        name,
-        publicId,
-        systemId,
-        nodeDocument: document,
-      });
+    const documentType = new DocumentType({
+      name,
+      publicId,
+      systemId,
+      nodeDocument: document,
+    });
 
-      document.appendChild(documentType);
-    }
+    document.appendChild(documentType);
   }
 
   setDocumentMode(document: Document, mode: html.DOCUMENT_MODE): void {

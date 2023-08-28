@@ -67,10 +67,10 @@ export function Document_HTML<T extends Constructor<Node>>(
     _currentDocumentReadiness: DocumentReadyState = "complete";
 
     get location(): Location {
-      throw new Error();
+      throw new Error("location#getter");
     }
     set location(href: Location) {
-      throw new Error();
+      throw new Error("location#setter");
     }
 
     get domain(): string {

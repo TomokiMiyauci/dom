@@ -584,7 +584,8 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this[$namespace] === Namespace.HTML && this[$nodeDocument]._type !== "xml"
+      this[$namespace] === Namespace.HTML &&
+      isHTMLDocument(this[$nodeDocument])
     ) qualifiedName = qualifiedName.toLowerCase();
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.

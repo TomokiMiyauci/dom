@@ -5,7 +5,7 @@ interface IDocument_SVG extends Pick<Document, "rootElement"> {}
 export function Document_SVG<T extends Constructor>(Ctor: T) {
   abstract class Mixin extends Ctor implements IDocument_SVG {
     get rootElement(): SVGSVGElement | null {
-      throw new Error();
+      throw new Error("rootElement#getter");
     }
   }
 

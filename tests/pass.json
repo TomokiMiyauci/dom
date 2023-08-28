@@ -41,6 +41,32 @@
         "name": "Node with custom prototype",
         "reason": "Prototype chain is wrong"
       }
+    ],
+    "dom/nodes/Node-appendChild.html": [
+      {
+        "name": "Appending null to a text node",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Appending null to a comment",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Appending null to a doctype",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Appending a document",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Adopting an orphan",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Adopting a non-orphan",
+        "reason": "globalThis#frames is not supported"
+      }
     ]
   }
 }
