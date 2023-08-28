@@ -153,7 +153,7 @@
   // "dom/nodes/Node-parentNode-iframe.html",
   // "dom/nodes/Node-parentNode.html",
   // "dom/nodes/Node-properties.html",
-  // "dom/nodes/Node-removeChild.html",
+  "dom/nodes/Node-removeChild.html",
   // "dom/nodes/Node-replaceChild.html",
   // "dom/nodes/Node-textContent.html",
   // "dom/nodes/NodeList-Iterable.html",

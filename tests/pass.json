@@ -67,6 +67,48 @@
         "name": "Adopting a non-orphan",
         "reason": "globalThis#frames is not supported"
       }
+    ],
+    "dom/nodes/Node-removeChild.html": [
+      {
+        "name": "Passing a detached element from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a non-detached element from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Calling removeChild on a element from a frame document with no children should throw NOT_FOUND_ERR.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a detached text from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a non-detached text from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Calling removeChild on a text from a frame document with no children should throw NOT_FOUND_ERR.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a detached comment from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a non-detached comment from a frame document to removeChild should not affect it.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Calling removeChild on a comment from a frame document with no children should throw NOT_FOUND_ERR.",
+        "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "Passing a value that is not a Node reference to removeChild should throw TypeError.",
+        "reason": "compiler error"
+      }
     ]
   }
 }
