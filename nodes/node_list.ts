@@ -1,45 +1,54 @@
 import { Node } from "./node.ts";
-import { first, islice, len } from "../deps.ts";
+import { at, ifilter, len, range } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
-import { Collection, CollectionOptions } from "./collection.ts";
-import { Indexer } from "../utils.ts";
+import { CollectionOptions } from "./collection.ts";
 import { Iterable, iterable } from "../webidl/iterable.ts";
+import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
+import { Getter, getter, WebIDL } from "../webidl/idl.ts";
+import { orderTree } from "../trees/tree.ts";
 
-function getElementByIndex(
-  this: NodeList,
-  index: number,
-): Node | undefined {
-  return this.getItem(index);
-}
-
-function hasElement(
-  this: NodeList,
-  index: number,
-): boolean {
-  return 0 <= index && index < this.length;
-}
-
-@Indexer({ get: getElementByIndex, has: hasElement })
 @iterable
-export class NodeList extends Collection<Node> implements INodeList {
-  [k: number]: Node;
+abstract class CollectiveNodeList extends LegacyPlatformObject
+  implements INodeList {
+  protected abstract represent(): globalThis.Iterable<Node>;
 
-  constructor(options: CollectionOptions<Node>) {
-    super(options);
+  [WebIDL.supportedIndexes](): Set<number> {
+    const size = len(this.represent());
+
+    if (!size) return new Set();
+    return new Set(range(0, size));
   }
 
-  protected getItem(index: number): Node | undefined {
-    if (!Number.isInteger(index)) return undefined;
-
-    return first(islice(this.represent(), index, index + 1));
-  }
+  [WebIDL.supportedNamedProperties]: undefined;
 
   get length(): number {
     return len(this.represent());
   }
 
+  @getter("index")
   item(index: number): Node | null {
-    return this.getItem(index) ?? null;
+    return at(this.represent(), index) ?? null;
+  }
+}
+
+interface CollectiveNodeList extends Getter<"index", Node>, Iterable<Node> {}
+
+export class NodeList extends CollectiveNodeList implements INodeList {
+  private root: Node;
+  private filter: (node: Node, root: Node) => boolean;
+
+  constructor(options: CollectionOptions<Node>) {
+    super();
+
+    this.root = options.root;
+    this.filter = options.filter;
+  }
+
+  protected override represent(): globalThis.Iterable<Node> {
+    return ifilter(
+      orderTree(this.root),
+      (node) => this.filter(node, this.root),
+    );
   }
 }
 
@@ -56,19 +65,16 @@ export interface NodeListOf<T extends Node> extends NodeList {
   [Symbol.iterator](): IterableIterator<T>;
 }
 
-// deno-lint-ignore no-empty-interface
-export interface NodeList extends Iterable<Node> {}
-
-export class StaticNodeList<T extends Node> extends NodeList
+export class StaticNodeList<T extends Node> extends CollectiveNodeList
   implements INodeList {
-  private list: Iterable<T>;
-  constructor(root: Node, list: Iterable<T>) {
-    super({ root, filter: (_: Node): _ is Node => true });
+  private list: T[];
+  constructor(iterable: Iterable<T>) {
+    super();
 
-    this.list = list;
+    this.list = [...iterable];
   }
 
-  protected override represent(): Iterable<T> {
+  protected override represent(): T[] {
     return this.list;
   }
 }

@@ -101,7 +101,6 @@ export function ParentNode<T extends abstract new (...args: any[]) => Node>(
       selectors: string,
     ): NodeListOf<Element> {
       return new StaticNodeList(
-        this,
         matchScopedSelectorsString(selectors, this),
       ) as never as NodeListOf<Element>;
     }

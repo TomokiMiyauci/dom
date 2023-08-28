@@ -38,11 +38,12 @@ import { OrderedSet } from "../infra/data_structures/set.ts";
 import { matchASCIICaseInsensitive } from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 import type { ParentNode } from "./parent_node.ts";
-import { SameObject } from "../webidl/extended_attribute.ts";
+import { Exposed, SameObject } from "../webidl/extended_attribute.ts";
 import { type Const, constant } from "../webidl/idl.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./attr.ts";
 import { type Element } from "./element.ts";
+import { DOMString } from "../webidl/types.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -72,6 +73,7 @@ export interface NodeStates {
   nodeDocument: Document;
 }
 
+@Exposed(Window)
 export abstract class Node extends EventTarget implements INode {
   @constant
   static DOCUMENT_POSITION_DISCONNECTED =
@@ -188,8 +190,8 @@ export abstract class Node extends EventTarget implements INode {
   get childNodes(): NodeListOf<Node & ChildNode> {
     return new NodeList({
       root: this,
-      filter: (node): node is Node => {
-        return this._children.contains(node);
+      filter: (node, root): boolean => {
+        return root._children.contains(node);
       },
     }) as any as NodeListOf<
       Node & ChildNode
