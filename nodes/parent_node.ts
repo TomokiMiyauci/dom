@@ -2,7 +2,7 @@ import { type Node } from "./node.ts";
 import { type Document } from "./document.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { Text } from "./text.ts";
-import { isElement, UnImplemented } from "./utils.ts";
+import { isElement } from "./utils.ts";
 import { type Element } from "./element.ts";
 import type { IParentNode } from "../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
@@ -18,7 +18,12 @@ import {
   map,
 } from "../deps.ts";
 import { $create, $nodeDocument } from "./internal.ts";
-import { appendNode, preInsertNode } from "./mutation.ts";
+import {
+  appendNode,
+  ensurePreInsertionValidity,
+  preInsertNode,
+  replaceAllNode,
+} from "./mutation.ts";
 import { getFirstChild } from "../trees/tree.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
@@ -80,8 +85,18 @@ export function ParentNode<T extends Constructor<Node>>(
       appendNode(node, this);
     }
 
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-parentnode-replacechildren
+     */
     replaceChildren(...nodes: (string | Node)[]): void {
-      throw new UnImplemented("replaceChildren");
+      // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
+      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+
+      // 2. Ensure pre-insertion validity of node into this before null.
+      ensurePreInsertionValidity(node, this, null);
+
+      // 3. Replace all with node within this.
+      replaceAllNode(node, this);
     }
 
     /**
