@@ -109,6 +109,28 @@
         "name": "Passing a value that is not a Node reference to removeChild should throw TypeError.",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/Node-insertBefore.html": [
+      {
+        "name": "Calling insertBefore with second argument missing, or other than Node, null, or undefined, must throw TypeError.",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Calling insertBefore with a non-Node first argument on a leaf node DocumentType must throw TypeError.",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Calling insertBefore with a non-Node first argument on a leaf node Text must throw TypeError.",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Calling insertBefore with a non-Node first argument on a leaf node Comment must throw TypeError.",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Calling insertBefore with a non-Node first argument on a leaf node ProcessingInstruction must throw TypeError.",
+        "reason": "compiler error"
+      }
     ]
   }
 }

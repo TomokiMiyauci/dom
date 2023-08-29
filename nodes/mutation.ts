@@ -7,7 +7,6 @@ import {
   isShadowHost,
   isShadowRoot,
   isText,
-  UnImplemented,
 } from "./utils.ts";
 import { type Node, NodeType } from "./node.ts";
 import { type Document } from "./document.ts";
@@ -15,9 +14,11 @@ import { $nodeDocument, $shadowRoot, $slotAssignment } from "./internal.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import {
+  getFollows,
   getIndex,
   getLastChild,
   getNextSibling,
+  getPrecedings,
   getPreviousSibling,
   getRoot,
   hasParent,
@@ -26,7 +27,7 @@ import {
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
-import { ifilter, some, takewhile } from "../deps.ts";
+import { some, takewhile } from "../deps.ts";
 import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
 
 /**
@@ -259,34 +260,52 @@ export function ensurePreInsertionValidity(
 
       // If node has more than one element child or has a Text node child.
       if (elementsCount > 1 || some(node._children, isText)) {
-        throw new DOMException();
+        throw new DOMException(
+          "<message>",
+          DOMExceptionName.HierarchyRequestError,
+        );
       }
 
       // Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
       if (
-        elementsCount === 1 &&
-        ([...(ifilter(ifilter(parent._children, isElement), isNotEqualsChild))]
-          .length) // TODO child is non-null and a doctype is following child.
-      ) throw new UnImplemented();
+        elementsCount === 1 && (
+          some(parent._children, isElement) ||
+          (child && isDocumentType(child)) ||
+          (child && some(getFollows(child), isDocumentType))
+        )
+      ) {
+        throw new DOMException(
+          "<message>",
+          DOMExceptionName.HierarchyRequestError,
+        );
+      }
       // Element
     } else if (isElement(node)) {
       // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
-      // TODO
-      if (some(parent._children, isElement) && child && isDocumentType(child)) {
-        throw new UnImplemented("ensurePreInsertionValidity");
+      if (
+        some(parent._children, isElement) ||
+        (child && isDocumentType(child)) ||
+        (child && some(getFollows(child), isDocumentType))
+      ) {
+        throw new DOMException(
+          "<message>",
+          DOMExceptionName.HierarchyRequestError,
+        );
       }
     } // DocumentType
     else if (isDocumentType(node)) {
       // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
-      // TODO
-      if (some(parent._children, isDocumentType) && child !== null) {
-        throw new UnImplemented("ensurePreInsertionValidity");
+      if (
+        some(parent._children, isDocumentType) ||
+        (child && some(getPrecedings(child), isElement)) ||
+        (!child && some(parent._children, isElement))
+      ) {
+        throw new DOMException(
+          "<message>",
+          DOMExceptionName.HierarchyRequestError,
+        );
       }
     }
-  }
-
-  function isNotEqualsChild(other: unknown): boolean {
-    return child !== other;
   }
 }
 

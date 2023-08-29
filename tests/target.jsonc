@@ -139,7 +139,7 @@
   // "dom/nodes/Node-compareDocumentPosition.html",
   "dom/nodes/Node-constants.html",
   // "dom/nodes/Node-contains.html",
-  // "dom/nodes/Node-insertBefore.html",
+  "dom/nodes/Node-insertBefore.html",
   // "dom/nodes/Node-isConnected-shadow-dom.html",
   // "dom/nodes/Node-isConnected.html",
   "dom/nodes/Node-isEqualNode.html",
