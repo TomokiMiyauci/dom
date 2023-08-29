@@ -12,6 +12,7 @@ import {
   Constructor,
   first,
   ifilter,
+  isObject,
   isSingle,
   last,
   len,
@@ -25,6 +26,7 @@ import {
   replaceAllNode,
 } from "./mutation.ts";
 import { getFirstChild } from "../trees/tree.ts";
+import { convert, DOMString } from "../webidl/types.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
   Ctor: T,
@@ -66,7 +68,8 @@ export function ParentNode<T extends Constructor<Node>>(
     /**
      * @see https://dom.spec.whatwg.org/#dom-parentnode-prepend
      */
-    prepend(...nodes: (string | Node)[]): void {
+    @convert
+    prepend(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
       const node = convertNodesToNode(nodes, this[$nodeDocument]);
 

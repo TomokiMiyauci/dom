@@ -1,4 +1,5 @@
 import "npm:reflect-metadata";
+import { convertScalar } from "../infra/string.ts";
 
 export class MetaKey {
   static readonly Convertor = Symbol();
@@ -8,7 +9,7 @@ export function DOMString(
   target: object,
   propertyKey: string | symbol,
   parameterIndex: number,
-) {
+): void {
   const parameters: Convertor[] = Reflect.getMetadata(
     MetaKey.Convertor,
     target,
@@ -23,6 +24,32 @@ export function DOMString(
   );
 }
 
+DOMString.exclude = (
+  predicate: (value: unknown) => boolean,
+): (
+  target: object,
+  propertyKey: string | symbol,
+  parameterIndex: number,
+) => void => {
+  return (target, propertyKey, parameterIndex): void => {
+    const parameters: Convertor[] = Reflect.getMetadata(
+      MetaKey.Convertor,
+      target,
+      propertyKey,
+    ) ?? [];
+    const convert = (value: unknown): unknown => {
+      return predicate(value) ? value : String(value);
+    };
+
+    Reflect.defineMetadata(
+      MetaKey.Convertor,
+      parameters.concat({ index: parameterIndex, convert }),
+      target,
+      propertyKey,
+    );
+  };
+};
+
 export interface Convertor {
   index: number;
 
@@ -33,7 +60,7 @@ export function convert(
   target: object,
   prop: string | symbol,
   // deno-lint-ignore ban-types
-  descriptor: { value?: Function },
+  descriptor: { value?: Function } | { set?: Function },
 ): void {
   const convertors: Convertor[] = Reflect.getOwnMetadata(
     MetaKey.Convertor,
@@ -41,11 +68,15 @@ export function convert(
     prop,
   ) ?? [];
 
-  const method = descriptor.value;
+  const normalized = "value" in descriptor
+    ? { type: "value", value: descriptor.value }
+    : "set" in descriptor
+    ? { type: "set", value: descriptor.set }
+    : undefined;
 
-  if (!method) return;
+  if (!normalized || !normalized.value) return;
 
-  const length = method.length;
+  const length = normalized.value.length;
 
   function reducer(acc: unknown[], convertor: Convertor): unknown[] {
     // rest parameter
@@ -60,7 +91,7 @@ export function convert(
     return applyConvert(acc, convertor);
   }
 
-  const proxy = new Proxy(method, {
+  const proxy = new Proxy(normalized.value, {
     apply: (target, thisArg, argArray) => {
       const converted = convertors.reduce(reducer, argArray);
 
@@ -68,7 +99,7 @@ export function convert(
     },
   });
 
-  descriptor.value = proxy;
+  Object.defineProperty(descriptor, normalized.type, { value: proxy });
 }
 
 function applyConvert(
@@ -83,4 +114,23 @@ function applyConvert(
   }
 
   return array;
+}
+
+export function USVString(
+  target: object,
+  propertyKey: string | symbol,
+  parameterIndex: number,
+) {
+  const parameters: Convertor[] = Reflect.getMetadata(
+    MetaKey.Convertor,
+    target,
+    propertyKey,
+  ) ?? [];
+
+  Reflect.defineMetadata(
+    MetaKey.Convertor,
+    parameters.concat({ index: parameterIndex, convert: convertScalar }),
+    target,
+    propertyKey,
+  );
 }
