@@ -131,6 +131,12 @@
         "name": "Calling insertBefore with a non-Node first argument on a leaf node ProcessingInstruction must throw TypeError.",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/Node-replaceChild.html": [
+      {
+        "name": "Passing null to replaceChild should throw a TypeError.",
+        "reason": "compiler error"
+      }
     ]
   }
 }
