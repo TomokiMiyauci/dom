@@ -21,6 +21,7 @@ import {
   getNextSibling,
   getPreviousSibling,
   getRoot,
+  isInclusiveDescendantOf,
 } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import {
@@ -44,6 +45,7 @@ import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./attr.ts";
 import { type Element } from "./element.ts";
 import { DOMString } from "../webidl/types.ts";
+const inspect = Symbol.for("Deno.customInspect");
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -288,8 +290,14 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented();
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-contains
+   */
   contains(other: Node | null): boolean {
-    throw new UnImplemented("contains");
+    if (!other) return false;
+
+    // return true if other is an inclusive descendant of this; otherwise false (including when other is null).
+    return isInclusiveDescendantOf(other, this);
   }
 
   /**
@@ -357,6 +365,11 @@ export abstract class Node extends EventTarget implements INode {
    */
   get parentElement(): HTMLElement | null {
     return getParentElement(this) as HTMLElement | null; // The specification is `Element`
+  }
+
+  [inspect](): string {
+    return `${this.nodeName}
+  ${[...this._children].map((node) => this[inspect].call(node)).join("")}`;
   }
 }
 

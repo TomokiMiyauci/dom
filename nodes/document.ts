@@ -567,7 +567,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 2. If data contains the string "?>", then throw an "InvalidCharacterError" DOMException.
-    if (data.includes("?")) {
+    if (data.includes("?>")) {
       throw new DOMException("<message>", "InvalidCharacterError");
     }
 
