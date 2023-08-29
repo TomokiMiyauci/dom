@@ -1,0 +1,501 @@
+import {
+  getFollowingSiblings,
+  getFollows,
+  getNextSibling,
+  getPrecedings,
+  getPrecedingSiblings,
+  getPreviousSibling,
+  getRoot,
+  getSiblings,
+  isAncestorOf,
+  isChildOf,
+  isDescendantOf,
+  isInclusiveAncestorOf,
+  isInclusiveDescendantOf,
+  isInclusiveSiblingOf,
+  isSiblingOf,
+  orderTree,
+  TreeNode,
+} from "./tree.ts";
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  describe,
+  it,
+} from "../_dev_deps.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
+
+class Node implements TreeNode {
+  _parent: TreeNode | null = null;
+
+  _children: OrderedSet<TreeNode> = new OrderedSet();
+
+  appendChild(node: TreeNode) {
+    if (this === node) throw new Error();
+
+    this._children.append(node);
+    node._parent = this;
+  }
+}
+
+const root = new Node();
+const parent = new Node();
+const child = new Node();
+const child2 = new Node();
+const child3 = new Node();
+const child4 = new Node();
+const child5 = new Node();
+const grandChild = new Node();
+const grandChild_2 = new Node();
+const grandChild2 = new Node();
+const other = new Node();
+
+root.appendChild(parent);
+parent.appendChild(child);
+parent.appendChild(child2);
+parent.appendChild(child3);
+parent.appendChild(child4);
+parent.appendChild(child5);
+child.appendChild(grandChild);
+child.appendChild(grandChild_2);
+child2.appendChild(grandChild2);
+
+describe("isChildOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [child, parent],
+      [grandChild, child],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isChildOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [child, child],
+      [grandChild, grandChild],
+      [parent, child],
+      [parent, grandChild],
+      [child, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isChildOf(target, of));
+    });
+  });
+});
+
+describe("isDescendantOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [child, parent],
+      [grandChild, parent],
+      [grandChild, child],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isDescendantOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [child, child],
+      [grandChild, grandChild],
+      [parent, child],
+      [parent, grandChild],
+      [child, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isDescendantOf(target, of));
+    });
+  });
+});
+
+describe("isAncestorOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [parent, child],
+      [parent, grandChild],
+      [child, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isAncestorOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [child, child],
+      [grandChild, grandChild],
+      [child, parent],
+      [grandChild, parent],
+      [grandChild, child],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isAncestorOf(target, of));
+    });
+  });
+});
+
+describe("isInclusiveDescendantOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [child, parent],
+      [grandChild, parent],
+      [grandChild, child],
+      [parent, parent],
+      [child, child],
+      [grandChild, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isInclusiveDescendantOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, child],
+      [parent, grandChild],
+      [child, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isInclusiveDescendantOf(target, of));
+    });
+  });
+});
+
+describe("isInclusiveAncestorOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [child, child],
+      [grandChild, grandChild],
+      [parent, child],
+      [parent, grandChild],
+      [child, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isInclusiveAncestorOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [child, parent],
+      [grandChild, parent],
+      [grandChild, child],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isInclusiveAncestorOf(target, of));
+    });
+  });
+});
+
+describe("isSiblingOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [child, child2],
+      [child2, child],
+      [parent, parent],
+      [child, child],
+      [child2, child2],
+      [grandChild, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isSiblingOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, child],
+      [parent, child2],
+      [parent, grandChild],
+      [child, parent],
+      [child, grandChild],
+      [grandChild, parent],
+      [grandChild, child],
+      [grandChild, child2],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isSiblingOf(target, of));
+    });
+  });
+});
+
+describe("isInclusiveSiblingOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [child, child2],
+      [child2, child],
+      [child, child],
+      [child2, child2],
+      [grandChild, grandChild],
+      [parent, parent],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isInclusiveSiblingOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, child],
+      [parent, child2],
+      [parent, grandChild],
+      [child, parent],
+      [child, grandChild],
+      [grandChild, parent],
+      [grandChild, child],
+      [grandChild, child2],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isInclusiveSiblingOf(target, of));
+    });
+  });
+});
+
+describe("getRoot", () => {
+  it("should return root node", () => {
+    const table: Node[] = [root, parent, child, child2, grandChild];
+
+    table.forEach((target) => {
+      assert(getRoot(target) === root);
+    });
+  });
+});
+
+describe("getSiblings", () => {
+  it("should return siblings", () => {
+    const table: [Node, Node[]][] = [
+      [child, [child, child2, child3, child4, child5]],
+      [child2, [child, child2, child3, child4, child5]],
+      [parent, [parent]],
+      [grandChild, [grandChild, grandChild_2]],
+      [root, []],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getSiblings(target)], expected);
+    });
+  });
+});
+
+describe("getPrecedingSiblings", () => {
+  it("should return preceding siblings", () => {
+    const table: [Node, Node[]][] = [
+      [child, []],
+      [child2, [child]],
+      [child3, [child, child2]],
+      [child4, [child, child2, child3]],
+      [child5, [child, child2, child3, child4]],
+      [parent, []],
+      [grandChild, []],
+      [root, []],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getPrecedingSiblings(target)], expected);
+    });
+  });
+});
+
+describe("getPreviousSibling", () => {
+  it("should return previous sibling", () => {
+    const table: [Node, Node | null][] = [
+      [child, null],
+      [child2, child],
+      [child3, child2],
+      [child4, child3],
+      [child5, child4],
+      [root, null],
+      [parent, null],
+      [grandChild, null],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals(getPreviousSibling(target), expected);
+    });
+  });
+});
+
+describe("getFollowingSiblings", () => {
+  it("should return following siblings", () => {
+    const table: [Node, Node[]][] = [
+      [child, [child2, child3, child4, child5]],
+      [child2, [child3, child4, child5]],
+      [child3, [child4, child5]],
+      [child4, [child5]],
+      [child5, []],
+      [root, []],
+      [parent, []],
+      [grandChild, [grandChild_2]],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getFollowingSiblings(target)], expected);
+    });
+  });
+});
+
+describe("getNextSibling", () => {
+  it("should return next sibling", () => {
+    const table: [Node, Node | null][] = [
+      [child, child2],
+      [child2, child3],
+      [child3, child4],
+      [child4, child5],
+      [child5, null],
+      [root, null],
+      [parent, null],
+      [grandChild, grandChild_2],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals(getNextSibling(target), expected);
+    });
+  });
+});
+
+describe("getPrecedings", () => {
+  it("should return precedings", () => {
+    const table: [Node, Node[]][] = [
+      [root, []],
+      [parent, [root]],
+      [child, [root, parent]],
+      [grandChild, [root, parent, child]],
+      [grandChild_2, [root, parent, child, grandChild]],
+      [child2, [root, parent, child, grandChild, grandChild_2]],
+      [grandChild2, [root, parent, child, grandChild, grandChild_2, child2]],
+      [child3, [
+        root,
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+      ]],
+      [child4, [
+        root,
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+      ]],
+      [child5, [
+        root,
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+      ]],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getPrecedings(target)], expected);
+    });
+  });
+});
+
+describe("orderTree", () => {
+  it("should yield depth first", () => {
+    const table: [Node, Node[]][] = [
+      [root, [
+        root,
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [parent, [
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [child, [child, grandChild, grandChild_2]],
+      [child2, [child2, grandChild2]],
+      [child3, [child3]],
+      [child4, [child4]],
+      [child5, [child5]],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals([...orderTree(node)], expected);
+    });
+  });
+});
+
+describe("getFollows", () => {
+  it("should return following nodes", () => {
+    const table: [Node, Node[]][] = [
+      [root, [
+        parent,
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [child, [
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [child2, [grandChild2, child3, child4, child5]],
+      [child3, [
+        child4,
+        child5,
+      ]],
+      [child4, [child5]],
+      [child5, []],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getFollows(target)], expected);
+    });
+  });
+});

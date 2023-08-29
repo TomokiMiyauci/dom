@@ -6,9 +6,7 @@ export {
   type TreeAdapterTypeMap,
 } from "npm:parse5@7.1.2";
 export {
-  enumerate,
   every,
-  find,
   first,
   ifilter,
   imap,
@@ -19,7 +17,8 @@ export {
   reduce,
   some,
   takewhile,
-} from "npm:itertools";
+} from "npm:itertools@2.1.2";
+import { enumerate, find } from "npm:itertools@2.1.2";
 export { default as xmlValidator } from "npm:xml-name-validator@4.0.0";
 export { initLast } from "https://deno.land/x/seqtools@1.0.0/init_last.ts";
 export { insert } from "https://deno.land/x/upsert@1.2.0/mod.ts";
@@ -30,6 +29,8 @@ export {
   type Result,
 } from "https://deno.land/x/result_js@2.0.0/mod.ts";
 export { default as isNegativeZero } from "npm:is-negative-zero";
+export { isSingle } from "https://deno.land/x/isx@1.5.0/iterable/is_single.ts";
+export { enumerate, find };
 
 export type Public<T> = { [k in keyof T]: T[k] };
 
@@ -79,4 +80,34 @@ export function divide(input: string, delimiter: string): [string, string] {
   if (pos > -1) return [input.slice(0, pos), input.slice(pos + 1)];
 
   return [input, ""];
+}
+
+export function at<T>(
+  iterable: globalThis.Iterable<T>,
+  index: number,
+): T | undefined {
+  const indexed = enumerate(iterable);
+  const entry = find(indexed, (entry) => entry[0] === index);
+
+  return entry ? entry[1] : undefined;
+}
+
+/** Returns an iterator that drops elements from the iterable as long as the
+ * predicate is true; afterwards, returns every remaining element.  Note, the
+ * iterator does not produce any output until the predicate first becomes
+ * false.
+ */
+export function* dropwhile<T>(
+  iterable: Iterable<T>,
+  predicate: (v: T) => boolean,
+): Iterable<T> {
+  let hit = false;
+
+  for (const value of iterable) {
+    if (hit) yield value;
+    if (!predicate(value)) {
+      yield value;
+      hit = true;
+    }
+  }
 }

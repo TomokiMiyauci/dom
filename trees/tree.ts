@@ -1,14 +1,18 @@
 import { OrderedSet } from "../infra/data_structures/set.ts";
-import { enumerate, some } from "../deps.ts";
+import {
+  dropwhile,
+  enumerate,
+  first,
+  islice,
+  last,
+  some,
+  takewhile,
+} from "../deps.ts";
 
 export function hasParent<T>(
   tree: { _parent: T | null },
 ): tree is { _parent: T } {
   return tree._parent !== null;
-}
-
-export function isSibling(a: Tree, b: Tree): boolean {
-  return a._parent !== null && a._parent === b._parent;
 }
 
 export interface TreeNode {
@@ -36,30 +40,16 @@ export function getLastChild<C extends Tree>(
   return tree._children[tree._children.size - 1] ?? null;
 }
 
-export function getPreviousSibling<C extends Tree>(
-  tree: Tree<Tree, C>,
+export function getPreviousSibling<C extends TreeNode>(
+  tree: Tree<Tree<TreeNode, C>>,
 ): C | null {
-  if (tree._parent) {
-    const index = [...tree._parent._children].indexOf(
-      tree as unknown as Tree,
-    );
-    if (index > 0) return (tree._parent._children[index - 1] as C) ?? null;
-  }
-
-  return null;
+  return last(getPrecedingSiblings(tree)) ?? null;
 }
 
 export function getNextSibling<C extends Tree>(
-  tree: Tree<Tree, C>,
+  tree: Tree<Tree<TreeNode, C>>,
 ): C | null {
-  if (tree._parent) {
-    const index = [...tree._parent._children].indexOf(
-      tree as unknown as Tree,
-    );
-    if (index > -1) return (tree._parent._children[index + 1] as C) ?? null;
-  }
-
-  return null;
+  return first(getFollowingSiblings(tree)) ?? null;
 }
 
 export function getIndex(tree: Tree): number {
@@ -70,6 +60,31 @@ export function getIndex(tree: Tree): number {
   }
 
   return 0;
+}
+
+export function getSiblings<C extends TreeNode>(
+  tree: Tree<Tree<TreeNode, C>>,
+): OrderedSet<C> {
+  if (!tree._parent) return new OrderedSet();
+
+  return tree._parent._children;
+}
+
+export function getPrecedingSiblings<C extends TreeNode>(
+  tree: Tree<Tree<Tree, C>>,
+): Iterable<C> {
+  const siblings = getSiblings(tree);
+
+  return takewhile(siblings, (value) => value !== tree);
+}
+
+export function getFollowingSiblings<C extends TreeNode>(
+  tree: Tree<Tree<Tree, C>>,
+): Iterable<C> {
+  const siblings = getSiblings(tree);
+  const inclusiveNextSiblings = dropwhile(siblings, (value) => value !== tree);
+
+  return islice(inclusiveNextSiblings, 1, Infinity);
 }
 
 export function getRoot<T extends Tree>(tree: T): T {
@@ -115,10 +130,38 @@ export function isDescendantOf(target: Tree, of: Tree): boolean {
     some(descendant(of), (descendant) => isChildOf(target, descendant));
 }
 
+export function isInclusiveDescendantOf(target: Tree, of: Tree): boolean {
+  return target === of || isDescendantOf(target, of);
+}
+
 export function isChildOf(target: Tree, of: Tree): boolean {
   return target._parent === of;
 }
 
 export function isSameTree(left: Tree, right: Tree): boolean {
   return left === right || getRoot(left) === getRoot(right);
+}
+
+export function isSiblingOf(target: Tree, of: Tree): boolean {
+  return !!target._parent && target._parent === of._parent;
+}
+
+export function isInclusiveSiblingOf(target: Tree, of: Tree): boolean {
+  return target === of || isSiblingOf(target, of);
+}
+
+export function getPrecedings<T extends Tree>(tree: T): Iterable<T> {
+  const root = getRoot(tree);
+
+  return takewhile(orderTree(root), (value) => value !== tree);
+}
+
+export function getFollows<T extends Tree>(tree: T): Iterable<T> {
+  const root = getRoot(tree);
+  const inclusiveFollows = dropwhile(
+    orderTree(root),
+    (value) => value !== tree,
+  );
+
+  return islice(inclusiveFollows, 1, Infinity);
 }
