@@ -160,7 +160,7 @@ export class Document extends Node implements IDocument {
   }
 
   protected override clone(document: Document): Document {
-    const doc = new Document();
+    const doc = new (this.constructor as typeof Document)();
 
     doc._type = document._type;
     doc._contentType = document._contentType;

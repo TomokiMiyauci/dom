@@ -56,6 +56,7 @@ import { Element_CSSShadowParts } from "../css/css_shadow_parts/element.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { PutForwards, SameObject } from "../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../webidl/types.ts";
+import { createElement } from "./element_algorithm.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -243,18 +244,13 @@ export class Element extends Node implements IElement {
 
   protected override clone(document: Document): Element {
     // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
-    // The specification calls for a createElement, but this is difficult to implement.
-    // `createElement` contains an import of an `HTMLElement` and it subclass, which is a circular reference in `Element`.
-    // Instead, use constructor. This works correctly as long as the subclass constants are not overridden.
-    const copy = new (this.constructor as typeof Element)({
-      namespace: this[$namespace],
-      namespacePrefix: this[$namespacePrefix],
-      localName: this[$localName],
-      isValue: this[$isValue],
-      customElementState: this[$customElementState],
-      customElementDefinition: this.#customElementDefinition,
-      nodeDocument: document,
-    });
+    const copy = createElement(
+      document,
+      this[$localName],
+      this[$namespace],
+      this[$namespacePrefix],
+      this[$isValue],
+    );
 
     // 2. For each attribute in node’s attribute list:
     for (const attribute of this[$attributeList]) {

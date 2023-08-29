@@ -45,14 +45,12 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     namespaceURI: html.NS,
     attrs: Token.Attribute[],
   ): Element {
-    const element = this.document.createElement(tagName);
+    const element = this.document.createElementNS(namespaceURI, tagName);
     const attributes = attrs.map((attribute) =>
       AttrConvertor.to(attribute, this.document)
     );
 
     attributes.forEach(element.setAttributeNode.bind(element));
-
-    Object.defineProperty(element, "namespaceURI", { value: namespaceURI });
 
     return element;
   }
