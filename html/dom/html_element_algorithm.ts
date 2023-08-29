@@ -1,7 +1,7 @@
 import { isValidCustomElementName } from "../custom_element.ts";
 import { HTMLUnknownElement } from "./html_unknown_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import { type Element } from "../../nodes/element.ts";
+import { interfaceRegistry } from "../../nodes/element_algorithm.ts";
 import { HTMLElement } from "./html_element.ts";
 import { tagNameMap } from "../tagname_map.ts";
 
@@ -32,18 +32,6 @@ const knowns = new Set<string>([
 
 const preElements = new Set<string>(["listing", "xmp"]);
 
-interface InterfaceResolver {
-  readonly namespace: Namespace;
-  resolve(name: string): typeof Element;
-}
-
-export const HTMLInterfaceResolver: InterfaceResolver = {
-  namespace: Namespace.HTML,
-  resolve(name: string): typeof Element {
-    return resolveInterface(name);
-  },
-};
-
 /**
  * @see https://momdo.github.io/html/dom.html#htmlelement
  */
@@ -66,4 +54,8 @@ export function resolveInterface(name: string): typeof HTMLElement {
 
   // 7. Return HTMLUnknownElement.
   return HTMLUnknownElement;
+}
+
+export function register(): void {
+  interfaceRegistry.set(Namespace.HTML, resolveInterface);
 }

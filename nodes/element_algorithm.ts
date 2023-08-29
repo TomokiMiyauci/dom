@@ -2,7 +2,6 @@ import { lookUpCustomElementDefinition } from "../html/custom_element.ts";
 import { CustomElementState } from "./constant.ts";
 import { Element } from "./element.ts";
 import { type Document } from "./document.ts";
-import { HTMLInterfaceResolver } from "../html/dom/html_element_algorithm.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-create-element)
@@ -87,9 +86,7 @@ export function createElement(
   // 7. Otherwise:
   else {
     // 1. Let interface be the element interface for localName and namespace.
-    const Interface = HTMLInterfaceResolver.namespace === namespace
-      ? HTMLInterfaceResolver.resolve(localName)
-      : Element;
+    const Interface = resolveInterface(localName, namespace);
 
     // 2. Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document.
     result = new Interface({
@@ -107,4 +104,24 @@ export function createElement(
 
   // 8. Return result.
   return result;
+}
+
+export interface InterfaceResolver {
+  (localName: string): typeof Element;
+}
+export const interfaceRegistry = new Map<string, InterfaceResolver>();
+
+function resolveInterface(
+  localName: string,
+  namespace: string | null,
+): typeof Element {
+  if (namespace === null) return Element;
+
+  if (interfaceRegistry.has(namespace)) {
+    const resolver = interfaceRegistry.get(namespace)!;
+
+    return resolver(localName);
+  }
+
+  return Element;
 }
