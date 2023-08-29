@@ -1,6 +1,8 @@
 import {
+  getDescendants,
   getFollowingSiblings,
   getFollows,
+  getIndex,
   getNextSibling,
   getPrecedings,
   getPrecedingSiblings,
@@ -496,6 +498,53 @@ describe("getFollows", () => {
 
     table.forEach(([target, expected]) => {
       assertEquals([...getFollows(target)], expected);
+    });
+  });
+});
+
+describe("getIndex", () => {
+  it("should", () => {
+    const table: [Node, number][] = [
+      [parent, 0],
+      [child, 0],
+      [child2, 1],
+      [child2, 1],
+      [child3, 2],
+      [child4, 3],
+      [child5, 4],
+      [grandChild, 0],
+      [grandChild_2, 1],
+      [other, 0],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals(getIndex(node), expected);
+    });
+  });
+});
+
+describe("getDescendants", () => {
+  it("should", () => {
+    const table: [Node, Node[]][] = [
+      [parent, [
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [child, [grandChild, grandChild_2]],
+      [child2, [grandChild2]],
+      [child3, []],
+      [child4, []],
+      [child5, []],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals([...getDescendants(node)], expected);
     });
   });
 });

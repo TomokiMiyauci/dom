@@ -15,6 +15,7 @@ import { OrderedSet } from "../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import {
   getFollows,
+  getInclusiveDescendants,
   getIndex,
   getLastChild,
   getNextSibling,
@@ -27,8 +28,9 @@ import {
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
-import { some, takewhile } from "../deps.ts";
+import { find, some } from "../deps.ts";
 import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
+import { filter } from "npm:itertools@2.1.2";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -44,6 +46,9 @@ export function replaceChild<T extends Node>(
   ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 2. If node is a host-including inclusive ancestor of parent, then throw a "HierarchyRequestError" DOMException.
+  if (isHostIncludingInclusiveAncestorOf(node, parent)) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
   // 3. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
   if (child._parent !== parent) {
@@ -67,15 +72,43 @@ export function replaceChild<T extends Node>(
   }
 
   function checkNode(node: Node): boolean {
-    // TODO
     switch (node.nodeType) {
-      case NodeType.ELEMENT_NODE:
+      case NodeType.DOCUMENT_FRAGMENT_NODE: {
+        // If node has more than one element child or has a Text node child.
+        const elementsCount = filter(node._children, isElement).length;
+
+        if (elementsCount > 1 || find(node._children, isText)) return true;
+
+        // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
+        if (
+          elementsCount === 1 && (
+            some(
+              filter(parent._children, isElement),
+              (value) => !Object.is(value, child),
+            ) ||
+            some(getFollows(child), isDocumentType)
+          )
+        ) return true;
+
+        return false;
+      }
+
+      case NodeType.ELEMENT_NODE: {
         // parent has an element child that is not child or a doctype is following child.
-      case NodeType.DOCUMENT_TYPE_NODE:
+        const element = find(parent._children, isElement);
+
+        return (element && !Object.is(element, child)) ||
+          some(getFollows(child), isDocumentType);
+      }
+
+      case NodeType.DOCUMENT_TYPE_NODE: {
         // parent has a doctype child that is not child, or an element is preceding child.
-      case NodeType.DOCUMENT_FRAGMENT_NODE:
-      // If node has more than one element child or has a Text node child.
-      // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
+        const doctype = find(parent._children, isDocumentType);
+
+        return ((doctype && !Object.is(doctype, child)) ||
+          some(getPrecedings(child), isElement));
+      }
+
       default:
         return false;
     }
@@ -85,7 +118,7 @@ export function replaceChild<T extends Node>(
   let referenceChild = getNextSibling(child);
 
   // 8. If referenceChild is node, then set referenceChild to node’s next sibling.
-  if (referenceChild) referenceChild = getNextSibling(node);
+  if (referenceChild === node) referenceChild = getNextSibling(node);
 
   // 9. Let previousSibling be child’s previous sibling.
   const previousSibling = getPreviousSibling(child);
@@ -134,7 +167,7 @@ export function insertNode(
 ) {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
-    ? node._children
+    ? node._children.clone()
     : new OrderedSet<Node & ChildNode>([node]);
 
   // 2. Let count be nodes’s size.
@@ -174,8 +207,6 @@ export function insertNode(
     else parent._children.insert(getIndex(child), node);
     // sync parent
     node._parent = parent;
-
-    // console.log("size", parent._children.size);
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -256,7 +287,7 @@ export function ensurePreInsertionValidity(
   if (isDocument(parent)) {
     // DocumentFragment
     if (isDocumentFragment(node)) {
-      const elementsCount = [...takewhile(node._children, isElement)].length;
+      const elementsCount = filter(node._children, isElement).length;
 
       // If node has more than one element child or has a Text node child.
       if (elementsCount > 1 || some(node._children, isText)) {
@@ -324,9 +355,7 @@ export function preInsertNode(
   let referenceChild = child;
 
   // 3. If referenceChild is node, then set referenceChild to node’s next sibling.
-  if (referenceChild !== null) {
-    referenceChild = referenceChild.nextSibling;
-  }
+  if (referenceChild === node) referenceChild = getNextSibling(node);
 
   // 4. Insert node into parent before referenceChild.
   insertNode(node, parent, referenceChild);
@@ -477,9 +506,12 @@ export function adoptNode(node: Node, document: Document): void {
   // 3. If document is not oldDocument, then:
   if (document !== oldDocument) {
     // 1. For each inclusiveDescendant in node’s shadow-including inclusive descendants:
+    for (const inclusiveDescendant of getInclusiveDescendants(node)) { // TODO(miyauci): shadow-including
+      // 1. Set inclusiveDescendant’s node document to document.
+      inclusiveDescendant[$nodeDocument] = document;
 
-    // 1. Set inclusiveDescendant’s node document to document.
-    // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
+      // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
+    }
   }
 
   // 2. For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom, enqueue a custom element callback reaction with inclusiveDescendant, callback name "adoptedCallback", and an argument list containing oldDocument and document.

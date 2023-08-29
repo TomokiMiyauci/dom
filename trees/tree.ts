@@ -53,10 +53,12 @@ export function getNextSibling<C extends Tree>(
 }
 
 export function getIndex(tree: Tree): number {
-  if (tree._children) {
-    for (const [index, item] of enumerate(tree._children)) {
-      if (tree === item) return index;
-    }
+  const parent = tree._parent;
+
+  if (!parent) return 0;
+
+  for (const [index, item] of enumerate(parent._children)) {
+    if (tree === item) return index;
   }
 
   return 0;
@@ -164,4 +166,18 @@ export function getFollows<T extends Tree>(tree: T): Iterable<T> {
   );
 
   return islice(inclusiveFollows, 1, Infinity);
+}
+
+export function* getDescendants<T extends Tree>(
+  tree: T,
+): Iterable<T | TreeNode> {
+  for (const child of tree._children) {
+    yield child;
+    yield* getDescendants(child);
+  }
+}
+
+export function* getInclusiveDescendants(tree: Tree): Iterable<Tree> {
+  yield tree;
+  yield* getDescendants(tree);
 }
