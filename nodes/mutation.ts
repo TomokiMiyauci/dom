@@ -371,20 +371,18 @@ export function replaceAllNode(node: Node | null, parent: Node): void {
   // 1. Let removedNodes be parent’s children.
   const removeNodes = parent._children;
 
-  // @optimized
   // 2. Let addedNodes be the empty set.
-  // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
   const addNodes = !node
     ? new OrderedSet<Node>()
+    // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
     : isDocumentFragment(node)
     ? node._children.clone()
     // 4. Otherwise, if node is non-null, set addedNodes to « node ».
     : new OrderedSet([node]);
 
   // 5. Remove all parent’s children, in tree order, with the suppress observers flag set.
-  for (const node of orderTreeChildren(parent._children)) {
-    removeNode(node, true);
-  }
+  // removeNode delete parent's children, so not lazy.
+  for (const node of [...parent._children]) removeNode(node, true);
 
   // 6. If node is non-null, then insert node into parent before null with the suppress observers flag set.
   if (node) insertNode(node, parent, null, true);
