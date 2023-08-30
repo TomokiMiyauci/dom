@@ -9,6 +9,7 @@ import { DOMExceptionName } from "../webidl/exception.ts";
 import { queueMutationRecord } from "./mutation_observer.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { LegacyNullToEmptyString } from "../webidl/legacy_extended_attributes.ts";
+import { convert, unsignedLong } from "../webidl/types.ts";
 
 export interface CharacterDataStates {
   /**
@@ -107,7 +108,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-deletedata
    */
-  deleteData(offset: number, count: number): void {
+  @convert
+  deleteData(@unsignedLong offset: number, @unsignedLong count: number): void {
     // replace data with node this, offset offset, count count, and data the empty string.
     replaceData(this, offset, count, "");
   }
@@ -115,7 +117,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-insertdata
    */
-  insertData(offset: number, data: string): void {
+  @convert
+  insertData(@unsignedLong offset: number, data: string): void {
     // replace data with node this, offset offset, count 0, and data data.
     replaceData(this, offset, 0, data);
   }
@@ -124,7 +127,12 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-characterdata-replacedata
    * @throws {DOMException}
    */
-  replaceData(offset: number, count: number, data: string): void {
+  @convert
+  replaceData(
+    @unsignedLong offset: number,
+    @unsignedLong count: number,
+    data: string,
+  ): void {
     // replace data with node this, offset offset, count count, and data data.
     replaceData(this, offset, count, data);
   }
@@ -134,8 +142,11 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @throws {TypeError}
    * @throws {DOMException}
    */
-  substringData(offset: number, count: number): string {
-    if (arguments.length < 2) throw new TypeError("<message>");
+  @convert
+  substringData(
+    @unsignedLong offset: number,
+    @unsignedLong count: number,
+  ): string {
     // return the result of running substring data with node this, offset offset, and count count.
     return substringData(this, offset, count);
   }

@@ -170,6 +170,26 @@
     ],
     "dom/nodes/Node-isConnected.html": [
       { "name": "Test with iframes", "reason": "frames is not supported" }
+    ],
+    "dom/nodes/CharacterData-appendData.html": [
+      {
+        "name": "Text.appendData()",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Comment.appendData()",
+        "reason": "compiler error"
+      }
+    ],
+    "dom/nodes/CharacterData-substringData.html": [
+      {
+        "name": "Text.substringData() with too few arguments",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Comment.substringData() with too few arguments",
+        "reason": "compiler error"
+      }
     ]
   }
 }
