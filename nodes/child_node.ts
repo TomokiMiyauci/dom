@@ -3,7 +3,12 @@ import { UnImplemented } from "./utils.ts";
 import type { IChildNode } from "../interface.d.ts";
 import { type Constructor, find, isObject } from "../deps.ts";
 import { preInsertNode, removeNode } from "./mutation.ts";
-import { getFollowingSiblings } from "../trees/tree.ts";
+import {
+  getFirstChild,
+  getFollowingSiblings,
+  getNextSibling,
+  getPrecedingSiblings,
+} from "../trees/tree.ts";
 import { convertNodesToNode } from "./parent_node.ts";
 import { $nodeDocument } from "./internal.ts";
 import { convert, DOMString } from "../webidl/types.ts";
@@ -34,8 +39,34 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       preInsertNode(node, parent, viableNextSibling);
     }
 
-    before(...nodes: (string | Node)[]): void {
-      throw new UnImplemented("before");
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-childnode-before
+     */
+    @convert
+    before(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
+      // 1. Let parent be this’s parent.
+      const parent = this._parent;
+
+      // 2. If parent is null, then return.
+      if (!parent) return;
+
+      const precedingSiblings = getPrecedingSiblings(this);
+      const set = new Set(nodes);
+      const notHas = (node: Node): boolean => !set.has(node);
+
+      // 3. Let viablePreviousSibling be this’s first preceding sibling not in nodes; otherwise null.
+      let viablePreviousSibling = find(precedingSiblings, notHas) ?? null;
+
+      // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
+      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+
+      // 5. If viablePreviousSibling is null, then set it to parent’s first child;
+      if (!viablePreviousSibling) viablePreviousSibling = getFirstChild(parent);
+      // otherwise to viablePreviousSibling’s next sibling.
+      else viablePreviousSibling = getNextSibling(viablePreviousSibling);
+
+      // 6. Pre-insert node into parent before viablePreviousSibling.
+      preInsertNode(node, parent, viablePreviousSibling);
     }
 
     replaceWith(...nodes: (string | Node)[]): void {
