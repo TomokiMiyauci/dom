@@ -137,6 +137,40 @@
         "name": "Passing null to replaceChild should throw a TypeError.",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/Document-getElementById.html": [
+      {
+        "name": "add id attribute via innerHTML",
+        "reason": "innerHTML setter is not supported"
+      },
+      {
+        "name": "remove id attribute via innerHTML",
+        "reason": "innerHTML setter is not supported"
+      },
+      {
+        "name": "add id attribute via outerHTML",
+        "reason": "outerHTML setter is not supported"
+      },
+      {
+        "name": "remove id attribute via outerHTML",
+        "reason": "outerHTML setter is not supported"
+      }
+    ],
+    "dom/nodes/Element-tagName.html": [
+      {
+        "name": "tagName should be updated when changing ownerDocument",
+        "reason": "DOMParser text/xml is not supported"
+      }
+    ],
+    "dom/nodes/Document-constructor.html": [
+      {
+        "name": "new Document(): metadata",
+        "reason": "Document location is not supported"
+      },
+      {
+        "name": "new Document(): URL parsing",
+        "reason": "HTMLHyperlinkElementUtils href getter is not supported"
+      }
     ]
   }
 }
