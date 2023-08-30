@@ -37,7 +37,7 @@
   // "dom/nodes/Document-getElementsByTagName.html",
   // "dom/nodes/Document-getElementsByTagNameNS.html",
   "dom/nodes/Document-implementation.html",
-  // "dom/nodes/Document-importNode.html",
+  "dom/nodes/Document-importNode.html",
   // "dom/nodes/Document-URL.html",
   "dom/nodes/DocumentFragment-constructor.html",
   // "dom/nodes/DocumentFragment-getElementById.html",

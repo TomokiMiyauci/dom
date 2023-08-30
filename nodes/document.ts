@@ -654,12 +654,23 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
-  importNode<T>(node: T & Node, deep?: boolean | undefined): T {
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-importnode
+   */
+  importNode<T>(node: T & Node, deep = false): T {
+    // 1. If node is a document or shadow root, then throw a "NotSupportedError" DOMException.
     if (isDocument(node) || isShadowRoot(node)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
-    return this.cloneNode(deep) as T;
+    // TODO(miyauci): improve dirty re-assignment
+    const document = node[$nodeDocument];
+    node[$nodeDocument] = this;
+    // 2. Return a clone of node, with this and the clone children flag set if deep is true.
+    const copy = node.cloneNode(deep) as T;
+    node[$nodeDocument] = document;
+
+    return copy;
   }
 }
 
