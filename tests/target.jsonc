@@ -13,7 +13,7 @@
   // "dom/nodes/CharacterData-replaceData.html",
   // "dom/nodes/CharacterData-substringData.html",
   // "dom/nodes/CharacterData-surrogates.html",
-  // "dom/nodes/ChildNode-after.html",
+  "dom/nodes/ChildNode-after.html",
   // "dom/nodes/ChildNode-before.html",
   // "dom/nodes/ChildNode-replaceWith.html",
   "dom/nodes/Comment-constructor.html",
