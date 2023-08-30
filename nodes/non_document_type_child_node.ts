@@ -1,7 +1,7 @@
 import { type INonDocumentTypeChildNode } from "../interface.d.ts";
 import { isElement } from "./utils.ts";
 import type { Element } from "./element.ts";
-import { type Constructor, find, ifilter, last } from "../deps.ts";
+import { type Constructor, find, first, ifilter } from "../deps.ts";
 import { type Node } from "./node.ts";
 import { getFollowingSiblings, getPrecedingSiblings } from "../trees/tree.ts";
 
@@ -16,7 +16,7 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
       const precedeSiblings = getPrecedingSiblings(this);
       const precedeElementSiblings = ifilter(precedeSiblings, isElement);
 
-      return last(precedeElementSiblings) ?? null;
+      return first(precedeElementSiblings) ?? null;
     }
 
     /**

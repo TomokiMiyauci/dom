@@ -306,9 +306,9 @@ describe("getPrecedingSiblings", () => {
     const table: [Node, Node[]][] = [
       [child, []],
       [child2, [child]],
-      [child3, [child, child2]],
-      [child4, [child, child2, child3]],
-      [child5, [child, child2, child3, child4]],
+      [child3, [child2, child]],
+      [child4, [child3, child2, child]],
+      [child5, [child4, child3, child2, child]],
       [parent, []],
       [grandChild, []],
       [root, []],
@@ -524,6 +524,32 @@ describe("getIndex", () => {
 });
 
 describe("getDescendants", () => {
+  it("should", () => {
+    const table: [Node, Node[]][] = [
+      [parent, [
+        child,
+        grandChild,
+        grandChild_2,
+        child2,
+        grandChild2,
+        child3,
+        child4,
+        child5,
+      ]],
+      [child, [grandChild, grandChild_2]],
+      [child2, [grandChild2]],
+      [child3, []],
+      [child4, []],
+      [child5, []],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals([...getDescendants(node)], expected);
+    });
+  });
+});
+
+describe("orderTreeChildren", () => {
   it("should", () => {
     const table: [Node, Node[]][] = [
       [parent, [

@@ -43,7 +43,7 @@ export function getLastChild<C extends Tree>(
 export function getPreviousSibling<C extends TreeNode>(
   tree: Tree<Tree<TreeNode, C>>,
 ): C | null {
-  return last(getPrecedingSiblings(tree)) ?? null;
+  return first(getPrecedingSiblings(tree)) ?? null;
 }
 
 export function getNextSibling<C extends Tree>(
@@ -72,12 +72,16 @@ export function getSiblings<C extends TreeNode>(
   return tree._parent._children;
 }
 
+/** Yields the preceding siblings in the order of adjacency. */
 export function getPrecedingSiblings<C extends TreeNode>(
   tree: Tree<Tree<Tree, C>>,
-): Iterable<C> {
+): C[] {
   const siblings = getSiblings(tree);
 
-  return takewhile(siblings, (value) => value !== tree);
+  const precedings = takewhile(siblings, (value) => value !== tree);
+
+  // TODO(miyauci): use DoubleEndedIterator
+  return [...precedings].reverse();
 }
 
 export function getFollowingSiblings<C extends TreeNode>(
