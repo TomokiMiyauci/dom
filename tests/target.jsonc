@@ -15,7 +15,7 @@
   // "dom/nodes/CharacterData-surrogates.html",
   "dom/nodes/ChildNode-after.html",
   "dom/nodes/ChildNode-before.html",
-  // "dom/nodes/ChildNode-replaceWith.html",
+  "dom/nodes/ChildNode-replaceWith.html",
   "dom/nodes/Comment-constructor.html",
   // "dom/nodes/Document-adoptNode.html",
   // "dom/nodes/Document-characterSet-normalization-1.html",

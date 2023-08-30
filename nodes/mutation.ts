@@ -23,7 +23,6 @@ import {
   getPreviousSibling,
   getRoot,
   hasParent,
-  orderTreeChildren,
 } from "../trees/tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
@@ -56,7 +55,12 @@ export function replaceChild<T extends Node>(
   }
 
   // 4. If node is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
-  if (!(isDocumentFragment(node) || isDocumentType(node) || isElement(node))) {
+  if (
+    !(isDocumentFragment(node) ||
+      isDocumentType(node) ||
+      isElement(node) ||
+      isCharacterData(node))
+  ) {
     throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
   }
 
