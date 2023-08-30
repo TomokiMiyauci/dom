@@ -1,25 +1,26 @@
 import { type INonDocumentTypeChildNode } from "../interface.d.ts";
-import { UnImplemented } from "./utils.ts";
+import { isElement } from "./utils.ts";
 import type { Element } from "./element.ts";
-import { type Constructor } from "../deps.ts";
+import { type Constructor, ifilter, last } from "../deps.ts";
+import { type Node } from "./node.ts";
+import { getPrecedingSiblings } from "../trees/tree.ts";
 
-export function NonDocumentTypeChildNode<T extends Constructor>(Ctor: T) {
+export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class NonDocumentTypeChildNode extends Ctor
     implements INonDocumentTypeChildNode {
-    get nextElementSibling(): Element | null {
-      throw new UnImplemented("nextElementSibling");
-    }
-
-    set nextElementSibling(value: Element | null) {
-      throw new UnImplemented("nextElementSibling");
-    }
-
+    /**
+     * @see https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-previouselementsibling
+     */
     get previousElementSibling(): Element | null {
-      throw new UnImplemented("previousElementSibling");
+      // return the first preceding sibling that is an element; otherwise null.
+      const precedeSiblings = getPrecedingSiblings(this);
+      const precedeElementSiblings = ifilter(precedeSiblings, isElement);
+
+      return last(precedeElementSiblings) ?? null;
     }
 
-    set previousElementSibling(value: Element | null) {
-      throw new UnImplemented("previousElementSibling");
+    get nextElementSibling(): Element | null {
+      throw new Error("nextElementSibling");
     }
   }
 
