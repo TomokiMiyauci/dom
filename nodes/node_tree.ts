@@ -1,11 +1,14 @@
 import {
   isAttr,
   isCharacterData,
+  isDocument,
   isDocumentType,
   isElement,
+  isShadowRoot,
   isText,
 } from "./utils.ts";
-import { $data } from "./internal.ts";
+import { getRoot } from "../trees/tree.ts";
+import { $data, $host } from "./internal.ts";
 import { type Attr } from "./attr.ts";
 import { type Document } from "./document.ts";
 import { type DocumentFragment } from "./document_fragment.ts";
@@ -83,4 +86,29 @@ export function assignSlottables(slot: HTMLSlotElement): void {
  */
 export function signalSlotChange(slot: HTMLSlotElement) {
   throw new Error("signalSlotChange");
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#connected
+ */
+export function isConnected(node: Node): boolean {
+  // if its shadow-including root is a document.
+  const root = getShadowIncludingRoot(node);
+
+  return isDocument(root);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-shadow-including-root
+ */
+export function getShadowIncludingRoot(node: Node): Node {
+  // object is its root’s host’s shadow-including root, if the object’s root is a shadow root; otherwise its root.
+  const root = getRoot(node);
+
+  if (isShadowRoot(root)) {
+    const host = root[$host];
+    return getShadowIncludingRoot(host);
+  }
+
+  return root;
 }

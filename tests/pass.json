@@ -167,6 +167,9 @@
         "name": "new Document(): URL parsing",
         "reason": "HTMLHyperlinkElementUtils href getter is not supported"
       }
+    ],
+    "dom/nodes/Node-isConnected.html": [
+      { "name": "Test with iframes", "reason": "frames is not supported" }
     ]
   }
 }

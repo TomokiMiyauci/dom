@@ -141,7 +141,7 @@
   "dom/nodes/Node-contains.html",
   "dom/nodes/Node-insertBefore.html",
   // "dom/nodes/Node-isConnected-shadow-dom.html",
-  // "dom/nodes/Node-isConnected.html",
+  "dom/nodes/Node-isConnected.html",
   "dom/nodes/Node-isEqualNode.html",
   "dom/nodes/Node-isSameNode.html",
   "dom/nodes/Node-lookupNamespaceURI.html",

@@ -6,6 +6,7 @@ import {
 } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
+import { isConnected } from "./node_tree.ts";
 import { type Document } from "./document.ts";
 import type { INode } from "../interface.d.ts";
 import {
@@ -44,7 +45,7 @@ import { type Const, constant } from "../webidl/idl.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./attr.ts";
 import { type Element } from "./element.ts";
-import { DOMString } from "../webidl/types.ts";
+
 const inspect = Symbol.for("Deno.customInspect");
 
 export enum NodeType {
@@ -155,7 +156,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   get isConnected(): boolean {
-    throw new UnImplemented("isConnected");
+    return isConnected(this);
   }
 
   abstract get ownerDocument(): Document | null;
