@@ -1,13 +1,13 @@
 import { range } from "../deps.ts";
 
-/**
+/** Match unicode safe case insensitive.
  * @see https://infra.spec.whatwg.org/#ascii-case-insensitive
  */
 export function matchASCIICaseInsensitive(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
 
-  for (const index of range(a.length)) {
-    if (a.charCodeAt(index) !== b.charCodeAt(index)) return false;
+  for (const i of range(0, a.length)) {
+    if ((a.charCodeAt(i) | 32) !== (b.charCodeAt(i) | 32)) return false;
   }
 
   return true;

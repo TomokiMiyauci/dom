@@ -8,6 +8,8 @@ import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $create, $document, $origin } from "./internal.ts";
 import { validate } from "../infra/namespace.ts";
+import { convert, DOMString } from "../webidl/types.ts";
+import { isUndefined } from "../deps.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   [$document]!: Document;
@@ -80,7 +82,8 @@ export class DOMImplementation implements IDOMImplementation {
   /**
    * @see https://dom.spec.whatwg.org/#dom-domimplementation-createhtmldocument
    */
-  createHTMLDocument(title?: string | undefined): Document {
+  @convert
+  createHTMLDocument(@DOMString.exclude(isUndefined) title?: string): Document {
     // 1. Let doc be a new document that is an HTML document.
     const doc = new Document();
     doc._type = "html";

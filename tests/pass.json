@@ -10,10 +10,6 @@
       {
         "name": "createHTMLDocument(): URL parsing",
         "reason": "HTMLAnchorElement#href getter is not supported"
-      },
-      {
-        "name": "createHTMLDocument test 2: undefined,undefined,\"\"",
-        "reason": "DOMString with undefined is not supported"
       }
     ],
     "dom/nodes/Text-constructor.html": [
