@@ -155,7 +155,11 @@ export abstract class Node extends EventTarget implements INode {
     throw new UnImplemented("baseURI");
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-isconnected
+   */
   get isConnected(): boolean {
+    // return true, if this is connected; otherwise false.
     return isConnected(this);
   }
 
@@ -464,6 +468,61 @@ export function getElementsByClassName(
 
         return false;
       });
+    },
+  });
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-getelementsbytagnamens
+ */
+export function getElementsByNamespaceAndLocalName(
+  namespace: string | null,
+  localName: string,
+  root: Node,
+): HTMLCollection {
+  // 1. If namespace is the empty string, then set it to null.
+  namespace ||= null;
+
+  // 2. If both namespace and localName are U+002A (*), then return an HTMLCollection rooted at root, whose filter matches descendant elements.
+  if (namespace === "*" && localName === "*") {
+    return new HTMLCollection({
+      root,
+      filter: (element) => root !== element,
+    });
+  }
+
+  // 3. If namespace is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches descendant elements whose local name is localName.
+  if (namespace === "*") {
+    return new HTMLCollection({
+      root,
+      filter: (element) => {
+        if (element === root) return false;
+
+        return element[$localName] === localName;
+      },
+    });
+  }
+
+  // 4. If localName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace.
+  if (localName === "*") {
+    return new HTMLCollection({
+      root,
+      filter: (element) => {
+        if (element === root) return false;
+
+        return element[$namespace] === namespace;
+      },
+    });
+  }
+
+  // 5. Return an HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace and local name is localName.
+  return new HTMLCollection({
+    root,
+    filter: (element) => {
+      if (element === root) return false;
+
+      return element[$namespace] === namespace &&
+        element[$localName] === localName;
     },
   });
 }

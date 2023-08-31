@@ -1,5 +1,6 @@
 import {
   getElementsByClassName,
+  getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
   Node,
   NodeType,
@@ -644,14 +645,10 @@ export class Document extends Node implements IDocument {
     localName: string,
   ): HTMLCollectionOf<Element>;
   getElementsByTagNameNS(
-    namespace: unknown,
-    localName: unknown,
-  ):
-    | HTMLCollectionOf<HTMLElement>
-    | HTMLCollectionOf<SVGElement>
-    | HTMLCollectionOf<MathMLElement>
-    | HTMLCollectionOf<Element> {
-    throw new UnImplemented();
+    namespace: string | null,
+    localName: string,
+  ): HTMLCollectionOf<Element> {
+    return getElementsByNamespaceAndLocalName(namespace, localName, this);
   }
 
   /**

@@ -1,5 +1,6 @@
 import {
   getElementsByClassName,
+  getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
   Node,
   NodeStates,
@@ -471,16 +472,12 @@ export class Element extends Node implements IElement {
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<globalThis.Element>;
+  ): HTMLCollectionOf<Element>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ):
-    | HTMLCollectionOf<HTMLElement>
-    | HTMLCollectionOf<SVGElement>
-    | HTMLCollectionOf<MathMLElement>
-    | HTMLCollectionOf<globalThis.Element> {
-    throw new UnImplemented("getElementsByTagNameNS");
+  ): HTMLCollectionOf<Element> {
+    return getElementsByNamespaceAndLocalName(namespace, localName, this);
   }
 
   /**
