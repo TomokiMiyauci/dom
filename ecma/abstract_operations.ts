@@ -84,3 +84,19 @@ export function CreateMethodProperty(
   Object.defineProperty(O, P, newDesc);
   // 4. Return unused.
 }
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isextensible-o
+ */
+export function IsExtensible(O: object): boolean {
+  // 1. Return ? O.[[IsExtensible]]().
+  return Reflect.isExtensible(O);
+}
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue
+ */
+export function SameValue(x: unknown, y: unknown): boolean {
+  // TODO
+  return Object.is(x, y);
+}

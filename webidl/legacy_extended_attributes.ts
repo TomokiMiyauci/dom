@@ -5,6 +5,8 @@ import {
   OrdinaryGetOwnProperty,
   ToUnit32,
 } from "../ecma/abstract_operations.ts";
+import { IsDataDescriptor } from "../ecma/data_types.ts";
+import { OrdinaryDefineOwnProperty } from "../ecma/behaviours.ts";
 
 export function LegacyNullToEmptyString(
   _: unknown,
@@ -62,6 +64,8 @@ export abstract class LegacyPlatformObject {
       getOwnPropertyDescriptor: (target, prop) => {
         return LegacyPlatformObjectGetOwnProperty(target, prop, false);
       },
+      deleteProperty: Delete,
+      defineProperty: DefineOwnProperty,
       preventExtensions: () => false,
       ownKeys: (target) => {
         const set = new Set<string | symbol>();
@@ -93,6 +97,61 @@ export abstract class LegacyPlatformObject {
 
   abstract [WebIDL.supportedIndexes]?(): Set<number>;
   abstract [WebIDL.supportedNamedProperties]?(): Set<string>;
+}
+
+export function Delete(O: object, P: PropertyKey): boolean {
+  if (isIndexedProperty(O) && isArrayIndex(P)) {
+    const index = ToUnit32(P);
+
+    return !O[WebIDL.supportedIndexes].call(O).has(index);
+  }
+
+  if (
+    isNamedProperty(O) &&
+    typeof P === "string" &&
+    runNamedPropertyVisibilityAlgorithm(P, O)
+  ) return false;
+
+  const desc = Reflect.getOwnPropertyDescriptor(O, P);
+
+  if (desc) {
+    if (!desc.configurable) return false;
+    delete (O as Record<typeof P, unknown>)[P];
+  }
+
+  return true;
+}
+
+export function DefineOwnProperty(
+  O: object,
+  P: PropertyKey,
+  Desc: PropertyDescriptor,
+): boolean {
+  if (isIndexedProperty(O) && isArrayIndex(P)) {
+    return false;
+  }
+
+  if (isNamedProperty(O) && typeof P === "string") {
+    // 1. Let creating be true if P is not a supported property name, and false otherwise.
+    const creating = !O[WebIDL.supportedNamedProperties].call(O).has(P);
+
+    if (!Reflect.has(O, P)) {
+      if (!creating && !Reflect.has(O, WebIDL.namedPropertySetter)) {
+        return false;
+      }
+
+      if (WebIDL.namedPropertySetter in O) {
+        if (!IsDataDescriptor(Desc)) return false;
+
+        // O[WebIDL.namedPropertySetter](P)
+        return true;
+      }
+    }
+  }
+
+  Desc.configurable = true;
+
+  return OrdinaryDefineOwnProperty(O, P, Desc);
 }
 
 export interface IndexedProperties {
@@ -127,6 +186,7 @@ export function LegacyPlatformObjectGetOwnProperty(
         configurable: true,
         enumerable: true,
         value,
+        writable: false,
       };
 
       return desc;

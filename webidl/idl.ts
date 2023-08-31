@@ -46,8 +46,12 @@ export function stringifier(
 
 export type Getter<
   T extends "index" | "name",
-> = T extends ["name"] ? { [WebIDL.namedPropertyGetter](name: string): unknown }
-  : { [WebIDL.indexGetter](index: number): unknown };
+  U = unknown,
+> = T extends ["name"] ? { [WebIDL.namedPropertyGetter](name: string): U }
+  : {
+    [index: number]: U;
+    [WebIDL.indexGetter](index: number): U;
+  };
 
 export type PrimitiveType = boolean | number;
 
