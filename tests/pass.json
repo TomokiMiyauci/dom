@@ -256,6 +256,16 @@
         "name": "Shouldn't be able to set unsigned properties on a HTMLCollection (non-strict mode)",
         "reason": "strict mode"
       }
+    ],
+    "dom/nodes/Node-properties.html": [
+      {
+        "name": "document.URL",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "document.documentURI",
+        "reason": "location is not supported"
+      }
     ]
   }
 }
