@@ -1,4 +1,5 @@
 import { range } from "../deps.ts";
+import { type List } from "./data_structures/list.ts";
 
 /** Return ASCII lowercase.
  * @see https://infra.spec.whatwg.org/#ascii-lowercase
@@ -77,4 +78,21 @@ function substringCodeUnitByPositions(
 
 export function substringCodeUnitToEnd(string: string, start: number): string {
   return substringCodeUnitByPositions(string, start, string.length);
+}
+
+/**
+ * @see https://infra.spec.whatwg.org/#string-concatenate
+ */
+export function concatString(
+  strings: List<string>,
+  separator?: string,
+): string {
+  // 1. If list is empty, then return the empty string.
+  if (strings.isEmpty) return "";
+
+  // 2. If separator is not given, then set separator to the empty string.
+  separator ??= "";
+
+  // 3. Return a string whose contents are list’s items, in order, separated from each other by separator.
+  return [...strings].join(separator);
 }

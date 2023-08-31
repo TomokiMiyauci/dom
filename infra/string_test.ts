@@ -1,4 +1,8 @@
-import { matchASCIICaseInsensitive, toASCIILowerCase } from "./string.ts";
+import {
+  concatString,
+  matchASCIICaseInsensitive,
+  toASCIILowerCase,
+} from "./string.ts";
 import {
   assert,
   assertEquals,
@@ -6,6 +10,7 @@ import {
   describe,
   it,
 } from "../_dev_deps.ts";
+import { List } from "./data_structures/list.ts";
 
 describe("toASCIILowerCase", () => {
   it("should return lower case", () => {
@@ -53,6 +58,40 @@ describe("matchASCIICaseInsensitive", () => {
 
     table.forEach(([left, right]) => {
       assertFalse(matchASCIICaseInsensitive(left, right));
+    });
+  });
+});
+
+describe("concatString", () => {
+  it("should return concat string without separator", () => {
+    const table: [string[], string][] = [
+      [[""], ""],
+      [[" "], " "],
+      [["", ""], ""],
+      [[" ", " "], "  "],
+      [["a", "b"], "ab"],
+      [["A", "b"], "Ab"],
+      [["あ", "亜"], "あ亜"],
+    ];
+
+    table.forEach(([left, right]) => {
+      assertEquals(concatString(new List(left)), right);
+    });
+  });
+
+  it("should return concat string with separator", () => {
+    const table: [string[], string, string][] = [
+      [[""], "", ""],
+      [["", ""], "", ""],
+      [["a", ""], "", "a"],
+      [["a", "b"], "", "ab"],
+      [["a", "b"], " ", "a b"],
+      [["a", "b"], ":", "a:b"],
+      [["a", "b", "c", "d"], ":", "a:b:c:d"],
+    ];
+
+    table.forEach(([left, separator, right]) => {
+      assertEquals(concatString(new List(left), separator), right);
     });
   });
 });

@@ -368,8 +368,8 @@
   // "dom/nodes/rootNode.html",
   // "dom/nodes/svg-template-querySelector.html",
   "dom/nodes/Text-constructor.html",
-  "dom/nodes/Text-splitText.html"
-  // "dom/nodes/Text-wholeText.html",
+  "dom/nodes/Text-splitText.html",
+  "dom/nodes/Text-wholeText.html"
   // "dom/parts/basic-dom-part-objects.tentative.html",
   // "dom/ranges/Range-adopt-test.html",
   // "dom/ranges/Range-attributes.html",

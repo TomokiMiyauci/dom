@@ -13,14 +13,16 @@ import { insertNode } from "./mutation.ts";
 import type { IText } from "../interface.d.ts";
 import { nodeLength } from "./node_tree.ts";
 import {
+  getDescendants,
+  getFollowingSiblings,
   getNextSibling,
-  getPreviousSibling,
-  orderTree,
+  getPrecedingSiblings,
   orderTreeChildren,
 } from "../trees/tree.ts";
 import { $create, $data, $nodeDocument } from "./internal.ts";
-import { ifilter, imap, isNotNull, tail } from "../deps.ts";
+import { ifilter, imap, isNotNull, takewhile } from "../deps.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
+import { concatString } from "../infra/string.ts";
 
 @Slottable
 export class Text extends CharacterData implements IText {
@@ -65,8 +67,12 @@ export class Text extends CharacterData implements IText {
    * @see https://dom.spec.whatwg.org/#dom-text-wholetext
    */
   get wholeText(): string {
+    const textNodes = contiguousTextNodes(this);
+    const data = imap(textNodes, (text) => text[$data]);
     // to return the concatenation of the data of the contiguous Text nodes of this, in tree order.
-    return concatTextData(contiguousTextNodes(this));
+    const list = new List(data);
+
+    return concatString(list);
   }
 
   /**
@@ -131,14 +137,6 @@ export function splitText(node: Text, offset: number): Text {
 }
 
 /**
- * free translation
- * @see https://triple-underscore.github.io/DOM4-ja.html#_concatenate-text-data
- */
-function concatTextData(list: List<Text>): string {
-  return [...imap(list, (text) => text[$data])].join("");
-}
-
-/**
  * @see https://dom.spec.whatwg.org/#concept-child-text-content
  */
 export function getChildTextContent(node: Node): string {
@@ -152,42 +150,24 @@ export function getChildTextContent(node: Node): string {
 /**
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
-function contiguousTextNodes(node: Node): List<Text> {
-  return contiguousSibling(node, isText);
-}
+export function* contiguousTextNodes(node: Text): Iterable<Text> {
+  const preceding = getPrecedingSiblings(node);
+  const precedingTexts = takewhile(preceding, isText) as Iterable<Text>;
+  const following = getFollowingSiblings(node);
+  const followingTexts = takewhile(following, isText) as Iterable<Text>;
 
-/**
- * free translation
- * @see https://triple-underscore.github.io/DOM4-ja.html#_contiguous-nodes
- */
-export function contiguousSibling(
-  node: Node,
-  condition: (node: Node) => node is Text,
-): List<Text> {
-  let n: Node | null = node;
-
-  while (n && condition(n)) {
-    n = getPreviousSibling(node);
-  }
-
-  const list = new List<Text>();
-
-  while (n && condition(n)) {
-    list.append(n);
-
-    n = getNextSibling(node);
-  }
-
-  return list;
+  yield* [...precedingTexts].reverse();
+  yield node;
+  yield* followingTexts;
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-descendant-text-content
  */
-export function descendantTextContent(node: Node) {
-  const list = new List<Text>();
+export function descendantTextContent(node: Node): string {
+  const descendants = getDescendants(node) as Iterable<Node>;
+  const textDescendants = ifilter(descendants, isText);
+  const dataList = imap(textDescendants, (text) => text[$data]);
 
-  for (const text of ifilter(tail(orderTree(node)), isText)) list.append(text);
-
-  return concatTextData(list);
+  return concatString(new List(dataList));
 }
