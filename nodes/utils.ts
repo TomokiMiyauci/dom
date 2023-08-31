@@ -1,4 +1,10 @@
-import { $data, $localName, $namespacePrefix } from "./internal.ts";
+import {
+  $data,
+  $host,
+  $localName,
+  $namespacePrefix,
+  $shadowRoot,
+} from "./internal.ts";
 import { type Node } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./document.ts";
@@ -8,6 +14,7 @@ import { type Element } from "./element.ts";
 import { type Attr } from "./attr.ts";
 import { type Comment } from "./comment.ts";
 import { type CharacterData } from "./character_data.ts";
+import { type ShadowRoot } from "./shadow_root.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
 
 export class UnImplemented extends Error {}
@@ -48,6 +55,23 @@ export function isProcessingInstruction(
   node: Node,
 ): node is ProcessingInstruction {
   return node.nodeType === node.COMMENT_NODE;
+}
+
+/** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */
+export function isShadowRoot(node: Node): node is ShadowRoot {
+  return isDocumentFragment(node) && !!node[$host];
+}
+
+export interface ShadowHost extends Element {
+  [$shadowRoot]: ShadowRoot;
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#element-shadow-host
+ */
+export function isShadowHost(element: Element): element is ShadowHost {
+  // shadow root is non-null.
+  return !!element[$shadowRoot];
 }
 
 /**

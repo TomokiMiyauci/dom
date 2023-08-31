@@ -80,7 +80,8 @@ export function ParentNode<T extends Constructor<Node>>(
     /**
      * @see https://dom.spec.whatwg.org/#dom-parentnode-append
      */
-    append(...nodes: (string | Node)[]): void {
+    @convert
+    append(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // Let node be the result of converting nodes into a node given nodes and this’s node document.
       const node = convertNodesToNode(nodes, this[$nodeDocument]);
 
@@ -91,7 +92,10 @@ export function ParentNode<T extends Constructor<Node>>(
     /**
      * @see https://dom.spec.whatwg.org/#dom-parentnode-replacechildren
      */
-    replaceChildren(...nodes: (string | Node)[]): void {
+    @convert
+    replaceChildren(
+      @DOMString.exclude(isObject) ...nodes: (string | Node)[]
+    ): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
       const node = convertNodesToNode(nodes, this[$nodeDocument]);
 

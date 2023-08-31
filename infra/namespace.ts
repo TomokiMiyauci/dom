@@ -119,17 +119,17 @@ export function validateAndExtract(
     );
   }
 
-  // Duplicate 8. It maybe be specification mistake.
-  // // 9. If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException.
-  // if (
-  //   namespace === Namespace.XMLNS && (qualifiedName !== "xmlns") &&
-  //   prefix !== "xmlns"
-  // ) {
-  //   throw new DOMException(
-  //     DOMExceptionDescription.NamespaceError,
-  //     DOMExceptionName.NamespaceError,
-  //   );
-  // }
+  // 9. If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException.
+  if (
+    namespace === Namespace.XMLNS &&
+    qualifiedName !== "xmlns" &&
+    prefix !== "xmlns"
+  ) {
+    throw new DOMException(
+      DOMExceptionDescription.NamespaceError,
+      DOMExceptionName.NamespaceError,
+    );
+  }
 
   // 10. Return namespace, prefix, and localName.
   return { namespace, prefix, localName };
