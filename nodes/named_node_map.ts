@@ -23,6 +23,7 @@ import {
 import { Namespace } from "../infra/namespace.ts";
 import { isHTMLDocument } from "./document.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
+import { toASCIILowerCase } from "../infra/string.ts";
 
 export interface NamedNodeMapInits {
   element: Element;
@@ -60,7 +61,7 @@ export class NamedNodeMap extends LegacyPlatformObject
     ) {
       names.forEach((name) => {
         // 1. Let lowercaseName be name, in ASCII lowercase.
-        const lowercaseName = name.toLowerCase();
+        const lowercaseName = toASCIILowerCase(name);
 
         // 2. If lowercaseName is not equal to name, remove name from names.
         if (lowercaseName !== name) names.delete(name);
@@ -175,7 +176,7 @@ function getAttributesByName(
   if (
     element.namespaceURI === html.NS.HTML &&
     isHTMLDocument(element[$nodeDocument])
-  ) qualifiedName = qualifiedName.toLowerCase();
+  ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   return find(element[$attributeList], (attr) => {
     const q = attr.prefix === null

@@ -1,5 +1,22 @@
 import { range } from "../deps.ts";
 
+/** Return ASCII lowercase.
+ * @see https://infra.spec.whatwg.org/#ascii-lowercase
+ */
+export function toASCIILowerCase(string: string): string {
+  // replace all ASCII upper alphas in the string with their corresponding code point in ASCII lower alpha.
+  let result = "";
+
+  for (const char of string) {
+    const value = char.charCodeAt(0);
+
+    if (65 <= value && value <= 90) result += String.fromCharCode(value + 32);
+    else result += char;
+  }
+
+  return result;
+}
+
 /** Match unicode safe case insensitive.
  * @see https://infra.spec.whatwg.org/#ascii-case-insensitive
  */
@@ -22,4 +39,42 @@ export function stripAndCollapseASCIIWhitespace(input: string): string {
     .replace(/[ \t\n\f\r]+/g, " ")
     .replace(/^[ \t\n\f\r]+/, "")
     .replace(/[ \t\n\f\r]+$/, "");
+}
+
+/**
+ * @see https://infra.spec.whatwg.org/#javascript-string-convert
+ */
+export function convertScalar(input: string): string {
+  return input.replace(/[\uD800-\uDFFF]/g, "\uFFFD");
+}
+
+function substringCodeUnit(
+  string: string,
+  start: number,
+  length: number,
+): string {
+  if (
+    0 <= start && start <= start + length && start + length <= string.length
+  ) {
+    let result = "";
+
+    for (const i of range(start, start + length - 1)) {
+      result += String.fromCodePoint(string.codePointAt(i)!);
+    }
+
+    return result;
+  }
+  throw new Error();
+}
+
+function substringCodeUnitByPositions(
+  string: string,
+  start: number,
+  end: number,
+) {
+  return substringCodeUnit(string, start, end - start);
+}
+
+export function substringCodeUnitToEnd(string: string, start: number): string {
+  return substringCodeUnitByPositions(string, start, string.length);
 }

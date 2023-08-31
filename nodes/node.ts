@@ -37,7 +37,10 @@ import {
 } from "./internal.ts";
 import { every, find, html, izip } from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
-import { matchASCIICaseInsensitive } from "../infra/string.ts";
+import {
+  matchASCIICaseInsensitive,
+  toASCIILowerCase,
+} from "../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
 import type { ParentNode } from "./parent_node.ts";
 import { Exposed, SameObject } from "../webidl/extended_attribute.ts";
@@ -428,7 +431,7 @@ export function getElementsByQualifiedName(
         element !== root &&
           // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
           (element[$namespace] === Namespace.HTML &&
-            getQualifiedName(element) === qualifiedName.toLowerCase()) ||
+            getQualifiedName(element) === toASCIILowerCase(qualifiedName)) ||
         // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
         (element[$namespace] !== Namespace.HTML &&
           getQualifiedName(element) === qualifiedName),

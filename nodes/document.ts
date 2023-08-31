@@ -55,6 +55,7 @@ import { ReName } from "../xml/document.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { adoptNode } from "./mutation.ts";
+import { toASCIILowerCase } from "../infra/string.ts";
 
 export interface Encoding {
   name: string;
@@ -301,7 +302,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
-    if (isHTMLDocument(this)) localName = localName.toLowerCase();
+    if (isHTMLDocument(this)) localName = toASCIILowerCase(localName);
 
     // 3. Return a new attribute whose local name is localName and node document is this.
     return new Attr({ localName, nodeDocument: this });
@@ -396,7 +397,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 2. If this is an HTML document, then set localName to localName in ASCII lowercase.
-    if (isHTMLDocument(this)) tagName = tagName.toLowerCase();
+    if (isHTMLDocument(this)) tagName = toASCIILowerCase(tagName);
 
     // 3. Let is be null.
     let is: string | null = null;

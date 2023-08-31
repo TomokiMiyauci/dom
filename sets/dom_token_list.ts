@@ -15,6 +15,7 @@ import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
 import { getter, stringifier, WebIDL } from "../webidl/idl.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { range } from "../deps.ts";
+import { toASCIILowerCase } from "../infra/string.ts";
 
 const $tokenSet = Symbol();
 
@@ -213,7 +214,7 @@ export class DOMTokenList extends LegacyPlatformObject
     if (tokenSet.isEmpty) throw new TypeError("<message>");
 
     // 2. Let lowercase token be a copy of token, in ASCII lowercase.
-    const lowercaseToken = token.toLowerCase();
+    const lowercaseToken = toASCIILowerCase(token);
 
     // 3. If lowercase token is present in supported tokens, return true. // 4. Return false.
     return tokenSet.contains(lowercaseToken);

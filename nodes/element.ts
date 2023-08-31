@@ -58,6 +58,7 @@ import { DOMExceptionName } from "../webidl/exception.ts";
 import { PutForwards, SameObject } from "../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
+import { toASCIILowerCase } from "../infra/string.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -487,7 +488,7 @@ export class Element extends Node implements IElement {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$namespace] === Namespace.HTML && isHTMLDocument(this[$nodeDocument])
-    ) qualifiedName = qualifiedName.toLowerCase();
+    ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
     return hasAttributeByQualifiedName(qualifiedName, this);
@@ -579,7 +580,7 @@ export class Element extends Node implements IElement {
     if (
       this[$namespace] === Namespace.HTML &&
       isHTMLDocument(this[$nodeDocument])
-    ) qualifiedName = qualifiedName.toLowerCase();
+    ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
@@ -652,7 +653,7 @@ export class Element extends Node implements IElement {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$namespace] === Namespace.HTML && isHTMLDocument(this[$nodeDocument])
-    ) qualifiedName = qualifiedName.toLowerCase();
+    ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
@@ -929,7 +930,7 @@ export function getAttributeByName(
   if (
     element[$namespace] === Namespace.HTML &&
     element[$nodeDocument]._type !== "xml"
-  ) qualifiedName = qualifiedName.toLowerCase();
+  ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
   return find(
