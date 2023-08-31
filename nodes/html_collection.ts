@@ -80,7 +80,8 @@ export class HTMLCollection extends LegacyPlatformObject
       // - it has an ID which is key;
       element._ID === key ||
       // - it is in the HTML namespace and has a name attribute whose value is key;
-      element.getAttribute("name") === key) ?? null; // or null if there is no such element.
+      (element[$namespace] === Namespace.HTML &&
+        element.getAttribute("name") === key)) ?? null; // or null if there is no such element.
   }
 
   protected *represent(): IterableIterator<Element> {

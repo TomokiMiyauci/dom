@@ -190,6 +190,60 @@
         "name": "Comment.substringData() with too few arguments",
         "reason": "compiler error"
       }
+    ],
+    "dom/collections/HTMLCollection-delete.html": [
+      {
+        "name": "Loose id",
+        "reason": "strict mode only"
+      },
+      {
+        "name": "Loose name",
+        "reason": "strict mode only"
+      }
+    ],
+    "dom/collections/HTMLCollection-as-prototype.html": [
+      {
+        "name": "HTMLCollection as a prototype should not allow getting .length on the base object",
+        "reason": "not supported"
+      }
+    ],
+    "dom/collections/HTMLCollection-supported-property-indices.html": [
+      {
+        "name": "Trying to set an expando that would shadow an already-existing indexed property",
+        "reason": "strict mode"
+      },
+      {
+        "name": "Trying to set an expando with an indexed property name past the end of the list",
+        "reason": "strict mode"
+      },
+      {
+        "name": "Trying to delete an indexed property name should never work",
+        "reason": "strict mode"
+      }
+    ],
+    "dom/collections/HTMLCollection-own-props.html": [
+      {
+        "name": "Setting non-array index while named property exists (loose)",
+        "reason": "strict mode"
+      },
+      {
+        "name": "Setting array index while indexed property exists (loose)",
+        "reason": "strict mode"
+      },
+      {
+        "name": "Setting array index while indexed property doesn't exist (loose)",
+        "reason": "strict mode"
+      }
+    ],
+    "dom/collections/HTMLCollection-supported-property-names.html": [
+      {
+        "name": "Trying to set an expando that would shadow an already-existing named property",
+        "reason": "strict mode"
+      },
+      {
+        "name": "Trying to set a non-configurable expando that shadows a named property that gets added later",
+        "reason": "strict mode"
+      }
     ]
   }
 }
