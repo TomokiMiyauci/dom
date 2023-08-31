@@ -25,7 +25,7 @@ import { descendantTextContent } from "./text.ts";
 import { every, find, map, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
-import { replaceAllNode } from "./mutation.ts";
+import { preInsertNode, replaceAllNode } from "./mutation.ts";
 import { type ShadowRoot } from "./shadow_root.ts";
 import {
   $attributeChangeSteps,
@@ -59,6 +59,7 @@ import { PutForwards, SameObject } from "../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../infra/string.ts";
+import { getFirstChild, getNextSibling } from "../trees/tree.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -517,11 +518,15 @@ export class Element extends Node implements IElement {
     return !this[$attributeList].isEmpty;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-insertadjacentelement
+   */
   insertAdjacentElement(
     where: InsertPosition,
-    element: globalThis.Element,
-  ): globalThis.Element | null {
-    throw new UnImplemented("insertAdjacentElement");
+    element: Element,
+  ): Element | null {
+    // result of running insert adjacent, give this, where, and element.
+    return insertAdjacent(this, where, element);
   }
 
   insertAdjacentText(where: InsertPosition, data: string): void {
@@ -975,6 +980,47 @@ export function hasAttributeByQualifiedName(
   }
 
   return false;
+}
+
+/**
+ * @throws {DOMException}
+ * @see https://dom.spec.whatwg.org/#insert-adjacent
+ */
+export function insertAdjacent(
+  element: Element,
+  where: string,
+  node: Node,
+): Node | null {
+  // run the steps associated with the first ASCII case-insensitive match for where:
+  switch (toASCIILowerCase(where)) {
+    case "beforebegin": {
+      const parent = element._parent;
+      // If element’s parent is null, return null.
+      if (!parent) return null;
+
+      // Return the result of pre-inserting node into element’s parent before element.
+      return preInsertNode(node, parent, element);
+    }
+    case "afterbegin": {
+      // Return the result of pre-inserting node into element before element’s first child.
+      return preInsertNode(node, element, getFirstChild(element));
+    }
+    case "beforeend": {
+      // Return the result of pre-inserting node into element before null.
+      return preInsertNode(node, element, null);
+    }
+    case "afterend": {
+      const parent = element._parent;
+      // If element’s parent is null, return null.
+      if (!parent) return null;
+
+      // Return the result of pre-inserting node into element’s parent before element’s next sibling.
+      return preInsertNode(node, parent, getNextSibling(element));
+    }
+    default:
+      // Throw a "SyntaxError" DOMException.
+      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
+  }
 }
 
 export interface AttributesContext {

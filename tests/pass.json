@@ -266,6 +266,12 @@
         "name": "document.documentURI",
         "reason": "location is not supported"
       }
+    ],
+    "dom/nodes/Element-insertAdjacentElement.html": [
+      {
+        "name": "Adding more than one child to document should cause a HierarchyRequestError exception",
+        "reason": "style.visibility setter is not supported"
+      }
     ]
   }
 }
