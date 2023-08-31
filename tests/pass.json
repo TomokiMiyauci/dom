@@ -278,6 +278,12 @@
         "name": "Adding more than one child to document should cause a HierarchyRequestError exception",
         "reason": "style.visibility setter is not supported"
       }
+    ],
+    "dom/nodes/Node-normalize.html": [
+      {
+        "name": "Non-text nodes with empty textContent values.",
+        "reason": "DOMParser is not supported text/xml"
+      }
     ]
   }
 }

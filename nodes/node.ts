@@ -2,24 +2,30 @@ import {
   getQualifiedName,
   isDocument,
   isElement,
+  isText,
   UnImplemented,
 } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
-import { isConnected } from "./node_tree.ts";
+import { isConnected, nodeLength } from "./node_tree.ts";
 import { type Document } from "./document.ts";
+import { type Text } from "./text.ts";
 import type { INode } from "../interface.d.ts";
 import {
   appendNode,
   preInsertNode,
   preRemoveChild,
+  removeNode,
   replaceChild,
 } from "./mutation.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import {
+  getDescendants,
   getFirstChild,
+  getFollowingSiblings,
   getLastChild,
   getNextSibling,
+  getPrecedingSiblings,
   getPreviousSibling,
   getRoot,
   isInclusiveDescendantOf,
@@ -27,6 +33,7 @@ import {
 import { Namespace } from "../infra/namespace.ts";
 import {
   $attributeList,
+  $data,
   $element,
   $localName,
   $mode,
@@ -35,9 +42,19 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
-import { every, find, html, izip } from "../deps.ts";
+import {
+  every,
+  find,
+  html,
+  ifilter,
+  imap,
+  izip,
+  len,
+  takewhile,
+} from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import {
+  concatString,
   matchASCIICaseInsensitive,
   toASCIILowerCase,
 } from "../infra/string.ts";
@@ -48,6 +65,8 @@ import { type Const, constant } from "../webidl/idl.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./attr.ts";
 import { type Element } from "./element.ts";
+import { List } from "../infra/data_structures/list.ts";
+import { replaceData } from "./character_data_algorithm.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -240,8 +259,60 @@ export abstract class Node extends EventTarget implements INode {
     return getNextSibling(this);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-normalize
+   */
   normalize(): void {
-    throw new UnImplemented("normalize");
+    const descendants = getDescendants(this) as Iterable<Node>;
+    const descendantExclusiveTextNodes = ifilter(descendants, isText);
+
+    for (const node of [...descendantExclusiveTextNodes]) { // remove will occurs, use spread.
+      // 1. Let length be node’s length.
+      let length = nodeLength(node);
+
+      // 2. If length is zero, then remove node and continue with the next exclusive Text node, if any.
+      if (!length) {
+        removeNode(node);
+        continue;
+      }
+
+      const contiguousExclusiveTextNodes = contiguousTextNodesExclusive(node);
+      const dataList = imap(
+        contiguousExclusiveTextNodes,
+        (text) => text[$data],
+      );
+
+      // 3. Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order.
+      const data = concatString(new List(dataList));
+
+      // 4. Replace data with node node, offset length, count 0, and data data.
+      replaceData(node, length, 0, data);
+
+      // 5. Let currentNode be node’s next sibling.
+      let currentNode = getNextSibling(node);
+
+      // 6. While currentNode is an exclusive Text node:
+      while (currentNode && isText(currentNode)) {
+        // 1. For each live range whose start node is currentNode, add length to its start offset and set its start node to node.
+
+        // 2. For each live range whose end node is currentNode, add length to its end offset and set its end node to node.
+
+        // 3. For each live range whose start node is currentNode’s parent and start offset is currentNode’s index, set its start node to node and its start offset to length.
+
+        // 4. For each live range whose end node is currentNode’s parent and end offset is currentNode’s index, set its end node to node and its end offset to length.
+
+        // 5. Add currentNode’s length to length.
+        length = nodeLength(currentNode);
+
+        // 6. Set currentNode to its next sibling.
+        currentNode = getNextSibling(currentNode);
+      }
+
+      // 7. Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order.
+      [...contiguousTextNodesExclusive(node)].forEach((node) =>
+        removeNode(node)
+      );
+    }
   }
 
   cloneNode(deep?: boolean | undefined): Node {
@@ -680,4 +751,23 @@ export function locateNamespace(
       return locateNamespace(parentElement, prefix);
     }
   }
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
+ */
+function* contiguousTextNodesExclusive(node: Node): Iterable<Text> {
+  const preceding = getPrecedingSiblings(node) as Iterable<Node>;
+  const precedingTexts: Iterable<Text> = takewhile(
+    preceding,
+    isText,
+  ) as Iterable<never>;
+  const following = getFollowingSiblings(node);
+  const followingTexts: Iterable<Text> = takewhile(
+    following,
+    isText,
+  ) as Iterable<never>;
+
+  yield* [...precedingTexts].reverse();
+  yield* followingTexts;
 }
