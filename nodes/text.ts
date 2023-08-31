@@ -3,9 +3,9 @@ import { type Document } from "./document.ts";
 import {
   CharacterData,
   type CharacterDataStates,
-  replaceData,
   substringData,
 } from "./character_data.ts";
+import { replaceData } from "./character_data_algorithm.ts";
 import { isText } from "./utils.ts";
 import { Slottable } from "./slottable.ts";
 import { List } from "../infra/data_structures/list.ts";
