@@ -250,7 +250,7 @@
   "dom/nodes/Element-hasAttribute.html",
   "dom/nodes/Element-hasAttributes.html",
   "dom/nodes/Element-insertAdjacentElement.html",
-  // "dom/nodes/Element-insertAdjacentText.html",
+  "dom/nodes/Element-insertAdjacentText.html",
   "dom/nodes/Element-lastElementChild.html",
   // "dom/nodes/Element-matches-namespaced-elements.html",
   // "dom/nodes/Element-matches.html",

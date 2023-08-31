@@ -529,8 +529,15 @@ export class Element extends Node implements IElement {
     return insertAdjacent(this, where, element);
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-insertadjacenttext
+   */
   insertAdjacentText(where: InsertPosition, data: string): void {
-    throw new UnImplemented("insertAdjacentText");
+    // 1. Let text be a new Text node whose data is data and node document is this’s node document.
+    const text = Text[$create]({ data, nodeDocument: this[$nodeDocument] });
+
+    // 2. Run insert adjacent, given this, where, and text.
+    insertAdjacent(this, where, text);
   }
 
   matches(selectors: string): boolean {
