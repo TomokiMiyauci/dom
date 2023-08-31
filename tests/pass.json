@@ -244,6 +244,18 @@
         "name": "Trying to set a non-configurable expando that shadows a named property that gets added later",
         "reason": "strict mode"
       }
+    ],
+    "dom/nodes/Document-getElementsByTagName.html": [
+      {
+        "name": "Shouldn't be able to set unsigned properties on a HTMLCollection (non-strict mode)",
+        "reason": "strict mode"
+      }
+    ],
+    "dom/nodes/Element-getElementsByTagName.html": [
+      {
+        "name": "Shouldn't be able to set unsigned properties on a HTMLCollection (non-strict mode)",
+        "reason": "strict mode"
+      }
     ]
   }
 }
