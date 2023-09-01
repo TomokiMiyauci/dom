@@ -56,6 +56,8 @@ import { getDocumentElement } from "./document_tree.ts";
 import { convert, DOMString } from "../../webidl/types.ts";
 import { adoptNode } from "./mutation.ts";
 import { toASCIILowerCase } from "../../infra/string.ts";
+import { Range } from "../ranges/range.ts";
+import { BoundaryPoint } from "../ranges/boundary_point.ts";
 
 export interface Encoding {
   name: string;
@@ -573,8 +575,17 @@ export class Document extends Node implements IDocument {
     return new ProcessingInstruction({ data, target, nodeDocument: this });
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-document-createrange
+   */
   createRange(): Range {
-    throw new UnImplemented();
+    // return a new live range with (this, 0) as its start an end.
+    const range = new Range();
+
+    range["start"] = new BoundaryPoint({ node: this, offset: 0 });
+    range["end"] = new BoundaryPoint({ node: this, offset: 0 });
+
+    return range;
   }
 
   /**

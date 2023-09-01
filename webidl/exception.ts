@@ -6,6 +6,8 @@ export enum DOMExceptionName {
   InvalidCharacterError = "InvalidCharacterError",
   IndexSizeError = "IndexSizeError",
   SyntaxError = "SyntaxError",
+  InvalidNodeTypeError = "InvalidNodeTypeError",
+  WrongDocumentError = "WrongDocumentError",
 }
 
 export enum DOMExceptionDescription {

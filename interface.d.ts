@@ -113,3 +113,6 @@ export type ISVGAElement = SVGAElement;
 export type ISVGTests = SVGTests;
 export type ISVGURIReference = SVGURIReference;
 export type ICSSStyleDeclaration = CSSStyleDeclaration;
+export type IAbstractRange = AbstractRange;
+export type IStaticRange = StaticRange;
+export type IRange = Range;
