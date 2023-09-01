@@ -1,7 +1,7 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
 import { ChildNode } from "./child_node.ts";
 import { Document } from "./document.ts";
-import { $nodeDocument } from "./internal.ts";
+import { $name, $nodeDocument, $publicId, $systemId } from "./internal.ts";
 import type { IDocumentType } from "../interface.d.ts";
 import type { PartialBy } from "../deps.ts";
 
@@ -23,9 +23,9 @@ type Optional = "publicId" | "systemId";
 
 @ChildNode
 export class DocumentType extends Node implements IDocumentType {
-  readonly #name: string;
-  readonly #publicId: string;
-  readonly #systemId: string;
+  readonly [$name]: string;
+  readonly [$publicId]: string;
+  readonly [$systemId]: string;
 
   constructor(
     { name, publicId = "", systemId = "", nodeDocument }:
@@ -34,9 +34,9 @@ export class DocumentType extends Node implements IDocumentType {
   ) {
     super();
 
-    this.#name = name;
-    this.#publicId = publicId;
-    this.#systemId = systemId;
+    this[$name] = name;
+    this[$publicId] = publicId;
+    this[$systemId] = systemId;
     this[$nodeDocument] = nodeDocument;
   }
 
@@ -47,7 +47,7 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   override get nodeName(): string {
-    return this.#name;
+    return this[$name];
   }
 
   /**
@@ -87,33 +87,27 @@ export class DocumentType extends Node implements IDocumentType {
     return this[$nodeDocument];
   }
 
-  protected override equals(other: this): boolean {
-    return this.#name === other.#name &&
-      this.#publicId === other.#publicId &&
-      this.#systemId === other.#systemId;
-  }
-
   protected override clone(document: Document): DocumentType {
     return new DocumentType(
       {
-        name: this.#name,
-        publicId: this.#publicId,
-        systemId: this.#systemId,
+        name: this[$name],
+        publicId: this[$publicId],
+        systemId: this[$systemId],
         nodeDocument: document,
       },
     );
   }
 
   get name(): string {
-    return this.#name;
+    return this[$name];
   }
 
   get publicId(): string {
-    return this.#publicId;
+    return this[$publicId];
   }
 
   get systemId(): string {
-    return this.#systemId;
+    return this[$systemId];
   }
 }
 

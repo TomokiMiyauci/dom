@@ -88,10 +88,6 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     return this[$nodeDocument];
   }
 
-  protected override equals(): true {
-    return true;
-  }
-
   protected override clone(document: Document): DocumentFragment {
     return DocumentFragment[$create]({ nodeDocument: document });
   }

@@ -55,10 +55,6 @@ export class Text extends CharacterData implements IText {
     return "#text";
   }
 
-  protected override equals(other: this): boolean {
-    return this[$data] === other[$data];
-  }
-
   protected override clone(document: Document): Text {
     return Text[$create]({ data: this[$data], nodeDocument: document });
   }

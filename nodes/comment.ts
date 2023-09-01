@@ -32,10 +32,6 @@ export class Comment extends CharacterData implements IComment {
     return "#comment";
   }
 
-  protected override equals(other: this): boolean {
-    return this[$data] === other[$data];
-  }
-
   protected override clone(document: Document): Comment {
     return Comment[$create]({ data: this[$data], nodeDocument: document });
   }

@@ -157,10 +157,6 @@ export class Document extends Node implements IDocument {
     // noop
   }
 
-  protected override equals(): true {
-    return true;
-  }
-
   protected override clone(document: Document): Document {
     const doc = new (this.constructor as typeof Document)();
 

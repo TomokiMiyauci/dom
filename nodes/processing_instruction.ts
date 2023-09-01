@@ -3,7 +3,7 @@ import { CharacterData, CharacterDataStates } from "./character_data.ts";
 import { LinkStyle } from "../cssom/link_style.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { Document } from "./document.ts";
-import { $data } from "./internal.ts";
+import { $data, $target } from "./internal.ts";
 
 export interface ProcessingInstructionInits {
   target: string;
@@ -12,7 +12,7 @@ export interface ProcessingInstructionInits {
 @LinkStyle
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
-  #target: string;
+  readonly [$target]: string;
 
   constructor(
     { data, nodeDocument, target }:
@@ -21,28 +21,24 @@ export class ProcessingInstruction extends CharacterData
       & NodeStates,
   ) {
     super(data, nodeDocument);
-    this.#target = target;
+    this[$target] = target;
   }
 
   override readonly nodeType: NodeType.PROCESSING_INSTRUCTION_NODE =
     NodeType.PROCESSING_INSTRUCTION_NODE;
 
   override get nodeName(): string {
-    return this.#target;
+    return this[$target];
   }
 
   get target(): string {
-    return this.#target;
-  }
-
-  protected override equals(other: this): boolean {
-    return this.#target === other.#target && this[$data] === other[$data];
+    return this[$target];
   }
 
   protected override clone(document: Document): ProcessingInstruction {
     return new ProcessingInstruction({
       data: this[$data],
-      target: this.#target,
+      target: this[$target],
       nodeDocument: document,
     });
   }

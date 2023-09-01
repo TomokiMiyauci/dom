@@ -11,7 +11,6 @@ import {
   Attr,
   changeAttributes,
   cloneAttr,
-  equalsAttr,
   handleAttributesChanges,
 } from "./attr.ts";
 import { ParentNode } from "./parent_node.ts";
@@ -22,7 +21,7 @@ import { CustomElementDefinition } from "../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../infra/namespace.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { descendantTextContent } from "./text.ts";
-import { every, find, map, some, xmlValidator } from "../deps.ts";
+import { find, map, some, xmlValidator } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 import { Text } from "./text.ts";
 import { preInsertNode, replaceAllNode } from "./mutation.ts";
@@ -228,21 +227,6 @@ export class Element extends Node implements IElement {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[$nodeDocument];
-  }
-
-  protected override equals(other: this): boolean {
-    // Its namespace, namespace prefix, local name, and its attribute list’s size.
-    return this[$namespace] === other[$namespace] &&
-      this[$namespacePrefix] === other[$namespacePrefix] &&
-      this[$localName] === other[$localName] &&
-      this[$attributeList].size === other[$attributeList].size &&
-      // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
-      // TODO:(miyauci) improve performance. O(n²)
-      every(
-        this[$attributeList],
-        (left) =>
-          some(other[$attributeList], (right) => equalsAttr(left, right)),
-      );
   }
 
   protected override clone(document: Document): Element {

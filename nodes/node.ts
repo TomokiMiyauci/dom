@@ -6,6 +6,8 @@ import {
   UnImplemented,
 } from "./utils.ts";
 import type { ChildNode } from "./child_node.ts";
+import type { CharacterData } from "./character_data.ts";
+import type { ProcessingInstruction } from "./processing_instruction.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { isConnected, nodeLength } from "./node_tree.ts";
 import { type Document } from "./document.ts";
@@ -37,9 +39,13 @@ import {
   $element,
   $localName,
   $mode,
+  $name,
   $namespace,
   $namespacePrefix,
   $nodeDocument,
+  $publicId,
+  $systemId,
+  $target,
   $value,
 } from "./internal.ts";
 import {
@@ -49,7 +55,7 @@ import {
   ifilter,
   imap,
   izip,
-  len,
+  some,
   takewhile,
 } from "../deps.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
@@ -65,6 +71,7 @@ import { type Const, constant } from "../webidl/idl.ts";
 import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./attr.ts";
 import { type Element } from "./element.ts";
+import { type DocumentType } from "./document_type.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { replaceData } from "./character_data_algorithm.ts";
 
@@ -336,25 +343,12 @@ export abstract class Node extends EventTarget implements INode {
    */
   protected abstract clone(document: Document): Node;
 
-  /** Equals to {@linkcode other} node.
-   * This is used for {@linkcode isEqualNode}.
-   */
-  protected abstract equals(other: this): boolean;
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-isequalnode
    */
   isEqualNode(otherNode: Node | null): boolean {
-    // @optimized
     // return true if otherNode is non-null and this equals otherNode; otherwise false.
-    return this === otherNode || (otherNode !== null &&
-      this.nodeType === otherNode.nodeType &&
-      this.equals(otherNode as this) &&
-      this._children.size === otherNode._children.size &&
-      every(
-        izip(this._children, otherNode._children),
-        ([left, right]) => Node.prototype.isEqualNode.call(left, right),
-      ));
+    return !!otherNode && equals(this, otherNode);
   }
 
   /**
@@ -751,6 +745,87 @@ export function locateNamespace(
       return locateNamespace(parentElement, prefix);
     }
   }
+}
+
+export function equals(A: Node, B: Node): boolean {
+  // A and B implement the same interfaces.
+  if (A.nodeType !== B.nodeType) return false;
+
+  // A and B have the same number of children.
+  if (A._children.size !== B._children.size) return false;
+
+  // The following are equal, switching on the interface A implements:
+  if (!equalsInternalSlot(A, B)) return false;
+
+  const pair = izip(A._children, B._children);
+
+  // Each child of A equals the child of B at the identical index.
+  return every(pair, ([left, right]) => equals(left, right));
+}
+
+export function equalsDocumentType(
+  left: DocumentType,
+  right: DocumentType,
+): boolean {
+  return left[$name] === right[$name] &&
+    left[$publicId] === right[$publicId] &&
+    left[$systemId] === right[$systemId];
+}
+
+export function equalsInternalSlot(left: Node, right: Node): boolean {
+  switch (left.nodeType) {
+    case NodeType.DOCUMENT_TYPE_NODE:
+      return equalsDocumentType(<DocumentType> left, <DocumentType> right);
+
+    case NodeType.ELEMENT_NODE:
+      return equalsElement(<Element> left, <Element> right);
+    case NodeType.ATTRIBUTE_NODE:
+      return equalsAttr(<Attr> left, <Attr> right);
+    case NodeType.PROCESSING_INSTRUCTION_NODE:
+      return equalsProcessingInstruction(
+        <ProcessingInstruction> left,
+        <ProcessingInstruction> right,
+      );
+    case NodeType.TEXT_NODE:
+    case NodeType.CDATA_SECTION_NODE:
+    case NodeType.COMMENT_NODE:
+      return equalsCharacterData(<CharacterData> left, <CharacterData> right);
+    default:
+      return true;
+  }
+}
+
+export function equalsElement(left: Element, right: Element): boolean {
+  return left[$namespace] === right[$namespace] &&
+    left[$namespacePrefix] === right[$namespacePrefix] &&
+    left[$localName] === right[$localName] &&
+    left[$attributeList].size === right[$attributeList].size &&
+    // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
+    // TODO:(miyauci) improve performance. O(n²)
+    every(
+      left[$attributeList],
+      (left) => some(right[$attributeList], (right) => equalsAttr(left, right)),
+    );
+}
+
+export function equalsAttr(left: Attr, right: Attr): boolean {
+  // Its namespace, local name, and value.
+  return left === right || left[$namespace] === right[$namespace] &&
+      left[$localName] === right[$localName] && left[$value] === right[$value];
+}
+
+export function equalsCharacterData(
+  left: CharacterData,
+  right: CharacterData,
+): boolean {
+  return left[$data] === right[$data];
+}
+
+export function equalsProcessingInstruction(
+  left: ProcessingInstruction,
+  right: ProcessingInstruction,
+): boolean {
+  return equalsCharacterData(left, right) && left[$target] === right[$target];
 }
 
 /**

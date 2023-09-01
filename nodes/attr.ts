@@ -126,10 +126,6 @@ export class Attr extends Node implements IAttr {
     return this[$nodeDocument];
   }
 
-  protected override equals(other: this): boolean {
-    return equalsAttr(this, other);
-  }
-
   protected override clone(document: Document): Attr {
     return cloneAttr(this, document);
   }
@@ -264,15 +260,6 @@ export function handleAttributesChanges(
     value: newValue,
     namespace: attribute[$namespace],
   });
-}
-
-/** Equals {@linkcode left} {@linkcode Attr} to {@linkcode right} {@linkcode Attr}.
- * @see https://dom.spec.whatwg.org/#concept-node-equals
- */
-export function equalsAttr(left: Attr, right: Attr): boolean {
-  // Its namespace, local name, and value.
-  return left === right || left[$namespace] === right[$namespace] &&
-      left[$localName] === right[$localName] && left[$value] === right[$value];
 }
 
 export function cloneAttr(attr: Attr, document: Document): Attr {
