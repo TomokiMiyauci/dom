@@ -1,8 +1,9 @@
 import type { IShadowRoot } from "../interface.d.ts";
 import { DocumentFragment } from "./document_fragment.ts";
+import { type Element } from "./element.ts";
 import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
 import { InnerHTML } from "../domparsing/inner_html.ts";
-import { $slotAssignment } from "./internal.ts";
+import { $host, $slotAssignment } from "./internal.ts";
 
 @DocumentOrShadowRoot
 @InnerHTML
@@ -11,7 +12,13 @@ import { $slotAssignment } from "./internal.ts";
  */
 export class ShadowRoot extends DocumentFragment implements IShadowRoot {
   [$slotAssignment]: SlotAssignmentMode = "named";
+  [$host]: Element;
 
+  constructor({ host }: { host: Element }) {
+    super();
+
+    this[$host] = host;
+  }
   get mode(): ShadowRootMode {
     throw new Error("mode");
   }

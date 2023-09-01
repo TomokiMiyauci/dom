@@ -84,8 +84,10 @@ export function assignSlottables(slot: HTMLSlotElement): void {
 /**
  * @see https://dom.spec.whatwg.org/#signal-a-slot-change
  */
-export function signalSlotChange(slot: HTMLSlotElement) {
-  throw new Error("signalSlotChange");
+export function signalSlotChange(slot: Element): void {
+  // 1. Append slot to slot’s relevant agent’s signal slots.
+  // TODO
+  // 2. Queue a mutation observer microtask.
 }
 
 /**
