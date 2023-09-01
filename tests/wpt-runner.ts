@@ -70,9 +70,10 @@ export function runTest(
   });
 
   const pubsub = new PubSub<TestReport>();
-  const injectCode =
-    `add_result_callback((t) => pubsub.publish(t._structured_clone));
-add_completion_callback(() => pubsub.unsubscribe());`;
+  const injectCode = deps.length
+    ? `add_result_callback((t) => pubsub.publish(t._structured_clone));
+add_completion_callback(() => pubsub.unsubscribe());`
+    : "";
   const source = deps
     .concat(injectCode)
     .concat(scripts)
