@@ -3,7 +3,7 @@ import { type Node } from "./node.ts";
 import type { IHTMLCollection } from "../interface.d.ts";
 import { at, find, len, range } from "../deps.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $namespace } from "./internal.ts";
+import { $filter, $namespace, $root } from "./internal.ts";
 import { isElement } from "./utils.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 import {
@@ -13,9 +13,6 @@ import {
 import { Getter, getter, WebIDL } from "../webidl/idl.ts";
 import { orderTree } from "../trees/tree.ts";
 import { convert, DOMString, unsignedLong } from "../webidl/types.ts";
-
-const $root = Symbol();
-const $filter = Symbol();
 
 @Exposed(Window)
 @LegacyUnenumerableNamedProperties

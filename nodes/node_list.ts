@@ -1,11 +1,19 @@
 import { Node } from "./node.ts";
 import { at, ifilter, len, range } from "../deps.ts";
 import { INodeList } from "../interface.d.ts";
-import { CollectionOptions } from "./collection.ts";
 import { Iterable, iterable } from "../webidl/iterable.ts";
 import { LegacyPlatformObject } from "../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../webidl/idl.ts";
+import { $filter, $root } from "./internal.ts";
 import { orderTree } from "../trees/tree.ts";
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-collection
+ */
+export interface CollectionOptions {
+  root: Node;
+  filter: (node: Node) => boolean;
+}
 
 @iterable
 abstract class CollectiveNodeList extends LegacyPlatformObject
@@ -34,20 +42,20 @@ abstract class CollectiveNodeList extends LegacyPlatformObject
 interface CollectiveNodeList extends Getter<"index", Node>, Iterable<Node> {}
 
 export class NodeList extends CollectiveNodeList implements INodeList {
-  private root: Node;
-  private filter: (node: Node, root: Node) => boolean;
+  [$root]: Node;
+  [$filter]: (node: Node, root: Node) => boolean;
 
-  constructor(options: CollectionOptions<Node>) {
+  constructor(options: CollectionOptions) {
     super();
 
-    this.root = options.root;
-    this.filter = options.filter;
+    this[$root] = options.root;
+    this[$filter] = options.filter;
   }
 
   protected override represent(): globalThis.Iterable<Node> {
     return ifilter(
-      orderTree(this.root),
-      (node) => this.filter(node, this.root),
+      orderTree(this[$root]),
+      (node) => this[$filter](node, this[$root]),
     );
   }
 }
@@ -65,16 +73,18 @@ export interface NodeListOf<T extends Node> extends NodeList {
   [Symbol.iterator](): IterableIterator<T>;
 }
 
+const $list = Symbol();
+
 export class StaticNodeList<T extends Node> extends CollectiveNodeList
   implements INodeList {
-  private list: T[];
+  [$list]: T[];
   constructor(iterable: Iterable<T>) {
     super();
 
-    this.list = [...iterable];
+    this[$list] = [...iterable];
   }
 
   protected override represent(): T[] {
-    return this.list;
+    return this[$list];
   }
 }
