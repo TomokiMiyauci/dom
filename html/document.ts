@@ -1,14 +1,14 @@
 // deno-lint-ignore-file no-empty-interface
 import { Constructor, first } from "../deps.ts";
-import { $localName, $namespace } from "../nodes/internal.ts";
+import { $localName, $namespace } from "../dom/nodes/internal.ts";
 import { find, ifilter } from "../deps.ts";
-import { isElement } from "../nodes/utils.ts";
-import { type Node } from "../nodes/node.ts";
-import { type Element } from "../nodes/element.ts";
+import { isElement } from "../dom/nodes/utils.ts";
+import { type Node } from "../dom/nodes/node.ts";
+import { type Element } from "../dom/nodes/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
-import { getDocumentElement } from "../nodes/document_tree.ts";
-import { orderTreeChildren } from "../trees/tree.ts";
-import { getChildTextContent } from "../nodes/text.ts";
+import { getDocumentElement } from "../dom/nodes/document_tree.ts";
+import { orderTreeChildren } from "../dom/trees/tree.ts";
+import { getChildTextContent } from "../dom/nodes/text.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 

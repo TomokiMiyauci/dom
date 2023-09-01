@@ -1,11 +1,11 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
-import { DocumentFragment } from "../../nodes/document_fragment.ts";
-import { Document } from "../../nodes/document.ts";
+import { DocumentFragment } from "../../dom/nodes/document_fragment.ts";
+import { Document } from "../../dom/nodes/document.ts";
 import {
   $host,
   $nodeDocument,
   $templateContents,
-} from "../../nodes/internal.ts";
+} from "../../dom/nodes/internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
 

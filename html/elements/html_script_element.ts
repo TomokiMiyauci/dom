@@ -1,5 +1,6 @@
 import type { IHTMLScriptElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { reflectGet, reflectSet } from "../../dom/nodes/element.ts";
 
 export class HTMLScriptElement extends HTMLElement
   implements IHTMLScriptElement {
@@ -63,11 +64,18 @@ export class HTMLScriptElement extends HTMLElement
     throw new Error("referrerPolicy#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/scripting.html#dom-script-src
+   */
   get src(): string {
-    throw new Error("src#getter");
+    return reflectGet(this, "src");
   }
+
+  /**
+   * @see https://html.spec.whatwg.org/multipage/scripting.html#dom-script-src
+   */
   set src(value: string) {
-    throw new Error("src#setter");
+    reflectSet(this, "src", value);
   }
 
   get text(): string {
@@ -81,6 +89,6 @@ export class HTMLScriptElement extends HTMLElement
     throw new Error("type#getter");
   }
   set type(value: string) {
-    throw new Error("type#setter");
+    reflectSet(this, "src", value);
   }
 }

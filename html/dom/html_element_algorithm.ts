@@ -1,7 +1,7 @@
 import { isValidCustomElementName } from "../custom_element.ts";
 import { HTMLUnknownElement } from "./html_unknown_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import { interfaceRegistry } from "../../nodes/element_algorithm.ts";
+import { interfaceRegistry } from "../../dom/nodes/element_algorithm.ts";
 import { HTMLElement } from "./html_element.ts";
 import { tagNameMap } from "../tagname_map.ts";
 

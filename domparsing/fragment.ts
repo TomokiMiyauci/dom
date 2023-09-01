@@ -1,11 +1,11 @@
-import type { Element } from "../nodes/element.ts";
-import type { Node } from "../nodes/node.ts";
-import { $create, $nodeDocument } from "../nodes/internal.ts";
-import { DocumentFragment } from "../nodes/document_fragment.ts";
+import type { Element } from "../dom/nodes/element.ts";
+import type { Node } from "../dom/nodes/node.ts";
+import { $create, $nodeDocument } from "../dom/nodes/internal.ts";
+import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { parseHTMLFragment } from "../html/html_parser.ts";
-import { orderTreeChildren } from "../trees/tree.ts";
-import { appendNode } from "../nodes/mutation.ts";
-import { isHTMLDocument } from "../nodes/document.ts";
+import { orderTreeChildren } from "../dom/trees/tree.ts";
+import { appendNode } from "../dom/nodes/mutation.ts";
+import { isHTMLDocument } from "../dom/nodes/document.ts";
 import { serialize } from "npm:parse5@7.1.2";
 import { DOMTreeAdapter, DOMTreeAdapterMap } from "../html/utils.ts";
 

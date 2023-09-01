@@ -1,19 +1,19 @@
-import { Node } from "../nodes/node.ts";
-import { Text } from "../nodes/text.ts";
-import { Attr } from "../nodes/attr.ts";
-import { getQualifiedName } from "../nodes/utils.ts";
-import { Comment } from "../nodes/comment.ts";
-import { Element } from "../nodes/element.ts";
-import { DocumentFragment } from "../nodes/document_fragment.ts";
-import { DocumentType } from "../nodes/document_type.ts";
-import { Document } from "../nodes/document.ts";
+import { Node } from "../dom/nodes/node.ts";
+import { Text } from "../dom/nodes/text.ts";
+import { Attr } from "../dom/nodes/attr.ts";
+import { getQualifiedName } from "../dom/nodes/utils.ts";
+import { Comment } from "../dom/nodes/comment.ts";
+import { Element } from "../dom/nodes/element.ts";
+import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
+import { DocumentType } from "../dom/nodes/document_type.ts";
+import { Document } from "../dom/nodes/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
 import {
   $host,
   $mode,
   $nodeDocument,
   $templateContents,
-} from "../nodes/internal.ts";
+} from "../dom/nodes/internal.ts";
 import { HTMLTemplateElement } from "./elements/html_template_element.ts";
 
 export type DOMTreeAdapterMap = TreeAdapterTypeMap<

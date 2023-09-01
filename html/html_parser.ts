@@ -1,10 +1,10 @@
-import { Document } from "../nodes/document.ts";
-import type { Element } from "../nodes/element.ts";
-import type { Node } from "../nodes/node.ts";
+import { Document } from "../dom/nodes/document.ts";
+import type { Element } from "../dom/nodes/element.ts";
+import type { Node } from "../dom/nodes/node.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./utils.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
-import { $mode, $nodeDocument } from "../nodes/internal.ts";
+import { $mode, $nodeDocument } from "../dom/nodes/internal.ts";
 
 export class HTMLParser {
   #adaptor: DOMTreeAdapter;

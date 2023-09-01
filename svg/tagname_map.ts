@@ -1,7 +1,7 @@
 import { SVGAElement } from "./elements/svg_a_element.ts";
 import { SVGElement } from "./elements/svg_element.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { interfaceRegistry } from "../nodes/element_algorithm.ts";
+import { interfaceRegistry } from "../dom/nodes/element_algorithm.ts";
 
 export const tagNameMap: Record<string, typeof SVGElement> = {
   a: SVGAElement,
