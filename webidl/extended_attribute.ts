@@ -1,3 +1,11 @@
+const map = new Map<object, object>();
+
+export function Exposed(global: object): ClassDecorator {
+  return (target): void => {
+    map.set(target, global);
+  };
+}
+
 /**
  * @throws {Error} If the {@linkcode descriptor}'s get is not defined.
  */
