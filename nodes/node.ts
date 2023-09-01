@@ -1,5 +1,6 @@
 import {
   getQualifiedName,
+  isAttr,
   isDocument,
   isElement,
   isText,
@@ -30,7 +31,10 @@ import {
   getPrecedingSiblings,
   getPreviousSibling,
   getRoot,
+  isAncestorOf,
+  isDescendantOf,
   isInclusiveDescendantOf,
+  isPrecedeOf,
 } from "../trees/tree.ts";
 import { Namespace } from "../infra/namespace.ts";
 import {
@@ -359,8 +363,73 @@ export abstract class Node extends EventTarget implements INode {
     return this === otherNode;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-node-comparedocumentposition
+   */
   compareDocumentPosition(other: Node): number {
-    throw new UnImplemented();
+    // 1. If this is other, then return zero.
+    if (this === other) return 0;
+
+    // 2. Let node1 be other and node2 be this.
+    let node1: Node | null = other;
+    // deno-lint-ignore no-this-alias
+    let node2: Node | Element | null = this;
+    let attr1: Attr | null = null;
+    let attr2: Attr | null = null;
+
+    // 4. node1 is an attribute, then set attr1 to node1 and node1 to attr1’s element.
+    if (isAttr(node1)) attr1 = node1, node1 = attr1[$element];
+
+    // 5. If node2 is an attribute, then:
+    if (isAttr(node2)) {
+      // 1. Set attr2 to node2 and node2 to attr2’s element.
+      attr2 = node2, node2 = attr2[$element];
+
+      // 2. If attr1 and node1 are non-null, and node2 is node1, then:
+      if (!!attr1 && !!node1 && node2 === node1) {
+        // 2. For each attr in node2’s attribute list:
+        for (const attr of (node2 as Element)[$attributeList]) {
+          // 1. If attr equals attr1, then return the result of adding DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC and DOCUMENT_POSITION_PRECEDING.
+          if (equals(attr, attr1)) {
+            return Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC +
+              Position.DOCUMENT_POSITION_PRECEDING;
+          }
+
+          // 2. If attr equals attr2, then return the result of adding DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC and DOCUMENT_POSITION_FOLLOWING.
+          if (equals(attr, attr2)) {
+            return Position.DOCUMENT_POSITION_PRECEDING +
+              Position.DOCUMENT_POSITION_FOLLOWING;
+          }
+        }
+      }
+    }
+    // 6. If node1 or node2 is null, or node1’s root is not node2’s root, then return the result of adding DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC, and either DOCUMENT_POSITION_PRECEDING or DOCUMENT_POSITION_FOLLOWING, with the constraint that this is to be consistent, together.
+    if (!node1 || !node2 || getRoot(node1) !== getRoot(node2)) {
+      return Position.DOCUMENT_POSITION_DISCONNECTED +
+        Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC +
+        Position.DOCUMENT_POSITION_PRECEDING;
+    }
+
+    // 7. If node1 is an ancestor of node2 and attr1 is null, or node1 is node2 and attr2 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINS to DOCUMENT_POSITION_PRECEDING.
+    if ((isAncestorOf(node1, node2) && !attr1) || (node1 === node2 && !attr2)) {
+      return Position.DOCUMENT_POSITION_CONTAINS +
+        Position.DOCUMENT_POSITION_PRECEDING;
+    }
+
+    // 8. If node1 is a descendant of node2 and attr2 is null, or node1 is node2 and attr1 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINED_BY to DOCUMENT_POSITION_FOLLOWING.
+    if (
+      (isDescendantOf(node1, node2) && !attr2) ||
+      (node1 === node2 && attr1)
+    ) {
+      return Position.DOCUMENT_POSITION_CONTAINED_BY +
+        Position.DOCUMENT_POSITION_FOLLOWING;
+    }
+
+    // 9. If node1 is preceding node2, then return DOCUMENT_POSITION_PRECEDING.
+    if (isPrecedeOf(node1, node2)) return Position.DOCUMENT_POSITION_PRECEDING;
+
+    // 10. Return DOCUMENT_POSITION_FOLLOWING.
+    return Position.DOCUMENT_POSITION_FOLLOWING;
   }
 
   /**

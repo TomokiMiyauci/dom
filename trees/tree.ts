@@ -4,7 +4,6 @@ import {
   enumerate,
   first,
   islice,
-  last,
   some,
   takewhile,
 } from "../deps.ts";
@@ -154,6 +153,17 @@ export function isSiblingOf(target: Tree, of: Tree): boolean {
 
 export function isInclusiveSiblingOf(target: Tree, of: Tree): boolean {
   return target === of || isSiblingOf(target, of);
+}
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-tree-preceding
+ */
+export function isPrecedeOf(target: Tree, of: Tree): boolean {
+  // A and B are in the same tree and A comes before B in tree order.
+  if (target === of) return false;
+  if (!isSameTree(target, of)) return false;
+
+  return some(getPrecedings(of), (tree) => tree === target);
 }
 
 export function getPrecedings<T extends Tree>(tree: T): Iterable<T> {

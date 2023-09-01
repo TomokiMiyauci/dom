@@ -15,6 +15,7 @@ import {
   isInclusiveAncestorOf,
   isInclusiveDescendantOf,
   isInclusiveSiblingOf,
+  isPrecedeOf,
   isSiblingOf,
   orderTree,
   TreeNode,
@@ -237,6 +238,74 @@ describe("isSiblingOf", () => {
 
     table.forEach(([target, of]) => {
       assertFalse(isSiblingOf(target, of));
+    });
+  });
+});
+
+describe("isPrecedeOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [parent, child],
+      [parent, child2],
+      [parent, child3],
+      [parent, child4],
+      [parent, child5],
+      [child, child2],
+      [child, child2],
+      [child, child3],
+      [child, child4],
+      [child, child5],
+      [child2, child3],
+      [child2, child4],
+      [child2, child5],
+      [child3, child4],
+      [child3, child5],
+      [child4, child5],
+      [grandChild, grandChild_2],
+      [grandChild, grandChild2],
+      [grandChild, child2],
+      [grandChild, child3],
+      [grandChild, child4],
+      [grandChild, child5],
+      [grandChild_2, grandChild2],
+      [grandChild_2, child2],
+      [grandChild_2, child3],
+      [grandChild_2, child4],
+      [grandChild_2, child5],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isPrecedeOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [parent, other],
+      [parent, root],
+      [child, root],
+      [child, parent],
+      [child, child],
+      [child2, root],
+      [child2, parent],
+      [child2, child],
+      [child2, child2],
+      [child3, root],
+      [child3, parent],
+      [child3, child],
+      [child3, grandChild],
+      [child3, grandChild_2],
+      [child3, child2],
+      [child3, grandChild2],
+      [grandChild, root],
+      [grandChild, parent],
+      [grandChild, child],
+      [grandChild, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isPrecedeOf(target, of));
     });
   });
 });

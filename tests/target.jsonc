@@ -318,7 +318,7 @@
   "dom/nodes/Node-cloneNode-svg.html",
   "dom/nodes/Node-cloneNode-XMLDocument.html",
   "dom/nodes/Node-cloneNode.html",
-  // "dom/nodes/Node-compareDocumentPosition.html",
+  "dom/nodes/Node-compareDocumentPosition.html",
   "dom/nodes/Node-constants.html",
   "dom/nodes/Node-contains.html",
   "dom/nodes/Node-insertBefore.html",
