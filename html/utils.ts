@@ -37,7 +37,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   createDocumentFragment(): DocumentFragment {
-    return this.createDocumentFragment();
+    return this.document.createDocumentFragment();
   }
 
   createElement(
