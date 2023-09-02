@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-window-prefix
 import {
   dirname,
   join,
@@ -6,7 +7,7 @@ import {
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 import { insert } from "https://deno.land/x/upsert@1.2.0/mod.ts";
 import * as DOM from "../mod.ts";
-import type { TestReport } from "./types.ts";
+import { Statuses, TestReport, TestsStatus } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
 
 for (const item of Object.keys(DOM)) {
@@ -69,17 +70,61 @@ export function runTest(
     configurable: true,
   });
 
+  const ids = new Set<number>();
+  const { setTimeout: $setTimeout } = window;
+
+  const proxiedSetTimeout = new Proxy(setTimeout, {
+    apply: (...args) => {
+      const id: number = Reflect.apply(...args);
+
+      ids.add(id);
+
+      return id;
+    },
+  });
+
   const pubsub = new PubSub<TestReport>();
   const injectCode = deps.length
-    ? `add_result_callback((t) => pubsub.publish(t._structured_clone));
-add_completion_callback(() => pubsub.unsubscribe());`
+    ? `add_result_callback((t) => {
+      pubsub.publish(t._structured_clone)
+    });`
     : "";
   const source = deps
     .concat(injectCode)
     .concat(scripts)
     .join("\n");
 
+  window.setTimeout = proxiedSetTimeout;
+
   eval(source);
 
+  window.add_completion_callback((_, testStatus) => {
+    ids.forEach(clearTimeout);
+    window.setTimeout = $setTimeout;
+
+    switch (testStatus.status) {
+      case Statuses.Ok:
+      case Statuses.Error:
+        pubsub.unsubscribe();
+        break;
+      case Statuses.Timeout:
+        pubsub.error(new Error("Timeout"));
+        break;
+      default: {
+        pubsub.error(new Error("Precondition fail"));
+      }
+    }
+  });
+
+  dispatchEvent(new Event("load"));
+
   return pubsub;
+}
+
+declare global {
+  interface Window {
+    add_completion_callback(
+      fn: (_: unknown, status: TestsStatus) => void,
+    ): void;
+  }
 }

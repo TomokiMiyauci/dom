@@ -36,11 +36,10 @@ Deno.test("wpt", async (t) => {
 
       await t.step(metadata.title, async (t) => {
         const reports = runTest(metadata);
+        // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         for await (const report of reports) {
-          // // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
-          await new Promise((resolve) => setTimeout(resolve, 0));
-
           const ignore = shouldBeIgnore(name, report.name);
 
           await t.step({

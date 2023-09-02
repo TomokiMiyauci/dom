@@ -11,6 +11,19 @@ export interface Test {
   stack: string;
 }
 
+export interface TestsStatus {
+  message: string | null;
+  stack: string | null;
+  status: Statuses;
+}
+
+export enum Statuses {
+  Ok,
+  Error,
+  Timeout,
+  PreconditionFailed,
+}
+
 interface BaseTestReport {
   /** The test name. */
   name: string;

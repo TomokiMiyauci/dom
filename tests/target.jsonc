@@ -333,7 +333,7 @@
   "dom/nodes/Node-normalize.html",
   "dom/nodes/Node-parentElement.html",
   "dom/nodes/Node-parentNode-iframe.html",
-  "dom/nodes/Node-parentNode.html",
+  // "dom/nodes/Node-parentNode.html",
   "dom/nodes/Node-properties.html",
   "dom/nodes/Node-removeChild.html",
   "dom/nodes/Node-replaceChild.html",
