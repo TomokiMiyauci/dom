@@ -984,7 +984,8 @@ export class CSSStyleDeclaration implements ICSSStyleDeclaration {
     throw new Error("display#getter");
   }
   set display(value: string) {
-    throw new Error("display#setter");
+    console.warn("style.display setter is ignored");
+    // throw new Error("display#setter");
   }
   get dominantBaseline(): string {
     throw new Error("dominantBaseline#getter");

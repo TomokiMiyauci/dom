@@ -24,6 +24,7 @@ import {
   substringCodeUnitByPositions,
   substringCodeUnitToEnd,
 } from "../../infra/string.ts";
+import { convert, unsignedLong } from "../../webidl/types.ts";
 
 Exposed(Window);
 export class Range extends AbstractRange implements IRange {
@@ -527,7 +528,8 @@ export class Range extends AbstractRange implements IRange {
     // do nothing.
   }
 
-  isPointInRange(node: Node, offset: number): boolean {
+  @convert
+  isPointInRange(node: Node, @unsignedLong offset: number): boolean {
     // 1. If node’s root is different from this’s root, return false.
     if (getRoot(node) !== this.#root) return false;
 
@@ -544,7 +546,12 @@ export class Range extends AbstractRange implements IRange {
       throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
     }
 
+    const bp = new BoundaryPoint({ node, offset });
     // 4. If (node, offset) is before start or after end, return false.
+    if (
+      bp.positionOf(this.start) === Position.Before ||
+      bp.positionOf(this.end) === Position.After
+    ) return false;
 
     // 5. Return true.
     return true;
@@ -553,7 +560,8 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-comparepoint
    */
-  comparePoint(node: Node, offset: number): number {
+  @convert
+  comparePoint(node: Node, @unsignedLong offset: number): number {
     // 1. If node’s root is different from this’s root, then throw a "WrongDocumentError" DOMException.
     if (getRoot(node) !== this.#root) {
       throw new DOMException("<message>", DOMExceptionName.WrongDocumentError);
@@ -588,6 +596,7 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#dom-range-intersectsnode
    */
   intersectsNode(node: Node): boolean {
+    console.log(node);
     // 1. If node’s root is different from this’s root, return false.
     if (getRoot(node) !== this.#root) return false;
 
