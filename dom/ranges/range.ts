@@ -3,10 +3,16 @@ import type { CharacterData } from "../nodes/character_data.ts";
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
-import { getIndex, getRoot, isInclusiveAncestorOf } from "../trees/tree.ts";
+import {
+  getFollow,
+  getIndex,
+  getNextSibling,
+  getRoot,
+  isInclusiveAncestorOf,
+} from "../trees/tree.ts";
 import { AbstractRange } from "./abstract_range.ts";
 import { BoundaryPoint, Position } from "./boundary_point.ts";
-import { isCharacterData, isDocumentType } from "../nodes/utils.ts";
+import { isCharacterData, isDocumentType, isText } from "../nodes/utils.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_tree.ts";
@@ -14,6 +20,10 @@ import { $create, $data, $nodeDocument } from "../nodes/internal.ts";
 import { substringData } from "../nodes/character_data.ts";
 import { appendNode } from "../nodes/mutation.ts";
 import { replaceData } from "../nodes/character_data_algorithm.ts";
+import {
+  substringCodeUnitByPositions,
+  substringCodeUnitToEnd,
+} from "../../infra/string.ts";
 
 Exposed(Window);
 export class Range extends AbstractRange implements IRange {
@@ -270,7 +280,7 @@ export class Range extends AbstractRange implements IRange {
       ? { point: this.end, otherPoint: sourceRange.end }
       : { point: this.start, otherPoint: sourceRange.end };
 
-    const position = point["positionOf"](otherPoint);
+    const position = point.positionOf(otherPoint);
 
     switch (position) {
       case Position.Before:
@@ -565,10 +575,10 @@ export class Range extends AbstractRange implements IRange {
     const bp = new BoundaryPoint({ node, offset });
 
     // 4. If (node, offset) is before start, return −1.
-    if (bp["positionOf"](this.start) === Position.Before) return -1;
+    if (bp.positionOf(this.start) === Position.Before) return -1;
 
     // 5. If (node, offset) is after end, return 1.
-    if (bp["positionOf"](this.end) === Position.After) return 1;
+    if (bp.positionOf(this.end) === Position.After) return 1;
 
     // 6. Return 0.
     return 0;
@@ -594,16 +604,61 @@ export class Range extends AbstractRange implements IRange {
 
     // 5. If (parent, offset) is before end and (parent, offset plus 1) is after start, return true.
     if (
-      startBp["positionOf"](this.end) === Position.Before &&
-      endBp["positionOf"](this.start) === Position.After
+      startBp.positionOf(this.end) === Position.Before &&
+      endBp.positionOf(this.start) === Position.After
     ) return true;
 
     // 6. Return false.
     return false;
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-range-stringifier
+   */
   override toString(): string {
-    throw new Error("toString");
+    // 1. Let s be the empty string.
+    let s = "";
+
+    const startNode = this.start[0],
+      endNode = this.end[0],
+      startOffset = this.start[1],
+      endOffset = this.end[1];
+
+    // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
+    if (startNode === endNode && isText(startNode)) {
+      return substringCodeUnitByPositions(
+        startNode[$data],
+        startOffset,
+        endOffset,
+      );
+    }
+
+    // 3. If this’s start node is a Text node, then append the substring of that node’s data from this’s start offset until the end to s.
+    if (isText(startNode)) {
+      s += substringCodeUnitToEnd(startNode[$data], startOffset);
+    }
+
+    // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
+    // TODO(miyauci): Follow spec
+    let currentNode: Node | null = startNode;
+    const end = nextNodeDescendant(endNode);
+
+    while (currentNode && currentNode !== end) {
+      if (isText(currentNode) && this.#contained(currentNode, this)) {
+        // 4. Append the concatenation of the data of all Text nodes that are contained in this, in tree order, to s.
+        s += currentNode.data;
+      }
+
+      currentNode = getFollow(currentNode) as Node | null;
+    }
+
+    // 5. If this’s end node is a Text node, then append the substring of that node’s data from its start until this’s end offset to s.
+    if (isText(endNode)) {
+      s += substringCodeUnitByPositions(endNode[$data], 0, endOffset);
+    }
+
+    // 6. Return s.
+    return s;
   }
 
   /**
@@ -613,7 +668,7 @@ export class Range extends AbstractRange implements IRange {
     step: "start" | "end",
     range: Range,
     boundaryPoint: BoundaryPoint,
-  ) {
+  ): void {
     const node = boundaryPoint[0], offset = boundaryPoint[1];
     // 1. If node is a doctype, then throw an "InvalidNodeTypeError" DOMException.
     if (isDocumentType(node)) {
@@ -635,19 +690,24 @@ export class Range extends AbstractRange implements IRange {
     switch (step) {
       // If these steps were invoked as "set the start"
       case "start": {
-        // TODO
         // If range’s root is not equal to node’s root, or if bp is after the range’s end, set range’s end to bp.
-        if (range.#root !== getRoot(node)) range.start = bp;
+        if (
+          range.#root !== getRoot(node) ||
+          bp.positionOf(range.end) === Position.After
+        ) range.end = bp;
 
         // 2. Set range’s start to bp.
-        range.end = bp;
+        range.start = bp;
         break;
       }
 
       // If these steps were invoked as "set the end"
       case "end": {
         // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start, set range’s start to bp.
-        if (range.#root !== getRoot(node)) range.start = bp;
+        if (
+          range.#root !== getRoot(node) ||
+          bp.positionOf(range.start) === Position.Before
+        ) range.start = bp;
 
         // 2. Set range’s end to bp.
         range.end = bp;
@@ -655,9 +715,34 @@ export class Range extends AbstractRange implements IRange {
     }
   }
 
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-range-root
+   */
   get #root(): Node {
-    return this.start[0];
+    const startNode = this.start[0];
+
+    // the root of its start node.
+    return getRoot(startNode);
   }
+
+  #contained(node: Node, range: Range): boolean {
+    return getRoot(node) === range.#root &&
+      new BoundaryPoint({ node, offset: 0 }).positionOf(range.start) ===
+        Position.After &&
+      new BoundaryPoint({ node, offset: nodeLength(node) }).positionOf(
+          range.end,
+        ) === Position.Before;
+  }
+}
+
+function nextNodeDescendant(node: Node | null): Node | null {
+  while (node && getNextSibling(node)) {
+    node = node._parent;
+  }
+
+  if (!node) return null;
+
+  return getNextSibling(node);
 }
 
 export interface Range

@@ -1,7 +1,7 @@
 import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
 import { Attr } from "../dom/nodes/attr.ts";
-import { getQualifiedName } from "../dom/nodes/utils.ts";
+import { getQualifiedName, isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
 import { Element } from "../dom/nodes/element.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
@@ -103,6 +103,15 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   insertText(parentNode: Element, text: string): void {
+    if (parentNode.childNodes.length) {
+      const lastChild = parentNode.lastChild;
+
+      if (lastChild && isText(lastChild)) {
+        lastChild.data += text;
+        return;
+      }
+    }
+
     parentNode.appendChild(this.document.createTextNode(text));
   }
 

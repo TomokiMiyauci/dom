@@ -284,6 +284,16 @@
         "name": "Non-text nodes with empty textContent values.",
         "reason": "DOMParser is not supported text/xml"
       }
+    ],
+    "dom/ranges/StaticRange-constructor.html": [
+      {
+        "name": "Construct static range with CDATASection container",
+        "reason": "DOMParser is not supported application/xml"
+      },
+      {
+        "name": "Throw on missing or invalid arguments",
+        "reason": "compiler error"
+      }
     ]
   }
 }

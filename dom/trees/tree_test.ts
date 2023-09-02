@@ -1,5 +1,6 @@
 import {
   getDescendants,
+  getFollow,
   getFollowingSiblings,
   getFollows,
   getIndex,
@@ -12,6 +13,7 @@ import {
   isAncestorOf,
   isChildOf,
   isDescendantOf,
+  isFollowOf,
   isInclusiveAncestorOf,
   isInclusiveDescendantOf,
   isInclusiveSiblingOf,
@@ -306,6 +308,74 @@ describe("isPrecedeOf", () => {
 
     table.forEach(([target, of]) => {
       assertFalse(isPrecedeOf(target, of));
+    });
+  });
+});
+
+describe("isFollowOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [parent, root],
+      [child, root],
+      [child, parent],
+      [child2, root],
+      [child2, parent],
+      [child2, child],
+      [child3, root],
+      [child3, parent],
+      [child3, child],
+      [child3, grandChild],
+      [child3, grandChild_2],
+      [child3, child2],
+      [child3, grandChild2],
+      [grandChild, root],
+      [grandChild, parent],
+      [grandChild, child],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isFollowOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [parent, other],
+      [parent, parent],
+      [parent, child],
+      [parent, child2],
+      [parent, child3],
+      [parent, child4],
+      [parent, child5],
+      [child, child],
+      [child, child2],
+      [child, child2],
+      [child, child3],
+      [child, child4],
+      [child, child5],
+      [child2, child2],
+      [child2, child3],
+      [child2, child4],
+      [child2, child5],
+      [child3, child4],
+      [child3, child5],
+      [child4, child5],
+      [grandChild, grandChild_2],
+      [grandChild, grandChild2],
+      [grandChild, child2],
+      [grandChild, child3],
+      [grandChild, child4],
+      [grandChild, child5],
+      [grandChild_2, grandChild2],
+      [grandChild_2, child2],
+      [grandChild_2, child3],
+      [grandChild_2, child4],
+      [grandChild_2, child5],
+      [grandChild, grandChild],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isFollowOf(target, of));
     });
   });
 });
@@ -640,6 +710,27 @@ describe("orderTreeChildren", () => {
 
     table.forEach(([node, expected]) => {
       assertEquals([...getDescendants(node)], expected);
+    });
+  });
+});
+
+describe("getFollow", () => {
+  it("should return follow node", () => {
+    const table: [Node, Node | null][] = [
+      [root, parent],
+      [parent, child],
+      [child, grandChild],
+      [grandChild, grandChild_2],
+      [grandChild_2, child2],
+      [child2, grandChild2],
+      [grandChild2, child3],
+      [child3, child4],
+      [child4, child5],
+      [child5, null],
+    ];
+
+    table.forEach(([tree, expected]) => {
+      assertEquals(getFollow(tree), expected);
     });
   });
 });

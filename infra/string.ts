@@ -49,33 +49,37 @@ export function convertScalar(input: string): string {
   return input.replace(/[\uD800-\uDFFF]/g, "\uFFFD");
 }
 
-function substringCodeUnit(
+/**
+ * @see https://infra.spec.whatwg.org/#code-unit-substring
+ */
+export function substringCodeUnit(
   string: string,
   start: number,
   length: number,
 ): string {
-  if (
-    0 <= start && start <= start + length && start + length <= string.length
-  ) {
-    let result = "";
+  let result = "";
 
-    for (const i of range(start, start + length - 1)) {
-      result += String.fromCodePoint(string.codePointAt(i)!);
-    }
-
-    return result;
+  for (const i of range(start, start + length)) {
+    result += String.fromCharCode(string.charCodeAt(i));
   }
-  throw new Error();
+
+  return result;
 }
 
-function substringCodeUnitByPositions(
+/**
+ * @see https://infra.spec.whatwg.org/#code-unit-substring-by-positions
+ */
+export function substringCodeUnitByPositions(
   string: string,
   start: number,
   end: number,
-) {
+): string {
   return substringCodeUnit(string, start, end - start);
 }
 
+/**
+ * @see https://infra.spec.whatwg.org/#code-unit-substring-to-the-end-of-the-string
+ */
 export function substringCodeUnitToEnd(string: string, start: number): string {
   return substringCodeUnitByPositions(string, start, string.length);
 }

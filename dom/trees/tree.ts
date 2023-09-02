@@ -166,6 +166,14 @@ export function isPrecedeOf(target: Tree, of: Tree): boolean {
   return some(getPrecedings(of), (tree) => tree === target);
 }
 
+export function isFollowOf(target: Tree, of: Tree): boolean {
+  // A and B are in the same tree and A comes after B in tree order.
+  if (target === of) return false;
+  if (!isSameTree(target, of)) return false;
+
+  return some(getFollows(of), (tree) => tree === target);
+}
+
 export function getPrecedings<T extends Tree>(tree: T): Iterable<T> {
   const root = getRoot(tree);
 
@@ -194,4 +202,8 @@ export function* getDescendants<T extends Tree>(
 export function* getInclusiveDescendants(tree: Tree): Iterable<Tree> {
   yield tree;
   yield* getDescendants(tree);
+}
+
+export function getFollow(tree: Tree): Tree | null {
+  return first(getFollows(tree)) ?? null;
 }
