@@ -1,3 +1,14 @@
+export type Message = Succeed | Fail;
+
+export interface Succeed {
+  success: true;
+}
+
+export interface Fail<T = unknown> {
+  success: false;
+  error: T;
+}
+
 export class PubSub<T> {
   #target = new EventTarget();
   #done = false;
@@ -16,16 +27,29 @@ export class PubSub<T> {
       this.#queue.length = 0;
       if (this.#done) break;
 
-      await new Promise<void>((resolve) => {
-        this.#target.addEventListener(this.#key, () => {
-          resolve();
+      await new Promise<void>((resolve, reject) => {
+        this.#target.addEventListener(this.#key, (e) => {
+          const message = (e as CustomEvent<Message>).detail;
+          if (message.success) resolve();
+          else reject(message.error);
         }, { once: true });
       });
     }
   }
 
-  unsubscribe() {
+  error(err: unknown): void {
+    this.#terminate({ success: false, error: err });
+  }
+
+  unsubscribe(): void {
+    this.#terminate({ success: true });
+  }
+
+  #terminate(message: Message) {
     this.#done = true;
-    this.#target.dispatchEvent(new Event(this.#key));
+    const event = new CustomEvent<Message>(this.#key, {
+      detail: message,
+    });
+    this.#target.dispatchEvent(event);
   }
 }
