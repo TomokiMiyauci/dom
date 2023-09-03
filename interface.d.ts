@@ -116,3 +116,5 @@ export type ICSSStyleDeclaration = CSSStyleDeclaration;
 export type IAbstractRange = AbstractRange;
 export type IStaticRange = StaticRange;
 export type IRange = Range;
+export type IMutationObserver = MutationObserver;
+export type IMutationRecord = MutationRecord;

@@ -3,6 +3,7 @@ import {
   getFollow,
   getFollowingSiblings,
   getFollows,
+  getInclusiveAncestors,
   getIndex,
   getNextSibling,
   getPrecedings,
@@ -731,6 +732,24 @@ describe("getFollow", () => {
 
     table.forEach(([tree, expected]) => {
       assertEquals(getFollow(tree), expected);
+    });
+  });
+});
+
+describe("getInclusiveAncestors", () => {
+  it("should yield inclusive ancestors", () => {
+    const table: [Node, Node[]][] = [
+      [root, [root]],
+      [parent, [parent, root]],
+      [child, [child, parent, root]],
+      [grandChild, [grandChild, child, parent, root]],
+      [grandChild_2, [grandChild_2, child, parent, root]],
+      [child2, [child2, parent, root]],
+      [grandChild2, [grandChild2, child2, parent, root]],
+    ];
+
+    table.forEach(([tree, expected]) => {
+      assertEquals([...getInclusiveAncestors(tree)], expected);
     });
   });
 });

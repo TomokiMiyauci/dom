@@ -15,6 +15,7 @@ import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import {
   getFollows,
+  getInclusiveAncestors,
   getInclusiveDescendants,
   getIndex,
   getLastChild,
@@ -24,11 +25,11 @@ import {
   getRoot,
   hasParent,
 } from "../trees/tree.ts";
-import { queueTreeMutationRecord } from "./mutation_observer.ts";
 import type { Child } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
 import { filter, find, some } from "../../deps.ts";
 import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
+import { queueTreeMutationRecord } from "./mutation_observer.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -471,6 +472,20 @@ export function removeNode(
   // 20. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
 
   // 21. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
+  for (
+    const inclusiveAncestor of getInclusiveAncestors(parent) as Iterable<Node>
+  ) {
+    const list = inclusiveAncestor["registeredObserverList"];
+    for (const registered of [...list]) {
+      if (registered.options.subtree) {
+        list.append({
+          observer: registered.observer,
+          options: registered.options,
+          source: registered,
+        });
+      }
+    }
+  }
 
   // 22. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
   if (suppressObservers === null) {

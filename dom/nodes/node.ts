@@ -78,6 +78,10 @@ import { type Element } from "./element.ts";
 import { type DocumentType } from "./document_type.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { replaceData } from "./character_data_algorithm.ts";
+import {
+  type RegisteredObserver,
+  type TransientRegisteredObserver,
+} from "./mutation_observer.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -183,6 +187,11 @@ export abstract class Node extends EventTarget implements INode {
 
   _parent: (Node & ParentNode) | null = null;
   _children: OrderedSet<Node & ChildNode> = new OrderedSet();
+
+  /** @see https://dom.spec.whatwg.org/#registered-observer-list */
+  private registeredObserverList: List<
+    RegisteredObserver | TransientRegisteredObserver
+  > = new List();
 
   get baseURI(): string {
     throw new UnImplemented("baseURI");

@@ -78,7 +78,7 @@ const $list = Symbol();
 export class StaticNodeList<T extends Node> extends CollectiveNodeList
   implements INodeList {
   [$list]: T[];
-  constructor(iterable: Iterable<T>) {
+  constructor(iterable: globalThis.Iterable<T>) {
     super();
 
     this[$list] = [...iterable];

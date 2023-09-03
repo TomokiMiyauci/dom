@@ -199,6 +199,15 @@ export function* getDescendants<T extends Tree>(
   }
 }
 
+export function* getInclusiveAncestors(tree: Tree): Iterable<Tree> {
+  yield tree;
+
+  const parent = tree._parent;
+  if (!parent) return;
+
+  yield* getInclusiveAncestors(parent);
+}
+
 export function* getInclusiveDescendants(tree: Tree): Iterable<Tree> {
   yield tree;
   yield* getDescendants(tree);

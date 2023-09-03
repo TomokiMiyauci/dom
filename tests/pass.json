@@ -2310,6 +2310,12 @@
         "name": "createElementNS test in XHTML document: \"foo:\",\"\",\"INVALID_CHARACTER_ERR\"",
         "reason": "HTMLIFrameElement contentDocument is not supported"
       }
+    ],
+    "dom/nodes/MutationObserver-attributes.html": [
+      {
+        "name": "attributes HTMLInputElement.type: type update mutation",
+        "reason": "HTMLInputElement type setter is not supported"
+      }
     ]
   }
 }
