@@ -56,3 +56,7 @@ interface FailureTestReport extends BaseTestReport {
 }
 
 export type TestReport = SuccessTestReport | FailureTestReport;
+
+export interface Tests {
+  timeout_id: number | null;
+}
