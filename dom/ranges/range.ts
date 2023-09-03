@@ -24,7 +24,7 @@ import {
   substringCodeUnitByPositions,
   substringCodeUnitToEnd,
 } from "../../infra/string.ts";
-import { convert, unsignedLong } from "../../webidl/types.ts";
+import { convert, unsignedLong, unsignedShort } from "../../webidl/types.ts";
 
 Exposed(Window);
 export class Range extends AbstractRange implements IRange {
@@ -256,7 +256,11 @@ export class Range extends AbstractRange implements IRange {
   @constant
   static readonly END_TO_START: 3;
 
-  compareBoundaryPoints(how: number, sourceRange: Range): number {
+  @convert
+  compareBoundaryPoints(
+    @unsignedShort how: number,
+    sourceRange: Range,
+  ): number {
     switch (how) {
       case Range.START_TO_START:
       case Range.START_TO_END:

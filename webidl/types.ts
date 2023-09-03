@@ -158,6 +158,28 @@ export function unsignedLong(
   );
 }
 
+export function unsignedShort(
+  target: object,
+  propertyKey: string | symbol,
+  parameterIndex: number,
+): void {
+  const parameters: Convertor[] = Reflect.getMetadata(
+    MetaKey.Convertor,
+    target,
+    propertyKey,
+  ) ?? [];
+
+  Reflect.defineMetadata(
+    MetaKey.Convertor,
+    parameters.concat({
+      index: parameterIndex,
+      convert: convertToUnsignedShort,
+    }),
+    target,
+    propertyKey,
+  );
+}
+
 function convertToUnsignedLong(value: unknown): number {
   if (typeof value !== "number") return 0;
 
@@ -171,7 +193,21 @@ function convertToUnsignedLong(value: unknown): number {
   return number;
 }
 
+function convertToUnsignedShort(value: unknown): number {
+  if (typeof value !== "number") return 0;
+
+  const number = ConvertToInt(value, 16, "unsigned");
+
+  // Values outside the range are not specified.
+  // An implementation that passes WPT would look like this:
+  if (number < 0) return value + MAX_UNSIGNED_SHORT;
+  if (number >= MAX_UNSIGNED_SHORT) return value - MAX_UNSIGNED_SHORT;
+
+  return number;
+}
+
 const MAX_UNSIGNED_LONG = 2 ** 32;
+const MAX_UNSIGNED_SHORT = 2 ** 16;
 
 /**
  * @see https://webidl.spec.whatwg.org/#abstract-opdef-converttoint

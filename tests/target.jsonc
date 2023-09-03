@@ -378,7 +378,7 @@
   "dom/ranges/Range-collapse.html",
   "dom/ranges/Range-commonAncestorContainer-2.html",
   "dom/ranges/Range-commonAncestorContainer.html",
-  // "dom/ranges/Range-compareBoundaryPoints.html",
+  "dom/ranges/Range-compareBoundaryPoints.html",
   "dom/ranges/Range-comparePoint-2.html",
   "dom/ranges/Range-comparePoint.html",
   "dom/ranges/Range-constructor.html",
