@@ -1,13 +1,16 @@
-import type { Node } from "./node.ts";
-import type { Child } from "./types.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
-import type { IMutationObserver, IMutationRecord } from "../../interface.d.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
-import { List } from "../../infra/data_structures/list.ts";
-import { Queue } from "../../infra/data_structures/queue.ts";
-import { StaticNodeList } from "./node_trees/node_list.ts";
-import { getInclusiveAncestors } from "../trees/tree.ts";
-import { ifilter } from "../../deps.ts";
+import type { Node } from "../node.ts";
+import type { Child } from "../types.ts";
+import { OrderedSet } from "../../../infra/data_structures/set.ts";
+import type {
+  IMutationObserver,
+  IMutationRecord,
+} from "../../../interface.d.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
+import { List } from "../../../infra/data_structures/list.ts";
+import { Queue } from "../../../infra/data_structures/queue.ts";
+import { StaticNodeList } from "../node_trees/node_list.ts";
+import { getInclusiveAncestors } from "../../trees/tree.ts";
+import { ifilter } from "../../../deps.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)

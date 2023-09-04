@@ -13,7 +13,7 @@ import {
   $nodeDocument,
   $value,
 } from "./internal.ts";
-import { queueMutationRecord } from "./mutation_observer.ts";
+import { queueMutationRecord } from "./mutation_observers/mutation_observer.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 
 export interface AttrStates {
