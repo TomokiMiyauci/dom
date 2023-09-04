@@ -26,7 +26,7 @@ import {
   hasParent,
 } from "../../trees/tree.ts";
 import type { Child, Parent } from "../types.ts";
-import { isHostIncludingInclusiveAncestorOf } from "../algorithm.ts";
+import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
 import { filter, find, some } from "../../../deps.ts";
 import {
   assignSlot,

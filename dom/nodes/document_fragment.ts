@@ -96,6 +96,3 @@ export class DocumentFragment extends Node implements IDocumentFragment {
 export interface DocumentFragment extends ParentNode, NonElementParentNode {
   getElementById(elementId: string): HTMLElement | null;
 }
-
-// Algorithm
-// [isHostIncludingInclusiveAncestorOf](./algorithm.ts)
