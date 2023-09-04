@@ -26,16 +26,7 @@ import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
-import {
-  $create,
-  $encoding,
-  $host,
-  $implementation,
-  $mode,
-  $nodeDocument,
-  $origin,
-  $URL,
-} from "../internal.ts";
+import { $create, $host, $nodeDocument } from "../internal.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
@@ -58,11 +49,7 @@ import { adoptNode } from "../node_trees/mutation.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Range } from "../../ranges/range.ts";
 import { BoundaryPoint } from "../../ranges/boundary_point.ts";
-
-export interface Encoding {
-  name: string;
-  labels: string[];
-}
+import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -70,21 +57,13 @@ export interface OpaqueOrigin {
   type: "opaque";
 }
 
+const opaqueOrigin: OpaqueOrigin = {
+  type: "opaque",
+};
+
 export interface TupleOrigin {
   type: "tuple";
 }
-
-const utf8: Encoding = {
-  name: "UTF-8",
-  labels: [
-    "unicode-1-1-utf-8",
-    "unicode11utf8",
-    "unicode20utf8",
-    "utf-8",
-    "utf8",
-    "x-unicode20utf8",
-  ],
-};
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
@@ -104,19 +83,51 @@ export type CompatMode = "BackCompat" | "CSS1Compat";
 @FontFaceSource
 @XPathEvaluatorBase
 export class Document extends Node implements IDocument {
-  _type: "xml" | "html" = "xml";
-  _contentType: string = "application/xml";
+  /**
+   * @default utf-8
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
+   */
+  private _encoding: Encoding = utf8;
 
-  [$URL]: URL = new URL("about:blank");
-  [$implementation]: DOMImplementation;
-  [$origin]: Origin = { type: "opaque" };
-  [$mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
-  [$encoding]: Encoding = utf8;
+  /**
+   * @default "application/xml"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-content-type)
+   */
+  private _contentType = "application/xml";
+
+  /**
+   * @default new URL("about:blank")
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-url)
+   */
+  private _URL: URL = new URL("about:blank");
+
+  /**
+   * @default OpaqueOrigin
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-origin)
+   */
+  private _origin: Origin = opaqueOrigin;
+
+  /**
+   * @default "xml"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-type)
+   */
+  private _type: "xml" | "html" = "xml";
+
+  /**
+   * @default "no-quirks"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
+   */
+  private _mode: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
+   */
+  private _implementation: DOMImplementation;
 
   constructor() {
     super();
 
-    this[$implementation] = DOMImplementation.create(this);
+    this._implementation = DOMImplementation.create(this);
   }
 
   override get [$nodeDocument](): Document {
@@ -173,7 +184,7 @@ export class Document extends Node implements IDocument {
    */
   get URL(): string {
     // return this’s URL, serialized.
-    return this[$URL].href;
+    return this._URL.href;
   }
 
   /**
@@ -181,7 +192,7 @@ export class Document extends Node implements IDocument {
    */
   get characterSet(): string {
     // return this’s encoding’s name.
-    return this[$encoding].name;
+    return this._encoding.name;
   }
 
   /**
@@ -189,7 +200,7 @@ export class Document extends Node implements IDocument {
    */
   get charset(): string {
     // return this’s encoding’s name.
-    return this[$encoding].name;
+    return this._encoding.name;
   }
 
   /**
@@ -197,7 +208,7 @@ export class Document extends Node implements IDocument {
    */
   get compatMode(): CompatMode {
     // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
-    switch (this[$mode]) {
+    switch (this._mode) {
       case html.DOCUMENT_MODE.QUIRKS:
         return "BackCompat";
       default:
@@ -232,7 +243,7 @@ export class Document extends Node implements IDocument {
    */
   get documentURI(): string {
     // return this’s URL, serialized.
-    return this[$URL].href;
+    return this._URL.href;
   }
 
   /**
@@ -240,7 +251,7 @@ export class Document extends Node implements IDocument {
    */
   get implementation(): DOMImplementation {
     // return the DOMImplementation object that is associated with this.
-    return this[$implementation];
+    return this._implementation;
   }
 
   /**
@@ -248,7 +259,7 @@ export class Document extends Node implements IDocument {
    */
   get inputEncoding(): string {
     // return this’s encoding’s name.
-    return this[$encoding].name;
+    return this._encoding.name;
   }
 
   /**
@@ -757,5 +768,5 @@ export function internalCreateElement(
  */
 export function isHTMLDocument(document: Document): boolean {
   // type is "xml"; otherwise an HTML document.
-  return document._type !== "xml";
+  return document["_type"] !== "xml";
 }

@@ -98,11 +98,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   setDocumentMode(document: Document, mode: html.DOCUMENT_MODE): void {
-    document[$mode] = mode;
+    document["_mode"] = mode;
   }
 
   getDocumentMode(document: Document): html.DOCUMENT_MODE {
-    return document[$mode];
+    return document["_mode"];
   }
 
   insertText(parentNode: Element, text: string): void {

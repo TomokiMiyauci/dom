@@ -26,10 +26,10 @@ export function parseHTMLFragment(
 ): List<Node> {
   // 1. Create a new Document node, and mark it as being an HTML document.
   const document = new Document();
-  document._type = "html";
+  document["_type"] = "html";
 
   // 2. If the node document of the context element is in quirks mode, then let the Document be in quirks mode. Otherwise, the node document of the context element is in limited-quirks mode, then let the Document be in limited-quirks mode. Otherwise, leave the Document in no-quirks mode.
-  document[$mode] = context[$nodeDocument][$mode];
+  document["_mode"] = context[$nodeDocument]["_mode"];
 
   // 3. Create a new HTML parser, and associate it with the just created Document node.
   const parser = new HTMLParser(document);
