@@ -42,14 +42,11 @@ import {
 import { Namespace } from "../../infra/namespace.ts";
 import {
   $data,
-  $element,
   $name,
-  $namespace,
   $nodeDocument,
   $publicId,
   $systemId,
   $target,
-  $value,
 } from "./internal.ts";
 import {
   every,
@@ -386,12 +383,12 @@ export abstract class Node extends EventTarget implements INode {
     let attr2: Attr | null = null;
 
     // 4. node1 is an attribute, then set attr1 to node1 and node1 to attr1’s element.
-    if (isAttr(node1)) attr1 = node1, node1 = attr1[$element];
+    if (isAttr(node1)) attr1 = node1, node1 = attr1["_element"];
 
     // 5. If node2 is an attribute, then:
     if (isAttr(node2)) {
       // 1. Set attr2 to node2 and node2 to attr2’s element.
-      attr2 = node2, node2 = attr2[$element];
+      attr2 = node2, node2 = attr2["_element"];
 
       // 2. If attr1 and node1 are non-null, and node2 is node1, then:
       if (!!attr1 && !!node1 && node2 === node1) {
@@ -700,7 +697,7 @@ function getInterface(node: Node, nodeType: NodeType): Element | null {
       return null;
     case NodeType.ATTRIBUTE_NODE:
       // Return the result of locating a namespace prefix for its element, if its element is non-null; otherwise null.
-      return (node as Attr)[$element];
+      return (node as Attr)["_element"];
     default:
       // Return the result of locating a namespace prefix for its parent element, if its parent element is non-null; otherwise null.
       return getParentElement(node);
@@ -726,7 +723,7 @@ export function locateNamespacePrefix(
     element["_attributeList"],
     (attr) =>
       attr["_namespacePrefix"] === Namespace.XMLNS &&
-      attr[$value] === namespace,
+      attr["_value"] === namespace,
   );
 
   if (attribute) return attribute["_localName"];
@@ -770,7 +767,7 @@ export function locateNamespace(
       const hasAttr = find(
         attrList,
         (attr) =>
-          attr[$namespace] === Namespace.XMLNS &&
+          attr["_namespace"] === Namespace.XMLNS &&
           attr["_namespacePrefix"] === "xmlns" &&
           attr["_localName"] === prefix,
       );
@@ -778,13 +775,13 @@ export function locateNamespace(
       const attribute = hasAttr ??
         (prefix === null
           ? find(attrList, (attr) =>
-            attr[$namespace] === Namespace.XMLNS &&
+            attr["_namespace"] === Namespace.XMLNS &&
             attr["_namespacePrefix"] === null &&
             attr["_localName"] === "xmlns")
           : null);
 
       // then return its value if it is not the empty string, and null otherwise.
-      if (attribute) return attribute[$value] || null;
+      if (attribute) return attribute["_value"] || null;
 
       const parentElement = getParentElement(element);
 
@@ -810,7 +807,7 @@ export function locateNamespace(
       return null;
 
     case NodeType.ATTRIBUTE_NODE: {
-      const element = (node as Attr)[$element];
+      const element = (node as Attr)["_element"];
 
       // 1. If its element is null, then return null.
       if (element === null) return null;
@@ -895,9 +892,9 @@ export function equalsElement(left: Element, right: Element): boolean {
 
 export function equalsAttr(left: Attr, right: Attr): boolean {
   // Its namespace, local name, and value.
-  return left === right || left[$namespace] === right[$namespace] &&
+  return left === right || left["_namespace"] === right["_namespace"] &&
       left["_localName"] === right["_localName"] &&
-      left[$value] === right[$value];
+      left["_value"] === right["_value"];
 }
 
 export function equalsCharacterData(

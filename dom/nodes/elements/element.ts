@@ -25,13 +25,7 @@ import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { type ShadowRoot } from "../shadow_root.ts";
-import {
-  $create,
-  $element,
-  $namespace,
-  $nodeDocument,
-  $value,
-} from "../internal.ts";
+import { $create, $element, $nodeDocument } from "../internal.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
 import { InnerHTML } from "../../../domparsing/inner_html.ts";
@@ -390,7 +384,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return attr[$value];
+    return attr["_value"];
   }
 
   /**
@@ -408,7 +402,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return attr[$value];
+    return attr["_value"];
   }
 
   /**
@@ -522,7 +516,7 @@ export class Element extends Node implements IElement {
     return some(
       this._attributeList,
       (attr) =>
-        attr[$namespace] === namespace && attr["_localName"] === localName,
+        attr["_namespace"] === namespace && attr["_localName"] === localName,
     );
   }
 
@@ -762,7 +756,7 @@ export function getAttributeValue(
   if (attr === null) return "";
 
   // 3. Return attr’s value.
-  return attr[$value];
+  return attr["_value"];
 }
 
 /**
@@ -770,7 +764,7 @@ export function getAttributeValue(
  */
 export function setAttribute(attr: Attr, element: Element): Attr | null {
   // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
-  if (!(attr[$element] === null || attr[$element] === element)) {
+  if (!(attr["_element"] === null || attr["_element"] === element)) {
     throw new DOMException(
       "The attribute is in use by another element",
       "InUseAttributeError",
@@ -779,7 +773,7 @@ export function setAttribute(attr: Attr, element: Element): Attr | null {
 
   // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
   const oldAttr = getAttributeByNamespaceAndLocalName(
-    attr[$namespace],
+    attr["_namespace"],
     attr["_localName"],
     element,
   );
@@ -845,7 +839,7 @@ export function getAttributeByNamespaceAndLocalName(
   return find(
     element["_attributeList"],
     (attribute) =>
-      attribute[$namespace] === namespace &&
+      attribute["_namespace"] === namespace &&
       attribute["_localName"] === localName,
   ) ?? null;
 }
@@ -858,10 +852,10 @@ export function appendAttribute(attribute: Attr, element: Element): void {
   element["_attributeList"].append(attribute);
 
   // 2. Set attribute’s element to element.
-  attribute[$element] = element;
+  attribute["_element"] = element;
 
   // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
-  handleAttributesChanges(attribute, element, null, attribute[$value]);
+  handleAttributesChanges(attribute, element, null, attribute["_value"]);
 }
 
 /**
@@ -869,23 +863,23 @@ export function appendAttribute(attribute: Attr, element: Element): void {
  */
 export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
   // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
-  oldAttr[$element]?.["_attributeList"].replace(
+  oldAttr["_element"]?.["_attributeList"].replace(
     newAttr,
     (attr) => attr === oldAttr,
   );
 
   // 2. Set newAttr’s element to oldAttr’s element.
-  newAttr[$element] = oldAttr[$element];
+  newAttr["_element"] = oldAttr["_element"];
 
   // 3. Set oldAttr’s element to null.
-  oldAttr[$element] = null;
+  oldAttr["_element"] = null;
 
   // 4. Handle attribute changes for oldAttr with newAttr’s element, oldAttr’s value, and newAttr’s value.
-  newAttr[$element] && handleAttributesChanges(
+  newAttr["_element"] && handleAttributesChanges(
     oldAttr,
-    newAttr[$element],
-    oldAttr[$value],
-    newAttr[$value],
+    newAttr["_element"],
+    oldAttr["_value"],
+    newAttr["_value"],
   );
 }
 
@@ -895,17 +889,17 @@ export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
 export function removeAttribute(attribute: Attr): void {
   // Unclear whether there is always a element in attribute.
   // 1. Let element be attribute’s element.
-  const element = attribute[$element];
+  const element = attribute["_element"];
 
   // 2. Remove attribute from element’s attribute list.
   element?.["_attributeList"].remove((attr) => attr === attribute);
 
   // 3. Set attribute’s element to null.
-  attribute[$element] = null;
+  attribute["_element"] = null;
 
   // 4. Handle attribute changes for attribute with element, attribute’s value, and null.
   element &&
-    handleAttributesChanges(attribute, element, attribute[$value], null);
+    handleAttributesChanges(attribute, element, attribute["_value"], null);
 }
 
 /**

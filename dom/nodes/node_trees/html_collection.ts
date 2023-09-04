@@ -3,7 +3,7 @@ import { type Node } from "../node.ts";
 import type { IHTMLCollection } from "../../../interface.d.ts";
 import { at, find, len, range } from "../../../deps.ts";
 import { Namespace } from "../../../infra/namespace.ts";
-import { $filter, $namespace, $root } from "../internal.ts";
+import { $filter, $root } from "../internal.ts";
 import { isElement } from "../utils.ts";
 import { Exposed } from "../../../webidl/extended_attribute.ts";
 import {

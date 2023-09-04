@@ -4,7 +4,7 @@ import { type PartialBy } from "../../../deps.ts";
 import { type Element, isCustom } from "../elements/element.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
-import { $element, $namespace, $nodeDocument, $value } from "../internal.ts";
+import { $nodeDocument } from "../internal.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 
@@ -38,12 +38,30 @@ export interface AttrStates {
 type Optional = "namespace" | "namespacePrefix" | "value" | "element";
 
 export class Attr extends Node implements IAttr {
-  [$namespace]: string | null;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-namespace)
+   */
+  private _namespace: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix)
+   */
   private _namespacePrefix: string | null;
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-local-name)
+   */
   private _localName: string;
-  [$value]: string;
-  [$element]: Element | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-value)
+   */
+  private _value: string;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-element)
+   */
+  private _element: Element | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
@@ -64,11 +82,11 @@ export class Attr extends Node implements IAttr {
   ) {
     super();
 
-    this[$namespace] = namespace;
+    this._namespace = namespace;
     this._namespacePrefix = namespacePrefix;
-    this[$value] = value;
+    this._value = value;
     this._localName = localName;
-    this[$element] = element;
+    this._element = element;
     this[$nodeDocument] = nodeDocument;
   }
 
@@ -90,7 +108,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -106,7 +124,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -135,7 +153,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this[$namespace];
+    return this._namespace;
   }
 
   /**
@@ -167,7 +185,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this[$value];
+    return this._value;
   }
 
   /**
@@ -183,7 +201,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this[$element];
+    return this._element;
   }
 
   /**
@@ -203,8 +221,8 @@ export function setAnExistingAttributeValue(
   value: string,
 ): void {
   // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (attribute[$element] === null) {
-    attribute[$value] = value;
+  if (attribute["_element"] === null) {
+    attribute["_value"] = value;
   } else {
     // 2. Otherwise, change attribute to value.
     changeAttributes(attribute, value);
@@ -216,14 +234,14 @@ export function setAnExistingAttributeValue(
  */
 export function changeAttributes(attribute: Attr, value: string): void {
   // 1. Let oldValue be attribute’s value.
-  const oldValue = attribute[$value];
+  const oldValue = attribute["_value"];
 
   // 2. Set attribute’s value to value.
-  attribute[$value] = value;
+  attribute["_value"] = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  if (attribute[$element]) {
-    handleAttributesChanges(attribute, attribute[$element], oldValue, value);
+  if (attribute["_element"]) {
+    handleAttributesChanges(attribute, attribute["_element"], oldValue, value);
   }
 }
 
@@ -241,7 +259,7 @@ export function handleAttributesChanges(
     "attributes",
     element,
     attribute["_localName"],
-    attribute[$namespace],
+    attribute["_namespace"],
     oldValue,
     new OrderedSet(),
     new OrderedSet(),
@@ -258,16 +276,16 @@ export function handleAttributesChanges(
     localName: attribute["_localName"],
     oldValue,
     value: newValue,
-    namespace: attribute[$namespace],
+    namespace: attribute["_namespace"],
   });
 }
 
 export function cloneAttr(attr: Attr, document: Document): Attr {
   return new Attr({
-    namespace: attr[$namespace],
+    namespace: attr["_namespace"],
     namespacePrefix: attr["_namespacePrefix"],
     localName: attr["_localName"],
-    value: attr[$value],
+    value: attr["_value"],
     nodeDocument: document,
   });
 }
