@@ -2,7 +2,7 @@ import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
 import { type ChildNode } from "../dom/nodes/node_trees/child_node.ts";
 import { Attr } from "../dom/nodes/elements/attr.ts";
-import { getQualifiedName, isText } from "../dom/nodes/utils.ts";
+import { isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
 import { Element } from "../dom/nodes/elements/element.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
@@ -11,7 +11,6 @@ import { Document } from "../dom/nodes/documents/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
 import {
   $host,
-  $mode,
   $nodeDocument,
   $templateContents,
 } from "../dom/nodes/internal.ts";
@@ -159,7 +158,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTagName(element: Element): string {
-    return getQualifiedName(element);
+    return element["_qualifiedName"];
   }
 
   getTextNodeContent(textNode: Text): string {

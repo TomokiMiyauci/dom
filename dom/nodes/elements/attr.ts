@@ -4,15 +4,7 @@ import { type PartialBy } from "../../../deps.ts";
 import { type Element, isCustom } from "../elements/element.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
-import {
-  $attributeChangeSteps,
-  $element,
-  $localName,
-  $namespace,
-  $namespacePrefix,
-  $nodeDocument,
-  $value,
-} from "../internal.ts";
+import { $element, $namespace, $nodeDocument, $value } from "../internal.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 
@@ -47,10 +39,18 @@ type Optional = "namespace" | "namespacePrefix" | "value" | "element";
 
 export class Attr extends Node implements IAttr {
   [$namespace]: string | null;
-  [$namespacePrefix]: string | null;
-  [$localName]: string;
+  private _namespacePrefix: string | null;
+
+  private _localName: string;
   [$value]: string;
   [$element]: Element | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
+   */
+  private get _qualifiedName(): string {
+    return getQualifiedName(this._localName, this._namespacePrefix);
+  }
 
   constructor(
     {
@@ -65,9 +65,9 @@ export class Attr extends Node implements IAttr {
     super();
 
     this[$namespace] = namespace;
-    this[$namespacePrefix] = namespacePrefix;
+    this._namespacePrefix = namespacePrefix;
     this[$value] = value;
-    this[$localName] = localName;
+    this._localName = localName;
     this[$element] = element;
     this[$nodeDocument] = nodeDocument;
   }
@@ -82,7 +82,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return getQualifiedName(this);
+    return this._qualifiedName;
   }
 
   /**
@@ -143,7 +143,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this[$namespacePrefix];
+    return this._namespacePrefix;
   }
 
   /**
@@ -151,7 +151,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this[$localName];
+    return this._localName;
   }
 
   /**
@@ -159,7 +159,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return getQualifiedName(this);
+    return this._qualifiedName;
   }
 
   /**
@@ -240,7 +240,7 @@ export function handleAttributesChanges(
   queueMutationRecord(
     "attributes",
     element,
-    attribute[$localName],
+    attribute["_localName"],
     attribute[$namespace],
     oldValue,
     new OrderedSet(),
@@ -253,9 +253,9 @@ export function handleAttributesChanges(
   if (isCustom(element)) throw new Error("handleAttributesChanges");
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  element[$attributeChangeSteps].run({
+  element["_attributeChangeSteps"].run({
     element,
-    localName: attribute[$localName],
+    localName: attribute["_localName"],
     oldValue,
     value: newValue,
     namespace: attribute[$namespace],
@@ -265,8 +265,8 @@ export function handleAttributesChanges(
 export function cloneAttr(attr: Attr, document: Document): Attr {
   return new Attr({
     namespace: attr[$namespace],
-    namespacePrefix: attr[$namespacePrefix],
-    localName: attr[$localName],
+    namespacePrefix: attr["_namespacePrefix"],
+    localName: attr["_localName"],
     value: attr[$value],
     nodeDocument: document,
   });

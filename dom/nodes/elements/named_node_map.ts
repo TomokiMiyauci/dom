@@ -9,12 +9,7 @@ import {
   setAttribute,
 } from "../elements/element.ts";
 import type { Attr } from "../elements/attr.ts";
-import {
-  $attributeList,
-  $element,
-  $namespace,
-  $nodeDocument,
-} from "../internal.ts";
+import { $element, $nodeDocument } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import {
   LegacyPlatformObject,
@@ -24,6 +19,8 @@ import { Namespace } from "../../../infra/namespace.ts";
 import { isHTMLDocument } from "../documents/document.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
+
+const $attributeList = Symbol();
 
 export interface NamedNodeMapInits {
   element: Element;
@@ -50,13 +47,16 @@ export class NamedNodeMap extends LegacyPlatformObject
 
   [WebIDL.supportedNamedProperties](): Set<string> {
     // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
-    const qualifiedNames = map(this[$attributeList], getQualifiedName);
+    const qualifiedNames = map(
+      this[$attributeList],
+      (attr) => getQualifiedName(attr["_localName"], attr["_namespacePrefix"]),
+    );
     const names = new Set(qualifiedNames);
 
     // 2. If this NamedNodeMap object’s element is in the HTML namespace and its node document is an HTML document, then for each name in names:
     const element = this[$element];
     if (
-      element[$namespace] === Namespace.HTML &&
+      element["_namespace"] === Namespace.HTML &&
       isHTMLDocument(element[$nodeDocument])
     ) {
       names.forEach((name) => {
@@ -178,7 +178,7 @@ function getAttributesByName(
     isHTMLDocument(element[$nodeDocument])
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
-  return find(element[$attributeList], (attr) => {
+  return find(element["_attributeList"], (attr) => {
     const q = attr.prefix === null
       ? attr.localName
       : attr.prefix + ":" + attr.localName;
@@ -194,7 +194,7 @@ function getAttributeByNamespace(
 ): Attr | null {
   namespace ||= null;
 
-  return find(element[$attributeList], (attr) => {
+  return find(element["_attributeList"], (attr) => {
     return attr.namespaceURI === namespace && attr.localName === localName;
   }) ?? null;
 }

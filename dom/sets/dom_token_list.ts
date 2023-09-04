@@ -8,7 +8,6 @@ import {
   setAttributeValue,
 } from "../nodes/elements/element.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
-import { $attributeChangeSteps, $attributeList } from "../nodes/internal.ts";
 import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
 import { reAsciiWhitespace } from "../../infra/code_point.ts";
 import { LegacyPlatformObject } from "../../webidl/legacy_extended_attributes.ts";
@@ -45,7 +44,7 @@ export class DOMTokenList extends LegacyPlatformObject
         else this[$tokenSet] = parseOrderSet(ctx.value);
       }
     };
-    const steps = element[$attributeChangeSteps];
+    const steps = element["_attributeChangeSteps"];
     steps.define(attributeChangeStep);
 
     // 1. Let element be associated element.
@@ -245,7 +244,7 @@ export class DOMTokenList extends LegacyPlatformObject
    */
   #updateSteps(): void {
     // 1. If the associated element does not have an associated attribute and token set is empty, then return.
-    if (this.#element[$attributeList].isEmpty && this[$tokenSet].isEmpty) {
+    if (this.#element["_attributeList"].isEmpty && this[$tokenSet].isEmpty) {
       return;
     }
 

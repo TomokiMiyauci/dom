@@ -15,7 +15,7 @@ export function NonElementParentNode<T extends Constructor<Node>>(Ctor: T) {
     getElementById(@DOMString elementId: string): Element | null {
       // return the first element, in tree order, within this’s descendants, whose ID is elementId; otherwise, if there is no such element, null.
       for (const node of descendant(this)) {
-        if (isElement(node) && node._ID === elementId) return node;
+        if (isElement(node) && node["_ID"] === elementId) return node;
       }
 
       return null;

@@ -1,10 +1,4 @@
-import {
-  $data,
-  $host,
-  $localName,
-  $namespacePrefix,
-  $shadowRoot,
-} from "./internal.ts";
+import { $data, $host, $shadowRoot } from "./internal.ts";
 import { NodeType } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./documents/document.ts";
@@ -75,7 +69,7 @@ export interface ShadowHost extends Element {
  */
 export function isShadowHost(element: Element): element is ShadowHost {
   // shadow root is non-null.
-  return !!element[$shadowRoot];
+  return !!element["_shadowRoot"];
 }
 
 /**
@@ -83,9 +77,10 @@ export function isShadowHost(element: Element): element is ShadowHost {
  * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
  */
 export function getQualifiedName(
-  input: Readonly<{ [$namespacePrefix]: string | null; [$localName]: string }>,
+  localName: string,
+  namespacePrefix: string | null,
 ): string {
-  return strQualifiedName(input[$localName], input[$namespacePrefix]);
+  return strQualifiedName(localName, namespacePrefix);
 }
 
 export function strQualifiedName(localName: string, prefix?: unknown): string {

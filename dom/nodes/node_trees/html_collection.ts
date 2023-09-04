@@ -40,10 +40,10 @@ export class HTMLCollection extends LegacyPlatformObject
     const set = new Set<string>();
 
     for (const element of this.represent()) {
-      const id = element._ID;
+      const id = element["_ID"];
 
       if (typeof id === "string") set.add(id);
-      if (element[$namespace] === Namespace.HTML) {
+      if (element["_namespace"] === Namespace.HTML) {
         const value = element.getAttribute("name");
 
         if (value) set.add(value);
@@ -75,9 +75,9 @@ export class HTMLCollection extends LegacyPlatformObject
     // 2. Return the first element in the collection for which at least one of the following is true:
     return find(this.represent(), (element) =>
       // - it has an ID which is key;
-      element._ID === key ||
+      element["_ID"] === key ||
       // - it is in the HTML namespace and has a name attribute whose value is key;
-      (element[$namespace] === Namespace.HTML &&
+      (element["_namespace"] === Namespace.HTML &&
         element.getAttribute("name") === key)) ?? null; // or null if there is no such element.
   }
 
