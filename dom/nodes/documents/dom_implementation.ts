@@ -7,7 +7,7 @@ import { DocumentType } from "../document_type.ts";
 import { Text } from "../text.ts";
 import type { Element } from "../elements/element.ts";
 import { createElement } from "../elements/element_algorithm.ts";
-import { appendNode } from "../mutation.ts";
+import { appendNode } from "../node_trees/mutation.ts";
 import type { IDOMImplementation } from "../../../interface.d.ts";
 import { Namespace } from "../../../infra/namespace.ts";
 import { $create, $document, $origin } from "../internal.ts";

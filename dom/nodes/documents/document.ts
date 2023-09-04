@@ -54,7 +54,7 @@ import { Document_SVG } from "../../../svg/document.ts";
 import { ReName } from "../../../xml/document.ts";
 import { getDocumentElement } from "../node_trees/node_tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
-import { adoptNode } from "../mutation.ts";
+import { adoptNode } from "../node_trees/mutation.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Range } from "../../ranges/range.ts";
 import { BoundaryPoint } from "../../ranges/boundary_point.ts";

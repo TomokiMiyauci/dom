@@ -24,7 +24,7 @@ import {
   preRemoveChild,
   removeNode,
   replaceChild,
-} from "./mutation.ts";
+} from "./node_trees/mutation.ts";
 import { HTMLCollection } from "./node_trees/html_collection.ts";
 import {
   getDescendants,

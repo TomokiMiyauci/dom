@@ -19,7 +19,7 @@ import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import { $create, $data, $nodeDocument } from "../nodes/internal.ts";
 import { substringData } from "../nodes/character_data.ts";
-import { appendNode } from "../nodes/mutation.ts";
+import { appendNode } from "../nodes/node_trees/mutation.ts";
 import { replaceData } from "../nodes/character_data_algorithm.ts";
 import {
   substringCodeUnitByPositions,

@@ -1,7 +1,11 @@
 import { type Node } from "../node.ts";
 import type { IChildNode } from "../../../interface.d.ts";
 import { type Constructor, find, isObject } from "../../../deps.ts";
-import { preInsertNode, removeNode, replaceChild } from "../mutation.ts";
+import {
+  preInsertNode,
+  removeNode,
+  replaceChild,
+} from "../node_trees/mutation.ts";
 import {
   getFirstChild,
   getFollowingSiblings,

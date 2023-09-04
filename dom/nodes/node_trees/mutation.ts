@@ -7,12 +7,12 @@ import {
   isShadowHost,
   isShadowRoot,
   isText,
-} from "./utils.ts";
-import { type Node, NodeType } from "./node.ts";
-import { type Document } from "./documents/document.ts";
-import { $nodeDocument, $shadowRoot, $slotAssignment } from "./internal.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+} from "../utils.ts";
+import { type Node, NodeType } from "../node.ts";
+import { type Document } from "../documents/document.ts";
+import { $nodeDocument, $shadowRoot, $slotAssignment } from "../internal.ts";
+import { OrderedSet } from "../../../infra/data_structures/set.ts";
+import { DOMExceptionName } from "../../../webidl/exception.ts";
 import {
   getFollows,
   getInclusiveAncestors,
@@ -24,16 +24,16 @@ import {
   getPreviousSibling,
   getRoot,
   hasParent,
-} from "../trees/tree.ts";
-import type { Child, Parent } from "./types.ts";
-import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
-import { filter, find, some } from "../../deps.ts";
+} from "../../trees/tree.ts";
+import type { Child, Parent } from "../types.ts";
+import { isHostIncludingInclusiveAncestorOf } from "../algorithm.ts";
+import { filter, find, some } from "../../../deps.ts";
 import {
   assignSlot,
   isSlottable,
   signalSlotChange,
-} from "./node_trees/node_tree.ts";
-import { queueTreeMutationRecord } from "./mutation_observers/queue.ts";
+} from "../node_trees/node_tree.ts";
+import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace

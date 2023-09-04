@@ -23,7 +23,7 @@ import { List } from "../../../infra/data_structures/list.ts";
 import { descendantTextContent, Text } from "../text.ts";
 import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
-import { preInsertNode, replaceAllNode } from "../mutation.ts";
+import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { type ShadowRoot } from "../shadow_root.ts";
 import {
   $attributeChangeSteps,

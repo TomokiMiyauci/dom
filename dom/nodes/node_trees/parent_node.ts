@@ -24,7 +24,7 @@ import {
   ensurePreInsertionValidity,
   preInsertNode,
   replaceAllNode,
-} from "../mutation.ts";
+} from "../node_trees/mutation.ts";
 import { getFirstChild } from "../../trees/tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 
