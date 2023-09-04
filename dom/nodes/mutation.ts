@@ -33,7 +33,7 @@ import {
   isSlottable,
   signalSlotChange,
 } from "./node_trees/node_tree.ts";
-import { queueTreeMutationRecord } from "./mutation_observers/mutation_observer.ts";
+import { queueTreeMutationRecord } from "./mutation_observers/queue.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace

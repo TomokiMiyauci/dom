@@ -81,7 +81,7 @@ import { replaceData } from "./character_data_algorithm.ts";
 import {
   type RegisteredObserver,
   type TransientRegisteredObserver,
-} from "./mutation_observers/mutation_observer.ts";
+} from "./mutation_observers/queue.ts";
 import { Child } from "./types.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
