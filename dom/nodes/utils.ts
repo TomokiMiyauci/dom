@@ -7,7 +7,7 @@ import {
 } from "./internal.ts";
 import { NodeType } from "./node.ts";
 import { type Text } from "./text.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import { type DocumentFragment } from "./document_fragment.ts";
 import { type DocumentType } from "./document_type.ts";
 import { type Element } from "./elements/element.ts";

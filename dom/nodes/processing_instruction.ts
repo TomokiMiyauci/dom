@@ -2,7 +2,7 @@ import type { IProcessingInstruction } from "../../interface.d.ts";
 import { CharacterData, CharacterDataStates } from "./character_data.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
 import { NodeStates, NodeType } from "./node.ts";
-import { Document } from "./document.ts";
+import { Document } from "./documents/document.ts";
 import { $data, $target } from "./internal.ts";
 
 export interface ProcessingInstructionInits {

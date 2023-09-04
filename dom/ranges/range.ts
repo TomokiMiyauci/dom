@@ -1,6 +1,6 @@
 import type { Node } from "../nodes/node.ts";
 import type { CharacterData } from "../nodes/character_data.ts";
-import type { Document } from "../nodes/document.ts";
+import type { Document } from "../nodes/documents/document.ts";
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";

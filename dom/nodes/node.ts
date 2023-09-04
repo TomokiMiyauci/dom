@@ -11,7 +11,7 @@ import type { CharacterData } from "./character_data.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
 import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
 import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import { type Text } from "./text.ts";
 import type { INode } from "../../interface.d.ts";
 import {

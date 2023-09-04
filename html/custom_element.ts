@@ -1,4 +1,4 @@
-import type { Document } from "../dom/nodes/document.ts";
+import type { Document } from "../dom/nodes/documents/document.ts";
 import { default as isPotentialCustomElementName } from "npm:is-potential-custom-element-name@1.0.1";
 
 /**

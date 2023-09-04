@@ -4,28 +4,28 @@ import {
   getElementsByQualifiedName,
   Node,
   NodeType,
-} from "./node.ts";
-import { ParentNode } from "./node_trees/parent_node.ts";
-import { DocumentOrShadowRoot } from "./node_trees/document_or_shadow_root.ts";
-import { XPathEvaluatorBase } from "../../dom/xpath/x_path_evaluator_base.ts";
+} from "../node.ts";
+import { ParentNode } from "../node_trees/parent_node.ts";
+import { DocumentOrShadowRoot } from "../node_trees/document_or_shadow_root.ts";
+import { XPathEvaluatorBase } from "../../../dom/xpath/x_path_evaluator_base.ts";
 import {
   isDocument,
   isDocumentFragment,
   isDocumentType,
   isShadowRoot,
   UnImplemented,
-} from "./utils.ts";
-import { Attr } from "./elements/attr.ts";
-import { Text } from "./text.ts";
-import { Comment } from "./comment.ts";
-import { createElement } from "./elements/element_algorithm.ts";
-import { type Element } from "./elements/element.ts";
-import { Namespace, validateAndExtract } from "../../infra/namespace.ts";
-import { DocumentFragment } from "./document_fragment.ts";
-import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
-import type { IDocument, IXMLDocument } from "../../interface.d.ts";
-import { type DocumentType } from "./document_type.ts";
-import { find, html, xmlValidator } from "../../deps.ts";
+} from "../utils.ts";
+import { Attr } from "../elements/attr.ts";
+import { Text } from "../text.ts";
+import { Comment } from "../comment.ts";
+import { createElement } from "../elements/element_algorithm.ts";
+import { type Element } from "../elements/element.ts";
+import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
+import { DocumentFragment } from "../document_fragment.ts";
+import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
+import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
+import { type DocumentType } from "../document_type.ts";
+import { find, html, xmlValidator } from "../../../deps.ts";
 import {
   $create,
   $encoding,
@@ -35,29 +35,29 @@ import {
   $nodeDocument,
   $origin,
   $URL,
-} from "./internal.ts";
-import { ProcessingInstruction } from "./processing_instruction.ts";
-import { DOMImplementation } from "./dom_implementation.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
-import { CDATASection } from "./cdata_section.ts";
-import { GlobalEventHandlers } from "../../html/global_event_handlers.ts";
-import { FontFaceSource } from "../../css/css_font_loading/font_face_source.ts";
-import { Document_HTML } from "../../html/document.ts";
-import { Document_CSSOM_View } from "../../cssom_view/document.ts";
-import { Document_Picture_In_Picture } from "../../picture_in_picture/document.ts";
-import { Document_Fullscreen } from "../../fullscreen/document.ts";
-import { Document_Pointerlock } from "../../pointerlock/document.ts";
-import { Document_Selection } from "../../selection/document.ts";
-import { Document_Storage_Access_API } from "../../storage_access_api/document.ts";
-import { Document_WebAnimation } from "../../web_animations/document.ts";
-import { Document_SVG } from "../../svg/document.ts";
-import { ReName } from "../../xml/document.ts";
-import { getDocumentElement } from "./document_tree.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
-import { adoptNode } from "./mutation.ts";
-import { toASCIILowerCase } from "../../infra/string.ts";
-import { Range } from "../ranges/range.ts";
-import { BoundaryPoint } from "../ranges/boundary_point.ts";
+} from "../internal.ts";
+import { ProcessingInstruction } from "../processing_instruction.ts";
+import { DOMImplementation } from "../documents/dom_implementation.ts";
+import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { CDATASection } from "../cdata_section.ts";
+import { GlobalEventHandlers } from "../../../html/global_event_handlers.ts";
+import { FontFaceSource } from "../../../css/css_font_loading/font_face_source.ts";
+import { Document_HTML } from "../../../html/document.ts";
+import { Document_CSSOM_View } from "../../../cssom_view/document.ts";
+import { Document_Picture_In_Picture } from "../../../picture_in_picture/document.ts";
+import { Document_Fullscreen } from "../../../fullscreen/document.ts";
+import { Document_Pointerlock } from "../../../pointerlock/document.ts";
+import { Document_Selection } from "../../../selection/document.ts";
+import { Document_Storage_Access_API } from "../../../storage_access_api/document.ts";
+import { Document_WebAnimation } from "../../../web_animations/document.ts";
+import { Document_SVG } from "../../../svg/document.ts";
+import { ReName } from "../../../xml/document.ts";
+import { getDocumentElement } from "../document_tree.ts";
+import { convert, DOMString } from "../../../webidl/types.ts";
+import { adoptNode } from "../mutation.ts";
+import { toASCIILowerCase } from "../../../infra/string.ts";
+import { Range } from "../../ranges/range.ts";
+import { BoundaryPoint } from "../../ranges/boundary_point.ts";
 
 export interface Encoding {
   name: string;

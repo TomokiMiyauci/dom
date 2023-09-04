@@ -1,6 +1,6 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
 import { DocumentFragment } from "../../dom/nodes/document_fragment.ts";
-import { Document } from "../../dom/nodes/document.ts";
+import { Document } from "../../dom/nodes/documents/document.ts";
 import {
   $host,
   $nodeDocument,

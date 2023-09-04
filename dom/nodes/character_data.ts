@@ -1,7 +1,7 @@
 import { Node } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { $data, $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";

@@ -1,4 +1,4 @@
-import { type Document } from "../document.ts";
+import { type Document } from "../documents/document.ts";
 import { Node, NodeStates, NodeType } from "../node.ts";
 import { type PartialBy } from "../../../deps.ts";
 import { type Element, isCustom } from "../elements/element.ts";

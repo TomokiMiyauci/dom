@@ -1,4 +1,4 @@
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { CharacterData, type CharacterDataStates } from "./character_data.ts";
 import { IComment } from "../../interface.d.ts";

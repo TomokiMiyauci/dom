@@ -7,7 +7,7 @@ import { Comment } from "../dom/nodes/comment.ts";
 import { Element } from "../dom/nodes/elements/element.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
-import { Document } from "../dom/nodes/document.ts";
+import { Document } from "../dom/nodes/documents/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
 import {
   $host,

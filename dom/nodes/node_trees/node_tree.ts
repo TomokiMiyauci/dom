@@ -10,7 +10,7 @@ import {
 import { getRoot } from "../../trees/tree.ts";
 import { $data, $host } from "../internal.ts";
 import { type Attr } from "../elements/attr.ts";
-import { type Document } from "../document.ts";
+import { type Document } from "../documents/document.ts";
 import { type DocumentFragment } from "../document_fragment.ts";
 import { type DocumentType } from "../document_type.ts";
 import { type Element } from "../elements/element.ts";

@@ -1,5 +1,5 @@
 import { type Node, type NodeStates, NodeType } from "./node.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import {
   CharacterData,
   type CharacterDataStates,

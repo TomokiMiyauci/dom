@@ -1,5 +1,5 @@
 import { type Node } from "../node.ts";
-import { type Document } from "../document.ts";
+import { type Document } from "../documents/document.ts";
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
 import { isElement } from "../utils.ts";

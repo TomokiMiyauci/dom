@@ -16,7 +16,7 @@ import {
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { type Document, isHTMLDocument } from "../document.ts";
+import { type Document, isHTMLDocument } from "../documents/document.ts";
 import { CustomElementDefinition } from "../../../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { List } from "../../../infra/data_structures/list.ts";

@@ -9,7 +9,7 @@ import {
   isText,
 } from "./utils.ts";
 import { type Node, NodeType } from "./node.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "./documents/document.ts";
 import { $nodeDocument, $shadowRoot, $slotAssignment } from "./internal.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
