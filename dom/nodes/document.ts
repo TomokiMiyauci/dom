@@ -5,8 +5,8 @@ import {
   Node,
   NodeType,
 } from "./node.ts";
-import { ParentNode } from "./parent_node.ts";
-import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
+import { ParentNode } from "./node_trees/parent_node.ts";
+import { DocumentOrShadowRoot } from "./node_trees/document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../../dom/xpath/x_path_evaluator_base.ts";
 import {
   isDocument,
@@ -22,7 +22,7 @@ import { createElement } from "./element_algorithm.ts";
 import { type Element } from "./element.ts";
 import { Namespace, validateAndExtract } from "../../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
-import { NonElementParentNode } from "./non_element_parent_node.ts";
+import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../interface.d.ts";
 import { type DocumentType } from "./document_type.ts";
 import { find, html, xmlValidator } from "../../deps.ts";

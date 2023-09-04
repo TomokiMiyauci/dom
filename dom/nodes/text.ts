@@ -7,11 +7,11 @@ import {
 } from "./character_data.ts";
 import { replaceData } from "./character_data_algorithm.ts";
 import { isText } from "./utils.ts";
-import { Slottable } from "./slottable.ts";
+import { Slottable } from "./node_trees/slottable.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { insertNode } from "./mutation.ts";
 import type { IText } from "../../interface.d.ts";
-import { nodeLength } from "./node_tree.ts";
+import { nodeLength } from "./node_trees/node_tree.ts";
 import {
   getDescendants,
   getFollowingSiblings,

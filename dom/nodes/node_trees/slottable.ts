@@ -1,6 +1,6 @@
-import type { ISlottable } from "../../interface.d.ts";
-import { type Constructor } from "../../deps.ts";
-import { UnImplemented } from "./utils.ts";
+import type { ISlottable } from "../../../interface.d.ts";
+import { type Constructor } from "../../../deps.ts";
+import { UnImplemented } from "../utils.ts";
 
 export function Slottable<T extends Constructor>(Ctor: T) {
   abstract class Slottable extends Ctor implements ISlottable {

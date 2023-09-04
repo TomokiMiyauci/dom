@@ -1,9 +1,12 @@
-import { type INonDocumentTypeChildNode } from "../../interface.d.ts";
-import { isElement } from "./utils.ts";
-import type { Element } from "./element.ts";
-import { type Constructor, find, first, ifilter } from "../../deps.ts";
-import { type Node } from "./node.ts";
-import { getFollowingSiblings, getPrecedingSiblings } from "../trees/tree.ts";
+import { type INonDocumentTypeChildNode } from "../../../interface.d.ts";
+import { isElement } from "../utils.ts";
+import type { Element } from "../element.ts";
+import { type Constructor, find, first, ifilter } from "../../../deps.ts";
+import { type Node } from "../node.ts";
+import {
+  getFollowingSiblings,
+  getPrecedingSiblings,
+} from "../../trees/tree.ts";
 
 export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class NonDocumentTypeChildNode extends Ctor

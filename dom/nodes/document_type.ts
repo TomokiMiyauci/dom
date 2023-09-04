@@ -1,5 +1,5 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
-import { ChildNode } from "./child_node.ts";
+import { ChildNode } from "./node_trees/child_node.ts";
 import { Document } from "./document.ts";
 import { $name, $nodeDocument, $publicId, $systemId } from "./internal.ts";
 import type { IDocumentType } from "../../interface.d.ts";

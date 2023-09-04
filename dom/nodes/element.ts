@@ -13,8 +13,8 @@ import {
   cloneAttr,
   handleAttributesChanges,
 } from "./attr.ts";
-import { ParentNode } from "./parent_node.ts";
-import { NonDocumentTypeChildNode } from "./non_document_type_child_node.ts";
+import { ParentNode } from "./node_trees/parent_node.ts";
+import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
 import { type Document, isHTMLDocument } from "./document.ts";
 import { CustomElementDefinition } from "../../html/custom_element.ts";
@@ -43,8 +43,8 @@ import {
 import { ARIAMixin } from "../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../web_animations/animatable.ts";
 import { InnerHTML } from "../../domparsing/inner_html.ts";
-import { ChildNode } from "./child_node.ts";
-import { Slottable } from "./slottable.ts";
+import { ChildNode } from "./node_trees/child_node.ts";
+import { Slottable } from "./node_trees/slottable.ts";
 import { DOMTokenList } from "../sets/dom_token_list.ts";
 import { Element_CSSOMView } from "../../cssom_view/element.ts";
 import { Element_CSSTypedOM } from "../../css/css_typed_om/element.ts";

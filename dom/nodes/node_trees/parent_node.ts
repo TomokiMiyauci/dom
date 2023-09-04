@@ -1,12 +1,12 @@
-import { type Node } from "./node.ts";
-import { type Document } from "./document.ts";
-import { DocumentFragment } from "./document_fragment.ts";
-import { Text } from "./text.ts";
-import { isElement } from "./utils.ts";
-import { type Element } from "./element.ts";
-import type { IParentNode } from "../../interface.d.ts";
+import { type Node } from "../node.ts";
+import { type Document } from "../document.ts";
+import { DocumentFragment } from "../document_fragment.ts";
+import { Text } from "../text.ts";
+import { isElement } from "../utils.ts";
+import { type Element } from "../element.ts";
+import type { IParentNode } from "../../../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
-import { matchScopedSelectorsString } from "../trees/selector.ts";
+import { matchScopedSelectorsString } from "../../trees/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import {
   Constructor,
@@ -17,16 +17,16 @@ import {
   last,
   len,
   map,
-} from "../../deps.ts";
-import { $create, $nodeDocument } from "./internal.ts";
+} from "../../../deps.ts";
+import { $create, $nodeDocument } from "../internal.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
   preInsertNode,
   replaceAllNode,
-} from "./mutation.ts";
-import { getFirstChild } from "../trees/tree.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
+} from "../mutation.ts";
+import { getFirstChild } from "../../trees/tree.ts";
+import { convert, DOMString } from "../../../webidl/types.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
   Ctor: T,

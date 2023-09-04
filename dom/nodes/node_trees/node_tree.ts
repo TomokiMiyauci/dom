@@ -6,17 +6,17 @@ import {
   isElement,
   isShadowRoot,
   isText,
-} from "./utils.ts";
-import { getRoot } from "../trees/tree.ts";
-import { $data, $host } from "./internal.ts";
-import { type Attr } from "./attr.ts";
-import { type Document } from "./document.ts";
-import { type DocumentFragment } from "./document_fragment.ts";
-import { type DocumentType } from "./document_type.ts";
-import { type Element } from "./element.ts";
-import { type Text } from "./text.ts";
-import { type Node } from "./node.ts";
-import { type CharacterData } from "./character_data.ts";
+} from "../utils.ts";
+import { getRoot } from "../../trees/tree.ts";
+import { $data, $host } from "../internal.ts";
+import { type Attr } from "../attr.ts";
+import { type Document } from "../document.ts";
+import { type DocumentFragment } from "../document_fragment.ts";
+import { type DocumentType } from "../document_type.ts";
+import { type Element } from "../element.ts";
+import { type Text } from "../text.ts";
+import { type Node } from "../node.ts";
+import { type CharacterData } from "../character_data.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length

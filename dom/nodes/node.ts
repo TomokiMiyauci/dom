@@ -6,11 +6,11 @@ import {
   isText,
   UnImplemented,
 } from "./utils.ts";
-import type { ChildNode } from "./child_node.ts";
+import type { ChildNode } from "./node_trees/child_node.ts";
 import type { CharacterData } from "./character_data.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
-import { NodeList, NodeListOf } from "./node_list.ts";
-import { isConnected, nodeLength } from "./node_tree.ts";
+import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
+import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
 import { type Document } from "./document.ts";
 import { type Text } from "./text.ts";
 import type { INode } from "../../interface.d.ts";
@@ -21,7 +21,7 @@ import {
   removeNode,
   replaceChild,
 } from "./mutation.ts";
-import { HTMLCollection } from "./html_collection.ts";
+import { HTMLCollection } from "./node_trees/html_collection.ts";
 import {
   getDescendants,
   getFirstChild,
@@ -69,7 +69,7 @@ import {
   toASCIILowerCase,
 } from "../../infra/string.ts";
 import { parseOrderSet } from "../trees/ordered_set.ts";
-import type { ParentNode } from "./parent_node.ts";
+import type { ParentNode } from "./node_trees/parent_node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
 import { getDocumentElement } from "./document_tree.ts";
@@ -504,7 +504,11 @@ export abstract class Node extends EventTarget implements INode {
     return appendNode(node, this) as T;
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-replacechild)
+   */
   replaceChild<T>(node: T & Node, child: T): T {
+    // return the result of replacing child with node within this.
     return replaceChild<T & Node>(child as any, node, this);
   }
 

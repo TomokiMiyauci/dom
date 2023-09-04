@@ -1,8 +1,8 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
-import { ParentNode } from "./parent_node.ts";
+import { ParentNode } from "./node_trees/parent_node.ts";
 import { type Document } from "./document.ts";
 import { type Element } from "./element.ts";
-import { NonElementParentNode } from "./non_element_parent_node.ts";
+import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
 import { $create, $host, $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";

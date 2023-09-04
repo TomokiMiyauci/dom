@@ -1,11 +1,11 @@
-import { Node } from "./node.ts";
-import { at, ifilter, len, range } from "../../deps.ts";
-import { INodeList } from "../../interface.d.ts";
-import { Iterable, iterable } from "../../webidl/iterable.ts";
-import { LegacyPlatformObject } from "../../webidl/legacy_extended_attributes.ts";
-import { Getter, getter, WebIDL } from "../../webidl/idl.ts";
-import { $filter, $root } from "./internal.ts";
-import { orderTree } from "../trees/tree.ts";
+import { Node } from "../node.ts";
+import { at, ifilter, len, range } from "../../../deps.ts";
+import { INodeList } from "../../../interface.d.ts";
+import { Iterable, iterable } from "../../../webidl/iterable.ts";
+import { LegacyPlatformObject } from "../../../webidl/legacy_extended_attributes.ts";
+import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
+import { $filter, $root } from "../internal.ts";
+import { orderTree } from "../../trees/tree.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-collection

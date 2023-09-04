@@ -5,7 +5,7 @@ import type { IMutationObserver, IMutationRecord } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { Queue } from "../../infra/data_structures/queue.ts";
-import { StaticNodeList } from "./node_list.ts";
+import { StaticNodeList } from "./node_trees/node_list.ts";
 import { getInclusiveAncestors } from "../trees/tree.ts";
 import { ifilter } from "../../deps.ts";
 
@@ -200,7 +200,9 @@ export class MutationObserver implements IMutationObserver {
   disconnect(): void {
     // 1. For each node of this’s node list, remove any registered observer from node’s registered observer list for which this is the observer.
     for (const node of this.nodeList) {
-      node["registeredObserverList"].remove(this.#isRegisteredObserverThis);
+      node["registeredObserverList"].remove(
+        this.#isRegisteredObserverThis.bind(this),
+      );
     }
 
     // 2. Empty this’s record queue.

@@ -28,7 +28,11 @@ import {
 import type { Child, Parent } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
 import { filter, find, some } from "../../deps.ts";
-import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
+import {
+  assignSlot,
+  isSlottable,
+  signalSlotChange,
+} from "./node_trees/node_tree.ts";
 import { queueTreeMutationRecord } from "./mutation_observer.ts";
 
 /**

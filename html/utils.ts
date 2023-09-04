@@ -1,6 +1,6 @@
 import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
-import { type ChildNode } from "../dom/nodes/child_node.ts";
+import { type ChildNode } from "../dom/nodes/node_trees/child_node.ts";
 import { Attr } from "../dom/nodes/attr.ts";
 import { getQualifiedName, isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";

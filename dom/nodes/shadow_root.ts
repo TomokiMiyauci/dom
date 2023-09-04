@@ -1,7 +1,7 @@
 import type { IShadowRoot } from "../../interface.d.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { type Element } from "./element.ts";
-import { DocumentOrShadowRoot } from "./document_or_shadow_root.ts";
+import { DocumentOrShadowRoot } from "./node_trees/document_or_shadow_root.ts";
 import { InnerHTML } from "../../domparsing/inner_html.ts";
 import { $host, $slotAssignment } from "./internal.ts";
 

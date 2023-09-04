@@ -1,10 +1,10 @@
-import { Element } from "./element.ts";
-import { type Node } from "./node.ts";
-import { Constructor } from "../../deps.ts";
-import { descendant } from "../trees/tree.ts";
-import { isElement } from "./utils.ts";
-import type { INonElementParentNode } from "../../interface.d.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
+import { Element } from "../element.ts";
+import { type Node } from "../node.ts";
+import { Constructor } from "../../../deps.ts";
+import { descendant } from "../../trees/tree.ts";
+import { isElement } from "../utils.ts";
+import type { INonElementParentNode } from "../../../interface.d.ts";
+import { convert, DOMString } from "../../../webidl/types.ts";
 
 export function NonElementParentNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class Mixin extends Ctor implements NonElementParentNode {

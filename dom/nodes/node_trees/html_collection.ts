@@ -1,18 +1,18 @@
-import { type Element } from "./element.ts";
-import { type Node } from "./node.ts";
-import type { IHTMLCollection } from "../../interface.d.ts";
-import { at, find, len, range } from "../../deps.ts";
-import { Namespace } from "../../infra/namespace.ts";
-import { $filter, $namespace, $root } from "./internal.ts";
-import { isElement } from "./utils.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { type Element } from "../element.ts";
+import { type Node } from "../node.ts";
+import type { IHTMLCollection } from "../../../interface.d.ts";
+import { at, find, len, range } from "../../../deps.ts";
+import { Namespace } from "../../../infra/namespace.ts";
+import { $filter, $namespace, $root } from "../internal.ts";
+import { isElement } from "../utils.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 import {
   LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-} from "../../webidl/legacy_extended_attributes.ts";
-import { Getter, getter, WebIDL } from "../../webidl/idl.ts";
-import { orderTree } from "../trees/tree.ts";
-import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
+} from "../../../webidl/legacy_extended_attributes.ts";
+import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
+import { orderTree } from "../../trees/tree.ts";
+import { convert, DOMString, unsignedLong } from "../../../webidl/types.ts";
 
 @Exposed(Window)
 @LegacyUnenumerableNamedProperties

@@ -1,16 +1,16 @@
-import { type Node } from "./node.ts";
-import type { IChildNode } from "../../interface.d.ts";
-import { type Constructor, find, isObject } from "../../deps.ts";
-import { preInsertNode, removeNode, replaceChild } from "./mutation.ts";
+import { type Node } from "../node.ts";
+import type { IChildNode } from "../../../interface.d.ts";
+import { type Constructor, find, isObject } from "../../../deps.ts";
+import { preInsertNode, removeNode, replaceChild } from "../mutation.ts";
 import {
   getFirstChild,
   getFollowingSiblings,
   getNextSibling,
   getPrecedingSiblings,
-} from "../trees/tree.ts";
-import { convertNodesToNode } from "./parent_node.ts";
-import { $nodeDocument } from "./internal.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
+} from "../../trees/tree.ts";
+import { convertNodesToNode } from "../node_trees/parent_node.ts";
+import { $nodeDocument } from "../internal.ts";
+import { convert, DOMString } from "../../../webidl/types.ts";
 
 export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class ChildNode extends Ctor implements ChildNode {
