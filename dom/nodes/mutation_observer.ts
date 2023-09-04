@@ -6,6 +6,7 @@ import { Exposed } from "../../webidl/extended_attribute.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { Queue } from "../../infra/data_structures/queue.ts";
 import { StaticNodeList } from "./node_list.ts";
+import { getInclusiveAncestors } from "../trees/tree.ts";
 
 export interface RegisteredObserver {
   observer: MutationObserver;
@@ -22,17 +23,20 @@ export interface TransientRegisteredObserver extends RegisteredObserver {
 const surroundingAgent = {
   mutationObserverMicrotaskQueued: false,
   pendingMutationObservers: new OrderedSet<MutationObserver>(),
-  signalSlogList: new OrderedSet<unknown>(),
+  signalSlots: new OrderedSet<unknown>(),
 };
 
 /**
  * @see https://dom.spec.whatwg.org/#queue-a-mutation-observer-compound-microtask
  */
 export function queueMutationObserverMicrotask(): void {
+  // 1. If the surrounding agent’s mutation observer microtask queued is true, then return.
   if (surroundingAgent.mutationObserverMicrotaskQueued) return;
 
+  // 2. Set the surrounding agent’s mutation observer microtask queued to true.
   surroundingAgent.mutationObserverMicrotaskQueued = true;
 
+  // 3. Queue a microtask to notify mutation observers.
   queueMicrotask(notifyMutationObservers);
 }
 
@@ -40,32 +44,46 @@ export function queueMutationObserverMicrotask(): void {
  * @see https://dom.spec.whatwg.org/#notify-mutation-observers
  */
 export function notifyMutationObservers(): void {
+  // 1. Set the surrounding agent’s mutation observer microtask queued to false.
   surroundingAgent.mutationObserverMicrotaskQueued = false;
 
-  const notices = surroundingAgent.pendingMutationObservers.clone();
+  // 2. Let notifySet be a clone of the surrounding agent’s pending mutation observers.
+  const notifySet = surroundingAgent.pendingMutationObservers.clone();
 
+  // 3. Empty the surrounding agent’s pending mutation observers.
   surroundingAgent.pendingMutationObservers.empty();
 
-  const slotSet = surroundingAgent.signalSlogList.clone();
+  // 4. Let signalSet be a clone of the surrounding agent’s signal slots.
+  const signalSet = surroundingAgent.signalSlots.clone();
 
-  surroundingAgent.signalSlogList.empty();
+  // 5. Empty the surrounding agent’s signal slots.
+  surroundingAgent.signalSlots.empty();
 
-  for (const mo of notices) {
+  // 6. For each mo of notifySet:
+  for (const mo of [...notifySet]) {
     const recordQueue = mo["recordQueue"];
+
+    // 1. Let records be a clone of mo’s record queue.
     const records = recordQueue.clone();
 
+    // 2. Empty mo’s record queue.
     recordQueue.empty();
 
+    // 3. For each node of mo’s node list, remove all transient registered observers whose observer is mo from node’s registered observer list.
     for (const node of [...mo["nodeList"]]) {
       node["registeredObserverList"].remove((registered) => {
         return "source" in registered && registered.observer === mo;
       });
     }
 
+    // 4. If records is not empty, then invoke mo’s callback with « records, mo », and mo. If this throws an exception, catch it, and report the exception.
     if (!records.isEmpty) {
       mo["callback"].apply(mo, [Array.from(records), mo]);
     }
   }
+
+  // 7. For each slot of signalSet, fire an event named slotchange, with its bubbles attribute set to true, at slot.
+  // TODO
 }
 
 /**
@@ -97,12 +115,24 @@ export class MutationObserver implements IMutationObserver {
     }
 
     // 3. If none of options["childList"], options["attributes"], and options["characterData"] is true, then throw a TypeError.
+    if (!options.childList && !options.attributes && !options.characterData) {
+      throw new TypeError("<message>");
+    }
 
     // 4. If options["attributeOldValue"] is true and options["attributes"] is false, then throw a TypeError.
+    if (options.attributeOldValue && !options.attributes) {
+      throw new TypeError("<message>");
+    }
 
     // 5. If options["attributeFilter"] is present and options["attributes"] is false, then throw a TypeError.
+    if (options.attributeFilter && !options.attributes) {
+      throw new TypeError("<message>");
+    }
 
     // 6. If options["characterDataOldValue"] is true and options["characterData"] is false, then throw a TypeError.
+    if (options.characterDataOldValue && !options.characterData) {
+      throw new TypeError("<message>");
+    }
 
     // 7. For each registered of target’s registered observer list, if registered’s observer is this:
     for (const registered of target["registeredObserverList"]) {
@@ -173,12 +203,12 @@ export function queueMutationRecord(
   removedNodes: OrderedSet<Node>,
   previousSibling: Node | null,
   nextSibling: Node | null,
-) {
+): void {
   // 1. Let interestedObservers be an empty map.
   const interestedObservers = new Map<MutationObserver, string | null>();
 
   // 2. Let nodes be the inclusive ancestors of target.
-  const nodes = [target];
+  const nodes = getInclusiveAncestors(target) as Iterable<Node>;
 
   // 3. For each node in nodes, and then for each registered of node’s registered observer list:
   for (const node of nodes) {
@@ -189,6 +219,7 @@ export function queueMutationRecord(
       // 2. If none of the following are true
       // - node is not target and options["subtree"] is false
       if (node !== target && !options.subtree) continue;
+
       // - type is "attributes" and options["attributes"] either does not exist or is false
       if (type === "attributes" && !options.attributes) continue;
 
@@ -224,7 +255,6 @@ export function queueMutationRecord(
   // 4. For each observer → mappedOldValue of interestedObservers:
   for (const [observer, mappedOldValue] of interestedObservers) {
     // 1. Let record be a new MutationRecord object with its type set to type, target set to target, attributeName set to name, attributeNamespace set to namespace, oldValue set to mappedOldValue, addedNodes set to addedNodes, removedNodes set to removedNodes, previousSibling set to previousSibling, and nextSibling set to nextSibling.
-
     const record = new MutationRecord(
       type,
       target,
