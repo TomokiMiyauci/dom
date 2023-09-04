@@ -1,4 +1,4 @@
-import { $host, $shadowRoot } from "./internal.ts";
+import { $shadowRoot } from "./internal.ts";
 import { NodeType } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./documents/document.ts";
@@ -57,7 +57,7 @@ export function isProcessingInstruction(
 
 /** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */
 export function isShadowRoot(node: NodeLike): node is ShadowRoot {
-  return isDocumentFragment(node) && !!node[$host];
+  return isDocumentFragment(node) && !!node["_host"];
 }
 
 export interface ShadowHost extends Element {

@@ -5,7 +5,6 @@
  */
 
 import { getRoot, isInclusiveAncestorOf, Tree } from "../trees/tree.ts";
-import { $host } from "./internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor
@@ -18,6 +17,6 @@ export function isHostIncludingInclusiveAncestorOf(
 
   const root = getRoot(of);
 
-  return $host in root && root[$host] !== null &&
-    isHostIncludingInclusiveAncestorOf(target, root[$host] as Tree);
+  return "_host" in root && root["_host"] !== null &&
+    isHostIncludingInclusiveAncestorOf(target, root["_host"] as Tree);
 }

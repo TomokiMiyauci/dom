@@ -2,7 +2,6 @@ export const $element = Symbol();
 export const $document = Symbol();
 export const $nodeDocument = Symbol();
 export const $create = Symbol();
-export const $host = Symbol();
 export const $templateContents = Symbol();
 export const $shadowRoot = Symbol();
 export const $slotAssignment = Symbol();

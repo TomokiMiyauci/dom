@@ -8,7 +8,6 @@ import {
   isText,
 } from "../utils.ts";
 import { getRoot } from "../../trees/tree.ts";
-import { $host } from "../internal.ts";
 import { type Attr } from "../elements/attr.ts";
 import { type Document } from "../documents/document.ts";
 import { type DocumentFragment } from "../document_fragment.ts";
@@ -109,7 +108,7 @@ export function getShadowIncludingRoot(node: Node): Node {
   const root = getRoot(node);
 
   if (isShadowRoot(root)) {
-    const host = root[$host];
+    const host = root["_host"];
     return getShadowIncludingRoot(host);
   }
 

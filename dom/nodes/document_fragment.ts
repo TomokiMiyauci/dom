@@ -4,7 +4,7 @@ import { type Document } from "./documents/document.ts";
 import { type Element } from "./elements/element.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
-import { $create, $host, $nodeDocument } from "./internal.ts";
+import { $create, $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";
 import { replaceAllString } from "./elements/element.ts";
 
@@ -14,7 +14,10 @@ import { replaceAllString } from "./elements/element.ts";
  * @see https://dom.spec.whatwg.org/#interface-documentfragment
  */
 export class DocumentFragment extends Node implements IDocumentFragment {
-  [$host]: Element | null = null;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
+   */
+  protected _host: Element | null = null;
   override [$nodeDocument]!: Document;
 
   static [$create](states: NodeStates): DocumentFragment {

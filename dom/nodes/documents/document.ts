@@ -26,7 +26,7 @@ import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
-import { $create, $host, $nodeDocument } from "../internal.ts";
+import { $create, $nodeDocument } from "../internal.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
@@ -288,7 +288,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. If node is a DocumentFragment node whose host is non-null, then return.
-    if (isDocumentFragment(node) && node[$host]) return node; // TODO(miyauci): Check return null or not.
+    if (isDocumentFragment(node) && node["_host"]) return node; // TODO(miyauci): Check return null or not.
 
     // 4. Adopt node into this.
     adoptNode(node, this);
