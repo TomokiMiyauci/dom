@@ -6,7 +6,7 @@ import { isElement } from "../dom/nodes/utils.ts";
 import { type Node } from "../dom/nodes/node.ts";
 import { type Element } from "../dom/nodes/elements/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
-import { getDocumentElement } from "../dom/nodes/document_tree.ts";
+import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { orderTreeChildren } from "../dom/trees/tree.ts";
 import { getChildTextContent } from "../dom/nodes/text.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";

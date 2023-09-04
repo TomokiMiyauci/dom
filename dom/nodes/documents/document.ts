@@ -52,7 +52,7 @@ import { Document_Storage_Access_API } from "../../../storage_access_api/documen
 import { Document_WebAnimation } from "../../../web_animations/document.ts";
 import { Document_SVG } from "../../../svg/document.ts";
 import { ReName } from "../../../xml/document.ts";
-import { getDocumentElement } from "../document_tree.ts";
+import { getDocumentElement } from "../node_trees/node_tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { adoptNode } from "../mutation.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";

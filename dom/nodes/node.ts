@@ -10,7 +10,11 @@ import type { ChildNode } from "./node_trees/child_node.ts";
 import type { CharacterData } from "./character_data.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
 import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
-import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
+import {
+  getDocumentElement,
+  isConnected,
+  nodeLength,
+} from "./node_trees/node_tree.ts";
 import { type Document } from "./documents/document.ts";
 import { type Text } from "./text.ts";
 import type { INode } from "../../interface.d.ts";
@@ -72,7 +76,6 @@ import { parseOrderSet } from "../trees/ordered_set.ts";
 import type { ParentNode } from "./node_trees/parent_node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
-import { getDocumentElement } from "./document_tree.ts";
 import { type Attr } from "./elements/attr.ts";
 import { type Element } from "./elements/element.ts";
 import { type DocumentType } from "./document_type.ts";
