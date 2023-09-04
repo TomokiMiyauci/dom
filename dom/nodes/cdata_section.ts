@@ -1,7 +1,7 @@
 import { Text } from "./text.ts";
 import { type NodeStates } from "./node.ts";
 import { NodeType } from "./node.ts";
-import { $create, $data, $nodeDocument } from "./internal.ts";
+import { $create, $nodeDocument } from "./internal.ts";
 import { type CharacterDataStates } from "./character_data.ts";
 import type { ICDATASection } from "../../interface.d.ts";
 
@@ -11,7 +11,7 @@ export class CDATASection extends Text implements ICDATASection {
   ): CDATASection {
     const node = new CDATASection();
 
-    node[$data] = data;
+    node["_data"] = data;
     node[$nodeDocument] = nodeDocument;
 
     return node;

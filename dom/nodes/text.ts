@@ -19,7 +19,7 @@ import {
   getPrecedingSiblings,
   orderTreeChildren,
 } from "../trees/tree.ts";
-import { $create, $data, $nodeDocument } from "./internal.ts";
+import { $create, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { concatString } from "../../infra/string.ts";
@@ -56,7 +56,7 @@ export class Text extends CharacterData implements IText {
   }
 
   protected override clone(document: Document): Text {
-    return Text[$create]({ data: this[$data], nodeDocument: document });
+    return Text[$create]({ data: this._data, nodeDocument: document });
   }
 
   /**
@@ -64,7 +64,7 @@ export class Text extends CharacterData implements IText {
    */
   get wholeText(): string {
     const textNodes = contiguousTextNodes(this);
-    const data = imap(textNodes, (text) => text[$data]);
+    const data = imap(textNodes, (text) => text._data);
     // to return the concatenation of the data of the contiguous Text nodes of this, in tree order.
     const list = new List(data);
 
@@ -139,7 +139,7 @@ export function getChildTextContent(node: Node): string {
   // concatenation of the data of all the Text node children of node, in tree order.
   return [...imap(
     ifilter(orderTreeChildren(node._children), isText),
-    (text) => text[$data],
+    (text) => text["_data"],
   )].join("");
 }
 
@@ -163,7 +163,7 @@ export function* contiguousTextNodes(node: Text): Iterable<Text> {
 export function descendantTextContent(node: Node): string {
   const descendants = getDescendants(node) as Iterable<Node>;
   const textDescendants = ifilter(descendants, isText);
-  const dataList = imap(textDescendants, (text) => text[$data]);
+  const dataList = imap(textDescendants, (text) => text["_data"]);
 
   return concatString(new List(dataList));
 }

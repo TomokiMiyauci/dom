@@ -2,7 +2,7 @@ import { type Document } from "./documents/document.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { CharacterData, type CharacterDataStates } from "./character_data.ts";
 import { IComment } from "../../interface.d.ts";
-import { $create, $data, $nodeDocument } from "./internal.ts";
+import { $create, $nodeDocument } from "./internal.ts";
 
 export class Comment extends CharacterData implements IComment {
   static [$create](
@@ -33,6 +33,6 @@ export class Comment extends CharacterData implements IComment {
   }
 
   protected override clone(document: Document): Comment {
-    return Comment[$create]({ data: this[$data], nodeDocument: document });
+    return Comment[$create]({ data: this._data, nodeDocument: document });
   }
 }

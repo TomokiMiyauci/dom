@@ -8,7 +8,7 @@ import {
   isText,
 } from "../utils.ts";
 import { getRoot } from "../../trees/tree.ts";
-import { $data, $host } from "../internal.ts";
+import { $host } from "../internal.ts";
 import { type Attr } from "../elements/attr.ts";
 import { type Document } from "../documents/document.ts";
 import { type DocumentFragment } from "../document_fragment.ts";
@@ -35,7 +35,7 @@ export function nodeLength(
   if (isDocumentType(node) || isAttr(node)) return 0;
 
   // 2. If node is a CharacterData node, then return node’s data’s length.
-  if (isCharacterData(node)) return node[$data].length;
+  if (isCharacterData(node)) return node["_data"].length;
 
   // 3. Return the number of node’s children.
   return node._children.size;

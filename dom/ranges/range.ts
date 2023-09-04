@@ -17,7 +17,7 @@ import { isCharacterData, isDocumentType, isText } from "../nodes/utils.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
-import { $create, $data, $nodeDocument } from "../nodes/internal.ts";
+import { $create, $nodeDocument } from "../nodes/internal.ts";
 import { substringData } from "../nodes/character_data.ts";
 import { appendNode } from "../nodes/node_trees/mutation.ts";
 import { replaceData } from "../nodes/character_data_algorithm.ts";
@@ -341,7 +341,7 @@ export class Range extends AbstractRange implements IRange {
         originalStartOffset,
         originalEndOffset - originalStartOffset,
       );
-      clone[$data] = data;
+      clone["_data"] = data;
 
       // 3. Append clone to fragment.
       appendNode(clone, fragment);
@@ -647,7 +647,7 @@ export class Range extends AbstractRange implements IRange {
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
     if (startNode === endNode && isText(startNode)) {
       return substringCodeUnitByPositions(
-        startNode[$data],
+        startNode["_data"],
         startOffset,
         endOffset,
       );
@@ -655,7 +655,7 @@ export class Range extends AbstractRange implements IRange {
 
     // 3. If this’s start node is a Text node, then append the substring of that node’s data from this’s start offset until the end to s.
     if (isText(startNode)) {
-      s += substringCodeUnitToEnd(startNode[$data], startOffset);
+      s += substringCodeUnitToEnd(startNode["_data"], startOffset);
     }
 
     // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
@@ -674,7 +674,7 @@ export class Range extends AbstractRange implements IRange {
 
     // 5. If this’s end node is a Text node, then append the substring of that node’s data from its start until this’s end offset to s.
     if (isText(endNode)) {
-      s += substringCodeUnitByPositions(endNode[$data], 0, endOffset);
+      s += substringCodeUnitByPositions(endNode["_data"], 0, endOffset);
     }
 
     // 6. Return s.

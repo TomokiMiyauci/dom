@@ -1,4 +1,4 @@
-import { $data, $host, $shadowRoot } from "./internal.ts";
+import { $host, $shadowRoot } from "./internal.ts";
 import { NodeType } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./documents/document.ts";
@@ -34,7 +34,7 @@ export function isElement(node: NodeLike): node is Element {
 }
 
 export function isCharacterData(node: NodeLike): node is CharacterData {
-  return $data in node;
+  return "_data" in node;
 }
 
 export function isAttr(node: NodeLike): node is Attr {

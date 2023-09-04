@@ -41,7 +41,6 @@ import {
 } from "../trees/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import {
-  $data,
   $name,
   $nodeDocument,
   $publicId,
@@ -295,7 +294,7 @@ export abstract class Node extends EventTarget implements INode {
       const contiguousExclusiveTextNodes = contiguousTextNodesExclusive(node);
       const dataList = imap(
         contiguousExclusiveTextNodes,
-        (text) => text[$data],
+        (text) => text["_data"],
       );
 
       // 3. Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order.
@@ -901,7 +900,7 @@ export function equalsCharacterData(
   left: CharacterData,
   right: CharacterData,
 ): boolean {
-  return left[$data] === right[$data];
+  return left["_data"] === right["_data"];
 }
 
 export function equalsProcessingInstruction(

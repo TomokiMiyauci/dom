@@ -3,7 +3,7 @@ import { ChildNode } from "./node_trees/child_node.ts";
 import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
 import { type Document } from "./documents/document.ts";
 import { type ICharacterData } from "../../interface.d.ts";
-import { $data, $nodeDocument } from "./internal.ts";
+import { $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
@@ -20,12 +20,15 @@ export interface CharacterDataStates {
 @ChildNode
 @NonDocumentTypeChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
-  [$data]: string;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
+   */
+  protected _data: string;
 
   constructor(data: string, document: Document) {
     super();
 
-    this[$data] = data;
+    this._data = data;
     this[$nodeDocument] = document;
   }
 
@@ -35,7 +38,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
    */
   override get nodeValue(): string {
-    return this[$data];
+    return this._data;
   }
 
   /**
@@ -51,7 +54,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this[$data];
+    return this._data;
   }
 
   /**
@@ -84,7 +87,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this[$data];
+    return this._data;
   }
 
   /**
@@ -171,8 +174,8 @@ export function substringData(
   }
 
   // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
-  if (offset + count > length) return node[$data].slice(offset);
+  if (offset + count > length) return node["_data"].slice(offset);
 
   // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
-  return node[$data].slice(offset, offset + count);
+  return node["_data"].slice(offset, offset + count);
 }
