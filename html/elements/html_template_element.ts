@@ -1,11 +1,7 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
 import { DocumentFragment } from "../../dom/nodes/document_fragment.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
-import {
-  $host,
-  $nodeDocument,
-  $templateContents,
-} from "../../dom/nodes/internal.ts";
+import { $nodeDocument, $templateContents } from "../../dom/nodes/internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
 
@@ -25,7 +21,7 @@ export class HTMLTemplateElement extends HTMLElement
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = new DocumentFragment();
     fragment[$nodeDocument] = doc;
-    fragment[$host] = this;
+    fragment["_host"] = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
     this[$templateContents] = fragment;

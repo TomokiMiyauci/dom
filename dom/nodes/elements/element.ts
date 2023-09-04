@@ -25,7 +25,7 @@ import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { type ShadowRoot } from "../shadow_root.ts";
-import { $create, $element, $nodeDocument } from "../internal.ts";
+import { $create, $nodeDocument } from "../internal.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
 import { InnerHTML } from "../../../domparsing/inner_html.ts";

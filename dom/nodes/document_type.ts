@@ -1,7 +1,7 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import { Document } from "./documents/document.ts";
-import { $name, $nodeDocument, $publicId, $systemId } from "./internal.ts";
+import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import type { PartialBy } from "../../deps.ts";
 
@@ -23,9 +23,20 @@ type Optional = "publicId" | "systemId";
 
 @ChildNode
 export class DocumentType extends Node implements IDocumentType {
-  readonly [$name]: string;
-  readonly [$publicId]: string;
-  readonly [$systemId]: string;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
+   */
+  protected readonly _name: string;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-publicid)
+   */
+  protected readonly _publicId: string;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-systemid)
+   */
+  protected readonly _systemId: string;
 
   constructor(
     { name, publicId = "", systemId = "", nodeDocument }:
@@ -34,9 +45,9 @@ export class DocumentType extends Node implements IDocumentType {
   ) {
     super();
 
-    this[$name] = name;
-    this[$publicId] = publicId;
-    this[$systemId] = systemId;
+    this._name = name;
+    this._publicId = publicId;
+    this._systemId = systemId;
     this[$nodeDocument] = nodeDocument;
   }
 
@@ -47,7 +58,7 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   override get nodeName(): string {
-    return this[$name];
+    return this._name;
   }
 
   /**
@@ -90,24 +101,24 @@ export class DocumentType extends Node implements IDocumentType {
   protected override clone(document: Document): DocumentType {
     return new DocumentType(
       {
-        name: this[$name],
-        publicId: this[$publicId],
-        systemId: this[$systemId],
+        name: this._name,
+        publicId: this._publicId,
+        systemId: this._systemId,
         nodeDocument: document,
       },
     );
   }
 
   get name(): string {
-    return this[$name];
+    return this._name;
   }
 
   get publicId(): string {
-    return this[$publicId];
+    return this._publicId;
   }
 
   get systemId(): string {
-    return this[$systemId];
+    return this._systemId;
   }
 }
 

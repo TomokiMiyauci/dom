@@ -40,13 +40,7 @@ import {
   isPrecedeOf,
 } from "../trees/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import {
-  $name,
-  $nodeDocument,
-  $publicId,
-  $systemId,
-  $target,
-} from "./internal.ts";
+import { $nodeDocument, $target } from "./internal.ts";
 import {
   every,
   find,
@@ -847,9 +841,9 @@ export function equalsDocumentType(
   left: DocumentType,
   right: DocumentType,
 ): boolean {
-  return left[$name] === right[$name] &&
-    left[$publicId] === right[$publicId] &&
-    left[$systemId] === right[$systemId];
+  return left["_name"] === right["_name"] &&
+    left["_publicId"] === right["_publicId"] &&
+    left["_systemId"] === right["_systemId"];
 }
 
 export function equalsInternalSlot(left: Node, right: Node): boolean {
