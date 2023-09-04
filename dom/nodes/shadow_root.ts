@@ -3,7 +3,6 @@ import { DocumentFragment } from "./document_fragment.ts";
 import { type Element } from "./elements/element.ts";
 import { DocumentOrShadowRoot } from "./node_trees/document_or_shadow_root.ts";
 import { InnerHTML } from "../../domparsing/inner_html.ts";
-import { $slotAssignment } from "./internal.ts";
 
 @DocumentOrShadowRoot
 @InnerHTML
@@ -11,7 +10,7 @@ import { $slotAssignment } from "./internal.ts";
  * @see https://dom.spec.whatwg.org/#interface-shadowroot
  */
 export class ShadowRoot extends DocumentFragment implements IShadowRoot {
-  [$slotAssignment]: SlotAssignmentMode = "named";
+  protected _slotAssignment: SlotAssignmentMode = "named";
   protected override _host: Element;
 
   constructor({ host }: { host: Element }) {

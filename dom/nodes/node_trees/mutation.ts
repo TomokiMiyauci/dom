@@ -10,7 +10,7 @@ import {
 } from "../utils.ts";
 import { type Node, NodeType } from "../node.ts";
 import { type Document } from "../documents/document.ts";
-import { $nodeDocument, $shadowRoot, $slotAssignment } from "../internal.ts";
+import { $nodeDocument } from "../internal.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import {
@@ -220,7 +220,7 @@ export function insertNode(
     if (
       isElement(parent) &&
       isShadowHost(parent) &&
-      parent[$shadowRoot][$slotAssignment] === "named" &&
+      parent["_shadowRoot"]["_slotAssignment"] === "named" &&
       isSlottable(node)
     ) assignSlot(node);
 

@@ -10,17 +10,17 @@ import { createElement } from "../elements/element_algorithm.ts";
 import { appendNode } from "../node_trees/mutation.ts";
 import type { IDOMImplementation } from "../../../interface.d.ts";
 import { Namespace } from "../../../infra/namespace.ts";
-import { $create, $document } from "../internal.ts";
+import { $create } from "../internal.ts";
 import { validate } from "../../../infra/namespace.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { isUndefined } from "../../../deps.ts";
 
 export class DOMImplementation implements IDOMImplementation {
-  [$document]!: Document;
+  protected _document!: Document;
 
   static create(document: Document): DOMImplementation {
     const instance = new DOMImplementation();
-    instance[$document] = document;
+    instance._document = document;
 
     return instance;
   }
@@ -41,7 +41,7 @@ export class DOMImplementation implements IDOMImplementation {
       name: qualifiedName,
       publicId,
       systemId,
-      nodeDocument: this[$document],
+      nodeDocument: this._document,
     });
   }
 
@@ -74,7 +74,7 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    document["_origin"] = this[$document]["_origin"];
+    document["_origin"] = this._document["_origin"];
 
     // 7. document’s content type is determined by namespace:
     document["_contentType"] = namespaceToContentType(namespace);
@@ -124,7 +124,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    doc["_origin"] = this[$document]["_origin"];
+    doc["_origin"] = this._document["_origin"];
 
     // 9. Return doc.
     return doc;

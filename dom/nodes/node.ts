@@ -40,7 +40,7 @@ import {
   isPrecedeOf,
 } from "../trees/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import { $nodeDocument, $target } from "./internal.ts";
+import { $nodeDocument } from "./internal.ts";
 import {
   every,
   find,
@@ -901,7 +901,8 @@ export function equalsProcessingInstruction(
   left: ProcessingInstruction,
   right: ProcessingInstruction,
 ): boolean {
-  return equalsCharacterData(left, right) && left[$target] === right[$target];
+  return equalsCharacterData(left, right) &&
+    left["_target"] === right["_target"];
 }
 
 /**

@@ -1,4 +1,3 @@
-import { $shadowRoot } from "./internal.ts";
 import { NodeType } from "./node.ts";
 import { type Text } from "./text.ts";
 import { type Document } from "./documents/document.ts";
@@ -60,9 +59,9 @@ export function isShadowRoot(node: NodeLike): node is ShadowRoot {
   return isDocumentFragment(node) && !!node["_host"];
 }
 
-export interface ShadowHost extends Element {
-  [$shadowRoot]: ShadowRoot;
-}
+export type ShadowHost = Element & {
+  _shadowRoot: ShadowRoot;
+};
 
 /**
  * @see https://dom.spec.whatwg.org/#element-shadow-host
