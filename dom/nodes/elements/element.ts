@@ -137,11 +137,6 @@ export class Element extends Node implements IElement {
   }
 
   /**
-   * @see https://dom.spec.whatwg.org/#dom-element-attributes
-   */
-  readonly attributes: NamedNodeMap;
-
-  /**
    * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name
    */
   get #upperQualifiedName(): string {
@@ -194,10 +189,6 @@ export class Element extends Node implements IElement {
     this._isValue = isValue;
     this[$nodeDocument] = nodeDocument;
     this._attributeList = attributeList;
-    this.attributes = new NamedNodeMap({
-      attributeList: this._attributeList,
-      element: this,
-    });
   }
 
   override [$nodeDocument]: Document;
@@ -503,6 +494,17 @@ export class Element extends Node implements IElement {
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
     return hasAttributeByQualifiedName(qualifiedName, this);
+  }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-attributes
+   */
+  @SameObject
+  get attributes(): NamedNodeMap {
+    return new NamedNodeMap({
+      attributeList: this._attributeList,
+      element: this,
+    });
   }
 
   /**
