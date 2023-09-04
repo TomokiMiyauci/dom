@@ -15,11 +15,11 @@ import {
   isShadowRoot,
   UnImplemented,
 } from "./utils.ts";
-import { Attr } from "./attr.ts";
+import { Attr } from "./elements/attr.ts";
 import { Text } from "./text.ts";
 import { Comment } from "./comment.ts";
-import { createElement } from "./element_algorithm.ts";
-import { type Element } from "./element.ts";
+import { createElement } from "./elements/element_algorithm.ts";
+import { type Element } from "./elements/element.ts";
 import { Namespace, validateAndExtract } from "../../infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";

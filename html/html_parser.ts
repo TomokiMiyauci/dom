@@ -1,5 +1,5 @@
 import { Document } from "../dom/nodes/document.ts";
-import type { Element } from "../dom/nodes/element.ts";
+import type { Element } from "../dom/nodes/elements/element.ts";
 import type { Node } from "../dom/nodes/node.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./utils.ts";
 import { List } from "../infra/data_structures/list.ts";

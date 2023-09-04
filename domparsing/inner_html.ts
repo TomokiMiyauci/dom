@@ -2,7 +2,7 @@ import { type Constructor } from "../deps.ts";
 import type { IInnerHTML } from "../interface.d.ts";
 import { replaceAllNode } from "../dom/nodes/mutation.ts";
 import { type Node } from "../dom/nodes/node.ts";
-import { type Element } from "../dom/nodes/element.ts";
+import { type Element } from "../dom/nodes/elements/element.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { parseFragment, serializeFragment } from "./fragment.ts";
 

@@ -1,5 +1,5 @@
 import { type Node } from "./node.ts";
-import { type Element } from "./element.ts";
+import { type Element } from "./elements/element.ts";
 import { isElement } from "./utils.ts";
 
 /** Return document element of document.

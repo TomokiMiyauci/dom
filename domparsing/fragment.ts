@@ -1,4 +1,4 @@
-import type { Element } from "../dom/nodes/element.ts";
+import type { Element } from "../dom/nodes/elements/element.ts";
 import type { Node } from "../dom/nodes/node.ts";
 import { $create, $nodeDocument } from "../dom/nodes/internal.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";

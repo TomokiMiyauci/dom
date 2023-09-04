@@ -1,8 +1,8 @@
 import { Document, internalCreateElement, XMLDocument } from "./document.ts";
 import { DocumentType } from "./document_type.ts";
 import { Text } from "./text.ts";
-import type { Element } from "./element.ts";
-import { createElement } from "./element_algorithm.ts";
+import type { Element } from "./elements/element.ts";
+import { createElement } from "./elements/element_algorithm.ts";
 import { appendNode } from "./mutation.ts";
 import type { IDOMImplementation } from "../../interface.d.ts";
 import { Namespace } from "../../infra/namespace.ts";

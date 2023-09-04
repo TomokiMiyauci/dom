@@ -1,29 +1,29 @@
-import type { INamedNodeMap } from "../../interface.d.ts";
-import { find, html, map, range } from "../../deps.ts";
-import { getQualifiedName } from "./utils.ts";
-import { List } from "../../infra/data_structures/list.ts";
+import type { INamedNodeMap } from "../../../interface.d.ts";
+import { find, html, map, range } from "../../../deps.ts";
+import { getQualifiedName } from "../utils.ts";
+import { List } from "../../../infra/data_structures/list.ts";
 import {
   type Element,
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "./element.ts";
-import type { Attr } from "./attr.ts";
+} from "../elements/element.ts";
+import type { Attr } from "../elements/attr.ts";
 import {
   $attributeList,
   $element,
   $namespace,
   $nodeDocument,
-} from "./internal.ts";
-import { Getter, getter, WebIDL } from "../../webidl/idl.ts";
+} from "../internal.ts";
+import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import {
   LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-} from "../../webidl/legacy_extended_attributes.ts";
-import { Namespace } from "../../infra/namespace.ts";
-import { isHTMLDocument } from "./document.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
-import { toASCIILowerCase } from "../../infra/string.ts";
+} from "../../../webidl/legacy_extended_attributes.ts";
+import { Namespace } from "../../../infra/namespace.ts";
+import { isHTMLDocument } from "../document.ts";
+import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { toASCIILowerCase } from "../../../infra/string.ts";
 
 export interface NamedNodeMapInits {
   element: Element;

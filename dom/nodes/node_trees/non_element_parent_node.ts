@@ -1,4 +1,4 @@
-import { Element } from "../element.ts";
+import { Element } from "../elements/element.ts";
 import { type Node } from "../node.ts";
 import { Constructor } from "../../../deps.ts";
 import { descendant } from "../../trees/tree.ts";

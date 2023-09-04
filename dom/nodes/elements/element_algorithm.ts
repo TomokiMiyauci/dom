@@ -1,7 +1,7 @@
-import { lookUpCustomElementDefinition } from "../../html/custom_element.ts";
-import { CustomElementState } from "./constant.ts";
+import { lookUpCustomElementDefinition } from "../../../html/custom_element.ts";
+import { CustomElementState } from "../constant.ts";
 import { Element } from "./element.ts";
-import { type Document } from "./document.ts";
+import { type Document } from "../document.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-create-element)

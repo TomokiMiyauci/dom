@@ -3,7 +3,7 @@ import { type Document } from "../document.ts";
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
 import { isElement } from "../utils.ts";
-import { type Element } from "../element.ts";
+import { type Element } from "../elements/element.ts";
 import type { IParentNode } from "../../../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
 import { matchScopedSelectorsString } from "../../trees/selector.ts";

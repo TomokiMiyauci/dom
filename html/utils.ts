@@ -1,10 +1,10 @@
 import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
 import { type ChildNode } from "../dom/nodes/node_trees/child_node.ts";
-import { Attr } from "../dom/nodes/attr.ts";
+import { Attr } from "../dom/nodes/elements/attr.ts";
 import { getQualifiedName, isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
-import { Element } from "../dom/nodes/element.ts";
+import { Element } from "../dom/nodes/elements/element.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
 import { Document } from "../dom/nodes/document.ts";

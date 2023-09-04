@@ -1,6 +1,6 @@
 import { type INonDocumentTypeChildNode } from "../../../interface.d.ts";
 import { isElement } from "../utils.ts";
-import type { Element } from "../element.ts";
+import type { Element } from "../elements/element.ts";
 import { type Constructor, find, first, ifilter } from "../../../deps.ts";
 import { type Node } from "../node.ts";
 import {

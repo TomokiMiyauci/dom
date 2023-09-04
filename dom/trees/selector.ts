@@ -1,7 +1,7 @@
 import { getRoot } from "./tree.ts";
 import type { Node } from "../nodes/node.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
-import type { Element } from "../nodes/element.ts";
+import type { Element } from "../nodes/elements/element.ts";
 import { matchSelectorToTree, parseSelector } from "../../selectors/hook.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 

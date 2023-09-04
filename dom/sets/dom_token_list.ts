@@ -6,7 +6,7 @@ import {
   type Element,
   getAttributeValue,
   setAttributeValue,
-} from "../nodes/element.ts";
+} from "../nodes/elements/element.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { $attributeChangeSteps, $attributeList } from "../nodes/internal.ts";
 import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";

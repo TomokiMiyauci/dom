@@ -1,9 +1,9 @@
-import { type Document } from "./document.ts";
-import { Node, NodeStates, NodeType } from "./node.ts";
-import { type PartialBy } from "../../deps.ts";
-import { type Element, isCustom } from "./element.ts";
-import type { IAttr } from "../../interface.d.ts";
-import { getQualifiedName } from "./utils.ts";
+import { type Document } from "../document.ts";
+import { Node, NodeStates, NodeType } from "../node.ts";
+import { type PartialBy } from "../../../deps.ts";
+import { type Element, isCustom } from "../elements/element.ts";
+import type { IAttr } from "../../../interface.d.ts";
+import { getQualifiedName } from "../utils.ts";
 import {
   $attributeChangeSteps,
   $element,
@@ -12,9 +12,9 @@ import {
   $namespacePrefix,
   $nodeDocument,
   $value,
-} from "./internal.ts";
-import { queueMutationRecord } from "./mutation_observers/queue.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+} from "../internal.ts";
+import { queueMutationRecord } from "../mutation_observers/queue.ts";
+import { OrderedSet } from "../../../infra/data_structures/set.ts";
 
 export interface AttrStates {
   /**

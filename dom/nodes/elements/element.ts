@@ -5,27 +5,26 @@ import {
   Node,
   NodeStates,
   NodeType,
-} from "./node.ts";
-import { getQualifiedName, UnImplemented } from "./utils.ts";
+} from "../node.ts";
+import { getQualifiedName, UnImplemented } from "../utils.ts";
 import {
   Attr,
   changeAttributes,
   cloneAttr,
   handleAttributesChanges,
 } from "./attr.ts";
-import { ParentNode } from "./node_trees/parent_node.ts";
-import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
+import { ParentNode } from "../node_trees/parent_node.ts";
+import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { type Document, isHTMLDocument } from "./document.ts";
-import { CustomElementDefinition } from "../../html/custom_element.ts";
-import { Namespace, validateAndExtract } from "../../infra/namespace.ts";
-import { List } from "../../infra/data_structures/list.ts";
-import { descendantTextContent } from "./text.ts";
-import { find, map, some, xmlValidator } from "../../deps.ts";
-import type { IElement } from "../../interface.d.ts";
-import { Text } from "./text.ts";
-import { preInsertNode, replaceAllNode } from "./mutation.ts";
-import { type ShadowRoot } from "./shadow_root.ts";
+import { type Document, isHTMLDocument } from "../document.ts";
+import { CustomElementDefinition } from "../../../html/custom_element.ts";
+import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
+import { List } from "../../../infra/data_structures/list.ts";
+import { descendantTextContent, Text } from "../text.ts";
+import { find, map, some, xmlValidator } from "../../../deps.ts";
+import type { IElement } from "../../../interface.d.ts";
+import { preInsertNode, replaceAllNode } from "../mutation.ts";
+import { type ShadowRoot } from "../shadow_root.ts";
 import {
   $attributeChangeSteps,
   $attributeList,
@@ -39,26 +38,26 @@ import {
   $nodeDocument,
   $shadowRoot,
   $value,
-} from "./internal.ts";
-import { ARIAMixin } from "../../wai_aria/aria_mixin.ts";
-import { Animatable } from "../../web_animations/animatable.ts";
-import { InnerHTML } from "../../domparsing/inner_html.ts";
-import { ChildNode } from "./node_trees/child_node.ts";
-import { Slottable } from "./node_trees/slottable.ts";
-import { DOMTokenList } from "../sets/dom_token_list.ts";
-import { Element_CSSOMView } from "../../cssom_view/element.ts";
-import { Element_CSSTypedOM } from "../../css/css_typed_om/element.ts";
-import { Element_DomParsing } from "../../domparsing/element.ts";
-import { Element_PointerEvents } from "../../pointerevents/element.ts";
-import { Element_PointerLock } from "../../pointerlock/element.ts";
-import { Element_Fullscreen } from "../../fullscreen/element.ts";
-import { Element_CSSShadowParts } from "../../css/css_shadow_parts/element.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
-import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
+} from "../internal.ts";
+import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
+import { Animatable } from "../../../web_animations/animatable.ts";
+import { InnerHTML } from "../../../domparsing/inner_html.ts";
+import { ChildNode } from "../node_trees/child_node.ts";
+import { Slottable } from "../node_trees/slottable.ts";
+import { DOMTokenList } from "../../sets/dom_token_list.ts";
+import { Element_CSSOMView } from "../../../cssom_view/element.ts";
+import { Element_CSSTypedOM } from "../../../css/css_typed_om/element.ts";
+import { Element_DomParsing } from "../../../domparsing/element.ts";
+import { Element_PointerEvents } from "../../../pointerevents/element.ts";
+import { Element_PointerLock } from "../../../pointerlock/element.ts";
+import { Element_Fullscreen } from "../../../fullscreen/element.ts";
+import { Element_CSSShadowParts } from "../../../css/css_shadow_parts/element.ts";
+import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
+import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
-import { toASCIILowerCase } from "../../infra/string.ts";
-import { getFirstChild, getNextSibling } from "../trees/tree.ts";
+import { toASCIILowerCase } from "../../../infra/string.ts";
+import { getFirstChild, getNextSibling } from "../../trees/tree.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)

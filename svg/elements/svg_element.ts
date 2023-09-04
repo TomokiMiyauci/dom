@@ -1,5 +1,5 @@
 import type { ISVGElement } from "../../interface.d.ts";
-import { Element } from "../../dom/nodes/element.ts";
+import { Element } from "../../dom/nodes/elements/element.ts";
 import { GlobalEventHandlers } from "../../html/global_event_handlers.ts";
 import { HTMLOrSVGElement } from "../../html/dom/html_or_svg_element.ts";
 import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";

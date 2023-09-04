@@ -1,12 +1,12 @@
 import { Node, NodeStates, NodeType } from "./node.ts";
 import { ParentNode } from "./node_trees/parent_node.ts";
 import { type Document } from "./document.ts";
-import { type Element } from "./element.ts";
+import { type Element } from "./elements/element.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
 import { $create, $host, $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";
-import { replaceAllString } from "./element.ts";
+import { replaceAllString } from "./elements/element.ts";
 
 @ParentNode
 @NonElementParentNode
