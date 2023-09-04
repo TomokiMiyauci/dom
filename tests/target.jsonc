@@ -303,7 +303,7 @@
   // "dom/nodes/MutationObserver-characterData.html",
   // "dom/nodes/MutationObserver-childList.html",
   // "dom/nodes/MutationObserver-cross-realm-callback-report-exception.html",
-  // "dom/nodes/MutationObserver-disconnect.html",
+  "dom/nodes/MutationObserver-disconnect.html",
   // "dom/nodes/MutationObserver-document.html",
   // "dom/nodes/MutationObserver-inner-outer.html",
   "dom/nodes/MutationObserver-sanity.html",

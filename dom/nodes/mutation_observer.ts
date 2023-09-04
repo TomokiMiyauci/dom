@@ -7,13 +7,30 @@ import { List } from "../../infra/data_structures/list.ts";
 import { Queue } from "../../infra/data_structures/queue.ts";
 import { StaticNodeList } from "./node_list.ts";
 import { getInclusiveAncestors } from "../trees/tree.ts";
+import { ifilter } from "../../deps.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
+ */
 export interface RegisteredObserver {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-observer)
+   */
   observer: MutationObserver;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-options)
+   */
   options: MutationObserverInit;
 }
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#transient-registered-observer)
+ */
 export interface TransientRegisteredObserver extends RegisteredObserver {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#transient-registered-observer-source)
+   */
   source: RegisteredObserver;
 }
 
@@ -87,20 +104,34 @@ export function notifyMutationObservers(): void {
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#interface-mutationobserver
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-mutationobserver)
  */
 Exposed(Window);
 export class MutationObserver implements IMutationObserver {
-  private callback: MutationCallback;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationobserver-node-list)
+   */
   private nodeList: List<Node> = new List();
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-queue)
+   */
   private recordQueue: Queue<MutationRecord> = new Queue();
 
-  constructor(callback: MutationCallback) {
-    this.callback = callback;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-mutationobserver)
+   */
+  constructor(
+    /**
+     * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-callback)
+     */
+    private callback: MutationCallback,
+  ) {
+    // set this’s callback to callback.
   }
 
   /**
-   * @see https://dom.spec.whatwg.org/#dom-mutationobserver-observe
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-observe)
    */
   observe(target: Node, options: MutationObserverInit = {}): void {
     // 1. If either options["attributeOldValue"] or options["attributeFilter"] exists, and options["attributes"] does not exist, then set options["attributes"] to true.
@@ -135,18 +166,21 @@ export class MutationObserver implements IMutationObserver {
     }
 
     // 7. For each registered of target’s registered observer list, if registered’s observer is this:
-    for (const registered of target["registeredObserverList"]) {
+    for (
+      const registered of ifilter(
+        target["registeredObserverList"],
+        this.#isRegisteredObserverThis,
+      )
+    ) {
       // 1. For each node of this’s node list, remove all transient registered observers whose source is registered from node’s registered observer list.
-      if (registered.observer === this) {
-        for (const node of [...this.nodeList]) {
-          const list = node["registeredObserverList"];
-          list.remove((observer) => {
-            return "source" in observer && observer.source === registered;
-          });
+      for (const node of [...this.nodeList]) {
+        const list = node["registeredObserverList"];
+        list.remove((observer) => {
+          return "source" in observer && observer.source === registered;
+        });
 
-          // 2. Set registered’s options to options.
-          registered.options = options;
-        }
+        // 2. Set registered’s options to options.
+        registered.options = options;
       }
     }
 
@@ -161,14 +195,12 @@ export class MutationObserver implements IMutationObserver {
   }
 
   /**
-   * @see https://dom.spec.whatwg.org/#dom-mutationobserver-disconnect
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-disconnect)
    */
   disconnect(): void {
     // 1. For each node of this’s node list, remove any registered observer from node’s registered observer list for which this is the observer.
     for (const node of this.nodeList) {
-      node["registeredObserverList"].remove(({ observer }) =>
-        observer === this
-      );
+      node["registeredObserverList"].remove(this.#isRegisteredObserverThis);
     }
 
     // 2. Empty this’s record queue.
@@ -176,7 +208,7 @@ export class MutationObserver implements IMutationObserver {
   }
 
   /**
-   * @see https://dom.spec.whatwg.org/#dom-mutationobserver-takerecords
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-takerecords)
    */
   takeRecords(): MutationRecord[] {
     // 1. Let records be a clone of this’s record queue.
@@ -188,10 +220,14 @@ export class MutationObserver implements IMutationObserver {
     // 3. Return records.
     return Array.from(records);
   }
+
+  #isRegisteredObserverThis({ observer }: RegisteredObserver): boolean {
+    return observer === this;
+  }
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#queueing-a-mutation-record
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#queueing-a-mutation-record)
  */
 export function queueMutationRecord(
   type: MutationRecordType,
@@ -279,7 +315,7 @@ export function queueMutationRecord(
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#queue-a-tree-mutation-record
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#queue-a-tree-mutation-record)
  */
 export function queueTreeMutationRecord(
   target: Node,
@@ -289,7 +325,6 @@ export function queueTreeMutationRecord(
   nextSibling: Child | null,
 ): void {
   // 1. Assert: either addedNodes or removedNodes is not empty.
-
   // 2. Queue a mutation record of "childList" for target with null, null, null, addedNodes, removedNodes, previousSibling, and nextSibling.
   queueMutationRecord(
     "childList",
@@ -304,6 +339,9 @@ export function queueTreeMutationRecord(
   );
 }
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationrecord)
+ */
 @Exposed(Window)
 export class MutationRecord implements IMutationRecord {
   constructor(
