@@ -285,8 +285,8 @@ export function queueTreeMutationRecord(
   target: Node,
   addedNodes: OrderedSet<Node>,
   removedNodes: OrderedSet<Node>,
-  previousSibling: Child,
-  nextSibling: Child,
+  previousSibling: Child | null,
+  nextSibling: Child | null,
 ): void {
   // 1. Assert: either addedNodes or removedNodes is not empty.
 

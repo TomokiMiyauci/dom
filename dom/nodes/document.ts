@@ -651,12 +651,16 @@ export class Document extends Node implements IDocument {
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<Element>;
+  ): HTMLCollectionOf<globalThis.Element>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<Element> {
-    return getElementsByNamespaceAndLocalName(namespace, localName, this);
+  ): HTMLCollectionOf<globalThis.Element> {
+    return getElementsByNamespaceAndLocalName(
+      namespace,
+      localName,
+      this,
+    ) as HTMLCollectionOf<Element>;
   }
 
   /**

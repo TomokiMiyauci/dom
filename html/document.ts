@@ -147,14 +147,14 @@ export function Document_HTML<T extends Constructor<Node>>(
         | Element
         | undefined;
 
-      if (!documentElement) return null;
+      if (!documentElement) return null as any;
 
-      if (documentElement[$localName] !== "html") return null;
+      if (documentElement[$localName] !== "html") return null as any;
 
-      return find(
-        documentElement._children,
-        (v) => ["body", "frameset"].includes(v[$localName]),
-      ) ?? null;
+      const bodyOrFrameSet =
+        find(documentElement._children, isBodyOrFrameset) ?? null;
+
+      return bodyOrFrameSet as any as HTMLElement;
     }
 
     set body(value: HTMLElement) {
@@ -167,10 +167,13 @@ export function Document_HTML<T extends Constructor<Node>>(
      */
     get head(): HTMLHeadElement {
       // return the head element of the document (a head element or null).
-      return first(ifilter(
-        ifilter(this._children, isElement),
+      const elements = ifilter(this._children, isElement);
+      const head = find(
+        elements,
         (element) => element[$localName] === "html",
-      )) ?? null;
+      );
+
+      return (head ?? null) as any as HTMLHeadElement;
     }
 
     get images(): HTMLCollectionOf<HTMLImageElement> {
@@ -235,7 +238,7 @@ export function Document_HTML<T extends Constructor<Node>>(
      */
     get defaultView(): (WindowProxy & typeof globalThis) | null {
       // TODO
-      return globalThis;
+      return globalThis as any;
       // 1. If this's browsing context is null, then return null.
 
       // 2. Return this's browsing context's WindowProxy object.
@@ -315,4 +318,12 @@ export function getTitleElement(node: Node): Element | null {
 function isSVGTitle(element: Element): boolean {
   return element[$localName] === "title" &&
     element[$namespace] === Namespace.SVG;
+}
+
+const tags = new Set<string>(["body", "frameset"]);
+
+function isBodyOrFrameset(node: Node): boolean {
+  if (!isElement(node)) return false;
+
+  return tags.has(node[$localName]);
 }

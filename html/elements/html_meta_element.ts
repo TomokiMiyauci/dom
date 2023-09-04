@@ -1,12 +1,13 @@
 import type { IHTMLMetaElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { reflectGet, reflectSet } from "../../dom/nodes/element.ts";
 
 export class HTMLMetaElement extends HTMLElement implements IHTMLMetaElement {
   get content(): string {
-    throw new Error("content#getter");
+    return reflectGet(this, "content");
   }
   set content(value: string) {
-    throw new Error("content#setter");
+    reflectSet(this, "content", value);
   }
 
   get httpEquiv(): string {
@@ -22,11 +23,18 @@ export class HTMLMetaElement extends HTMLElement implements IHTMLMetaElement {
     throw new Error("media#setter");
   }
 
+  /**
+   * @see https://html.spec.whatwg.org/multipage/semantics.html#dom-meta-name
+   */
   get name(): string {
-    throw new Error("name#getter");
+    return reflectGet(this, "name");
   }
+
+  /**
+   * @see https://html.spec.whatwg.org/multipage/semantics.html#dom-meta-name
+   */
   set name(value: string) {
-    throw new Error("name#setter");
+    reflectSet(this, "name", value);
   }
 
   get scheme(): string {

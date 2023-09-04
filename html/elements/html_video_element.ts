@@ -18,25 +18,25 @@ export class HTMLVideoElement extends HTMLMediaElement
   }
 
   get onenterpictureinpicture():
-    | ((this: HTMLVideoElement, ev: Event) => any)
+    | ((this: globalThis.HTMLVideoElement, ev: Event) => any)
     | null {
     throw new Error("onenterpictureinpicture#getter");
   }
 
   set onenterpictureinpicture(
-    value: ((this: HTMLVideoElement, ev: Event) => any) | null,
+    value: ((this: globalThis.HTMLVideoElement, ev: Event) => any) | null,
   ) {
     throw new Error("onenterpictureinpicture#setter");
   }
 
   get onleavepictureinpicture():
-    | ((this: HTMLVideoElement, ev: Event) => any)
+    | ((this: globalThis.HTMLVideoElement, ev: Event) => any)
     | null {
     throw new Error("onleavepictureinpicture#getter");
   }
 
   set onleavepictureinpicture(
-    value: ((this: HTMLVideoElement, ev: Event) => any) | null,
+    value: ((this: globalThis.HTMLVideoElement, ev: Event) => any) | null,
   ) {
     throw new Error("onleavepictureinpicture#setter");
   }

@@ -1,5 +1,6 @@
 import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
+import { type ChildNode } from "../dom/nodes/child_node.ts";
 import { Attr } from "../dom/nodes/attr.ts";
 import { getQualifiedName, isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
@@ -16,10 +17,12 @@ import {
 } from "../dom/nodes/internal.ts";
 import { HTMLTemplateElement } from "./elements/html_template_element.ts";
 
+type Child = Node & ChildNode;
+
 export type DOMTreeAdapterMap = TreeAdapterTypeMap<
   Node,
   ParentNode,
-  ChildNode,
+  Child,
   Document,
   DocumentFragment,
   Element,
@@ -151,7 +154,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     throw new Error("insertTextBefore");
   }
 
-  appendChild(parentNode: Element, newNode: ChildNode): void {
+  appendChild(parentNode: Element, newNode: Child): void {
     parentNode.appendChild(newNode);
   }
 
@@ -167,7 +170,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     return [...element.attributes].map(AttrConvertor.from.bind(AttrConvertor));
   }
 
-  getChildNodes(node: Element): ChildNode[] {
+  getChildNodes(node: Element): Child[] {
     return Array.from(node.childNodes);
   }
 
@@ -193,12 +196,12 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     return element.namespaceURI as html.NS;
   }
 
-  getFirstChild(node: Element): ChildNode | null {
+  getFirstChild(node: Element): Child | null {
     return node.firstChild;
   }
 
   getParentNode(node: Node): Element | null {
-    return node.parentElement;
+    return node.parentElement as any;
   }
 
   detachNode(node: ChildNode): void {

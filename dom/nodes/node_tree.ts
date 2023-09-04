@@ -23,6 +23,7 @@ import { type CharacterData } from "./character_data.ts";
  */
 export function nodeLength(
   node:
+    | Node
     | Document
     | DocumentType
     | DocumentFragment

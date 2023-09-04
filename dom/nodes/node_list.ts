@@ -12,7 +12,7 @@ import { orderTree } from "../trees/tree.ts";
  */
 export interface CollectionOptions {
   root: Node;
-  filter: (node: Node) => boolean;
+  filter: (node: Node, root: Node) => boolean;
 }
 
 @iterable

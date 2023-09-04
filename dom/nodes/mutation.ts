@@ -25,7 +25,7 @@ import {
   getRoot,
   hasParent,
 } from "../trees/tree.ts";
-import type { Child } from "./types.ts";
+import type { Child, Parent } from "./types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "./algorithm.ts";
 import { filter, find, some } from "../../deps.ts";
 import { assignSlot, isSlottable, signalSlotChange } from "./node_tree.ts";
@@ -166,13 +166,13 @@ export function replaceChild<T extends Node>(
 export function insertNode(
   node: Node,
   parent: Node,
-  child: Child,
+  child: Child | null,
   suppressObservers: boolean | null = null,
 ) {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
     ? node._children.clone()
-    : new OrderedSet<Node & ChildNode>([node]);
+    : new OrderedSet<Node>([node]);
 
   // 2. Let count be nodes’s size.
   const count = nodes.size;
@@ -206,11 +206,11 @@ export function insertNode(
     adoptNode(node, parent[$nodeDocument]);
 
     // 2. If child is null, then append node to parent’s children.
-    if (child === null) parent._children.append(node);
+    if (child === null) parent._children.append(node as Child);
     // 3. Otherwise, insert node into parent’s children before child’s index.
-    else parent._children.insert(getIndex(child), node);
+    else parent._children.insert(getIndex(child), node as Child);
     // sync parent
-    node._parent = parent;
+    node._parent = parent as Parent;
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -222,7 +222,7 @@ export function insertNode(
 
     // 5. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
     // TODO
-    if (isShadowRoot(getRoot(parent))) signalSlotChange(parent);
+    if (isShadowRoot(getRoot(parent))) signalSlotChange(parent as any);
 
     // 6. Run assign slottables for a tree with node’s root.
     // assignSlottablesForTree(getRoot(node));
@@ -256,7 +256,7 @@ export function insertNode(
 export function ensurePreInsertionValidity(
   node: Node,
   parent: Node,
-  child: Child,
+  child: Child | null,
 ): void {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -350,7 +350,7 @@ export function ensurePreInsertionValidity(
 export function preInsertNode(
   node: Node,
   parent: Node,
-  child: Child,
+  child: Child | null,
 ): Node {
   // 1. Ensure pre-insertion validity of node into parent before child.
   ensurePreInsertionValidity(node, parent, child);
@@ -371,7 +371,10 @@ export function preInsertNode(
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace-all
  */
-export function replaceAllNode(node: Node | null, parent: Node): void {
+export function replaceAllNode(
+  node: Node | null,
+  parent: Node,
+): void {
   // 1. Let removedNodes be parent’s children.
   const removeNodes = parent._children;
 
@@ -522,7 +525,11 @@ export function adoptNode(node: Node, document: Document): void {
   // 3. If document is not oldDocument, then:
   if (document !== oldDocument) {
     // 1. For each inclusiveDescendant in node’s shadow-including inclusive descendants:
-    for (const inclusiveDescendant of getInclusiveDescendants(node)) { // TODO(miyauci): shadow-including
+    for (
+      const inclusiveDescendant of getInclusiveDescendants(node) as Iterable<
+        Node
+      >
+    ) { // TODO(miyauci): shadow-including
       // 1. Set inclusiveDescendant’s node document to document.
       inclusiveDescendant[$nodeDocument] = document;
 

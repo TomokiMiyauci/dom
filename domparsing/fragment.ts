@@ -51,7 +51,7 @@ export function serializeFragment(
 
   // 2. If context document is an HTML document, return an HTML serialization of node.
   if (isHTMLDocument(contextDocument)) {
-    return serialize<DOMTreeAdapterMap>(node, {
+    return serialize<DOMTreeAdapterMap>(node as any, {
       treeAdapter: new DOMTreeAdapter(contextDocument),
     });
   }

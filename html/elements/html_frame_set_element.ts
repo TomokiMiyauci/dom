@@ -19,5 +19,31 @@ export class HTMLFrameSetElement extends HTMLElement
   }
 }
 
-// deno-lint-ignore no-empty-interface
-export interface HTMLFrameSetElement extends WindowEventHandlers {}
+export interface HTMLFrameSetElement extends WindowEventHandlers {
+  addEventListener<K extends keyof HTMLFrameSetElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLFrameSetElement,
+      ev: HTMLFrameSetElementEventMap[K],
+    ) => any,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  removeEventListener<K extends keyof HTMLFrameSetElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLFrameSetElement,
+      ev: HTMLFrameSetElementEventMap[K],
+    ) => any,
+    options?: boolean | EventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void;
+}

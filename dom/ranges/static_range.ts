@@ -2,6 +2,7 @@ import type { IStaticRange } from "../../interface.d.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { isAttr, isDocumentType } from "../nodes/utils.ts";
+import { type Node } from "../nodes/node.ts";
 import { AbstractRange } from "./abstract_range.ts";
 import { BoundaryPoint } from "./boundary_point.ts";
 
@@ -28,11 +29,11 @@ export class StaticRange extends AbstractRange implements IStaticRange {
     super();
     // 2. Set this’s start to (init["startContainer"], init["startOffset"]) and end to (init["endContainer"], init["endOffset"]).
     this.start = new BoundaryPoint({
-      node: startContainer,
+      node: startContainer as Node,
       offset: init.startOffset,
     });
     this.end = new BoundaryPoint({
-      node: endContainer,
+      node: endContainer as Node,
       offset: init.endOffset,
     });
   }

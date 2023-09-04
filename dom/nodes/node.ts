@@ -82,6 +82,7 @@ import {
   type RegisteredObserver,
   type TransientRegisteredObserver,
 } from "./mutation_observer.ts";
+import { Child } from "./types.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -240,7 +241,7 @@ export abstract class Node extends EventTarget implements INode {
     return new NodeList({
       root: this,
       filter: (node, root): boolean => {
-        return root._children.contains(node);
+        return (root._children as OrderedSet<Node>).contains(node);
       },
     }) as any as NodeListOf<
       Node & ChildNode
@@ -494,9 +495,9 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-insertbefore
    */
-  insertBefore<T>(node: T & Node, child: Node | null): T {
+  insertBefore<T>(node: T & Node, child: Child | null): T {
     // return the result of pre-inserting node into this before child.
-    return preInsertNode(node, this, child);
+    return preInsertNode(node, this, child) as T;
   }
 
   appendChild<T>(node: T & Node): T {
@@ -504,7 +505,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   replaceChild<T>(node: T & Node, child: T): T {
-    return replaceChild<T & Node>(child, node, this);
+    return replaceChild<T & Node>(child as any, node, this);
   }
 
   removeChild<T>(child: T & Node): T {

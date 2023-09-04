@@ -103,7 +103,7 @@ export class HTMLMediaElement extends HTMLElement implements IHTMLMediaElement {
   }
 
   get onencrypted():
-    | ((this: HTMLMediaElement, ev: MediaEncryptedEvent) => any)
+    | ((this: globalThis.HTMLMediaElement, ev: MediaEncryptedEvent) => any)
     | null {
     throw new Error("onencrypted#getter");
   }
@@ -117,7 +117,7 @@ export class HTMLMediaElement extends HTMLElement implements IHTMLMediaElement {
   }
 
   get onwaitingforkey():
-    | ((this: HTMLMediaElement, ev: Event) => any)
+    | ((this: globalThis.HTMLMediaElement, ev: Event) => any)
     | null {
     throw new Error("onwaitingforkey#getter");
   }

@@ -10,7 +10,9 @@ import { Statuses, TestReport, Tests, TestsStatus } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
 
 for (const item of Object.keys(DOM)) {
-  Object.defineProperty(self, item, { value: DOM[item] });
+  Object.defineProperty(self, item, {
+    value: (DOM as Record<string, unknown>)[item],
+  });
 }
 
 const parser = new DOMParser();

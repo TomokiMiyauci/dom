@@ -66,32 +66,8 @@ export abstract class LegacyPlatformObject {
       },
       deleteProperty: Delete,
       defineProperty: DefineOwnProperty,
-      preventExtensions: () => false,
-      ownKeys: (target) => {
-        const set = new Set<string | symbol>();
-        const supportedIndexes = target[WebIDL.supportedIndexes];
-
-        if (supportedIndexes) {
-          for (const index of supportedIndexes.call(target)) {
-            set.add(String(index));
-          }
-        }
-
-        if (isNamedProperty(target)) {
-          for (
-            const name of target[WebIDL.supportedNamedProperties].call(target)
-          ) {
-            if (runNamedPropertyVisibilityAlgorithm(name, target)) {
-              set.add(name);
-            }
-          }
-        }
-
-        Object.getOwnPropertyNames(target).forEach(set.add.bind(set));
-        Object.getOwnPropertySymbols(target).forEach(set.add.bind(set));
-
-        return Array.from(set);
-      },
+      preventExtensions: PreventExtensions,
+      ownKeys: OwnPropertyKeys,
     });
   }
 
@@ -99,10 +75,16 @@ export abstract class LegacyPlatformObject {
   abstract [WebIDL.supportedNamedProperties]?(): Set<string>;
 }
 
+/**
+ * @see [Infra Standard](https://webidl.spec.whatwg.org/#legacy-platform-object-delete)
+ */
 export function Delete(O: object, P: PropertyKey): boolean {
+  // 1. If O supports indexed properties and P is an array index, then:
   if (isIndexedProperty(O) && isArrayIndex(P)) {
+    // 1. Let index be the result of calling ! ToUint32(P).
     const index = ToUnit32(P);
 
+    // 2. If index is not a supported property index, then return true. // 3. Return false.
     return !O[WebIDL.supportedIndexes].call(O).has(index);
   }
 
@@ -114,12 +96,54 @@ export function Delete(O: object, P: PropertyKey): boolean {
 
   const desc = Reflect.getOwnPropertyDescriptor(O, P);
 
+  // 3. If O has an own property with name P, then:
   if (desc) {
+    // 1. If the property is not configurable, then return false.
     if (!desc.configurable) return false;
+
+    // 2. Otherwise, remove the property from O.
     delete (O as Record<typeof P, unknown>)[P];
   }
 
+  // 4. Return true.
   return true;
+}
+
+/**
+ * @see [Infra Standard](https://webidl.spec.whatwg.org/#legacy-platform-object-preventextensions)
+ */
+export function PreventExtensions(): false {
+  // 1. Return false.
+  return false;
+}
+
+/**
+ * @see [Infra Standard](https://webidl.spec.whatwg.org/#legacy-platform-object-ownpropertykeys)
+ */
+export function OwnPropertyKeys(target: object): (string | symbol)[] {
+  // 1. Let keys be a new empty list of ECMAScript String and Symbol values.
+  const set = new Set<string | symbol>();
+
+  if (isIndexedProperty(target)) {
+    for (const index of target[WebIDL.supportedIndexes].call(target)) {
+      set.add(String(index));
+    }
+  }
+
+  if (isNamedProperty(target)) {
+    for (
+      const name of target[WebIDL.supportedNamedProperties].call(target)
+    ) {
+      if (runNamedPropertyVisibilityAlgorithm(name, target)) {
+        set.add(name);
+      }
+    }
+  }
+
+  Object.getOwnPropertyNames(target).forEach(set.add.bind(set));
+  Object.getOwnPropertySymbols(target).forEach(set.add.bind(set));
+
+  return Array.from(set);
 }
 
 export function DefineOwnProperty(

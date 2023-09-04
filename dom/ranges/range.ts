@@ -1,5 +1,6 @@
 import type { Node } from "../nodes/node.ts";
 import type { CharacterData } from "../nodes/character_data.ts";
+import type { Document } from "../nodes/document.ts";
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
@@ -47,8 +48,14 @@ export class Range extends AbstractRange implements IRange {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    this.start = new BoundaryPoint({ node: globalThis.document, offset: 0 });
-    this.end = new BoundaryPoint({ node: globalThis.document, offset: 0 });
+    this.start = new BoundaryPoint({
+      node: globalThis.document as Document,
+      offset: 0,
+    });
+    this.end = new BoundaryPoint({
+      node: globalThis.document as Document,
+      offset: 0,
+    });
   }
 
   /**
@@ -386,7 +393,7 @@ export class Range extends AbstractRange implements IRange {
     // 3. Set new node to the parent of reference node, and new offset to one plus reference node’s index.
 
     // 15. If first partially contained child is a CharacterData node, then:
-    if (isCharacterData(firstPartiallyContainedChild)) {
+    if (isCharacterData(firstPartiallyContainedChild as any)) {
       // 1. Let clone be a clone of original start node.
 
       // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.

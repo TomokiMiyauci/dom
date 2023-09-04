@@ -458,11 +458,11 @@ export class Element extends Node implements IElement {
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<Element>;
+  ): HTMLCollectionOf<globalThis.Element>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<Element> {
+  ): HTMLCollectionOf<globalThis.Element> {
     return getElementsByNamespaceAndLocalName(namespace, localName, this);
   }
 
@@ -510,7 +510,7 @@ export class Element extends Node implements IElement {
     element: Element,
   ): Element | null {
     // result of running insert adjacent, give this, where, and element.
-    return insertAdjacent(this, where, element);
+    return insertAdjacent(this, where, element) as Element | null;
   }
 
   /**
