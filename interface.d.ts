@@ -120,3 +120,4 @@ export type IMutationObserver = MutationObserver;
 export type IMutationRecord = MutationRecord;
 export type INodeIterator = NodeIterator;
 export type INodeFilter = typeof NodeFilter;
+export type ITreeWalker = TreeWalker;

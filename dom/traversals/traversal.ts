@@ -1,5 +1,6 @@
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { type NodeIterator } from "./node_iterator.ts";
+import { type TreeWalker } from "./tree_walker.ts";
 import { NodeFilter } from "./node_filter.ts";
 
 /**
@@ -7,8 +8,11 @@ import { NodeFilter } from "./node_filter.ts";
  */
 export function filter(
   node: Node,
-  traverser: NodeIterator,
+  traverser: NodeIterator | TreeWalker,
 ): number {
+  // for types
+  traverser = traverser as NodeIterator;
+
   // 1. If traverser’s active flag is set, then throw an "InvalidStateError" DOMException.
   if (traverser["_activeFlag"]) {
     throw new DOMException("<message>", DOMExceptionName.InvalidStateError);
