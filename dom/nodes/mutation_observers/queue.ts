@@ -108,7 +108,7 @@ export function queueTreeMutationRecord(
   addedNodes: OrderedSet<Node>,
   removedNodes: OrderedSet<Node>,
   previousSibling: Child | null,
-  nextSibling: Child | null,
+  nextSibling: Node | null,
 ): void {
   // 1. Assert: either addedNodes or removedNodes is not empty.
   // 2. Queue a mutation record of "childList" for target with null, null, null, addedNodes, removedNodes, previousSibling, and nextSibling.

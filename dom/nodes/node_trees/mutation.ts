@@ -170,7 +170,7 @@ export function replaceChild<T extends Node>(
 export function insertNode(
   node: Node,
   parent: Node,
-  child: Child | null,
+  child: Node | null,
   suppressObservers: boolean | null = null,
 ) {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
@@ -260,7 +260,7 @@ export function insertNode(
 export function ensurePreInsertionValidity(
   node: Node,
   parent: Node,
-  child: Child | null,
+  child: Node | null,
 ): void {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -354,7 +354,7 @@ export function ensurePreInsertionValidity(
 export function preInsertNode(
   node: Node,
   parent: Node,
-  child: Child | null,
+  child: Node | null,
 ): Node {
   // 1. Ensure pre-insertion validity of node into parent before child.
   ensurePreInsertionValidity(node, parent, child);
