@@ -118,3 +118,5 @@ export type IStaticRange = StaticRange;
 export type IRange = Range;
 export type IMutationObserver = MutationObserver;
 export type IMutationRecord = MutationRecord;
+export type INodeIterator = NodeIterator;
+export type INodeFilter = typeof NodeFilter;

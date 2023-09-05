@@ -406,13 +406,13 @@
   "dom/ranges/Range-stringifier.html",
   // "dom/ranges/Range-surroundContents.html",
   // "dom/ranges/Range-test-iframe.html",
-  "dom/ranges/StaticRange-constructor.html"
+  "dom/ranges/StaticRange-constructor.html",
   // "dom/slot-recalc-ref.html",
   // "dom/slot-recalc.html",
   // "dom/svg-insert-crash.html",
-  // "dom/traversal/NodeFilter-constants.html",
+  "dom/traversal/NodeFilter-constants.html",
   // "dom/traversal/NodeIterator-removal.html",
-  // "dom/traversal/NodeIterator.html",
+  "dom/traversal/NodeIterator.html"
   // "dom/traversal/support/empty-document.html",
   // "dom/traversal/support/TreeWalker-acceptNode-filter-cross-realm-null-browsing-context-subframe.html",
   // "dom/traversal/TreeWalker-acceptNode-filter-cross-realm-null-browsing-context.html",

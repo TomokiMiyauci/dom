@@ -50,6 +50,7 @@ import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Range } from "../../ranges/range.ts";
 import { BoundaryPoint } from "../../ranges/boundary_point.ts";
 import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
+import { NodeIterator } from "../../traversals/node_iterator.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -553,12 +554,31 @@ export class Document extends Node implements IDocument {
     throw new UnImplemented();
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-createnodeiterator)
+   */
   createNodeIterator(
     root: Node,
-    whatToShow?: number | undefined,
-    filter?: NodeFilter | null | undefined,
+    whatToShow = 0xFFFFFFFF,
+    filter: NodeFilter | null = null,
   ): NodeIterator {
-    throw new UnImplemented();
+    // 1. Let iterator be a new NodeIterator object.
+    const iterator = new NodeIterator();
+
+    // 2. Set iterator’s root and iterator’s reference to root.
+    iterator["_root"] = root, iterator["_reference"] = root;
+
+    // 3. Set iterator’s pointer before reference to true.
+    iterator["_pointerBeforeReference"] = true;
+
+    // 4. Set iterator’s whatToShow to whatToShow.
+    iterator["_whatToShow"] = whatToShow;
+
+    // 5. Set iterator’s filter to filter.
+    iterator["_filter"] = filter;
+
+    // 6. Return iterator.
+    return iterator;
   }
 
   /**

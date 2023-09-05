@@ -2316,6 +2316,20 @@
         "name": "attributes HTMLInputElement.type: type update mutation",
         "reason": "HTMLInputElement type setter is not supported"
       }
+    ],
+    "dom/traversal/NodeIterator.html": [
+      {
+        "name": "createNodeIterator() parameter defaults",
+        "reason": "assign to readonly"
+      },
+      {
+        "name": "createNodeIterator() with null as arguments",
+        "reason": "assign to readonly"
+      },
+      {
+        "name": "createNodeIterator() with undefined as arguments",
+        "reason": "assign to readonly"
+      }
     ]
   }
 }

@@ -1,6 +1,6 @@
 const map = new Map<object, object>();
 
-export function Exposed(global: object): ClassDecorator {
+export function Exposed(global: object): (target: object) => void {
   return (target): void => {
     map.set(target, global);
   };
