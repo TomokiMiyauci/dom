@@ -20,6 +20,7 @@ import {
   isInclusiveSiblingOf,
   isPrecedeOf,
   isSiblingOf,
+  orderSubtree,
   orderTree,
   TreeNode,
 } from "./tree.ts";
@@ -47,31 +48,41 @@ class Node implements TreeNode {
 
 const root = new Node();
 const parent = new Node();
-const child = new Node();
-const child2 = new Node();
-const child3 = new Node();
-const child4 = new Node();
-const child5 = new Node();
-const grandChild = new Node();
-const grandChild_2 = new Node();
-const grandChild2 = new Node();
+const childA = new Node();
+const childB = new Node();
+const childC = new Node();
+const grandChildA1 = new Node();
+const grandChildB1 = new Node();
+const grandChildB2 = new Node();
+const grandChildC1 = new Node();
+const grandChildC2 = new Node();
+const grandChildC3 = new Node();
 const other = new Node();
 
 root.appendChild(parent);
-parent.appendChild(child);
-parent.appendChild(child2);
-parent.appendChild(child3);
-parent.appendChild(child4);
-parent.appendChild(child5);
-child.appendChild(grandChild);
-child.appendChild(grandChild_2);
-child2.appendChild(grandChild2);
+parent.appendChild(childA);
+parent.appendChild(childB);
+parent.appendChild(childC);
+childA.appendChild(grandChildA1);
+childB.appendChild(grandChildB1);
+childB.appendChild(grandChildB2);
+childC.appendChild(grandChildC1);
+childC.appendChild(grandChildC2);
+childC.appendChild(grandChildC3);
 
 describe("isChildOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
-      [child, parent],
-      [grandChild, child],
+      [parent, root],
+      [childA, parent],
+      [childB, parent],
+      [childC, parent],
+      [grandChildA1, childA],
+      [grandChildB1, childB],
+      [grandChildB2, childB],
+      [grandChildC1, childC],
+      [grandChildC2, childC],
+      [grandChildC3, childC],
     ];
 
     table.forEach(([target, of]) => {
@@ -81,12 +92,56 @@ describe("isChildOf", () => {
 
   it("should return false", () => {
     const table: [Node, Node][] = [
+      [root, root],
+      [root, parent],
+      [root, childA],
+      [root, childB],
+      [root, childC],
+      [root, grandChildA1],
+      [root, grandChildB1],
+      [root, grandChildB2],
+      [root, grandChildC1],
+      [root, grandChildC2],
+      [root, grandChildC3],
       [parent, parent],
-      [child, child],
-      [grandChild, grandChild],
-      [parent, child],
-      [parent, grandChild],
-      [child, grandChild],
+      [parent, childA],
+      [parent, childB],
+      [parent, childC],
+      [parent, grandChildA1],
+      [parent, grandChildB1],
+      [parent, grandChildB2],
+      [parent, grandChildC1],
+      [parent, grandChildC2],
+      [parent, grandChildC3],
+      [childA, root],
+      [childA, childA],
+      [childA, childB],
+      [childA, childC],
+      [childA, childC],
+      [childA, grandChildA1],
+      [childA, grandChildB1],
+      [childA, grandChildB2],
+      [childA, grandChildC1],
+      [childA, grandChildC2],
+      [childA, grandChildC3],
+      [grandChildA1, root],
+      [grandChildA1, parent],
+      [grandChildA1, childB],
+      [grandChildA1, childC],
+      [grandChildA1, grandChildA1],
+      [grandChildB1, grandChildB1],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, grandChildB1],
+      [grandChildB2, grandChildB2],
+      [grandChildC1, grandChildC1],
+      [grandChildC1, grandChildC2],
+      [grandChildC1, grandChildC3],
+      [grandChildC2, grandChildC1],
+      [grandChildC2, grandChildC2],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, grandChildC1],
+      [grandChildC3, grandChildC2],
+      [grandChildC3, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -98,9 +153,18 @@ describe("isChildOf", () => {
 describe("isDescendantOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
-      [child, parent],
-      [grandChild, parent],
-      [grandChild, child],
+      [parent, root],
+      [childA, root],
+      [childA, parent],
+      [childB, root],
+      [childB, parent],
+      [childC, root],
+      [childC, parent],
+      [grandChildA1, root],
+      [grandChildA1, parent],
+      [grandChildA1, childA],
+      [grandChildB2, childB],
+      [grandChildC3, childC],
     ];
 
     table.forEach(([target, of]) => {
@@ -110,12 +174,19 @@ describe("isDescendantOf", () => {
 
   it("should return false", () => {
     const table: [Node, Node][] = [
+      [root, root],
+      [root, parent],
+      [root, childA],
+      [root, grandChildA1],
       [parent, parent],
-      [child, child],
-      [grandChild, grandChild],
-      [parent, child],
-      [parent, grandChild],
-      [child, grandChild],
+      [parent, childA],
+      [parent, grandChildA1],
+      [childA, childA],
+      [childA, childB],
+      [childA, childC],
+      [childA, grandChildA1],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -124,44 +195,24 @@ describe("isDescendantOf", () => {
   });
 });
 
-describe("isAncestorOf", () => {
-  it("should return true", () => {
-    const table: [Node, Node][] = [
-      [parent, child],
-      [parent, grandChild],
-      [child, grandChild],
-    ];
-
-    table.forEach(([target, of]) => {
-      assert(isAncestorOf(target, of));
-    });
-  });
-
-  it("should return false", () => {
-    const table: [Node, Node][] = [
-      [parent, parent],
-      [child, child],
-      [grandChild, grandChild],
-      [child, parent],
-      [grandChild, parent],
-      [grandChild, child],
-    ];
-
-    table.forEach(([target, of]) => {
-      assertFalse(isAncestorOf(target, of));
-    });
-  });
-});
-
 describe("isInclusiveDescendantOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
-      [child, parent],
-      [grandChild, parent],
-      [grandChild, child],
+      [root, root],
+      [parent, root],
       [parent, parent],
-      [child, child],
-      [grandChild, grandChild],
+      [childA, root],
+      [childA, parent],
+      [childA, childA],
+      [childB, root],
+      [childB, parent],
+      [childC, root],
+      [childC, parent],
+      [grandChildA1, root],
+      [grandChildA1, parent],
+      [grandChildA1, childA],
+      [grandChildB2, childB],
+      [grandChildC3, childC],
     ];
 
     table.forEach(([target, of]) => {
@@ -171,9 +222,16 @@ describe("isInclusiveDescendantOf", () => {
 
   it("should return false", () => {
     const table: [Node, Node][] = [
-      [parent, child],
-      [parent, grandChild],
-      [child, grandChild],
+      [root, parent],
+      [root, childA],
+      [root, grandChildA1],
+      [parent, childA],
+      [parent, grandChildA1],
+      [childA, childB],
+      [childA, childC],
+      [childA, grandChildA1],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -182,15 +240,62 @@ describe("isInclusiveDescendantOf", () => {
   });
 });
 
+describe("isAncestorOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [root, parent],
+      [root, childA],
+      [root, childB],
+      [root, childC],
+      [root, grandChildA1],
+      [parent, childA],
+      [parent, childB],
+      [childA, grandChildA1],
+      [childB, grandChildB2],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isAncestorOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [root, root],
+      [parent, root],
+      [parent, parent],
+      [childA, childA],
+      [childA, childB],
+      [childA, childC],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
+      [childB, childB],
+      [childB, childC],
+      [childB, grandChildC3],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isAncestorOf(target, of));
+    });
+  });
+});
+
 describe("isInclusiveAncestorOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
+      [root, root],
+      [root, parent],
+      [root, childA],
+      [root, childB],
+      [root, childC],
+      [root, grandChildA1],
+      [parent, childA],
+      [parent, childB],
+      [childA, grandChildA1],
+      [childB, grandChildB2],
       [parent, parent],
-      [child, child],
-      [grandChild, grandChild],
-      [parent, child],
-      [parent, grandChild],
-      [child, grandChild],
+      [childA, childA],
+      [childB, childB],
     ];
 
     table.forEach(([target, of]) => {
@@ -200,9 +305,13 @@ describe("isInclusiveAncestorOf", () => {
 
   it("should return false", () => {
     const table: [Node, Node][] = [
-      [child, parent],
-      [grandChild, parent],
-      [grandChild, child],
+      [parent, root],
+      [childA, childB],
+      [childA, childC],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
+      [childB, childC],
+      [childB, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -214,12 +323,25 @@ describe("isInclusiveAncestorOf", () => {
 describe("isSiblingOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
-      [child, child2],
-      [child2, child],
       [parent, parent],
-      [child, child],
-      [child2, child2],
-      [grandChild, grandChild],
+      [childA, childA],
+      [childA, childB],
+      [childA, childC],
+      [childB, childA],
+      [childB, childB],
+      [childB, childC],
+      [childC, childA],
+      [childC, childB],
+      [childC, childC],
+      [grandChildB1, grandChildB1],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, grandChildB1],
+      [grandChildC1, grandChildC2],
+      [grandChildC1, grandChildC3],
+      [grandChildC2, grandChildC1],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, grandChildC1],
+      [grandChildC3, grandChildC2],
     ];
 
     table.forEach(([target, of]) => {
@@ -229,14 +351,18 @@ describe("isSiblingOf", () => {
 
   it("should return false", () => {
     const table: [Node, Node][] = [
-      [parent, child],
-      [parent, child2],
-      [parent, grandChild],
-      [child, parent],
-      [child, grandChild],
-      [grandChild, parent],
-      [grandChild, child],
-      [grandChild, child2],
+      [root, root],
+      [root, parent],
+      [root, childA],
+      [root, grandChildA1],
+      [parent, root],
+      [parent, childA],
+      [parent, grandChildA1],
+      [childA, root],
+      [childA, parent],
+      [childA, grandChildA1],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -245,36 +371,89 @@ describe("isSiblingOf", () => {
   });
 });
 
+describe("isInclusiveSiblingOf", () => {
+  it("should return true", () => {
+    const table: [Node, Node][] = [
+      [parent, parent],
+      [childA, childA],
+      [childA, childB],
+      [childA, childC],
+      [childB, childA],
+      [childB, childB],
+      [childB, childC],
+      [childC, childA],
+      [childC, childB],
+      [childC, childC],
+      [grandChildB1, grandChildB1],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, grandChildB1],
+      [grandChildC1, grandChildC2],
+      [grandChildC1, grandChildC3],
+      [grandChildC2, grandChildC1],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, grandChildC1],
+      [grandChildC3, grandChildC2],
+      [root, root],
+    ];
+
+    table.forEach(([target, of]) => {
+      assert(isInclusiveSiblingOf(target, of));
+    });
+  });
+
+  it("should return false", () => {
+    const table: [Node, Node][] = [
+      [root, parent],
+      [root, childA],
+      [root, grandChildA1],
+      [parent, root],
+      [parent, childA],
+      [parent, grandChildA1],
+      [childA, root],
+      [childA, parent],
+      [childA, grandChildA1],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
+    ];
+
+    table.forEach(([target, of]) => {
+      assertFalse(isInclusiveSiblingOf(target, of));
+    });
+  });
+});
+
 describe("isPrecedeOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
-      [parent, child],
-      [parent, child2],
-      [parent, child3],
-      [parent, child4],
-      [parent, child5],
-      [child, child2],
-      [child, child2],
-      [child, child3],
-      [child, child4],
-      [child, child5],
-      [child2, child3],
-      [child2, child4],
-      [child2, child5],
-      [child3, child4],
-      [child3, child5],
-      [child4, child5],
-      [grandChild, grandChild_2],
-      [grandChild, grandChild2],
-      [grandChild, child2],
-      [grandChild, child3],
-      [grandChild, child4],
-      [grandChild, child5],
-      [grandChild_2, grandChild2],
-      [grandChild_2, child2],
-      [grandChild_2, child3],
-      [grandChild_2, child4],
-      [grandChild_2, child5],
+      [parent, childA],
+      [parent, childB],
+      [parent, childC],
+      [childA, grandChildA1],
+      [childA, grandChildB2],
+      [childA, grandChildC3],
+      [childA, grandChildC3],
+      [childA, childB],
+      [childA, childC],
+      [childB, grandChildB1],
+      [childB, grandChildB2],
+      [childB, grandChildC3],
+      [childB, childC],
+      [childC, grandChildC1],
+      [childC, grandChildC2],
+      [childC, grandChildC3],
+      [grandChildA1, childB],
+      [grandChildA1, childC],
+      [grandChildA1, grandChildB1],
+      [grandChildA1, grandChildB2],
+      [grandChildA1, grandChildC3],
+      [grandChildB1, childC],
+      [grandChildB1, grandChildB2],
+      [grandChildB1, grandChildC1],
+      [grandChildB1, grandChildC2],
+      [grandChildB1, grandChildC3],
+      [grandChildC1, grandChildC2],
+      [grandChildC1, grandChildC3],
+      [grandChildC2, grandChildC3],
     ];
 
     table.forEach(([target, of]) => {
@@ -287,24 +466,25 @@ describe("isPrecedeOf", () => {
       [parent, parent],
       [parent, other],
       [parent, root],
-      [child, root],
-      [child, parent],
-      [child, child],
-      [child2, root],
-      [child2, parent],
-      [child2, child],
-      [child2, child2],
-      [child3, root],
-      [child3, parent],
-      [child3, child],
-      [child3, grandChild],
-      [child3, grandChild_2],
-      [child3, child2],
-      [child3, grandChild2],
-      [grandChild, root],
-      [grandChild, parent],
-      [grandChild, child],
-      [grandChild, grandChild],
+      [childA, root],
+      [childA, parent],
+      [childA, childA],
+      [childB, root],
+      [childB, parent],
+      [childB, childA],
+      [childB, childB],
+      [childC, root],
+      [childC, parent],
+      [childC, childA],
+      [childB, grandChildA1],
+      [childC, grandChildB1],
+      [childC, grandChildB2],
+      [childC, childB],
+      [childC, grandChildB2],
+      [grandChildA1, root],
+      [grandChildA1, parent],
+      [grandChildA1, childA],
+      [grandChildA1, grandChildA1],
     ];
 
     table.forEach(([target, of]) => {
@@ -317,21 +497,21 @@ describe("isFollowOf", () => {
   it("should return true", () => {
     const table: [Node, Node][] = [
       [parent, root],
-      [child, root],
-      [child, parent],
-      [child2, root],
-      [child2, parent],
-      [child2, child],
-      [child3, root],
-      [child3, parent],
-      [child3, child],
-      [child3, grandChild],
-      [child3, grandChild_2],
-      [child3, child2],
-      [child3, grandChild2],
-      [grandChild, root],
-      [grandChild, parent],
-      [grandChild, child],
+      [childA, root],
+      [childA, parent],
+      [childB, root],
+      [childB, parent],
+      [childB, childA],
+      [childC, root],
+      [childC, parent],
+      [childC, childA],
+      [childC, grandChildA1],
+      [childC, grandChildB1],
+      [childC, childB],
+      [childC, grandChildB1],
+      [grandChildA1, root],
+      [grandChildA1, parent],
+      [grandChildA1, childA],
     ];
 
     table.forEach(([target, of]) => {
@@ -343,36 +523,20 @@ describe("isFollowOf", () => {
     const table: [Node, Node][] = [
       [parent, other],
       [parent, parent],
-      [parent, child],
-      [parent, child2],
-      [parent, child3],
-      [parent, child4],
-      [parent, child5],
-      [child, child],
-      [child, child2],
-      [child, child2],
-      [child, child3],
-      [child, child4],
-      [child, child5],
-      [child2, child2],
-      [child2, child3],
-      [child2, child4],
-      [child2, child5],
-      [child3, child4],
-      [child3, child5],
-      [child4, child5],
-      [grandChild, grandChild_2],
-      [grandChild, grandChild2],
-      [grandChild, child2],
-      [grandChild, child3],
-      [grandChild, child4],
-      [grandChild, child5],
-      [grandChild_2, grandChild2],
-      [grandChild_2, child2],
-      [grandChild_2, child3],
-      [grandChild_2, child4],
-      [grandChild_2, child5],
-      [grandChild, grandChild],
+      [parent, childA],
+      [parent, childB],
+      [parent, childC],
+      [childA, childA],
+      [childA, childB],
+      [childA, childB],
+      [childA, childC],
+      [childB, childB],
+      [childB, childC],
+      [grandChildA1, grandChildB1],
+      [grandChildA1, grandChildB2],
+      [grandChildA1, childB],
+      [grandChildA1, childC],
+      [grandChildA1, grandChildA1],
     ];
 
     table.forEach(([target, of]) => {
@@ -381,43 +545,9 @@ describe("isFollowOf", () => {
   });
 });
 
-describe("isInclusiveSiblingOf", () => {
-  it("should return true", () => {
-    const table: [Node, Node][] = [
-      [child, child2],
-      [child2, child],
-      [child, child],
-      [child2, child2],
-      [grandChild, grandChild],
-      [parent, parent],
-    ];
-
-    table.forEach(([target, of]) => {
-      assert(isInclusiveSiblingOf(target, of));
-    });
-  });
-
-  it("should return false", () => {
-    const table: [Node, Node][] = [
-      [parent, child],
-      [parent, child2],
-      [parent, grandChild],
-      [child, parent],
-      [child, grandChild],
-      [grandChild, parent],
-      [grandChild, child],
-      [grandChild, child2],
-    ];
-
-    table.forEach(([target, of]) => {
-      assertFalse(isInclusiveSiblingOf(target, of));
-    });
-  });
-});
-
 describe("getRoot", () => {
   it("should return root node", () => {
-    const table: Node[] = [root, parent, child, child2, grandChild];
+    const table: Node[] = [root, parent, childA, childB, grandChildA1];
 
     table.forEach((target) => {
       assert(getRoot(target) === root);
@@ -428,11 +558,15 @@ describe("getRoot", () => {
 describe("getSiblings", () => {
   it("should return siblings", () => {
     const table: [Node, Node[]][] = [
-      [child, [child, child2, child3, child4, child5]],
-      [child2, [child, child2, child3, child4, child5]],
-      [parent, [parent]],
-      [grandChild, [grandChild, grandChild_2]],
       [root, []],
+      [parent, [parent]],
+      [childA, [childA, childB, childC]],
+      [childB, [childA, childB, childC]],
+      [childC, [childA, childB, childC]],
+      [grandChildA1, [grandChildA1]],
+      [grandChildB1, [grandChildB1, grandChildB2]],
+      [grandChildB2, [grandChildB1, grandChildB2]],
+      [grandChildC1, [grandChildC1, grandChildC2, grandChildC3]],
     ];
 
     table.forEach(([target, expected]) => {
@@ -444,14 +578,17 @@ describe("getSiblings", () => {
 describe("getPrecedingSiblings", () => {
   it("should return preceding siblings", () => {
     const table: [Node, Node[]][] = [
-      [child, []],
-      [child2, [child]],
-      [child3, [child2, child]],
-      [child4, [child3, child2, child]],
-      [child5, [child4, child3, child2, child]],
-      [parent, []],
-      [grandChild, []],
       [root, []],
+      [parent, []],
+      [childA, []],
+      [childB, [childA]],
+      [childC, [childB, childA]],
+      [grandChildA1, []],
+      [grandChildB1, []],
+      [grandChildB2, [grandChildB1]],
+      [grandChildC1, []],
+      [grandChildC2, [grandChildC1]],
+      [grandChildC3, [grandChildC2, grandChildC1]],
     ];
 
     table.forEach(([target, expected]) => {
@@ -463,14 +600,14 @@ describe("getPrecedingSiblings", () => {
 describe("getPreviousSibling", () => {
   it("should return previous sibling", () => {
     const table: [Node, Node | null][] = [
-      [child, null],
-      [child2, child],
-      [child3, child2],
-      [child4, child3],
-      [child5, child4],
       [root, null],
       [parent, null],
-      [grandChild, null],
+      [childA, null],
+      [childB, childA],
+      [childC, childB],
+      [grandChildA1, null],
+      [grandChildB1, null],
+      [grandChildB2, grandChildB1],
     ];
 
     table.forEach(([target, expected]) => {
@@ -482,14 +619,17 @@ describe("getPreviousSibling", () => {
 describe("getFollowingSiblings", () => {
   it("should return following siblings", () => {
     const table: [Node, Node[]][] = [
-      [child, [child2, child3, child4, child5]],
-      [child2, [child3, child4, child5]],
-      [child3, [child4, child5]],
-      [child4, [child5]],
-      [child5, []],
       [root, []],
       [parent, []],
-      [grandChild, [grandChild_2]],
+      [childA, [childB, childC]],
+      [childB, [childC]],
+      [childC, []],
+      [grandChildA1, []],
+      [grandChildB1, [grandChildB2]],
+      [grandChildB2, []],
+      [grandChildC1, [grandChildC2, grandChildC3]],
+      [grandChildC2, [grandChildC3]],
+      [grandChildC3, []],
     ];
 
     table.forEach(([target, expected]) => {
@@ -501,14 +641,17 @@ describe("getFollowingSiblings", () => {
 describe("getNextSibling", () => {
   it("should return next sibling", () => {
     const table: [Node, Node | null][] = [
-      [child, child2],
-      [child2, child3],
-      [child3, child4],
-      [child4, child5],
-      [child5, null],
       [root, null],
       [parent, null],
-      [grandChild, grandChild_2],
+      [childA, childB],
+      [childB, childC],
+      [childC, null],
+      [grandChildA1, null],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, null],
+      [grandChildC1, grandChildC2],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, null],
     ];
 
     table.forEach(([target, expected]) => {
@@ -522,45 +665,151 @@ describe("getPrecedings", () => {
     const table: [Node, Node[]][] = [
       [root, []],
       [parent, [root]],
-      [child, [root, parent]],
-      [grandChild, [root, parent, child]],
-      [grandChild_2, [root, parent, child, grandChild]],
-      [child2, [root, parent, child, grandChild, grandChild_2]],
-      [grandChild2, [root, parent, child, grandChild, grandChild_2, child2]],
-      [child3, [
+      [childA, [root, parent]],
+      [grandChildA1, [root, parent, childA]],
+      [childB, [root, parent, childA, grandChildA1]],
+      [grandChildB1, [root, parent, childA, grandChildA1, childB]],
+      [grandChildB2, [
         root,
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
       ]],
-      [child4, [
+      [childC, [
         root,
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
       ]],
-      [child5, [
+      [grandChildC2, [
         root,
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
       ]],
     ];
 
     table.forEach(([target, expected]) => {
       assertEquals([...getPrecedings(target)], expected);
+    });
+  });
+});
+
+describe("getFollows", () => {
+  it("should return following nodes", () => {
+    const table: [Node, Node[]][] = [
+      [root, [
+        parent,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [parent, [
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [childA, [
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildA1, [
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [childB, [
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildB1, [
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildB2, [
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [childC, [
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC1, [
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC2, [
+        grandChildC3,
+      ]],
+      [grandChildC3, []],
+    ];
+
+    table.forEach(([target, expected]) => {
+      assertEquals([...getFollows(target)], expected);
+    });
+  });
+});
+
+describe("next", () => {
+  it("should", () => {
+    const table: [Node, Node | null][] = [
+      [root, parent],
+      [parent, childA],
+      [childA, grandChildA1],
+      [grandChildA1, childB],
+      [childB, grandChildB1],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, childC],
+      [childC, grandChildC1],
+      [grandChildC1, grandChildC2],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, null],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals(getFollow(node), expected);
     });
   });
 });
@@ -571,31 +820,89 @@ describe("orderTree", () => {
       [root, [
         root,
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
       ]],
       [parent, [
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
       ]],
-      [child, [child, grandChild, grandChild_2]],
-      [child2, [child2, grandChild2]],
-      [child3, [child3]],
-      [child4, [child4]],
-      [child5, [child5]],
+      [childA, [
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildA1, [
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [childB, [
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildB1, [
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildB2, [
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [childC, [
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC1, [
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC2, [
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC3, [grandChildC3]],
     ];
 
     table.forEach(([node, expected]) => {
@@ -604,40 +911,46 @@ describe("orderTree", () => {
   });
 });
 
-describe("getFollows", () => {
-  it("should return following nodes", () => {
+describe("orderSubtree", () => {
+  it("should yield depth first", () => {
     const table: [Node, Node[]][] = [
-      [root, [
+      [parent, [
         parent,
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
       ]],
-      [child, [
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
+      [childA, [
+        childA,
+        grandChildA1,
       ]],
-      [child2, [grandChild2, child3, child4, child5]],
-      [child3, [
-        child4,
-        child5,
+      [grandChildA1, [grandChildA1]],
+      [childB, [
+        childB,
+        grandChildB1,
+        grandChildB2,
       ]],
-      [child4, [child5]],
-      [child5, []],
+      [grandChildB1, [grandChildB1]],
+      [grandChildB2, [grandChildB2]],
+      [childC, [
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
+      ]],
+      [grandChildC1, [grandChildC1]],
+      [grandChildC2, [grandChildC2]],
+      [grandChildC3, [grandChildC3]],
     ];
 
-    table.forEach(([target, expected]) => {
-      assertEquals([...getFollows(target)], expected);
+    table.forEach(([node, expected]) => {
+      assertEquals([...orderSubtree(node)], expected);
     });
   });
 });
@@ -645,15 +958,14 @@ describe("getFollows", () => {
 describe("getIndex", () => {
   it("should", () => {
     const table: [Node, number][] = [
+      [root, 0],
       [parent, 0],
-      [child, 0],
-      [child2, 1],
-      [child2, 1],
-      [child3, 2],
-      [child4, 3],
-      [child5, 4],
-      [grandChild, 0],
-      [grandChild_2, 1],
+      [childA, 0],
+      [childB, 1],
+      [childC, 2],
+      [grandChildA1, 0],
+      [grandChildB1, 0],
+      [grandChildB2, 1],
       [other, 0],
     ];
 
@@ -667,46 +979,23 @@ describe("getDescendants", () => {
   it("should", () => {
     const table: [Node, Node[]][] = [
       [parent, [
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
+        childA,
+        grandChildA1,
+        childB,
+        grandChildB1,
+        grandChildB2,
+        childC,
+        grandChildC1,
+        grandChildC2,
+        grandChildC3,
       ]],
-      [child, [grandChild, grandChild_2]],
-      [child2, [grandChild2]],
-      [child3, []],
-      [child4, []],
-      [child5, []],
-    ];
-
-    table.forEach(([node, expected]) => {
-      assertEquals([...getDescendants(node)], expected);
-    });
-  });
-});
-
-describe("orderTreeChildren", () => {
-  it("should", () => {
-    const table: [Node, Node[]][] = [
-      [parent, [
-        child,
-        grandChild,
-        grandChild_2,
-        child2,
-        grandChild2,
-        child3,
-        child4,
-        child5,
-      ]],
-      [child, [grandChild, grandChild_2]],
-      [child2, [grandChild2]],
-      [child3, []],
-      [child4, []],
-      [child5, []],
+      [childA, [grandChildA1]],
+      [childB, [grandChildB1, grandChildB2]],
+      [childC, [grandChildC1, grandChildC2, grandChildC3]],
+      [grandChildA1, []],
+      [grandChildB1, []],
+      [grandChildB2, []],
+      [grandChildC3, []],
     ];
 
     table.forEach(([node, expected]) => {
@@ -719,15 +1008,16 @@ describe("getFollow", () => {
   it("should return follow node", () => {
     const table: [Node, Node | null][] = [
       [root, parent],
-      [parent, child],
-      [child, grandChild],
-      [grandChild, grandChild_2],
-      [grandChild_2, child2],
-      [child2, grandChild2],
-      [grandChild2, child3],
-      [child3, child4],
-      [child4, child5],
-      [child5, null],
+      [parent, childA],
+      [childA, grandChildA1],
+      [grandChildA1, childB],
+      [childB, grandChildB1],
+      [grandChildB1, grandChildB2],
+      [grandChildB2, childC],
+      [childC, grandChildC1],
+      [grandChildC1, grandChildC2],
+      [grandChildC2, grandChildC3],
+      [grandChildC3, null],
     ];
 
     table.forEach(([tree, expected]) => {
@@ -741,11 +1031,11 @@ describe("getInclusiveAncestors", () => {
     const table: [Node, Node[]][] = [
       [root, [root]],
       [parent, [parent, root]],
-      [child, [child, parent, root]],
-      [grandChild, [grandChild, child, parent, root]],
-      [grandChild_2, [grandChild_2, child, parent, root]],
-      [child2, [child2, parent, root]],
-      [grandChild2, [grandChild2, child2, parent, root]],
+      [childA, [childA, parent, root]],
+      [grandChildA1, [grandChildA1, childA, parent, root]],
+      [childB, [childB, parent, root]],
+      [grandChildB1, [grandChildB1, childB, parent, root]],
+      [grandChildB2, [grandChildB2, childB, parent, root]],
     ];
 
     table.forEach(([tree, expected]) => {

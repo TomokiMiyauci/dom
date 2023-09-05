@@ -103,20 +103,37 @@ export function getRoot<T extends Tree>(tree: T): T {
  */
 export function* orderTree<T extends Tree>(tree: T): IterableIterator<T> {
   yield tree;
-  yield* descendant(tree);
+
+  let next = getFollow(tree);
+
+  while (next) {
+    yield next as T;
+    next = getFollow(next);
+  }
+}
+
+export function* orderSubtree<T extends Tree>(tree: T): IterableIterator<T> {
+  yield tree;
+
+  yield* getDescendants(tree) as IterableIterator<T>;
+}
+
+export function nextNodeDescendant(tree: Tree) {
+  let node: Tree | null = tree;
+
+  while (node && !getNextSibling(node)) {
+    node = node._parent;
+  }
+
+  if (!node) return null;
+
+  return getNextSibling(node);
 }
 
 export function* orderTreeChildren<T extends Tree>(
   iterable: Iterable<T>,
 ): IterableIterator<T> {
   for (const child of iterable) yield* orderTree(child);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-tree-descendant
- */
-export function* descendant<T extends Tree>(tree: T): IterableIterator<T> {
-  for (const child of tree._children) yield* orderTree<T>(child as T);
 }
 
 /**
@@ -132,7 +149,7 @@ export function isAncestorOf(target: Tree, of: Tree): boolean {
 
 export function isDescendantOf(target: Tree, of: Tree): boolean {
   return isChildOf(target, of) ||
-    some(descendant(of), (descendant) => isChildOf(target, descendant));
+    some(getDescendants(of), (descendant) => isChildOf(target, descendant));
 }
 
 export function isInclusiveDescendantOf(target: Tree, of: Tree): boolean {
@@ -214,5 +231,7 @@ export function* getInclusiveDescendants(tree: Tree): Iterable<Tree> {
 }
 
 export function getFollow(tree: Tree): Tree | null {
-  return first(getFollows(tree)) ?? null;
+  if (!tree._children.isEmpty) return tree._children[0] ?? null;
+
+  return nextNodeDescendant(tree);
 }
