@@ -63,8 +63,8 @@ export class Range extends AbstractRange implements IRange {
    */
   get commonAncestorContainer(): Node {
     // 1. Let container be start node.
-    let container = this.start[0];
-    const endNode = this.end[0];
+    let container = this._startNode;
+    const endNode = this._endNode;
 
     // 2. While container is not an inclusive ancestor of end node, let container be container’s parent.
     while (!isInclusiveAncestorOf(container, endNode)) {
@@ -314,17 +314,17 @@ export class Range extends AbstractRange implements IRange {
   private extract(range: Range): DocumentFragment {
     // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
     const fragment = DocumentFragment[$create]({
-      nodeDocument: range.start[0][$nodeDocument],
+      nodeDocument: range._startNode[$nodeDocument],
     });
 
     // 2. If range is collapsed, then return fragment.
-    if (range["isCollapsed"]) return fragment;
+    if (range._collapsed) return fragment;
 
     // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
-    const originalStartNode = range.start[0],
-      originalStartOffset = range.start[1],
-      originalEndNode = range.end[0],
-      originalEndOffset = range.end[1];
+    const originalStartNode = range._startNode,
+      originalStartOffset = range._startOffset,
+      originalEndNode = range._endNode,
+      originalEndOffset = range._endOffset;
 
     // 4. If original start node is original end node and it is a CharacterData node, then:
     if (
@@ -639,10 +639,10 @@ export class Range extends AbstractRange implements IRange {
     // 1. Let s be the empty string.
     let s = "";
 
-    const startNode = this.start[0],
-      endNode = this.end[0],
-      startOffset = this.start[1],
-      endOffset = this.end[1];
+    const startNode = this._startNode,
+      endNode = this._endNode,
+      startOffset = this._startOffset,
+      endOffset = this._endOffset;
 
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
     if (startNode === endNode && isText(startNode)) {
@@ -739,10 +739,8 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#concept-range-root
    */
   get #root(): Node {
-    const startNode = this.start[0];
-
     // the root of its start node.
-    return getRoot(startNode);
+    return getRoot(this._startNode);
   }
 
   #contained(node: Node, range: Range): boolean {
