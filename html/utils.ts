@@ -4,7 +4,7 @@ import { type ChildNode } from "../dom/nodes/node_trees/child_node.ts";
 import { Attr } from "../dom/nodes/elements/attr.ts";
 import { isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
-import { Element } from "../dom/nodes/elements/element.ts";
+import { Element, setAttributeValue } from "../dom/nodes/elements/element.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
 import { Document } from "../dom/nodes/documents/document.ts";
@@ -122,7 +122,10 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   adoptAttributes(recipient: Element, attrs: Token.Attribute[]): void {
-    throw new Error("adoptAttributes");
+    for (const attr of attrs) {
+      const { name, namespace, prefix, value } = attr;
+      setAttributeValue(recipient, name, value, prefix, namespace);
+    }
   }
 
   isTextNode(node: Node): node is Text {

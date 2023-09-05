@@ -51,6 +51,7 @@ import { Range } from "../../ranges/range.ts";
 import { BoundaryPoint } from "../../ranges/boundary_point.ts";
 import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
 import { NodeIterator } from "../../traversals/node_iterator.ts";
+import { TreeWalker } from "../../traversals/tree_walker.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -559,7 +560,7 @@ export class Document extends Node implements IDocument {
    */
   createNodeIterator(
     root: Node,
-    whatToShow = 0xFFFFFFFF,
+    whatToShow = 0xFFFFFFFF, // TODO unsigned long
     filter: NodeFilter | null = null,
   ): NodeIterator {
     // 1. Let iterator be a new NodeIterator object.
@@ -628,12 +629,28 @@ export class Document extends Node implements IDocument {
     return Text[$create]({ data, nodeDocument: this });
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-createtreewalker)
+   */
   createTreeWalker(
     root: Node,
-    whatToShow?: number | undefined,
-    filter?: NodeFilter | null | undefined,
+    whatToShow = 0xFFFFFFFF,
+    filter: NodeFilter | null = null,
   ): TreeWalker {
-    throw new UnImplemented();
+    // 1. Let walker be a new TreeWalker object.
+    const walker = new TreeWalker();
+
+    // 2. Set walker’s root and walker’s current to root.
+    walker["_root"] = root, walker["_current"] = root;
+
+    // 3. Set walker’s whatToShow to whatToShow.
+    walker["_whatToShow"] = whatToShow;
+
+    // 4. Set walker’s filter to filter.
+    walker["_filter"] = filter;
+
+    // 5. Return walker.
+    return walker;
   }
 
   /**

@@ -2330,6 +2330,30 @@
         "name": "createNodeIterator() with undefined as arguments",
         "reason": "assign to readonly"
       }
+    ],
+    "dom/traversal/TreeWalker-basic.html": [
+      {
+        "name": "Construct a TreeWalker by document.createTreeWalker(root).",
+        "reason": "assign to readonly"
+      },
+      {
+        "name": "Construct a TreeWalker by document.createTreeWalker(root, null, null).",
+        "reason": "assign to readonly"
+      },
+      {
+        "name": "Construct a TreeWalker by document.createTreeWalker(root, undefined, undefined).",
+        "reason": "assign to readonly"
+      },
+      {
+        "name": "Give an invalid root node to document.createTreeWalker().",
+        "reason": "compiler error"
+      }
+    ],
+    "dom/nodes/Document-createTreeWalker.html": [
+      {
+        "name": "Required arguments to createTreeWalker should be required.",
+        "reason": "compiler error"
+      }
     ]
   }
 }
