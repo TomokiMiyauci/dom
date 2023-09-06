@@ -1,7 +1,7 @@
 import { Element } from "../elements/element.ts";
 import { type Node } from "../node.ts";
 import { Constructor } from "../../../deps.ts";
-import { getDescendants } from "../../trees/tree.ts";
+import { getDescendants } from "../../infra/tree.ts";
 import { isElement } from "../utils.ts";
 import type { INonElementParentNode } from "../../../interface.d.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";

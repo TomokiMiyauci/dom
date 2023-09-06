@@ -1,7 +1,7 @@
 import type { INodeIterator } from "../../interface.d.ts";
 import type { Node } from "../nodes/node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import { orderSubtree } from "../trees/tree.ts";
+import { orderSubtree } from "../infra/tree.ts";
 import { filter } from "./traversal.ts";
 import { NodeFilter } from "./node_filter.ts";
 import { dropwhile, first, last, takewhile } from "../../deps.ts";

@@ -24,7 +24,7 @@ import {
   getPreviousSibling,
   getRoot,
   hasParent,
-} from "../../trees/tree.ts";
+} from "../../infra/tree.ts";
 import type { Child, Parent } from "../types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
 import { filter, find, some } from "../../../deps.ts";
@@ -232,8 +232,16 @@ export function insertNode(
     // assignSlottablesForTree(getRoot(node));
 
     // 7. For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order:
-    //// 1. Run the insertion steps with inclusiveDescendant.
-    //// 2. If inclusiveDescendant is connected, then:
+    // TODO
+    for (
+      let inclusiveDescendant of getInclusiveDescendants(node) as Iterable<Node>
+    ) {
+      // 1. Run the insertion steps with inclusiveDescendant.
+      node["insertionStep"].run(inclusiveDescendant);
+
+      // 2. If inclusiveDescendant is connected, then:
+    }
+
     ///// 1. If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list.
 
     ///// 2. Otherwise, try to upgrade inclusiveDescendant.

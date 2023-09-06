@@ -8,7 +8,7 @@ import {
   setAttributeValue,
 } from "../nodes/elements/element.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
-import { parseOrderSet, serializeOrderSet } from "../trees/ordered_set.ts";
+import { parseOrderSet, serializeOrderSet } from "../infra/ordered_set.ts";
 import { reAsciiWhitespace } from "../../infra/code_point.ts";
 import { LegacyPlatformObject } from "../../webidl/legacy_extended_attributes.ts";
 import { getter, stringifier, WebIDL } from "../../webidl/idl.ts";

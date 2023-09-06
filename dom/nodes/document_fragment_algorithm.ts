@@ -4,7 +4,7 @@
  * @module
  */
 
-import { getRoot, isInclusiveAncestorOf, Tree } from "../trees/tree.ts";
+import { getRoot, isInclusiveAncestorOf, Tree } from "../infra/tree.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor

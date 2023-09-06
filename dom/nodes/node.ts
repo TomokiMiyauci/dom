@@ -38,7 +38,7 @@ import {
   isDescendantOf,
   isInclusiveDescendantOf,
   isPrecedeOf,
-} from "../trees/tree.ts";
+} from "../infra/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import { $nodeDocument } from "./internal.ts";
 import {
@@ -57,7 +57,7 @@ import {
   matchASCIICaseInsensitive,
   toASCIILowerCase,
 } from "../../infra/string.ts";
-import { parseOrderSet } from "../trees/ordered_set.ts";
+import { parseOrderSet } from "../infra/ordered_set.ts";
 import type { ParentNode } from "./node_trees/parent_node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
@@ -515,6 +515,8 @@ export abstract class Node extends EventTarget implements INode {
     return `${this.nodeName}
   ${[...this._children].map((node) => this[inspect].call(node)).join("")}`;
   }
+
+  protected insertionStep: InsertionStep<this> = new InsertionStep();
 }
 
 export interface Node
@@ -922,4 +924,24 @@ function* contiguousTextNodesExclusive(node: Node): Iterable<Text> {
 
   yield* [...precedingTexts].reverse();
   yield* followingTexts;
+}
+
+interface Step<Args extends readonly unknown[]> {
+  define(fn: (...args: Args) => void): void;
+
+  run(...args: Args): void;
+}
+
+export class InsertionStep<T> implements Step<[insertedNode: T]> {
+  #set: Set<(insertedNode: any) => void> = new Set();
+
+  define(fn: (insertedNode: T) => void): void {
+    this.#set.add(fn);
+  }
+
+  run(insertedNode: T): void {
+    for (const fn of this.#set) {
+      fn.apply(fn, [insertedNode]);
+    }
+  }
 }

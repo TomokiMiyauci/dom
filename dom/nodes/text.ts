@@ -18,7 +18,7 @@ import {
   getNextSibling,
   getPrecedingSiblings,
   orderTreeChildren,
-} from "../trees/tree.ts";
+} from "../infra/tree.ts";
 import { $create, $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";

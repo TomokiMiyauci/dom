@@ -7,7 +7,7 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { getRoot } from "../../trees/tree.ts";
+import { getRoot } from "../../infra/tree.ts";
 import { type Attr } from "../elements/attr.ts";
 import { type Document } from "../documents/document.ts";
 import { type DocumentFragment } from "../document_fragment.ts";

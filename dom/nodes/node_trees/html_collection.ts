@@ -11,7 +11,7 @@ import {
   LegacyUnenumerableNamedProperties,
 } from "../../../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
-import { orderSubtree } from "../../trees/tree.ts";
+import { orderSubtree } from "../../infra/tree.ts";
 import { convert, DOMString, unsignedLong } from "../../../webidl/types.ts";
 
 @Exposed(Window)

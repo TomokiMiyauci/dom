@@ -4,7 +4,7 @@ import {
   isAncestorOf,
   isChildOf,
   isFollowOf,
-} from "../trees/tree.ts";
+} from "../infra/tree.ts";
 
 export enum Position {
   Before = "before",

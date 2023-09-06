@@ -44,7 +44,7 @@ import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
-import { getFirstChild, getNextSibling } from "../../trees/tree.ts";
+import { getFirstChild, getNextSibling } from "../../infra/tree.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)

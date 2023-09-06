@@ -6,7 +6,7 @@ import { type Node } from "../node.ts";
 import {
   getFollowingSiblings,
   getPrecedingSiblings,
-} from "../../trees/tree.ts";
+} from "../../infra/tree.ts";
 
 export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class NonDocumentTypeChildNode extends Ctor

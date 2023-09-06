@@ -1,6 +1,6 @@
 import type { Node } from "../node.ts";
 import { StaticNodeList } from "../node_trees/node_list.ts";
-import { getInclusiveAncestors } from "../../trees/tree.ts";
+import { getInclusiveAncestors } from "../../infra/tree.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import type { Child } from "../types.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";

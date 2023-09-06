@@ -8,7 +8,7 @@ import {
   getLastChild,
   getNextSibling,
   getPreviousSibling,
-} from "../trees/tree.ts";
+} from "../infra/tree.ts";
 
 @Exposed(Window)
 export class TreeWalker implements ITreeWalker {

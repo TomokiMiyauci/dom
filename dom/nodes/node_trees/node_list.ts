@@ -5,7 +5,7 @@ import { Iterable, iterable } from "../../../webidl/iterable.ts";
 import { LegacyPlatformObject } from "../../../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import { $filter, $root } from "../internal.ts";
-import { orderSubtree } from "../../trees/tree.ts";
+import { orderSubtree } from "../../infra/tree.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-collection

@@ -6,7 +6,7 @@ import { isElement } from "../utils.ts";
 import { type Element } from "../elements/element.ts";
 import type { IParentNode } from "../../../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
-import { matchScopedSelectorsString } from "../../trees/selector.ts";
+import { matchScopedSelectorsString } from "../../infra/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import {
   Constructor,
@@ -25,7 +25,7 @@ import {
   preInsertNode,
   replaceAllNode,
 } from "../node_trees/mutation.ts";
-import { getFirstChild } from "../../trees/tree.ts";
+import { getFirstChild } from "../../infra/tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 
 export function ParentNode<T extends Constructor<Node>>(

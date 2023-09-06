@@ -10,7 +10,7 @@ import {
   getNextSibling,
   getRoot,
   isInclusiveAncestorOf,
-} from "../trees/tree.ts";
+} from "../infra/tree.ts";
 import { AbstractRange } from "./abstract_range.ts";
 import { BoundaryPoint, Position } from "./boundary_point.ts";
 import {

@@ -11,7 +11,7 @@ import {
   getFollowingSiblings,
   getNextSibling,
   getPrecedingSiblings,
-} from "../../trees/tree.ts";
+} from "../../infra/tree.ts";
 import { convertNodesToNode } from "../node_trees/parent_node.ts";
 import { $nodeDocument } from "../internal.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
