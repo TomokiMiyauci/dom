@@ -83,79 +83,6 @@ export interface ElementInits {
 @Element_Fullscreen
 @Element_CSSShadowParts
 export class Element extends Node implements IElement {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
-   */
-  private _namespace: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace-prefix)
-   */
-  private _namespacePrefix: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-local-name)
-   */
-  private _localName: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
-   */
-  private _customElementState: CustomElementState;
-
-  #customElementDefinition: CustomElementDefinition | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-is-value)
-   */
-  private _isValue: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-shadow-root)
-   */
-  private _shadowRoot: ShadowRoot | null = null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-attribute)
-   */
-  private _attributeList: List<Attr>;
-
-  /**
-   * @see [DOM Living Standard]((https://dom.spec.whatwg.org/#concept-element-attributes-change-ext)
-   */
-  protected attributeChangeSteps: Steps<[AttributesContext]>;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-id)
-   */
-  private _ID: string | null = null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-qualified-name)
-   */
-  private get _qualifiedName(): string {
-    return getQualifiedName(this._localName, this._namespacePrefix);
-  }
-
-  /**
-   * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name
-   */
-  get #upperQualifiedName(): string {
-    // 1. Let qualifiedName be this’s qualified name.
-    let qualifiedName = this._qualifiedName;
-
-    // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
-    if (
-      this._namespace === Namespace.HTML &&
-      this[$nodeDocument]["_type"] !== "xml"
-    ) {
-      qualifiedName = qualifiedName.toUpperCase();
-    }
-
-    // 3. Return qualifiedName.
-    return qualifiedName;
-  }
-
   constructor({
     namespace,
     namespacePrefix,
@@ -331,8 +258,18 @@ export class Element extends Node implements IElement {
     return this._namespacePrefix;
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-element-shadowroot)
+   */
   get shadowRoot(): ShadowRoot | null {
-    throw new UnImplemented("shadowRoot");
+    // 1. Let shadow be this’s shadow root.
+    const shadow = this._shadowRoot;
+
+    // 2. If shadow is null or its mode is "closed", then return null.
+    if (!shadow || shadow["_mode"] === "closed") return null;
+
+    // 3. Return shadow.
+    return shadow;
   }
 
   get slot(): string {
@@ -720,6 +657,80 @@ export class Element extends Node implements IElement {
 
   webkitMatchesSelector(selectors: string): boolean {
     throw new UnImplemented("webkitMatchesSelector");
+  }
+
+  // internals
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
+   */
+  private _namespace: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace-prefix)
+   */
+  private _namespacePrefix: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-local-name)
+   */
+  private _localName: string;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
+   */
+  private _customElementState: CustomElementState;
+
+  #customElementDefinition: CustomElementDefinition | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-is-value)
+   */
+  private _isValue: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-shadow-root)
+   */
+  private _shadowRoot: ShadowRoot | null = null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-attribute)
+   */
+  private _attributeList: List<Attr>;
+
+  /**
+   * @see [DOM Living Standard]((https://dom.spec.whatwg.org/#concept-element-attributes-change-ext)
+   */
+  protected attributeChangeSteps: Steps<[AttributesContext]>;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-id)
+   */
+  private _ID: string | null = null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-qualified-name)
+   */
+  private get _qualifiedName(): string {
+    return getQualifiedName(this._localName, this._namespacePrefix);
+  }
+
+  /**
+   * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name
+   */
+  get #upperQualifiedName(): string {
+    // 1. Let qualifiedName be this’s qualified name.
+    let qualifiedName = this._qualifiedName;
+
+    // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
+    if (
+      this._namespace === Namespace.HTML &&
+      this[$nodeDocument]["_type"] !== "xml"
+    ) {
+      qualifiedName = qualifiedName.toUpperCase();
+    }
+
+    // 3. Return qualifiedName.
+    return qualifiedName;
   }
 }
 
