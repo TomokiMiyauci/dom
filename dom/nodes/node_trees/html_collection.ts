@@ -11,7 +11,7 @@ import {
   LegacyUnenumerableNamedProperties,
 } from "../../../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
-import { orderTree } from "../../trees/tree.ts";
+import { orderSubtree } from "../../trees/tree.ts";
 import { convert, DOMString, unsignedLong } from "../../../webidl/types.ts";
 
 @Exposed(Window)
@@ -82,7 +82,7 @@ export class HTMLCollection extends LegacyPlatformObject
   }
 
   protected *represent(): IterableIterator<Element> {
-    for (const node of orderTree(this[$root])) {
+    for (const node of orderSubtree(this[$root])) {
       if (isElement(node) && this[$filter](node)) yield node;
     }
   }
