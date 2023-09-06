@@ -237,7 +237,7 @@ export function insertNode(
       let inclusiveDescendant of getInclusiveDescendants(node) as Iterable<Node>
     ) {
       // 1. Run the insertion steps with inclusiveDescendant.
-      node["insertionStep"].run(inclusiveDescendant);
+      node["insertionSteps"].run(inclusiveDescendant);
 
       // 2. If inclusiveDescendant is connected, then:
     }

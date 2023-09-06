@@ -2,7 +2,7 @@ import { Iterable, iterable } from "../../webidl/iterable.ts";
 import type { IDOMTokenList } from "../../interface.d.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import {
-  AttributeChangeCallback,
+  AttributesContext,
   type Element,
   getAttributeValue,
   setAttributeValue,
@@ -38,13 +38,13 @@ export class DOMTokenList extends LegacyPlatformObject
 
   constructor({ element, localName }: DOMTokenListInits) {
     super();
-    const attributeChangeStep: AttributeChangeCallback = (ctx) => {
+    const attributeChangeStep = (ctx: AttributesContext) => {
       if (ctx.localName === localName && ctx.namespace === null) {
         if (ctx.value === null) this[$tokenSet].empty();
         else this[$tokenSet] = parseOrderSet(ctx.value);
       }
     };
-    const steps = element["_attributeChangeSteps"];
+    const steps = element["attributeChangeSteps"];
     steps.define(attributeChangeStep);
 
     // 1. Let element be associated element.

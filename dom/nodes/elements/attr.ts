@@ -271,7 +271,7 @@ export function handleAttributesChanges(
   if (isCustom(element)) throw new Error("handleAttributesChanges");
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  element["_attributeChangeSteps"].run({
+  element["attributeChangeSteps"].run({
     element,
     localName: attribute["_localName"],
     oldValue,

@@ -71,6 +71,7 @@ import {
   type TransientRegisteredObserver,
 } from "./mutation_observers/queue.ts";
 import { Child } from "./types.ts";
+import { Steps } from "../infra/applicable.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -516,7 +517,15 @@ export abstract class Node extends EventTarget implements INode {
   ${[...this._children].map((node) => this[inspect].call(node)).join("")}`;
   }
 
-  protected insertionStep: InsertionStep<this> = new InsertionStep();
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
+   */
+  protected insertionSteps: Steps<[insertedNode: this]> = new Steps();
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
+   */
+  protected childrenChangedSteps: Steps<[]> = new Steps();
 }
 
 export interface Node
@@ -924,24 +933,4 @@ function* contiguousTextNodesExclusive(node: Node): Iterable<Text> {
 
   yield* [...precedingTexts].reverse();
   yield* followingTexts;
-}
-
-interface Step<Args extends readonly unknown[]> {
-  define(fn: (...args: Args) => void): void;
-
-  run(...args: Args): void;
-}
-
-export class InsertionStep<T> implements Step<[insertedNode: T]> {
-  #set: Set<(insertedNode: any) => void> = new Set();
-
-  define(fn: (insertedNode: T) => void): void {
-    this.#set.add(fn);
-  }
-
-  run(insertedNode: T): void {
-    for (const fn of this.#set) {
-      fn.apply(fn, [insertedNode]);
-    }
-  }
 }

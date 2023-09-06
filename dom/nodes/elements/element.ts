@@ -45,6 +45,7 @@ import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { getFirstChild, getNextSibling } from "../../infra/tree.ts";
+import { Steps } from "../../infra/applicable.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -122,7 +123,7 @@ export class Element extends Node implements IElement {
   /**
    * @see [DOM Living Standard]((https://dom.spec.whatwg.org/#concept-element-attributes-change-ext)
    */
-  private _attributeChangeSteps: AttributeChangeSteps;
+  protected attributeChangeSteps: Steps<[AttributesContext]>;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-id)
@@ -167,9 +168,9 @@ export class Element extends Node implements IElement {
   }: ElementInits & NodeStates) {
     super();
 
-    const attributeChangeStep: AttributeChangeCallback = (
-      { localName, namespace, value },
-    ) => {
+    const changeAttribute = (
+      { localName, namespace, value }: AttributesContext,
+    ): void => {
       // 1. If localName is id, namespace is null, and value is null or the empty string, then unset element’s ID.
       if (localName === "id" && namespace === null) {
         // 2. Otherwise, if localName is id, namespace is null, then set element’s ID to value.
@@ -177,10 +178,10 @@ export class Element extends Node implements IElement {
       }
     };
 
-    const steps = new AttributeChangeSteps();
-    steps.define(attributeChangeStep);
+    const steps = new Steps<[AttributesContext]>();
+    steps.define(changeAttribute);
 
-    this._attributeChangeSteps = steps;
+    this.attributeChangeSteps = steps;
     this._namespace = namespace;
     this._namespacePrefix = namespacePrefix;
     this._localName = localName;
@@ -1048,19 +1049,4 @@ export interface AttributesContext {
   oldValue: string | null;
   value: string | null;
   namespace: string | null;
-}
-
-export interface AttributeChangeCallback {
-  (ctx: AttributesContext): void;
-}
-
-export class AttributeChangeSteps {
-  #callbacks = new Set<AttributeChangeCallback>();
-  define(callback: AttributeChangeCallback) {
-    this.#callbacks.add(callback);
-  }
-
-  run(ctx: AttributesContext): void {
-    this.#callbacks.forEach((callback) => callback(ctx));
-  }
 }
