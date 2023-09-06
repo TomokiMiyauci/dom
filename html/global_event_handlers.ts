@@ -1,10 +1,7 @@
 import { type Constructor } from "../deps.ts";
 import {
-  $,
-  activateEventHandler,
-  deactivateEventHandler,
-  determineEventHandler,
   getEventHandlerCurrentValue,
+  setEventHandlerIDLAttribute,
 } from "./events.ts";
 import type { IGlobalEventHandlers } from "../interface.d.ts";
 
@@ -177,7 +174,7 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
 
       if (eventTarget === null) return null;
 
-      return getEventHandlerCurrentValue(eventTarget, "onload");
+      return getEventHandlerCurrentValue(eventTarget, "onload") as any;
     }
     get onloadeddata(): ((this: GlobalEventHandlers, ev: Event) => any) | null {
       throw new Error();
@@ -604,28 +601,7 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
       throw new Error();
     }
     set onload(value: ((this: GlobalEventHandlers, ev: Event) => any) | null) {
-      // 1. Let eventTarget be the result of determining the target of an event handler given this object and name.
-      const eventTarget = determineEventHandler(this, "onload");
-
-      // 2. If eventTarget is null, then return.
-      if (eventTarget === null) return;
-
-      // 3. If the given value is null, then deactivate an event handler given eventTarget and name.
-      if (value === null) deactivateEventHandler(eventTarget, "onload");
-      // 4. Otherwise:
-      else {
-        // 1. Let handlerMap be eventTarget's event handler map.
-        const handlerMap = $(eventTarget).eventHandlerMap;
-
-        // 2. Let eventHandler be handlerMap[name].
-        const eventHandler = handlerMap.get("onload");
-
-        // 3. Set eventHandler's value to the given value.
-        eventHandler!.value = value;
-
-        // 4. Activate an event handler given eventTarget and name.
-        activateEventHandler(eventTarget, "onload");
-      }
+      setEventHandlerIDLAttribute(this, "onload", value);
     }
     set onloadeddata(
       value: ((this: GlobalEventHandlers, ev: Event) => any) | null,
