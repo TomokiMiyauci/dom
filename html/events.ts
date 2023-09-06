@@ -81,6 +81,23 @@ const eventHandlerMap = new EventHandlerMap();
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes)
  */
+export function getEventHandlerIDLAttribute(
+  target: EventTarget,
+  name: EventHandlerName,
+): Function | null {
+  // 1. Let eventTarget be the result of determining the target of an event handler given this object and name.
+  const eventTarget = determineEventHandler(target, name);
+
+  // 2. If eventTarget is null, then return null.
+  if (!eventTarget) return null;
+
+  // 3. Return the result of getting the current value of the event handler given eventTarget and name.
+  return getEventHandlerCurrentValue(eventTarget, name);
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes)
+ */
 export function setEventHandlerIDLAttribute(
   target: EventTarget,
   name: EventHandlerName,

@@ -1,6 +1,6 @@
 import { type Constructor } from "../deps.ts";
 import {
-  getEventHandlerCurrentValue,
+  getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "./events.ts";
 import type { IGlobalEventHandlers } from "../interface.d.ts";
@@ -170,11 +170,7 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
       throw new Error();
     }
     get onload(): ((this: GlobalEventHandlers, ev: Event) => any) | null {
-      const eventTarget = determineEventHandler(this, "onload");
-
-      if (eventTarget === null) return null;
-
-      return getEventHandlerCurrentValue(eventTarget, "onload") as any;
+      return getEventHandlerIDLAttribute(this, "onload") as any;
     }
     get onloadeddata(): ((this: GlobalEventHandlers, ev: Event) => any) | null {
       throw new Error();
