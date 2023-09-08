@@ -121,3 +121,6 @@ export type IMutationRecord = MutationRecord;
 export type INodeIterator = NodeIterator;
 export type INodeFilter = typeof NodeFilter;
 export type ITreeWalker = TreeWalker;
+export type IEvent = Event;
+export type ICustomEvent = CustomEvent;
+export type IEventTarget = EventTarget;
