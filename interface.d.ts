@@ -124,3 +124,5 @@ export type ITreeWalker = TreeWalker;
 export type IEvent = Event;
 export type ICustomEvent = CustomEvent;
 export type IEventTarget = EventTarget;
+export type IAbortController = AbortController;
+export type IAbortSignal = AbortSignal;
