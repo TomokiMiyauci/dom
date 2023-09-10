@@ -2,11 +2,13 @@ import { List } from "../../infra/data_structures/list.ts";
 import type { IEvent } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
+import { Steps } from "../infra/applicable.ts";
+import { type EventTarget } from "./event_target.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#potential-event-target)
  */
-type PotentialEventTarget = EventTarget | null;
+export type PotentialEventTarget = EventTarget | null;
 
 @Exposed("*")
 export class Event implements IEvent {
@@ -51,7 +53,7 @@ export class Event implements IEvent {
   }
 
   // When an event is created the attribute must be initialized to null.
-  #currentTarget = null;
+  #currentTarget: EventTarget | null = null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-currenttarget)
@@ -59,6 +61,10 @@ export class Event implements IEvent {
   get currentTarget(): EventTarget | null {
     // return the value it was initialized to
     return this.#currentTarget;
+  }
+
+  private set currentTarget(value: EventTarget) {
+    this.#currentTarget = value;
   }
 
   /**
@@ -198,6 +204,10 @@ export class Event implements IEvent {
   get eventPhase(): number {
     // return the value it was initialized to
     return this.#eventPhase;
+  }
+
+  private set eventPhase(value: 0 | 1 | 2 | 3) {
+    this.#eventPhase = value;
   }
 
   /**
@@ -346,7 +356,7 @@ export class Event implements IEvent {
 
   protected _relatedTarget: PotentialEventTarget = null;
   protected _touchTargetList: List<PotentialEventTarget> = new List();
-  protected _path: List<PathItem> = new List();
+  protected _path: List<Struct> = new List();
   protected _stopPropagation = false;
   protected _stopImmediatePropagation = false;
   protected _canceled = false;
@@ -354,6 +364,13 @@ export class Event implements IEvent {
   protected _composed: boolean;
   protected _initialized = false;
   protected _dispatch = false;
+
+  /**
+   *  @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-constructor-ext)
+   */
+  protected eventConstructionSteps: Steps<
+    [event: Event, eventInitDict: EventInit]
+  > = new Steps();
 }
 
 export interface Event
@@ -366,7 +383,7 @@ export interface Event
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#event-path)
  */
-export interface PathItem {
+export interface Struct {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#event-path-invocation-target)
    */
