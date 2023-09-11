@@ -46,6 +46,7 @@ import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { getFirstChild, getNextSibling } from "../../infra/tree.ts";
 import { Steps } from "../../infra/applicable.ts";
+import { $ } from "../../../internal.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -313,7 +314,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return attr["_value"];
+    return $(attr).value;
   }
 
   /**
@@ -331,7 +332,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return attr["_value"];
+    return $(attr).value;
   }
 
   /**
@@ -341,7 +342,7 @@ export class Element extends Node implements IElement {
     // return the qualified names of the attributes in this’s attribute list, in order; otherwise a new list.
     const qualifiedNames = map(
       this._attributeList,
-      (attr) => getQualifiedName(attr["_localName"], attr["_namespacePrefix"]),
+      (attr) => getQualifiedName($(attr).localName, $(attr).namespacePrefix),
     );
 
     return qualifiedNames;
@@ -456,7 +457,7 @@ export class Element extends Node implements IElement {
     return some(
       this._attributeList,
       (attr) =>
-        attr["_namespace"] === namespace && attr["_localName"] === localName,
+        $(attr).namespace === namespace && $(attr).localName === localName,
     );
   }
 
@@ -770,7 +771,7 @@ export function getAttributeValue(
   if (attr === null) return "";
 
   // 3. Return attr’s value.
-  return attr["_value"];
+  return $(attr).value;
 }
 
 /**
@@ -778,7 +779,7 @@ export function getAttributeValue(
  */
 export function setAttribute(attr: Attr, element: Element): Attr | null {
   // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
-  if (!(attr["_element"] === null || attr["_element"] === element)) {
+  if (!($(attr).element === null || $(attr).element === element)) {
     throw new DOMException(
       "The attribute is in use by another element",
       "InUseAttributeError",
@@ -787,8 +788,8 @@ export function setAttribute(attr: Attr, element: Element): Attr | null {
 
   // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
   const oldAttr = getAttributeByNamespaceAndLocalName(
-    attr["_namespace"],
-    attr["_localName"],
+    $(attr).namespace,
+    $(attr).localName,
     element,
   );
 
@@ -853,8 +854,8 @@ export function getAttributeByNamespaceAndLocalName(
   return find(
     element["_attributeList"],
     (attribute) =>
-      attribute["_namespace"] === namespace &&
-      attribute["_localName"] === localName,
+      $(attribute).namespace === namespace &&
+      $(attribute).localName === localName,
   ) ?? null;
 }
 
@@ -866,10 +867,10 @@ export function appendAttribute(attribute: Attr, element: Element): void {
   element["_attributeList"].append(attribute);
 
   // 2. Set attribute’s element to element.
-  attribute["_element"] = element;
+  $(attribute).element = element;
 
   // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
-  handleAttributesChanges(attribute, element, null, attribute["_value"]);
+  handleAttributesChanges(attribute, element, null, $(attribute).value);
 }
 
 /**
@@ -877,24 +878,26 @@ export function appendAttribute(attribute: Attr, element: Element): void {
  */
 export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
   // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
-  oldAttr["_element"]?.["_attributeList"].replace(
+  $(oldAttr).element?.["_attributeList"].replace(
     newAttr,
     (attr) => attr === oldAttr,
   );
 
   // 2. Set newAttr’s element to oldAttr’s element.
-  newAttr["_element"] = oldAttr["_element"];
+  $(newAttr).element = $(oldAttr).element;
 
   // 3. Set oldAttr’s element to null.
-  oldAttr["_element"] = null;
+  $(oldAttr).element = null;
 
+  const element = $(newAttr).element;
   // 4. Handle attribute changes for oldAttr with newAttr’s element, oldAttr’s value, and newAttr’s value.
-  newAttr["_element"] && handleAttributesChanges(
-    oldAttr,
-    newAttr["_element"],
-    oldAttr["_value"],
-    newAttr["_value"],
-  );
+  element &&
+    handleAttributesChanges(
+      oldAttr,
+      element,
+      $(oldAttr).value,
+      $(newAttr).value,
+    );
 }
 
 /**
@@ -903,17 +906,17 @@ export function replaceAttribute(oldAttr: Attr, newAttr: Attr): void {
 export function removeAttribute(attribute: Attr): void {
   // Unclear whether there is always a element in attribute.
   // 1. Let element be attribute’s element.
-  const element = attribute["_element"];
+  const element = $(attribute).element;
 
   // 2. Remove attribute from element’s attribute list.
   element?.["_attributeList"].remove((attr) => attr === attribute);
 
   // 3. Set attribute’s element to null.
-  attribute["_element"] = null;
+  $(attribute).element = null;
 
   // 4. Handle attribute changes for attribute with element, attribute’s value, and null.
   element &&
-    handleAttributesChanges(attribute, element, attribute["_value"], null);
+    handleAttributesChanges(attribute, element, $(attribute).value, null);
 }
 
 /**

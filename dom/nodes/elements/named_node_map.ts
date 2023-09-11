@@ -19,6 +19,7 @@ import { Namespace } from "../../../infra/namespace.ts";
 import { isHTMLDocument } from "../documents/document.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
+import { $ } from "../../../internal.ts";
 
 const $attributeList = Symbol();
 
@@ -49,7 +50,7 @@ export class NamedNodeMap extends LegacyPlatformObject
     // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
     const qualifiedNames = map(
       this[$attributeList],
-      (attr) => getQualifiedName(attr["_localName"], attr["_namespacePrefix"]),
+      (attr) => getQualifiedName($(attr).localName, $(attr).namespacePrefix),
     );
     const names = new Set(qualifiedNames);
 

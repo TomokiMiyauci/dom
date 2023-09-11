@@ -7,67 +7,16 @@ import { getQualifiedName } from "../utils.ts";
 import { $nodeDocument } from "../internal.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
-
-export interface AttrStates {
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
-   */
-  namespace: string | null;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix
-   */
-  namespacePrefix: string | null;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-local-name
-   */
-  localName: string;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-value
-   */
-  value: string;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-element
-   */
-  element: Element | null;
-}
+import { $, internalSlots } from "../../../internal.ts";
 
 type Optional = "namespace" | "namespacePrefix" | "value" | "element";
 
 export class Attr extends Node implements IAttr {
   /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-namespace)
-   */
-  private _namespace: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix)
-   */
-  private _namespacePrefix: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-local-name)
-   */
-  private _localName: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-value)
-   */
-  private _value: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-element)
-   */
-  private _element: Element | null;
-
-  /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
    */
   private get _qualifiedName(): string {
-    return getQualifiedName(this._localName, this._namespacePrefix);
+    return getQualifiedName(this.#_.localName, this.#_.namespacePrefix);
   }
 
   constructor(
@@ -78,15 +27,21 @@ export class Attr extends Node implements IAttr {
       element = null,
       value = "",
       nodeDocument,
-    }: PartialBy<AttrStates, Optional> & NodeStates,
+    }: PartialBy<AttrInternals, Optional> & NodeStates,
   ) {
     super();
 
-    this._namespace = namespace;
-    this._namespacePrefix = namespacePrefix;
-    this._value = value;
-    this._localName = localName;
-    this._element = element;
+    const _: AttrInternals = {
+      namespace,
+      namespacePrefix,
+      value,
+      localName,
+      element,
+    };
+
+    this.#_ = _;
+    internalSlots.set(this, _);
+
     this[$nodeDocument] = nodeDocument;
   }
 
@@ -108,7 +63,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this._value;
+    return this.#_.value;
   }
 
   /**
@@ -124,7 +79,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this._value;
+    return this.#_.value;
   }
 
   /**
@@ -153,7 +108,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this._namespace;
+    return this.#_.namespace;
   }
 
   /**
@@ -161,7 +116,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this._namespacePrefix;
+    return this.#_.namespacePrefix;
   }
 
   /**
@@ -169,7 +124,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this._localName;
+    return this.#_.localName;
   }
 
   /**
@@ -185,7 +140,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this._value;
+    return this.#_.value;
   }
 
   /**
@@ -201,7 +156,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this._element;
+    return this.#_.element;
   }
 
   /**
@@ -211,6 +166,35 @@ export class Attr extends Node implements IAttr {
     // The specified getter steps are to return true.
     return true;
   }
+
+  #_: AttrInternals;
+}
+
+export interface AttrInternals {
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
+   */
+  namespace: string | null;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix
+   */
+  namespacePrefix: string | null;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-local-name
+   */
+  localName: string;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-value
+   */
+  value: string;
+
+  /**
+   * @see https://dom.spec.whatwg.org/#concept-attribute-element
+   */
+  element: Element | null;
 }
 
 /**
@@ -220,28 +204,29 @@ export function setAnExistingAttributeValue(
   attribute: Attr,
   value: string,
 ): void {
+  const _ = $(attribute);
+
   // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (attribute["_element"] === null) {
-    attribute["_value"] = value;
-  } else {
-    // 2. Otherwise, change attribute to value.
-    changeAttributes(attribute, value);
-  }
+  if (_.element === null) _.value = value;
+  // 2. Otherwise, change attribute to value.
+  else changeAttributes(attribute, value);
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-change
  */
 export function changeAttributes(attribute: Attr, value: string): void {
+  const _ = $(attribute);
+
   // 1. Let oldValue be attribute’s value.
-  const oldValue = attribute["_value"];
+  const oldValue = _.value;
 
   // 2. Set attribute’s value to value.
-  attribute["_value"] = value;
+  _.value = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  if (attribute["_element"]) {
-    handleAttributesChanges(attribute, attribute["_element"], oldValue, value);
+  if (_.element) {
+    handleAttributesChanges(attribute, _.element, oldValue, value);
   }
 }
 
@@ -254,12 +239,14 @@ export function handleAttributesChanges(
   oldValue: string | null,
   newValue: string | null,
 ): void {
+  const { namespace, localName } = $(attribute);
+
   // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
   queueMutationRecord(
     "attributes",
     element,
-    attribute["_localName"],
-    attribute["_namespace"],
+    localName,
+    namespace,
     oldValue,
     new OrderedSet(),
     new OrderedSet(),
@@ -273,19 +260,13 @@ export function handleAttributesChanges(
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
   element["attributeChangeSteps"].run({
     element,
-    localName: attribute["_localName"],
+    localName,
     oldValue,
     value: newValue,
-    namespace: attribute["_namespace"],
+    namespace,
   });
 }
 
 export function cloneAttr(attr: Attr, document: Document): Attr {
-  return new Attr({
-    namespace: attr["_namespace"],
-    namespacePrefix: attr["_namespacePrefix"],
-    localName: attr["_localName"],
-    value: attr["_value"],
-    nodeDocument: document,
-  });
+  return new Attr({ ...$(attr), nodeDocument: document });
 }
