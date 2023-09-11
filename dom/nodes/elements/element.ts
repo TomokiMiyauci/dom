@@ -273,11 +273,11 @@ export class Element extends Node implements IElement {
   }
 
   get slot(): string {
-    throw new UnImplemented("slot getter");
+    return reflectGet(this, "slot");
   }
 
   set slot(value: string) {
-    throw new UnImplemented("slot setter");
+    reflectSet(this, "slot", value);
   }
 
   attachShadow(init: ShadowRootInit): ShadowRoot {

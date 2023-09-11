@@ -68,7 +68,9 @@ export function dispatch(
 
     // 6. Let slottable be target, if target is a slottable and is assigned, and null otherwise.
     // TODO
-    let slottable = isNodeLike(target) && isSlottable(target) ? target : null;
+    let slottable = isNodeLike(target) && isSlottable(target as any)
+      ? target
+      : null;
 
     // 7. Let slot-in-closed-tree be false.
     let slotInClosedTree = false;
@@ -95,7 +97,7 @@ export function dispatch(
 
       // 2. If parent is a slottable and is assigned, then set slottable to parent.
       // TODO
-      if (isNodeLike(parent) && isSlottable(parent)) slottable = parent;
+      if (isNodeLike(parent) && isSlottable(parent as any)) slottable = parent;
 
       // 3. Let relatedTarget be the result of retargeting event’s relatedTarget against parent.
       const relatedTarget = retarget(event["_relatedTarget"], parent);

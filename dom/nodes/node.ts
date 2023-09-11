@@ -72,6 +72,7 @@ import {
 } from "./mutation_observers/queue.ts";
 import { Child } from "./types.ts";
 import { Steps } from "../infra/applicable.ts";
+import { EventTarget } from "../events/event_target.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 

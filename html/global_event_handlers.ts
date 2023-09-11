@@ -4,6 +4,7 @@ import {
   setEventHandlerIDLAttribute,
 } from "./events.ts";
 import type { IGlobalEventHandlers } from "../interface.d.ts";
+import { type EventTarget } from "../dom/events/event_target.ts";
 
 export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
   Ctor: T,

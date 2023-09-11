@@ -12,8 +12,12 @@ import type { ProcessingInstruction } from "./processing_instruction.ts";
 
 export class UnImplemented extends Error {}
 
-interface NodeLike {
-  nodeType: NodeType;
+export interface NodeLike {
+  nodeType: unknown;
+}
+
+export function isNodeLike(object: object): object is NodeLike {
+  return "nodeType" in object;
 }
 
 export function isDocument(node: NodeLike): node is Document {

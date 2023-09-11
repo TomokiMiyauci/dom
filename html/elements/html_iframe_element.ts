@@ -4,14 +4,14 @@ import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
-import { reflectSet } from "../../dom/nodes/elements/element.ts";
+import { type Element, reflectSet } from "../../dom/nodes/elements/element.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
   constructor(args: any) {
     super(args);
 
-    this.insertionStep.define((element) => {
+    this.insertionSteps.define((element) => {
       // 1. Create a new child navigable for element.
 
       // 2. If element has a sandbox attribute, then parse the sandboxing directive given the attribute's value and element's iframe sandboxing flag set.

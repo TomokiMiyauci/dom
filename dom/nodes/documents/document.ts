@@ -13,7 +13,6 @@ import {
   isDocumentFragment,
   isDocumentType,
   isShadowRoot,
-  UnImplemented,
 } from "../utils.ts";
 import { Attr } from "../elements/attr.ts";
 import { Text } from "../text.ts";
@@ -52,6 +51,9 @@ import { BoundaryPoint } from "../../ranges/boundary_point.ts";
 import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
 import { NodeIterator } from "../../traversals/node_iterator.ts";
 import { TreeWalker } from "../../traversals/tree_walker.ts";
+import { createEvent } from "../../events/construct.ts";
+import { Event } from "../../events/event.ts";
+import { CustomEvent } from "../../events/custom_event.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -551,8 +553,37 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "WebGLContextEvent"): WebGLContextEvent;
   createEvent(eventInterface: "WheelEvent"): WheelEvent;
   createEvent(eventInterface: string): Event;
-  createEvent(eventInterface: string): Event {
-    throw new UnImplemented();
+  createEvent(eventInterface: string): globalThis.Event {
+    // 1. Let constructor be null.
+    let constructor: typeof globalThis.Event | null = null;
+
+    const lowercase = toASCIILowerCase(eventInterface);
+    // 2. If interface is an ASCII case-insensitive match for any of the strings in the first column in the following table, then set constructor to the interface in the second column on the same row as the matching string:
+    if (eventMap.has(lowercase)) constructor = eventMap.get(lowercase)!;
+
+    // 3. If constructor is null, then throw a "NotSupportedError" DOMException.
+    if (!constructor) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 4. If the interface indicated by constructor is not exposed on the relevant global object of this, then throw a "NotSupportedError" DOMException.
+
+    // 5. Let event be the result of creating an event given constructor.
+    const event = createEvent(constructor as typeof Event);
+
+    // 6. Initialize event’s type attribute to the empty string.
+    event["type"] = "";
+
+    // 7. Initialize event’s timeStamp attribute to the result of calling current high resolution time with this’s relevant global object.
+
+    // 8. Initialize event’s isTrusted attribute to false.
+    event["isTrusted"] = false;
+
+    // 9. Unset event’s initialized flag.
+    event["_initialized"] = false;
+
+    // 10. Return event.
+    return event;
   }
 
   /**
@@ -807,3 +838,38 @@ export function isHTMLDocument(document: Document): boolean {
   // type is "xml"; otherwise an HTML document.
   return document["_type"] !== "xml";
 }
+
+/**
+ * | String                   | Interface Notes        |
+ * | ------------------------ | ---------------------- |
+ * | "beforeunloadevent"      | BeforeUnloadEvent      |
+ * | "compositionevent"       | CompositionEvent       |
+ * | "customevent"            | CustomEvent            |
+ * | "devicemotionevent"      | DeviceMotionEvent      |
+ * | "deviceorientationevent" | DeviceOrientationEvent |
+ * | "dragevent"              | DragEvent              |
+ * | "event"                  | Event                  |
+ * | "events"                 | Event                  |
+ * | "focusevent"             | FocusEvent             |
+ * | "hashchangeevent"        | HashChangeEvent        |
+ * | "htmlevents"             | Event                  |
+ * | "keyboardevent"          | KeyboardEvent          |
+ * | "messageevent"           | MessageEvent           |
+ * | "mouseevent"             | MouseEvent             |
+ * | "mouseevents"            | MouseEvent             |
+ * | "storageevent"           | StorageEvent           |
+ * | "svgevents"              | Event                  |
+ * | "textevent"              | CompositionEvent       |
+ * | "touchevent"             | TouchEvent             |
+ * | "uievent"                | UIEvent                |
+ * | "uievents"               | UIEvent                |
+ */
+const eventMap = new Map<string, typeof Event>(
+  [
+    ["customevent", CustomEvent],
+    ["event", Event],
+    ["events", Event],
+    ["htmlevents", Event],
+    ["svgevents", Event],
+  ],
+);

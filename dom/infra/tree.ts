@@ -235,3 +235,7 @@ export function getFollow(tree: Tree): Tree | null {
 
   return nextNodeDescendant(tree);
 }
+
+export function isTree(object: object): object is Tree {
+  return "_parent" in object && "_children" in object;
+}

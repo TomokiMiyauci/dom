@@ -119,10 +119,6 @@ export class HTMLSelectElement extends HTMLElement
     throw new Error("namedItem");
   }
 
-  override remove(index?: number): void {
-    throw new Error("remove");
-  }
-
   reportValidity(): boolean {
     throw new Error("reportValidity");
   }

@@ -11,6 +11,8 @@ export function Slottable<T extends Constructor>(Ctor: T) {
     set assignedSlot(value: HTMLSlotElement | null) {
       throw new UnImplemented("assignedSlot");
     }
+
+    protected _assignedSlot: Element | null = null;
   }
 
   return Slottable;
