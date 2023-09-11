@@ -10,7 +10,7 @@ import { type EventTarget } from "./event_target.ts";
 export function fireEvent(
   e: string,
   target: EventTarget,
-  eventConstructor: new () => Event = Event.constructor.prototype, // 1. If eventConstructor is not given, then let eventConstructor be Event.
+  eventConstructor: typeof Event = Event, // 1. If eventConstructor is not given, then let eventConstructor be Event.
   legacyTargetOverride?: boolean,
 ): void {
   // 2. Let event be the result of creating an event given eventConstructor, in the relevant realm of target.

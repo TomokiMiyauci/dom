@@ -1,12 +1,14 @@
 import { Event, type PotentialEventTarget, type Struct } from "./event.ts";
 import { Node } from "../nodes/node.ts";
 import { type EventListener, type EventTarget } from "./event_target.ts";
-import { retarget, type ShadowRoot } from "../nodes/shadow_root.ts";
+import { retarget } from "../nodes/shadow_root_utils.ts";
+import { type ShadowRoot } from "../nodes/shadow_root.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
 import { getRoot } from "../infra/tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
 import { ifilter, imap, last, some, takewhile } from "../../deps.ts";
+import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -238,7 +240,7 @@ export function dispatch(
   }
 
   // 12. Return false if event’s canceled flag is set; otherwise true.
-  return target.dispatchEvent(event);
+  return !event["_canceled"];
 }
 
 /**
@@ -248,7 +250,7 @@ export function appendEventPath(
   event: Event,
   invocationTarget: EventTarget,
   shadowAdjustedTarget: PotentialEventTarget,
-  relatedTarget: EventTarget,
+  relatedTarget: PotentialEventTarget,
   touchTargets: List<PotentialEventTarget>,
   slotInClosedTree: boolean,
 ): void {
@@ -430,10 +432,20 @@ export function innerInvoke(
     if (listener.passive) event["_inPassiveListener"] = true;
 
     // 10. Call a user object’s operation with listener’s callback, "handleEvent", « event », and event’s currentTarget attribute value. If this throws an exception, then:
+    try {
+      callUserObjectOperation(
+        listener.callback,
+        "handleEvent",
+        [event],
+        event.currentTarget,
+      );
+    } catch {
+      // 1. Report the exception.
+      // TODO
 
-    // 1. Report the exception.
-
-    // 2. Set legacyOutputDidListenersThrowFlag if given.
+      // 2. Set legacyOutputDidListenersThrowFlag if given.
+      legacyOutputDidListenersThrowFlag = true;
+    }
 
     // 11. Unset event’s in passive listener flag.
     event["_inPassiveListener"] = false;
