@@ -5,9 +5,9 @@ import { retarget } from "../nodes/shadow_root_utils.ts";
 import { type ShadowRoot } from "../nodes/shadow_root.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
-import { getRoot } from "../infra/tree.ts";
+import { getRoot, isTree } from "../infra/tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
-import { ifilter, imap, last, some, takewhile } from "../../deps.ts";
+import { ifilter, last, lastItem, some } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
 
 /**
@@ -151,19 +151,16 @@ export function dispatch(
     const clearTargetsStruct = last(filtered);
 
     if (clearTargetsStruct) {
-      const eventTargets = ifilter(
-        clearTargetsStruct.touchTargetList,
-        (value): value is EventTarget => !!value,
-      );
-      const nodes = ifilter(eventTargets, isNodeLike) as Iterable<Node>;
-      const roots = imap(nodes, getRoot);
-      const has = some(roots, isShadowRoot);
-
       // 11. Let clearTargets be true if clearTargetsStruct’s shadow-adjusted target, clearTargetsStruct’s relatedTarget, or an EventTarget object in clearTargetsStruct’s touch target list is a node and its root is a shadow root; otherwise false.
       if (
-        has ||
-        clearTargetsStruct.shadowAdjustedTarget ||
-        clearTargetsStruct.relatedTarget
+        some([
+          clearTargetsStruct.shadowAdjustedTarget,
+          clearTargetsStruct.relatedTarget,
+          ...clearTargetsStruct.touchTargetList,
+        ], (potential) => {
+          return !!potential && isTree(potential) && isNodeLike(potential) &&
+            isShadowRoot(getRoot(potential));
+        })
       ) clearTargets = true;
     }
 
@@ -305,13 +302,12 @@ export function invoke(
   phase: string,
   legacyOutputDidListenersThrowFlag: boolean,
 ): void {
-  // TODO include struct itself
-  const preciding = takewhile(event["_path"], (item) => struct !== item);
-  const filtered = ifilter(
-    preciding,
-    (struct) => !!struct.shadowAdjustedTarget,
-  );
-  const lastStruct = last(filtered);
+  const path = [...event["_path"]];
+  const index = path.findIndex((item) => item === struct);
+  const candidates = index > -1
+    ? path.slice(0, index + 1).filter((struct) => !!struct.shadowAdjustedTarget)
+    : [];
+  const lastStruct = lastItem(candidates);
 
   // 1. Set event’s target to the shadow-adjusted target of the last struct in event’s path, that is either struct or preceding struct, whose shadow-adjusted target is non-null.
   if (lastStruct) event["_target"] = lastStruct.shadowAdjustedTarget;

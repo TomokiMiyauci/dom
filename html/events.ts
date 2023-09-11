@@ -6,6 +6,7 @@
 import {
   addEventListener,
   EventListener,
+  type EventTarget,
   removeEventListener,
 } from "../dom/events/event_target.ts";
 

@@ -28,7 +28,7 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     return this.#detail;
   }
 
-  private set detail(value: T) {
+  private set detail(value: T | null) {
     this.#detail = value;
   }
 
@@ -39,7 +39,7 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     type: string,
     bubbles = false,
     cancelable = false,
-    detail: T,
+    detail?: T,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
     if (this._dispatch) return;
@@ -48,6 +48,6 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     initialize(this, type, bubbles, cancelable);
 
     // 3. Set this’s detail attribute to detail.
-    this.detail = detail;
+    this.detail = detail ?? null;
   }
 }

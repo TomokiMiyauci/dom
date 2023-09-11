@@ -2354,6 +2354,22 @@
         "name": "Required arguments to createTreeWalker should be required.",
         "reason": "compiler error"
       }
+    ],
+
+    "dom/events/Event-type-empty.html": [
+      { "name": "Constructor", "reason": "globalThis Event is not supported" }
+    ],
+    "dom/events/CustomEvent.html": [
+      {
+        "name": "First parameter to initCustomEvent should be mandatory.",
+        "reason": "compiler error"
+      }
+    ],
+    "dom/events/Event-initEvent.html": [
+      {
+        "name": "First parameter to initEvent should be mandatory.",
+        "reason": "compiler error"
+      }
     ]
   }
 }

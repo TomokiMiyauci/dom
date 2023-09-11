@@ -450,15 +450,15 @@ export function initialize(
   event["bubbles"] = bubbles;
 
   // 7. Set event’s cancelable attribute to cancelable.
-  event["cancelBubble"] = cancelable;
+  event["cancelable"] = cancelable;
 }
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#set-the-canceled-flag)
  */
-export function setCanceled(event: Event) {
+export function setCanceled(event: Event): void {
   // if event’s cancelable attribute value is true and event’s in passive listener flag is unset, then set event’s canceled flag, and do nothing otherwise.
-  if (event.cancelBubble && !event["_inPassiveListener"]) {
+  if (event.cancelable && !event["_inPassiveListener"]) {
     event["_canceled"] = true;
   }
 }
