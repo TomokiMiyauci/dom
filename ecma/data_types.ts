@@ -73,3 +73,55 @@ export type GenericDescriptor = Pick<
   PropertyDescriptor,
   "configurable" | "enumerable"
 >;
+
+export enum Type {
+  Normal = "normal",
+  Break = "break",
+  Continue = "continue",
+  Return = "return",
+  Throw = "throw",
+}
+
+export const empty = Symbol("empty");
+
+export interface CompletionRecord<T = unknown> {
+  Type: Type;
+  Value: T;
+  Target: string | typeof empty;
+}
+
+export function NormalCompletion<T = unknown>(value: T): NormalCompletion<T> {
+  return { Type: Type.Normal, Value: value, Target: empty };
+}
+
+export function ThrowCompletion<T = unknown>(value: T): ThrowCompletion<T> {
+  return { Type: Type.Throw, Value: value, Target: empty };
+}
+
+export interface NormalCompletion<T = unknown> extends CompletionRecord {
+  Type: Type.Normal;
+  Value: T;
+  Target: typeof empty;
+}
+
+export interface ThrowCompletion<T = unknown> extends CompletionRecord {
+  Type: Type.Throw;
+  Value: T;
+  Target: typeof empty;
+}
+
+export interface AbruptCompletion<T = unknown> extends CompletionRecord {
+  Type: Type.Break | Type.Continue | Type.Return | Type.Throw;
+  Value: T;
+}
+
+/** Whether the {@linkcode completion} is {@linkcode AbruptCompletion} or not. */
+export function isAbruptCompletion(
+  completion: CompletionRecord,
+): completion is AbruptCompletion {
+  return completion.Type !== Type.Normal;
+}
+
+export function isCompletion(value: object): value is CompletionRecord {
+  return "Type" in value && "Value" in value && "Target" in value;
+}

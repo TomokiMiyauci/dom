@@ -1,3 +1,53 @@
+import { NormalCompletion, ThrowCompletion } from "./data_types.ts";
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-iscallable
+ */
+// deno-lint-ignore ban-types
+export function IsCallable(argument: unknown): argument is Function {
+  // 1. If argument is not an Object, return false.
+  // 2. If argument has a [[Call]] internal method, return true.
+  // 3. Return false.
+
+  return typeof argument === "function";
+}
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-get-o-p
+ */
+export function Get(
+  O: object,
+  P: PropertyKey,
+): NormalCompletion | ThrowCompletion {
+  // 1. Return ? O.[[Get]](P, O).
+  return callInternalSlot(() => Reflect.get(O, P));
+}
+
+function callInternalSlot<R>(
+  fn: () => R,
+): NormalCompletion<R> | ThrowCompletion {
+  try {
+    return NormalCompletion(fn());
+  } catch (e) {
+    return ThrowCompletion(e);
+  }
+}
+
+/**
+ * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-call
+ */
+export function Call(
+  F: unknown,
+  V: unknown,
+  argumentList: unknown[] = [], // 1. If argumentsList is not present, set argumentsList to a new empty List.
+): NormalCompletion | ThrowCompletion {
+  // 2. If IsCallable(F) is false, throw a TypeError exception.
+  if (!IsCallable(F)) return ThrowCompletion(new TypeError());
+
+  // 3. Return ? F.[[Call]](V, argumentsList).
+  return callInternalSlot(() => Reflect.apply(F, V, argumentList));
+}
+
 /**
  * @see https://tc39.es/ecma262/multipage/abstract-operations.html#sec-touint32
  */
