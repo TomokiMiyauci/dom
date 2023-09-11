@@ -5,6 +5,7 @@ import { getDescendants } from "../../infra/tree.ts";
 import { isElement } from "../utils.ts";
 import type { INonElementParentNode } from "../../../interface.d.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
+import { $ } from "../../../internal.ts";
 
 export function NonElementParentNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class Mixin extends Ctor implements NonElementParentNode {
@@ -15,7 +16,7 @@ export function NonElementParentNode<T extends Constructor<Node>>(Ctor: T) {
     getElementById(@DOMString elementId: string): Element | null {
       // return the first element, in tree order, within this’s descendants, whose ID is elementId; otherwise, if there is no such element, null.
       for (const node of getDescendants(this) as Iterable<Node>) {
-        if (isElement(node) && node["_ID"] === elementId) return node;
+        if (isElement(node) && $(node).ID === elementId) return node;
       }
 
       return null;

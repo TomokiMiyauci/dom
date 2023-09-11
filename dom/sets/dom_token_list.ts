@@ -15,6 +15,7 @@ import { getter, stringifier, WebIDL } from "../../webidl/idl.ts";
 import { convert, DOMString } from "../../webidl/types.ts";
 import { range } from "../../deps.ts";
 import { toASCIILowerCase } from "../../infra/string.ts";
+import { $ } from "../../internal.ts";
 
 const $tokenSet = Symbol();
 
@@ -44,7 +45,7 @@ export class DOMTokenList extends LegacyPlatformObject
         else this[$tokenSet] = parseOrderSet(ctx.value);
       }
     };
-    const steps = element["attributeChangeSteps"];
+    const steps = $(element).attributeChangeSteps;
     steps.define(attributeChangeStep);
 
     // 1. Let element be associated element.
@@ -244,7 +245,7 @@ export class DOMTokenList extends LegacyPlatformObject
    */
   #updateSteps(): void {
     // 1. If the associated element does not have an associated attribute and token set is empty, then return.
-    if (this.#element["_attributeList"].isEmpty && this[$tokenSet].isEmpty) {
+    if ($(this.#element).attributeList.isEmpty && this[$tokenSet].isEmpty) {
       return;
     }
 

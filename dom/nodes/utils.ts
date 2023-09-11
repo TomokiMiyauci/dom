@@ -9,6 +9,7 @@ import { type Comment } from "./comment.ts";
 import { type CharacterData } from "./character_data.ts";
 import { type ShadowRoot } from "./shadow_root.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
+import { internalSlots } from "../../internal.ts";
 
 export class UnImplemented extends Error {}
 
@@ -72,7 +73,7 @@ export type ShadowHost = Element & {
  */
 export function isShadowHost(element: Element): element is ShadowHost {
   // shadow root is non-null.
-  return !!element["_shadowRoot"];
+  return internalSlots.has(element) && !!internalSlots.get(element).shadowRoot;
 }
 
 /**

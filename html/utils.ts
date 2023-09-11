@@ -11,6 +11,7 @@ import { Document } from "../dom/nodes/documents/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
 import { $nodeDocument, $templateContents } from "../dom/nodes/internal.ts";
 import { HTMLTemplateElement } from "./elements/html_template_element.ts";
+import { $ } from "../internal.ts";
 
 type Child = Node & ChildNode;
 
@@ -157,7 +158,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTagName(element: Element): string {
-    return element["_qualifiedName"];
+    return $(element).qualifiedName;
   }
 
   getTextNodeContent(textNode: Text): string {

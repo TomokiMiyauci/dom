@@ -57,7 +57,7 @@ export class NamedNodeMap extends LegacyPlatformObject
     // 2. If this NamedNodeMap object’s element is in the HTML namespace and its node document is an HTML document, then for each name in names:
     const element = this[$element];
     if (
-      element["_namespace"] === Namespace.HTML &&
+      $(element).namespace === Namespace.HTML &&
       isHTMLDocument(element[$nodeDocument])
     ) {
       names.forEach((name) => {
@@ -179,7 +179,7 @@ function getAttributesByName(
     isHTMLDocument(element[$nodeDocument])
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
-  return find(element["_attributeList"], (attr) => {
+  return find($(element).attributeList, (attr) => {
     const q = attr.prefix === null
       ? attr.localName
       : attr.prefix + ":" + attr.localName;
@@ -195,7 +195,7 @@ function getAttributeByNamespace(
 ): Attr | null {
   namespace ||= null;
 
-  return find(element["_attributeList"], (attr) => {
+  return find($(element).attributeList, (attr) => {
     return attr.namespaceURI === namespace && attr.localName === localName;
   }) ?? null;
 }
