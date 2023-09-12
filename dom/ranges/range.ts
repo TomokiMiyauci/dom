@@ -24,7 +24,7 @@ import {
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
-import { $create, $nodeDocument } from "../nodes/internal.ts";
+import { $nodeDocument } from "../nodes/internal.ts";
 import { substringData } from "../nodes/character_data.ts";
 import {
   appendNode,

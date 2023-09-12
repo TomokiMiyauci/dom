@@ -25,7 +25,7 @@ import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { type ShadowRoot } from "../shadow_root.ts";
-import { $create, $nodeDocument } from "../internal.ts";
+import { $nodeDocument } from "../internal.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
 import { InnerHTML } from "../../../domparsing/inner_html.ts";
@@ -486,7 +486,7 @@ export class Element extends Node implements IElement {
    */
   insertAdjacentText(where: InsertPosition, data: string): void {
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    const text = Text[$create]({ data, nodeDocument: this[$nodeDocument] });
+    const text = Text["create"]({ data, nodeDocument: this[$nodeDocument] });
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);
@@ -1023,7 +1023,10 @@ export function replaceAllString(string: string, parent: Node): void {
 
   // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
   if (string !== "") {
-    node = Text[$create]({ data: string, nodeDocument: parent[$nodeDocument] });
+    node = Text["create"]({
+      data: string,
+      nodeDocument: parent[$nodeDocument],
+    });
   }
 
   // 3. Replace all with node within parent.

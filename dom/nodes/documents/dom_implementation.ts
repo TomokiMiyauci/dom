@@ -10,7 +10,6 @@ import { createElement } from "../elements/element_algorithm.ts";
 import { appendNode } from "../node_trees/mutation.ts";
 import type { IDOMImplementation } from "../../../interface.d.ts";
 import { Namespace } from "../../../infra/namespace.ts";
-import { $create } from "../internal.ts";
 import { validate } from "../../../infra/namespace.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { isUndefined } from "../../../deps.ts";
@@ -107,7 +106,7 @@ export class DOMImplementation implements IDOMImplementation {
 
       // 2. Append a new Text node, with its data set to title (which could be the empty string) and its node document set to doc, to the title element created earlier.
       appendNode(
-        Text[$create]({ data: title, nodeDocument: doc }),
+        Text["create"]({ data: title, nodeDocument: doc }),
         titleElement,
       );
     }

@@ -19,7 +19,7 @@ import {
   getPrecedingSiblings,
   orderTreeChildren,
 } from "../infra/tree.ts";
-import { $create, $nodeDocument } from "./internal.ts";
+import { $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { concatString } from "../../infra/string.ts";
@@ -27,16 +27,6 @@ import { $ } from "../../internal.ts";
 
 @Slottable
 export class Text extends CharacterData implements IText {
-  static [$create](
-    { data, nodeDocument }: CharacterDataStates & NodeStates,
-  ): Text {
-    const node = new Text(data);
-
-    node[$nodeDocument] = nodeDocument;
-
-    return node;
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-text
    */
@@ -57,7 +47,7 @@ export class Text extends CharacterData implements IText {
   }
 
   protected override clone(document: Document): Text {
-    return Text[$create]({ data: $(this).data, nodeDocument: document });
+    return Text.create({ data: $(this).data, nodeDocument: document });
   }
 
   /**
@@ -78,6 +68,16 @@ export class Text extends CharacterData implements IText {
   splitText(offset: number): Text {
     // to split this with offset offset.
     return splitText(this, offset);
+  }
+
+  protected static create(
+    { data, nodeDocument }: CharacterDataStates & NodeStates,
+  ): Text {
+    const node = new Text(data);
+
+    node[$nodeDocument] = nodeDocument;
+
+    return node;
   }
 }
 
@@ -104,7 +104,7 @@ export function splitText(node: Text, offset: number): Text {
   const newData = substringData(node, offset, count);
 
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
-  const newNode = Text[$create]({
+  const newNode = Text["create"]({
     data: newData,
     nodeDocument: node[$nodeDocument],
   });

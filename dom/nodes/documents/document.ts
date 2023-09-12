@@ -25,7 +25,7 @@ import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
-import { $create, $nodeDocument } from "../internal.ts";
+import { $nodeDocument } from "../internal.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
@@ -624,7 +624,7 @@ export class Document extends Node implements IDocument {
   @convert
   createTextNode(@DOMString data: string): Text {
     // return a new Text node whose data is data and node document is this.
-    return Text[$create]({ data, nodeDocument: this });
+    return Text["create"]({ data, nodeDocument: this });
   }
 
   /**

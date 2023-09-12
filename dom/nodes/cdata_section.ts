@@ -19,7 +19,7 @@ export class CDATASection extends Text implements ICDATASection {
     return "#cdata-section";
   }
 
-  private static create(
+  protected static override create(
     { data, nodeDocument }: CharacterDataStates & NodeStates,
   ): CDATASection {
     const node = new CDATASection();

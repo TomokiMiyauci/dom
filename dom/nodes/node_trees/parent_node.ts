@@ -18,7 +18,7 @@ import {
   len,
   map,
 } from "../../../deps.ts";
-import { $create, $nodeDocument } from "../internal.ts";
+import { $nodeDocument } from "../internal.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
@@ -171,7 +171,7 @@ export function convertNodesToNode(
   // 2. Replace each string in nodes with a new Text node whose data is the string and node document is document.
   const replaced = map(nodes, (node) => {
     if (typeof node === "string") {
-      return Text[$create]({ data: node, nodeDocument: document });
+      return Text["create"]({ data: node, nodeDocument: document });
     }
 
     return node;
