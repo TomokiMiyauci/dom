@@ -68,7 +68,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   ): void {
     const fragment = templateElement[$templateContents];
     contentElement[$nodeDocument] = fragment[$nodeDocument];
-    contentElement["_host"] = fragment["_host"];
+    $(contentElement).host = $(fragment).host;
 
     templateElement[$templateContents] = contentElement;
   }
@@ -94,11 +94,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   setDocumentMode(document: Document, mode: html.DOCUMENT_MODE): void {
-    document["_mode"] = mode;
+    $(document).mode = mode;
   }
 
   getDocumentMode(document: Document): html.DOCUMENT_MODE {
-    return document["_mode"];
+    return $(document).mode;
   }
 
   insertText(parentNode: Element, text: string): void {

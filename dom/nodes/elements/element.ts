@@ -674,7 +674,7 @@ export class Element extends Node implements IElement {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
       this.#_.namespace === Namespace.HTML &&
-      this[$nodeDocument]["_type"] !== "xml"
+      $(this[$nodeDocument]).type !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -1004,7 +1004,7 @@ export function getAttributeByName(
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
     $(element).namespace === Namespace.HTML &&
-    element[$nodeDocument]["_type"] !== "xml"
+    $(element[$nodeDocument]).type !== "xml"
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.

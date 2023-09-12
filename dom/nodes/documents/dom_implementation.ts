@@ -14,6 +14,7 @@ import { $create } from "../internal.ts";
 import { validate } from "../../../infra/namespace.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { isUndefined } from "../../../deps.ts";
+import { $ } from "../../../internal.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   protected _document!: Document;
@@ -74,10 +75,10 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    document["_origin"] = this._document["_origin"];
+    $(document).origin = $(this._document).origin;
 
     // 7. document’s content type is determined by namespace:
-    document["_contentType"] = namespaceToContentType(namespace);
+    $(document).contentType = namespaceToContentType(namespace);
 
     // 8. Return document.
     return document;
@@ -90,10 +91,10 @@ export class DOMImplementation implements IDOMImplementation {
   createHTMLDocument(@DOMString.exclude(isUndefined) title?: string): Document {
     // 1. Let doc be a new document that is an HTML document.
     const doc = new Document();
-    doc["_type"] = "html";
+    $(doc).type = "html";
 
     // 2. Set doc’s content type to "text/html".
-    doc["_contentType"] = "text/html";
+    $(doc).contentType = "text/html";
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
     const docType = new DocumentType({ name: "html", nodeDocument: doc });
@@ -124,7 +125,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    doc["_origin"] = this._document["_origin"];
+    $(doc).origin = $(this._document).origin;
 
     // 9. Return doc.
     return doc;

@@ -87,7 +87,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
   protected _availableElementInternals = false;
 
   protected _slotAssignment: SlotAssignmentMode = "named";
-  protected override _host: Element;
+  protected _host: Element;
 }
 
 export interface ShadowRoot extends DocumentOrShadowRoot, InnerHTML {}

@@ -7,6 +7,7 @@ import type { IDocumentFragment } from "../../interface.d.ts";
 import { $create, $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";
 import { replaceAllString } from "./elements/element.ts";
+import { internalSlots } from "../../internal.ts";
 
 @ParentNode
 @NonElementParentNode
@@ -14,10 +15,6 @@ import { replaceAllString } from "./elements/element.ts";
  * @see https://dom.spec.whatwg.org/#interface-documentfragment
  */
 export class DocumentFragment extends Node implements IDocumentFragment {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
-   */
-  protected _host: Element | null = null;
   override [$nodeDocument]!: Document;
 
   static [$create](states: NodeStates): DocumentFragment {
@@ -35,6 +32,8 @@ export class DocumentFragment extends Node implements IDocumentFragment {
 
     // set this’s node document to current global object’s associated Document.
     this[$nodeDocument] = globalThis.document as Document;
+
+    internalSlots.set(this, new DocumentFragmentInternals());
   }
 
   /**
@@ -98,4 +97,12 @@ export class DocumentFragment extends Node implements IDocumentFragment {
 
 export interface DocumentFragment extends ParentNode, NonElementParentNode {
   getElementById(elementId: string): HTMLElement | null;
+}
+
+export class DocumentFragmentInternals {
+  /**
+   * @default null
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
+   */
+  host: Element | null = null;
 }

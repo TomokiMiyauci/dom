@@ -573,7 +573,7 @@ export function getElementsByQualifiedName(
   }
 
   // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
-  if (root[$nodeDocument]["_type"] !== "xml") {
+  if ($(root[$nodeDocument]).type !== "xml") {
     return new HTMLCollection({
       root,
       filter: (element) =>
@@ -606,7 +606,7 @@ export function getElementsByClassName(
 
   if (classes.isEmpty) return new HTMLCollection({ root, filter: () => false });
 
-  const match = root[$nodeDocument]["_mode"] === html.DOCUMENT_MODE.QUIRKS
+  const match = $(root[$nodeDocument]).mode === html.DOCUMENT_MODE.QUIRKS
     ? matchASCIICaseInsensitive
     : Object.is;
 

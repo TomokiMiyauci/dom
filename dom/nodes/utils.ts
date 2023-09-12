@@ -9,7 +9,7 @@ import { type Comment } from "./comment.ts";
 import { type CharacterData } from "./character_data.ts";
 import { type ShadowRoot } from "./shadow_root.ts";
 import type { ProcessingInstruction } from "./processing_instruction.ts";
-import { internalSlots } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 export class UnImplemented extends Error {}
 
@@ -62,7 +62,7 @@ export function isProcessingInstruction(
 
 /** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */
 export function isShadowRoot(node: NodeLike): node is ShadowRoot {
-  return isDocumentFragment(node) && !!node["_host"];
+  return isDocumentFragment(node) && !!$(node).host;
 }
 
 export type ShadowHost = Element & {

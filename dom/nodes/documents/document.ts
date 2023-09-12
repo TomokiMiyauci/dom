@@ -54,6 +54,7 @@ import { TreeWalker } from "../../traversals/tree_walker.ts";
 import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
+import { $, internalSlots } from "../../../internal.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -87,52 +88,18 @@ export type CompatMode = "BackCompat" | "CSS1Compat";
 @FontFaceSource
 @XPathEvaluatorBase
 export class Document extends Node implements IDocument {
-  /**
-   * @default utf-8
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
-   */
-  private _encoding: Encoding = utf8;
-
-  /**
-   * @default "application/xml"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-content-type)
-   */
-  private _contentType = "application/xml";
-
-  /**
-   * @default new URL("about:blank")
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-url)
-   */
-  private _URL: URL = new URL("about:blank");
-
-  /**
-   * @default OpaqueOrigin
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-origin)
-   */
-  private _origin: Origin = opaqueOrigin;
-
-  /**
-   * @default "xml"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-type)
-   */
-  private _type: "xml" | "html" = "xml";
-
-  /**
-   * @default "no-quirks"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
-   */
-  private _mode: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
-   */
-  private _implementation: DOMImplementation;
-
   constructor() {
     super();
 
-    this._implementation = DOMImplementation.create(this);
+    const _ = new DocumentInternals({
+      implementation: DOMImplementation.create(this),
+    });
+
+    internalSlots.set(this, _);
+    this.#_ = _;
   }
+
+  #_: DocumentInternals;
 
   override get [$nodeDocument](): Document {
     return this;
@@ -177,8 +144,8 @@ export class Document extends Node implements IDocument {
   protected override clone(document: Document): Document {
     const doc = new (this.constructor as typeof Document)();
 
-    doc._type = document._type;
-    doc._contentType = document._contentType;
+    $(doc).type = $(document).type;
+    $(doc).contentType = $(document).contentType;
 
     return doc;
   }
@@ -188,7 +155,7 @@ export class Document extends Node implements IDocument {
    */
   get URL(): string {
     // return this’s URL, serialized.
-    return this._URL.href;
+    return this.#_.URL.href;
   }
 
   /**
@@ -196,7 +163,7 @@ export class Document extends Node implements IDocument {
    */
   get characterSet(): string {
     // return this’s encoding’s name.
-    return this._encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -204,7 +171,7 @@ export class Document extends Node implements IDocument {
    */
   get charset(): string {
     // return this’s encoding’s name.
-    return this._encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -212,7 +179,7 @@ export class Document extends Node implements IDocument {
    */
   get compatMode(): CompatMode {
     // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
-    switch (this._mode) {
+    switch (this.#_.mode) {
       case html.DOCUMENT_MODE.QUIRKS:
         return "BackCompat";
       default:
@@ -221,7 +188,7 @@ export class Document extends Node implements IDocument {
   }
 
   get contentType(): string {
-    return this._contentType;
+    return this.#_.contentType;
   }
 
   /**
@@ -247,7 +214,7 @@ export class Document extends Node implements IDocument {
    */
   get documentURI(): string {
     // return this’s URL, serialized.
-    return this._URL.href;
+    return this.#_.URL.href;
   }
 
   /**
@@ -255,7 +222,7 @@ export class Document extends Node implements IDocument {
    */
   get implementation(): DOMImplementation {
     // return the DOMImplementation object that is associated with this.
-    return this._implementation;
+    return this.#_.implementation;
   }
 
   /**
@@ -263,7 +230,7 @@ export class Document extends Node implements IDocument {
    */
   get inputEncoding(): string {
     // return this’s encoding’s name.
-    return this._encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -292,7 +259,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. If node is a DocumentFragment node whose host is non-null, then return.
-    if (isDocumentFragment(node) && node["_host"]) return node; // TODO(miyauci): Check return null or not.
+    if (isDocumentFragment(node) && $(node).host) return node; // TODO(miyauci): Check return null or not.
 
     // 4. Adopt node into this.
     adoptNode(node, this);
@@ -420,7 +387,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (isHTMLDocument(this) || this._contentType === "application/xhtml+xml")
+      (isHTMLDocument(this) || this.#_.contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -802,6 +769,53 @@ export interface Document
   ): void;
 }
 
+export class DocumentInternals {
+  /**
+   * @default utf8
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
+   */
+  encoding: Encoding = utf8;
+
+  /**
+   * @default "application/xml"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-content-type)
+   */
+  contentType = "application/xml";
+
+  /**
+   * @default new URL("about:blank")
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-url)
+   */
+  URL: URL = new URL("about:blank");
+
+  /**
+   * @default OpaqueOrigin
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-origin)
+   */
+  origin: Origin = opaqueOrigin;
+
+  /**
+   * @default "xml"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-type)
+   */
+  type: "xml" | "html" = "xml";
+
+  /**
+   * @default "no-quirks"
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
+   */
+  mode: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
+   */
+  implementation: DOMImplementation;
+
+  constructor({ implementation }: Pick<DocumentInternals, "implementation">) {
+    this.implementation = implementation;
+  }
+}
+
 export class XMLDocument extends Document implements IXMLDocument {}
 
 /**
@@ -836,7 +850,7 @@ export function internalCreateElement(
  */
 export function isHTMLDocument(document: Document): boolean {
   // type is "xml"; otherwise an HTML document.
-  return document["_type"] !== "xml";
+  return $(document).type !== "xml";
 }
 
 /**

@@ -4,6 +4,7 @@ import { Document } from "../../dom/nodes/documents/document.ts";
 import { $nodeDocument, $templateContents } from "../../dom/nodes/internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
+import { $ } from "../../internal.ts";
 
 /**
  * @see https://html.spec.whatwg.org/multipage/scripting.html#the-template-element
@@ -21,7 +22,7 @@ export class HTMLTemplateElement extends HTMLElement
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = new DocumentFragment();
     fragment[$nodeDocument] = doc;
-    fragment["_host"] = this;
+    $(fragment).host = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
     this[$templateContents] = fragment;
