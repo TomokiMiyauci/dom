@@ -1,51 +1,58 @@
 import type { IProcessingInstruction } from "../../interface.d.ts";
-import { CharacterData, CharacterDataStates } from "./character_data.ts";
+import {
+  CharacterData,
+  CharacterDataInternals,
+  CharacterDataStates,
+} from "./character_data.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
-import { $ } from "../../internal.ts";
-
-export interface ProcessingInstructionInits {
-  target: string;
-}
+import { internalSlots } from "../../internal.ts";
 
 @LinkStyle
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-pi-target)
-   */
-  protected readonly _target: string;
-
   constructor(
     { data, nodeDocument, target }:
-      & ProcessingInstructionInits
+      & ProcessingInstructionInternals
       & CharacterDataStates
       & NodeStates,
   ) {
     super(data, nodeDocument);
-    this._target = target;
+
+    const _: ProcessingInstructionInternals = { data, target };
+    internalSlots.set(this, _);
+    this._ = _;
   }
 
   override readonly nodeType: NodeType.PROCESSING_INSTRUCTION_NODE =
     NodeType.PROCESSING_INSTRUCTION_NODE;
 
   override get nodeName(): string {
-    return this._target;
+    return this._.target;
   }
 
   get target(): string {
-    return this._target;
+    return this._.target;
   }
 
   protected override clone(document: Document): ProcessingInstruction {
     return new ProcessingInstruction({
-      data: $(this).data,
-      target: this._target,
+      data: this._.data,
+      target: this._.target,
       nodeDocument: document,
     });
   }
+
+  protected override _: ProcessingInstructionInternals;
 }
 
 // deno-lint-ignore no-empty-interface
 export interface ProcessingInstruction extends LinkStyle {}
+
+export interface ProcessingInstructionInternals extends CharacterDataInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-pi-target)
+   */
+  target: string;
+}

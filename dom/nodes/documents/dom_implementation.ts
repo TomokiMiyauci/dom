@@ -14,18 +14,9 @@ import { $create } from "../internal.ts";
 import { validate } from "../../../infra/namespace.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { isUndefined } from "../../../deps.ts";
-import { $ } from "../../../internal.ts";
+import { $, internalSlots } from "../../../internal.ts";
 
 export class DOMImplementation implements IDOMImplementation {
-  protected _document!: Document;
-
-  static create(document: Document): DOMImplementation {
-    const instance = new DOMImplementation();
-    instance._document = document;
-
-    return instance;
-  }
-
   /**
    * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocumenttype
    */
@@ -42,7 +33,7 @@ export class DOMImplementation implements IDOMImplementation {
       name: qualifiedName,
       publicId,
       systemId,
-      nodeDocument: this._document,
+      nodeDocument: $(this).document,
     });
   }
 
@@ -75,7 +66,7 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    $(document).origin = $(this._document).origin;
+    $(document).origin = $($(this).document).origin;
 
     // 7. document’s content type is determined by namespace:
     $(document).contentType = namespaceToContentType(namespace);
@@ -125,7 +116,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    $(doc).origin = $(this._document).origin;
+    $(doc).origin = $($(this).document).origin;
 
     // 9. Return doc.
     return doc;
@@ -138,6 +129,22 @@ export class DOMImplementation implements IDOMImplementation {
     // return true
     return true;
   }
+
+  private static create(document: Document): DOMImplementation {
+    const instance = new DOMImplementation();
+
+    const _: DOMImplementationInternals = { document };
+    internalSlots.set(instance, _);
+
+    return instance;
+  }
+}
+
+export interface DOMImplementationInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
+   */
+  document: Document;
 }
 
 function namespaceToContentType(namespace: string | null): string {

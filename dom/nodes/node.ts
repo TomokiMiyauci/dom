@@ -925,7 +925,7 @@ export function equalsProcessingInstruction(
   right: ProcessingInstruction,
 ): boolean {
   return equalsCharacterData(left, right) &&
-    left["_target"] === right["_target"];
+    $(left).target === $(right).target;
 }
 
 /**

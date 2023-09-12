@@ -92,7 +92,7 @@ export class Document extends Node implements IDocument {
     super();
 
     const _ = new DocumentInternals({
-      implementation: DOMImplementation.create(this),
+      implementation: DOMImplementation["create"](this),
     });
 
     internalSlots.set(this, _);
@@ -328,7 +328,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new CDATASection node with its data set to data and node document set to this.
-    return CDATASection[$create]({ data, nodeDocument: this });
+    return CDATASection["create"]({ data, nodeDocument: this });
   }
 
   /**
@@ -338,7 +338,7 @@ export class Document extends Node implements IDocument {
   @convert
   createComment(@DOMString data: string): Comment {
     // return a new Comment node whose data is data and node document is this.
-    return Comment[$create]({ data, nodeDocument: this });
+    return Comment["create"]({ data, nodeDocument: this });
   }
 
   /**
@@ -346,7 +346,7 @@ export class Document extends Node implements IDocument {
    */
   createDocumentFragment(): DocumentFragment {
     // return a new DocumentFragment node whose node document is this.
-    return DocumentFragment[$create]({ nodeDocument: this });
+    return DocumentFragment["create"]({ nodeDocument: this });
   }
 
   /**

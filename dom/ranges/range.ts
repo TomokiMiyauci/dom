@@ -570,7 +570,7 @@ export interface Range
 
 function cloneContents(range: Range): DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
-  const fragment = DocumentFragment[$create]({
+  const fragment = DocumentFragment["create"]({
     nodeDocument: range["_startNode"][$nodeDocument],
   });
 
@@ -679,7 +679,7 @@ function cloneContents(range: Range): DocumentFragment {
  */
 function extract(range: Range): DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
-  const fragment = DocumentFragment[$create]({
+  const fragment = DocumentFragment["create"]({
     nodeDocument: range["_startNode"][$nodeDocument],
   });
 

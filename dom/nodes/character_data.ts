@@ -25,7 +25,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
     super();
 
     const _: CharacterDataInternals = { data };
-    this.#_ = _;
+    this._ = _;
     internalSlots.set(this, _);
     this[$nodeDocument] = document;
   }
@@ -36,7 +36,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
    */
   override get nodeValue(): string {
-    return this.#_.data;
+    return this._.data;
   }
 
   /**
@@ -52,7 +52,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this.#_.data;
+    return this._.data;
   }
 
   /**
@@ -85,7 +85,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this.#_.data;
+    return this._.data;
   }
 
   /**
@@ -151,7 +151,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return substringData(this, offset, count);
   }
 
-  #_: CharacterDataInternals;
+  protected _: CharacterDataInternals;
 }
 
 export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}

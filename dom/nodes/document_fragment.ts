@@ -4,7 +4,7 @@ import { type Document } from "./documents/document.ts";
 import { type Element } from "./elements/element.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
-import { $create, $nodeDocument } from "./internal.ts";
+import { $nodeDocument } from "./internal.ts";
 import { descendantTextContent } from "./text.ts";
 import { replaceAllString } from "./elements/element.ts";
 import { internalSlots } from "../../internal.ts";
@@ -16,13 +16,6 @@ import { internalSlots } from "../../internal.ts";
  */
 export class DocumentFragment extends Node implements IDocumentFragment {
   override [$nodeDocument]!: Document;
-
-  static [$create](states: NodeStates): DocumentFragment {
-    const node = new DocumentFragment();
-    node[$nodeDocument] = states.nodeDocument;
-
-    return node;
-  }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-documentfragment-documentfragment
@@ -91,7 +84,14 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   }
 
   protected override clone(document: Document): DocumentFragment {
-    return DocumentFragment[$create]({ nodeDocument: document });
+    return DocumentFragment.create({ nodeDocument: document });
+  }
+
+  private static create(states: NodeStates): DocumentFragment {
+    const node = new DocumentFragment();
+    node[$nodeDocument] = states.nodeDocument;
+
+    return node;
   }
 }
 
