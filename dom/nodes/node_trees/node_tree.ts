@@ -16,6 +16,7 @@ import { type Element } from "../elements/element.ts";
 import { type Text } from "../text.ts";
 import { type Node } from "../node.ts";
 import { type CharacterData } from "../character_data.ts";
+import { $ } from "../../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -34,7 +35,7 @@ export function nodeLength(
   if (isDocumentType(node) || isAttr(node)) return 0;
 
   // 2. If node is a CharacterData node, then return node’s data’s length.
-  if (isCharacterData(node)) return node["_data"].length;
+  if (isCharacterData(node)) return $(node).data.length;
 
   // 3. Return the number of node’s children.
   return node._children.size;

@@ -41,6 +41,7 @@ import { convert, unsignedLong, unsignedShort } from "../../webidl/types.ts";
 import { splitText } from "../nodes/text.ts";
 import { Range_CSSOM } from "../../cssom/range.ts";
 import { Range_DOMParsing } from "../../domparsing/range.ts";
+import { $ } from "../../internal.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
@@ -442,7 +443,7 @@ export class Range extends AbstractRange implements IRange {
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
     if (startNode === endNode && isText(startNode)) {
       return substringCodeUnitByPositions(
-        startNode["_data"],
+        $(startNode).data,
         startOffset,
         endOffset,
       );
@@ -450,7 +451,7 @@ export class Range extends AbstractRange implements IRange {
 
     // 3. If this’s start node is a Text node, then append the substring of that node’s data from this’s start offset until the end to s.
     if (isText(startNode)) {
-      s += substringCodeUnitToEnd(startNode["_data"], startOffset);
+      s += substringCodeUnitToEnd($(startNode).data, startOffset);
     }
 
     // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
@@ -469,7 +470,7 @@ export class Range extends AbstractRange implements IRange {
 
     // 5. If this’s end node is a Text node, then append the substring of that node’s data from its start until this’s end offset to s.
     if (isText(endNode)) {
-      s += substringCodeUnitByPositions(endNode["_data"], 0, endOffset);
+      s += substringCodeUnitByPositions($(endNode).data, 0, endOffset);
     }
 
     // 6. Return s.
@@ -590,7 +591,7 @@ function cloneContents(range: Range): DocumentFragment {
     const clone = originalStartNode.cloneNode() as CharacterData;
 
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset.
-    clone["_data"] = substringData(
+    $(clone).data = substringData(
       originalStartNode,
       originalStartOffset,
       originalEndOffset - originalStartOffset,
@@ -706,7 +707,7 @@ function extract(range: Range): DocumentFragment {
       originalStartOffset,
       originalEndOffset - originalStartOffset,
     );
-    clone["_data"] = data;
+    $(clone).data = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);

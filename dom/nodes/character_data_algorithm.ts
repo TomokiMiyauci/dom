@@ -7,6 +7,7 @@ import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import type { CharacterData } from "./character_data.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
+import { $ } from "../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace
@@ -35,7 +36,7 @@ export function replaceData(
     node,
     null,
     null,
-    node["_data"],
+    $(node).data,
     new OrderedSet(),
     new OrderedSet(),
     null,
@@ -43,11 +44,11 @@ export function replaceData(
   );
 
   // 5 Insert data into node’s data after offset code units.
-  node["_data"] = node["_data"].substring(0, offset) + data +
-    node["_data"].substring(offset + count);
+  $(node).data = $(node).data.substring(0, offset) + data +
+    $(node).data.substring(offset + count);
 
   // 6 Let delete offset be offset + data’s length.
-  const deleteOffset = offset + node["_data"].length;
+  const deleteOffset = offset + $(node).data.length;
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 

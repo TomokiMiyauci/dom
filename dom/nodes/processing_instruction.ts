@@ -3,6 +3,7 @@ import { CharacterData, CharacterDataStates } from "./character_data.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
+import { $ } from "../../internal.ts";
 
 export interface ProcessingInstructionInits {
   target: string;
@@ -39,7 +40,7 @@ export class ProcessingInstruction extends CharacterData
 
   protected override clone(document: Document): ProcessingInstruction {
     return new ProcessingInstruction({
-      data: this._data,
+      data: $(this).data,
       target: this._target,
       nodeDocument: document,
     });

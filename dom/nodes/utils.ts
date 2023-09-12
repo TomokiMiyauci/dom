@@ -38,7 +38,8 @@ export function isElement(node: NodeLike): node is Element {
 }
 
 export function isCharacterData(node: NodeLike): node is CharacterData {
-  return "_data" in node;
+  return internalSlots.has(node) &&
+    "data" in internalSlots.get(node as CharacterData);
 }
 
 export function isAttr(node: NodeLike): node is Attr {

@@ -291,7 +291,7 @@ export abstract class Node extends EventTarget implements INode {
       const contiguousExclusiveTextNodes = contiguousTextNodesExclusive(node);
       const dataList = imap(
         contiguousExclusiveTextNodes,
-        (text) => text["_data"],
+        (text) => $(text).data,
       );
 
       // 3. Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order.
@@ -858,9 +858,11 @@ export function equalsDocumentType(
   left: DocumentType,
   right: DocumentType,
 ): boolean {
-  return left["_name"] === right["_name"] &&
-    left["_publicId"] === right["_publicId"] &&
-    left["_systemId"] === right["_systemId"];
+  const _ = $(left), __ = $(right);
+
+  return _.name === __.name &&
+    _.publicId === __.publicId &&
+    _.systemId === __.systemId;
 }
 
 export function equalsInternalSlot(left: Node, right: Node): boolean {
@@ -915,7 +917,7 @@ export function equalsCharacterData(
   left: CharacterData,
   right: CharacterData,
 ): boolean {
-  return left["_data"] === right["_data"];
+  return $(left).data === $(right).data;
 }
 
 export function equalsProcessingInstruction(

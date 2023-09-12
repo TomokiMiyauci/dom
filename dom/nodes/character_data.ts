@@ -9,6 +9,7 @@ import { DOMExceptionName } from "../../webidl/exception.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
 import { convert, unsignedLong } from "../../webidl/types.ts";
 import { replaceData } from "./character_data_algorithm.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 export interface CharacterDataStates {
   /**
@@ -20,15 +21,12 @@ export interface CharacterDataStates {
 @ChildNode
 @NonDocumentTypeChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
-   */
-  protected _data: string;
-
   constructor(data: string, document: Document) {
     super();
 
-    this._data = data;
+    const _: CharacterDataInternals = { data };
+    this.#_ = _;
+    internalSlots.set(this, _);
     this[$nodeDocument] = document;
   }
 
@@ -38,7 +36,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
    */
   override get nodeValue(): string {
-    return this._data;
+    return this.#_.data;
   }
 
   /**
@@ -54,7 +52,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this._data;
+    return this.#_.data;
   }
 
   /**
@@ -87,7 +85,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this._data;
+    return this.#_.data;
   }
 
   /**
@@ -152,9 +150,18 @@ export abstract class CharacterData extends Node implements ICharacterData {
     // return the result of running substring data with node this, offset offset, and count count.
     return substringData(this, offset, count);
   }
+
+  #_: CharacterDataInternals;
 }
 
 export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
+
+export interface CharacterDataInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
+   */
+  data: string;
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-substring
@@ -174,8 +181,8 @@ export function substringData(
   }
 
   // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
-  if (offset + count > length) return node["_data"].slice(offset);
+  if (offset + count > length) return $(node).data.slice(offset);
 
   // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
-  return node["_data"].slice(offset, offset + count);
+  return $(node).data.slice(offset, offset + count);
 }

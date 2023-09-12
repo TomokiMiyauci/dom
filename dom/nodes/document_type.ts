@@ -4,50 +4,25 @@ import { Document } from "./documents/document.ts";
 import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import type { PartialBy } from "../../deps.ts";
-
-export interface DocumentTypeStates {
-  name: string;
-
-  /**
-   * @default ""
-   */
-  publicId: string;
-
-  /**
-   * @default ""
-   */
-  systemId: string;
-}
+import { internalSlots } from "../../internal.ts";
 
 type Optional = "publicId" | "systemId";
 
 @ChildNode
 export class DocumentType extends Node implements IDocumentType {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
-   */
-  protected readonly _name: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-publicid)
-   */
-  protected readonly _publicId: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-systemid)
-   */
-  protected readonly _systemId: string;
-
   constructor(
     { name, publicId = "", systemId = "", nodeDocument }:
-      & PartialBy<DocumentTypeStates, Optional>
+      & PartialBy<DocumentTypeInternals, Optional>
       & NodeStates,
   ) {
     super();
 
-    this._name = name;
-    this._publicId = publicId;
-    this._systemId = systemId;
+    const _ = new DocumentTypeInternals({ name });
+    _.publicId = publicId;
+    _.systemId = systemId;
+
+    this.#_ = _;
+    internalSlots.set(this, _);
     this[$nodeDocument] = nodeDocument;
   }
 
@@ -58,7 +33,7 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   override get nodeName(): string {
-    return this._name;
+    return this.#_.name;
   }
 
   /**
@@ -101,26 +76,51 @@ export class DocumentType extends Node implements IDocumentType {
   protected override clone(document: Document): DocumentType {
     return new DocumentType(
       {
-        name: this._name,
-        publicId: this._publicId,
-        systemId: this._systemId,
+        name: this.#_.name,
+        publicId: this.#_.publicId,
+        systemId: this.#_.systemId,
         nodeDocument: document,
       },
     );
   }
 
   get name(): string {
-    return this._name;
+    return this.#_.name;
   }
 
   get publicId(): string {
-    return this._publicId;
+    return this.#_.publicId;
   }
 
   get systemId(): string {
-    return this._systemId;
+    return this.#_.systemId;
   }
+
+  #_: DocumentTypeInternals;
 }
 
 // deno-lint-ignore no-empty-interface
 export interface DocumentType extends ChildNode {}
+
+export class DocumentTypeInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
+   */
+  name: string;
+
+  /**
+   * @default ""
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-publicid)
+   */
+  publicId = "";
+
+  /**
+   * @default ""
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-systemid)
+   */
+  systemId = "";
+
+  constructor({ name }: Pick<DocumentTypeInternals, "name">) {
+    this.name = name;
+  }
+}
