@@ -1,10 +1,9 @@
 import { Text } from "./text.ts";
 import { type NodeStates } from "./node.ts";
 import { NodeType } from "./node.ts";
-import { $nodeDocument } from "./internal.ts";
 import { type CharacterDataStates } from "./character_data.ts";
 import type { ICDATASection } from "../../interface.d.ts";
-import { internalSlots } from "../../internal.ts";
+import { $ } from "../../internal.ts";
 
 export class CDATASection extends Text implements ICDATASection {
   constructor() {
@@ -24,8 +23,8 @@ export class CDATASection extends Text implements ICDATASection {
   ): CDATASection {
     const node = new CDATASection();
 
-    internalSlots.set(node, { data });
-    node[$nodeDocument] = nodeDocument;
+    $(node).data = data;
+    $(node).nodeDocument = nodeDocument;
 
     return node;
   }

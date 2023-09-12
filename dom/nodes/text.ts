@@ -19,7 +19,6 @@ import {
   getPrecedingSiblings,
   orderTreeChildren,
 } from "../infra/tree.ts";
-import { $nodeDocument } from "./internal.ts";
 import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { concatString } from "../../infra/string.ts";
@@ -75,7 +74,7 @@ export class Text extends CharacterData implements IText {
   ): Text {
     const node = new Text(data);
 
-    node[$nodeDocument] = nodeDocument;
+    $(node).nodeDocument = nodeDocument;
 
     return node;
   }
@@ -106,7 +105,7 @@ export function splitText(node: Text, offset: number): Text {
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
   const newNode = Text["create"]({
     data: newData,
-    nodeDocument: node[$nodeDocument],
+    nodeDocument: $(node).nodeDocument,
   });
 
   // 6 Let parent be node’s parent.

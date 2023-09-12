@@ -13,8 +13,8 @@ import {
   getPrecedingSiblings,
 } from "../../infra/tree.ts";
 import { convertNodesToNode } from "../node_trees/parent_node.ts";
-import { $nodeDocument } from "../internal.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
+import { $ } from "../../../internal.ts";
 
 export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class ChildNode extends Ctor implements ChildNode {
@@ -36,7 +36,7 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       const viableNextSibling = find(followingSiblings, notHas) ?? null;
 
       // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 5. Pre-insert node into parent before viableNextSibling.
       preInsertNode(node, parent, viableNextSibling);
@@ -61,7 +61,7 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       let viablePreviousSibling = find(precedingSiblings, notHas) ?? null;
 
       // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 5. If viablePreviousSibling is null, then set it to parent’s first child;
       if (!viablePreviousSibling) viablePreviousSibling = getFirstChild(parent);
@@ -89,7 +89,7 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       const viableNextSibling = find(followingSiblings, notHas) ?? null;
 
       // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 5. If this’s parent is parent, replace this with node within parent.
       if (this._parent === parent) replaceChild(this, node, parent);

@@ -40,7 +40,6 @@ import {
   isPrecedeOf,
 } from "../infra/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import { $nodeDocument } from "./internal.ts";
 import {
   every,
   find,
@@ -73,7 +72,7 @@ import {
 import { Child } from "./types.ts";
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
-import { $ } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -164,8 +163,6 @@ export abstract class Node extends EventTarget implements INode {
   @constant
   static NOTATION_NODE = NodeType.NOTATION_NODE;
 
-  abstract [$nodeDocument]: Document;
-
   abstract get nodeType(): NodeType;
 
   abstract get nodeName(): string;
@@ -176,6 +173,12 @@ export abstract class Node extends EventTarget implements INode {
 
   abstract get textContent(): string | null;
   abstract set textContent(value: string | null);
+
+  constructor(nodeDocument: Document) {
+    super();
+
+    internalSlots.set(this, new NodeInternals(nodeDocument));
+  }
 
   _parent: (Node & ParentNode) | null = null;
   _children: OrderedSet<Node & ChildNode> = new OrderedSet();
@@ -328,7 +331,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   cloneNode(deep?: boolean | undefined): Node {
-    let document = this[$nodeDocument];
+    let document = this.#_.nodeDocument;
     const copy = this.clone(document);
 
     if (isDocument(copy)) document = copy;
@@ -340,6 +343,10 @@ export abstract class Node extends EventTarget implements INode {
     }
 
     return copy;
+  }
+
+  get #_(): NodeInternals {
+    return $(this);
   }
 
   /** Clone instance.
@@ -560,6 +567,24 @@ export interface Node
       Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     > {}
 
+export class NodeInternals {
+  nodeDocument: Document;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
+   */
+  insertionSteps: Steps<[insertedNode: this]> = new Steps();
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
+   */
+  childrenChangedSteps: Steps<[]> = new Steps();
+
+  constructor(nodeDocument: Document) {
+    this.nodeDocument = nodeDocument;
+  }
+}
+
 /**
  * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname
  */
@@ -573,7 +598,7 @@ export function getElementsByQualifiedName(
   }
 
   // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
-  if ($(root[$nodeDocument]).type !== "xml") {
+  if ($($(root).nodeDocument).type !== "xml") {
     return new HTMLCollection({
       root,
       filter: (element) =>
@@ -606,7 +631,7 @@ export function getElementsByClassName(
 
   if (classes.isEmpty) return new HTMLCollection({ root, filter: () => false });
 
-  const match = $(root[$nodeDocument]).mode === html.DOCUMENT_MODE.QUIRKS
+  const match = $($(root).nodeDocument).mode === html.DOCUMENT_MODE.QUIRKS
     ? matchASCIICaseInsensitive
     : Object.is;
 

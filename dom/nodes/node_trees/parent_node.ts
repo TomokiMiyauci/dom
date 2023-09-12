@@ -18,7 +18,6 @@ import {
   len,
   map,
 } from "../../../deps.ts";
-import { $nodeDocument } from "../internal.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
@@ -27,6 +26,7 @@ import {
 } from "../node_trees/mutation.ts";
 import { getFirstChild } from "../../infra/tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
+import { $ } from "../../../internal.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
   Ctor: T,
@@ -71,7 +71,7 @@ export function ParentNode<T extends Constructor<Node>>(
     @convert
     prepend(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 2. Pre-insert node into this before this’s first child.
       preInsertNode(node, this, getFirstChild(this));
@@ -83,7 +83,7 @@ export function ParentNode<T extends Constructor<Node>>(
     @convert
     append(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // Append node to this.
       appendNode(node, this);
@@ -97,7 +97,7 @@ export function ParentNode<T extends Constructor<Node>>(
       @DOMString.exclude(isObject) ...nodes: (string | Node)[]
     ): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, this[$nodeDocument]);
+      const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 2. Ensure pre-insertion validity of node into this before null.
       ensurePreInsertionValidity(node, this, null);

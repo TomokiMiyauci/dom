@@ -1,9 +1,8 @@
-import { Node } from "./node.ts";
+import { Node, NodeInternals } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
 import { type Document } from "./documents/document.ts";
 import { type ICharacterData } from "../../interface.d.ts";
-import { $nodeDocument } from "./internal.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
@@ -22,21 +21,19 @@ export interface CharacterDataStates {
 @NonDocumentTypeChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
   constructor(data: string, document: Document) {
-    super();
+    super(document);
 
-    const _: CharacterDataInternals = { data };
-    this._ = _;
-    internalSlots.set(this, _);
-    this[$nodeDocument] = document;
+    internalSlots.set(
+      this,
+      new CharacterDataInternals({ data, nodeDocument: document }),
+    );
   }
-
-  override [$nodeDocument]: Document;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
    */
   override get nodeValue(): string {
-    return this._.data;
+    return this.#_.data;
   }
 
   /**
@@ -52,7 +49,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this._.data;
+    return this.#_.data;
   }
 
   /**
@@ -69,7 +66,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this[$nodeDocument];
+    return this.#_.nodeDocument;
   }
 
   /**
@@ -85,7 +82,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this._.data;
+    return this.#_.data;
   }
 
   /**
@@ -151,16 +148,28 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return substringData(this, offset, count);
   }
 
-  protected _: CharacterDataInternals;
+  get #_(): CharacterDataInternals {
+    return internalSlots.get(this);
+  }
 }
 
 export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
 
-export interface CharacterDataInternals {
+export class CharacterDataInternals extends NodeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
    */
   data: string;
+
+  constructor(
+    { data, nodeDocument }:
+      & { data: string }
+      & Pick<NodeInternals, "nodeDocument">,
+  ) {
+    super(nodeDocument);
+
+    this.data = data;
+  }
 }
 
 /**

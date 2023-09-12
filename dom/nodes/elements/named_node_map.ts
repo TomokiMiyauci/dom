@@ -9,7 +9,7 @@ import {
   setAttribute,
 } from "../elements/element.ts";
 import type { Attr } from "../elements/attr.ts";
-import { $element, $nodeDocument } from "../internal.ts";
+import { $element } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import {
   LegacyPlatformObject,
@@ -58,7 +58,7 @@ export class NamedNodeMap extends LegacyPlatformObject
     const element = this[$element];
     if (
       $(element).namespace === Namespace.HTML &&
-      isHTMLDocument(element[$nodeDocument])
+      isHTMLDocument($(element).nodeDocument)
     ) {
       names.forEach((name) => {
         // 1. Let lowercaseName be name, in ASCII lowercase.
@@ -176,7 +176,7 @@ function getAttributesByName(
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
     element.namespaceURI === html.NS.HTML &&
-    isHTMLDocument(element[$nodeDocument])
+    isHTMLDocument($(element).nodeDocument)
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   return find($(element).attributeList, (attr) => {

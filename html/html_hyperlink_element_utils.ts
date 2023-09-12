@@ -1,7 +1,7 @@
 import { Constructor, isOk, Result } from "../deps.ts";
 import { type Element } from "../dom/nodes/elements/element.ts";
 import type { IHTMLHyperlinkElementUtils } from "../interface.d.ts";
-import { $nodeDocument } from "../dom/nodes/internal.ts";
+import { $ } from "../internal.ts";
 
 export function HTMLHyperlinkElementUtils<T extends Constructor<Element>>(
   Ctor: T,
@@ -27,7 +27,7 @@ export function HTMLHyperlinkElementUtils<T extends Constructor<Element>>(
       if (!this.hasAttribute("href")) this.#url = null;
       // 2. Otherwise, parse this element's href content attribute value relative to this element's node document. If parsing is successful, set this element's url to the result; otherwise, set this element's url to null.
       else {
-        const document = this[$nodeDocument];
+        const document = $(this).nodeDocument;
         const href = this.getAttribute("href")!;
         const result = parseURL(href, document);
 

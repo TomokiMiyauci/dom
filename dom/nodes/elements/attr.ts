@@ -1,15 +1,22 @@
 import { type Document } from "../documents/document.ts";
-import { Node, NodeStates, NodeType } from "../node.ts";
+import { Node, NodeInternals, NodeType } from "../node.ts";
 import { type PartialBy } from "../../../deps.ts";
 import { type Element, isCustom } from "../elements/element.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
-import { $nodeDocument } from "../internal.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { $, internalSlots } from "../../../internal.ts";
 
-type Optional = "namespace" | "namespacePrefix" | "value" | "element";
+type Required =
+  | "localName"
+  | "nodeDocument";
+
+type Optional =
+  | "namespace"
+  | "namespacePrefix"
+  | "value"
+  | "element";
 
 export class Attr extends Node implements IAttr {
   /**
@@ -27,25 +34,22 @@ export class Attr extends Node implements IAttr {
       element = null,
       value = "",
       nodeDocument,
-    }: PartialBy<AttrInternals, Optional> & NodeStates,
+    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional>,
   ) {
-    super();
+    super(nodeDocument);
 
-    const _: AttrInternals = {
-      namespace,
-      namespacePrefix,
-      value,
-      localName,
-      element,
-    };
-
-    this.#_ = _;
-    internalSlots.set(this, _);
-
-    this[$nodeDocument] = nodeDocument;
+    internalSlots.set(
+      this,
+      new AttrInternals({
+        namespace,
+        namespacePrefix,
+        value,
+        localName,
+        element,
+        nodeDocument,
+      }),
+    );
   }
-
-  override [$nodeDocument]: Document;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodetype
@@ -96,7 +100,7 @@ export class Attr extends Node implements IAttr {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this[$nodeDocument];
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): Attr {
@@ -167,10 +171,12 @@ export class Attr extends Node implements IAttr {
     return true;
   }
 
-  #_: AttrInternals;
+  get #_(): AttrInternals {
+    return internalSlots.get(this);
+  }
 }
 
-export interface AttrInternals {
+export class AttrInternals extends NodeInternals {
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
    */
@@ -195,6 +201,20 @@ export interface AttrInternals {
    * @see https://dom.spec.whatwg.org/#concept-attribute-element
    */
   element: Element | null;
+
+  constructor(
+    { namespace, nodeDocument, localName, value, element, namespacePrefix }:
+      & Omit<AttrInternals, "childrenChangedSteps" | "insertionSteps">
+      & Pick<NodeInternals, "nodeDocument">,
+  ) {
+    super(nodeDocument);
+
+    this.namespace = namespace;
+    this.localName = localName;
+    this.value = value;
+    this.element = element;
+    this.namespacePrefix = namespacePrefix;
+  }
 }
 
 /**

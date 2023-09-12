@@ -24,7 +24,6 @@ import {
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
-import { $nodeDocument } from "../nodes/internal.ts";
 import { substringData } from "../nodes/character_data.ts";
 import {
   appendNode,
@@ -571,7 +570,7 @@ export interface Range
 function cloneContents(range: Range): DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
-    nodeDocument: range["_startNode"][$nodeDocument],
+    nodeDocument: $(range["_startNode"]).nodeDocument,
   });
 
   // 2. If range is collapsed, then return fragment.
@@ -680,7 +679,7 @@ function cloneContents(range: Range): DocumentFragment {
 function extract(range: Range): DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
-    nodeDocument: range["_startNode"][$nodeDocument],
+    nodeDocument: $(range["_startNode"]).nodeDocument,
   });
 
   // 2. If range is collapsed, then return fragment.

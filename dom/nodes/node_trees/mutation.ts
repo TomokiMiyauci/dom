@@ -10,7 +10,6 @@ import {
 } from "../utils.ts";
 import { type Node, NodeType } from "../node.ts";
 import { type Document } from "../documents/document.ts";
-import { $nodeDocument } from "../internal.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import {
@@ -34,6 +33,7 @@ import {
   signalSlotChange,
 } from "../node_trees/node_tree.ts";
 import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
+import { $ } from "../../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -207,7 +207,7 @@ export function insertNode(
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) { // The iteration order of nodes is tree order
     // 1. Adopt node into parent’s node document.
-    adoptNode(node, parent[$nodeDocument]);
+    adoptNode(node, $(parent).nodeDocument);
 
     // 2. If child is null, then append node to parent’s children.
     if (child === null) parent._children.append(node as Child);
@@ -529,7 +529,7 @@ export function appendNode(node: Node, parent: Node): Node {
  */
 export function adoptNode(node: Node, document: Document): void {
   // 1. Let oldDocument be node’s node document.
-  const oldDocument = node[$nodeDocument];
+  const oldDocument = $(node).nodeDocument;
 
   // 2. If node’s parent is non-null, then remove node.
   if (hasParent(node)) removeNode(node);
@@ -543,7 +543,7 @@ export function adoptNode(node: Node, document: Document): void {
       >
     ) { // TODO(miyauci): shadow-including
       // 1. Set inclusiveDescendant’s node document to document.
-      inclusiveDescendant[$nodeDocument] = document;
+      $(inclusiveDescendant).nodeDocument = document;
 
       // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
     }

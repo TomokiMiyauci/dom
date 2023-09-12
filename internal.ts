@@ -6,6 +6,7 @@ import { type DocumentFragmentInternals } from "./dom/nodes/document_fragment.ts
 import { type DocumentInternals } from "./dom/nodes/documents/document.ts";
 import { type DOMImplementationInternals } from "./dom/nodes/documents/dom_implementation.ts";
 import { type ProcessingInstructionInternals } from "./dom/nodes/processing_instruction.ts";
+import { type NodeInternals } from "./dom/nodes/node.ts";
 
 export interface InternalSlots {
   set(key: Element, value: ElementInternals): void;
@@ -16,6 +17,7 @@ export interface InternalSlots {
   set(key: DocumentFragment, value: DocumentFragmentInternals): void;
   set(key: Document, value: DocumentInternals): void;
   set(key: DOMImplementation, value: DOMImplementationInternals): void;
+  set(key: Node, value: NodeInternals): void;
 
   has(key: object): boolean;
 
@@ -27,11 +29,12 @@ export interface InternalSlots {
   get(key: DocumentFragment): DocumentFragmentInternals;
   get(key: Document): DocumentInternals;
   get(key: DOMImplementation): DOMImplementationInternals;
+  get(key: Node): NodeInternals;
 }
 
 export class InternalSlotsMap {
   #map = new WeakMap();
-  set(key: object, value: unknown): void {
+  set(key: object, value: object): void {
     this.#map.set(key, value);
   }
 

@@ -1,7 +1,7 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
 import { DocumentFragment } from "../../dom/nodes/document_fragment.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
-import { $nodeDocument, $templateContents } from "../../dom/nodes/internal.ts";
+import { $templateContents } from "../../dom/nodes/internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
 import { $ } from "../../internal.ts";
@@ -17,11 +17,11 @@ export class HTMLTemplateElement extends HTMLElement
     super(...args);
 
     // 1. Let doc be the template element's node document's appropriate template contents owner document.
-    const doc = appropriateTemplateContentsOwnerDocument(this[$nodeDocument]);
+    const doc = appropriateTemplateContentsOwnerDocument($(this).nodeDocument);
 
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = new DocumentFragment();
-    fragment[$nodeDocument] = doc;
+    $(fragment).nodeDocument = doc;
     $(fragment).host = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.

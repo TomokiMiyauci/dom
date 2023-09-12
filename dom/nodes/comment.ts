@@ -2,7 +2,6 @@ import { type Document } from "./documents/document.ts";
 import { NodeStates, NodeType } from "./node.ts";
 import { CharacterData, type CharacterDataStates } from "./character_data.ts";
 import { IComment } from "../../interface.d.ts";
-import { $nodeDocument } from "./internal.ts";
 import { $ } from "../../internal.ts";
 
 export class Comment extends CharacterData implements IComment {
@@ -32,7 +31,7 @@ export class Comment extends CharacterData implements IComment {
   ): Comment {
     const node = new Comment(data);
 
-    node[$nodeDocument] = nodeDocument;
+    $(node).nodeDocument = nodeDocument;
 
     return node;
   }

@@ -3,6 +3,7 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
   Node,
+  NodeInternals,
   NodeType,
 } from "../node.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
@@ -25,7 +26,6 @@ import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
-import { $nodeDocument } from "../internal.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
@@ -89,20 +89,19 @@ export type CompatMode = "BackCompat" | "CSS1Compat";
 @XPathEvaluatorBase
 export class Document extends Node implements IDocument {
   constructor() {
+    // @ts-ignore
     super();
 
     const _ = new DocumentInternals({
       implementation: DOMImplementation["create"](this),
+      nodeDocument: this,
     });
 
     internalSlots.set(this, _);
-    this.#_ = _;
   }
 
-  #_: DocumentInternals;
-
-  override get [$nodeDocument](): Document {
-    return this;
+  get #_(): DocumentInternals {
+    return internalSlots.get(this);
   }
 
   override get nodeType(): NodeType.DOCUMENT_NODE {
@@ -719,11 +718,11 @@ export class Document extends Node implements IDocument {
     }
 
     // TODO(miyauci): improve dirty re-assignment
-    const document = node[$nodeDocument];
-    node[$nodeDocument] = this;
+    const document = $(node).nodeDocument;
+    $(node).nodeDocument = this;
     // 2. Return a clone of node, with this and the clone children flag set if deep is true.
     const copy = node.cloneNode(deep) as T;
-    node[$nodeDocument] = document;
+    $(node).nodeDocument = document;
 
     return copy;
   }
@@ -769,7 +768,7 @@ export interface Document
   ): void;
 }
 
-export class DocumentInternals {
+export class DocumentInternals extends NodeInternals {
   /**
    * @default utf8
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
@@ -811,7 +810,12 @@ export class DocumentInternals {
    */
   implementation: DOMImplementation;
 
-  constructor({ implementation }: Pick<DocumentInternals, "implementation">) {
+  constructor(
+    { implementation, nodeDocument }:
+      & Pick<DocumentInternals, "implementation">
+      & Pick<NodeInternals, "nodeDocument">,
+  ) {
+    super(nodeDocument);
     this.implementation = implementation;
   }
 }

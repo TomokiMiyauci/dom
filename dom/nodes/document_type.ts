@@ -1,7 +1,6 @@
-import { Node, NodeStates, NodeType } from "./node.ts";
+import { Node, NodeInternals, NodeType } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import { Document } from "./documents/document.ts";
-import { $nodeDocument } from "./internal.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import type { PartialBy } from "../../deps.ts";
 import { internalSlots } from "../../internal.ts";
@@ -11,22 +10,22 @@ type Optional = "publicId" | "systemId";
 @ChildNode
 export class DocumentType extends Node implements IDocumentType {
   constructor(
-    { name, publicId = "", systemId = "", nodeDocument }:
-      & PartialBy<DocumentTypeInternals, Optional>
-      & NodeStates,
+    { name, publicId = "", systemId = "", nodeDocument }: PartialBy<
+      Pick<
+        DocumentTypeInternals,
+        "name" | "publicId" | "systemId" | "nodeDocument"
+      >,
+      Optional
+    >,
   ) {
-    super();
+    super(nodeDocument);
 
-    const _ = new DocumentTypeInternals({ name });
+    const _ = new DocumentTypeInternals({ name, nodeDocument });
     _.publicId = publicId;
     _.systemId = systemId;
 
-    this.#_ = _;
     internalSlots.set(this, _);
-    this[$nodeDocument] = nodeDocument;
   }
-
-  override [$nodeDocument]: Document;
 
   override get nodeType(): NodeType.DOCUMENT_TYPE_NODE {
     return NodeType.DOCUMENT_TYPE_NODE;
@@ -70,7 +69,7 @@ export class DocumentType extends Node implements IDocumentType {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this[$nodeDocument];
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): DocumentType {
@@ -96,13 +95,15 @@ export class DocumentType extends Node implements IDocumentType {
     return this.#_.systemId;
   }
 
-  #_: DocumentTypeInternals;
+  get #_(): DocumentTypeInternals {
+    return internalSlots.get(this);
+  }
 }
 
 // deno-lint-ignore no-empty-interface
 export interface DocumentType extends ChildNode {}
 
-export class DocumentTypeInternals {
+export class DocumentTypeInternals extends NodeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
    */
@@ -120,7 +121,13 @@ export class DocumentTypeInternals {
    */
   systemId = "";
 
-  constructor({ name }: Pick<DocumentTypeInternals, "name">) {
+  constructor(
+    { name, nodeDocument }: Pick<
+      DocumentTypeInternals,
+      "name" | "nodeDocument"
+    >,
+  ) {
+    super(nodeDocument);
     this.name = name;
   }
 }

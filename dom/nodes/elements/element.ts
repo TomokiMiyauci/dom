@@ -3,6 +3,7 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
   Node,
+  NodeInternals,
   NodeStates,
   NodeType,
 } from "../node.ts";
@@ -25,7 +26,6 @@ import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { type ShadowRoot } from "../shadow_root.ts";
-import { $nodeDocument } from "../internal.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
 import { InnerHTML } from "../../../domparsing/inner_html.ts";
@@ -92,7 +92,7 @@ export class Element extends Node implements IElement {
     isValue,
     nodeDocument,
   }: ElementInits & NodeStates) {
-    super();
+    super(nodeDocument);
 
     const changeAttribute = (
       { localName, namespace, value }: AttributesContext,
@@ -111,16 +111,12 @@ export class Element extends Node implements IElement {
       customElementState,
       customElementDefinition,
       isValue,
+      nodeDocument,
     });
     _.attributeChangeSteps.define(changeAttribute);
 
-    this.#_ = _;
     internalSlots.set(this, _);
-
-    this[$nodeDocument] = nodeDocument;
   }
-
-  override [$nodeDocument]: Document;
 
   override get nodeType(): NodeType.ELEMENT_NODE {
     return NodeType.ELEMENT_NODE;
@@ -167,7 +163,7 @@ export class Element extends Node implements IElement {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this[$nodeDocument];
+    return $(this).nodeDocument;
   }
 
   protected override clone(document: Document): Element {
@@ -429,7 +425,7 @@ export class Element extends Node implements IElement {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this.#_.namespace === Namespace.HTML &&
-      isHTMLDocument(this[$nodeDocument])
+      isHTMLDocument($(this).nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
@@ -486,7 +482,7 @@ export class Element extends Node implements IElement {
    */
   insertAdjacentText(where: InsertPosition, data: string): void {
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    const text = Text["create"]({ data, nodeDocument: this[$nodeDocument] });
+    const text = Text["create"]({ data, nodeDocument: $(this).nodeDocument });
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);
@@ -543,7 +539,7 @@ export class Element extends Node implements IElement {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this.#_.namespace === Namespace.HTML &&
-      isHTMLDocument(this[$nodeDocument])
+      isHTMLDocument($(this).nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -557,7 +553,7 @@ export class Element extends Node implements IElement {
       const attribute = new Attr({
         localName: qualifiedName,
         value,
-        nodeDocument: this[$nodeDocument],
+        nodeDocument: $(this).nodeDocument,
       });
 
       appendAttribute(attribute, this);
@@ -617,7 +613,7 @@ export class Element extends Node implements IElement {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this.#_.namespace === Namespace.HTML &&
-      isHTMLDocument(this[$nodeDocument])
+      isHTMLDocument($(this).nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -634,7 +630,7 @@ export class Element extends Node implements IElement {
         const attr = new Attr({
           localName: qualifiedName,
           value: "",
-          nodeDocument: this[$nodeDocument],
+          nodeDocument: $(this).nodeDocument,
         });
 
         // then append this attribute to this,
@@ -662,7 +658,9 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("webkitMatchesSelector");
   }
 
-  #_: ElementInternals;
+  get #_(): ElementInternals {
+    return internalSlots.get(this);
+  }
 
   /**
    * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name
@@ -674,7 +672,7 @@ export class Element extends Node implements IElement {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
       this.#_.namespace === Namespace.HTML &&
-      $(this[$nodeDocument]).type !== "xml"
+      $($(this).nodeDocument).type !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }
@@ -701,7 +699,7 @@ export interface Element
     Element_Fullscreen,
     Element_CSSShadowParts {}
 
-export class ElementInternals {
+export class ElementInternals extends NodeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
    */
@@ -768,16 +766,20 @@ export class ElementInternals {
       isValue,
       customElementDefinition,
       customElementState,
-    }: Pick<
-      ElementInternals,
-      | "namespace"
-      | "namespacePrefix"
-      | "localName"
-      | "isValue"
-      | "customElementState"
-      | "customElementDefinition"
-    >,
+      nodeDocument,
+    }:
+      & Pick<
+        ElementInternals,
+        | "namespace"
+        | "namespacePrefix"
+        | "localName"
+        | "isValue"
+        | "customElementState"
+        | "customElementDefinition"
+      >
+      & Pick<NodeInternals, "nodeDocument">,
   ) {
+    super(nodeDocument);
     this.namespace = namespace;
     this.namespacePrefix = namespacePrefix;
     this.localName = localName;
@@ -864,7 +866,7 @@ export function setAttributeValue(
       namespacePrefix: prefix,
       localName,
       value,
-      nodeDocument: element[$nodeDocument],
+      nodeDocument: $(element).nodeDocument,
     });
 
     appendAttribute(attr, element);
@@ -1004,7 +1006,7 @@ export function getAttributeByName(
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
     $(element).namespace === Namespace.HTML &&
-    $(element[$nodeDocument]).type !== "xml"
+    $($(element).nodeDocument).type !== "xml"
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
@@ -1025,7 +1027,7 @@ export function replaceAllString(string: string, parent: Node): void {
   if (string !== "") {
     node = Text["create"]({
       data: string,
-      nodeDocument: parent[$nodeDocument],
+      nodeDocument: $(parent).nodeDocument,
     });
   }
 
