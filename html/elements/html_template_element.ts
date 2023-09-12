@@ -1,7 +1,6 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
-import { DocumentFragment } from "../../dom/nodes/document_fragment.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
-import { $templateContents } from "../../dom/nodes/internal.ts";
+import { ElementInternals } from "../../dom/nodes/elements/element.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
 import { $ } from "../../internal.ts";
@@ -11,8 +10,6 @@ import { $ } from "../../internal.ts";
  */
 export class HTMLTemplateElement extends HTMLElement
   implements IHTMLTemplateElement {
-  [$templateContents]: DocumentFragment;
-
   constructor(...args: ConstructorParameters<typeof HTMLElement>) {
     super(...args);
 
@@ -25,7 +22,7 @@ export class HTMLTemplateElement extends HTMLElement
     $(fragment).host = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
-    this[$templateContents] = fragment;
+    $(this).templateContents = fragment;
   }
 
   /**
@@ -33,8 +30,12 @@ export class HTMLTemplateElement extends HTMLElement
    */
   get content(): DocumentFragment {
     // return the template element's template contents.
-    return this[$templateContents];
+    return $(this).templateContents;
   }
+}
+
+export interface HTMLTemplateElementInternals extends ElementInternals {
+  templateContents: DocumentFragment;
 }
 
 const documentMap = new WeakMap<Document, Document>();

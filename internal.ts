@@ -8,7 +8,10 @@ import { type DOMImplementationInternals } from "./dom/nodes/documents/dom_imple
 import { type ProcessingInstructionInternals } from "./dom/nodes/processing_instruction.ts";
 import { type NodeInternals } from "./dom/nodes/node.ts";
 
+import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
+
 export interface InternalSlots {
+  set(key: HTMLTemplateElement, value: HTMLTemplateElementInternals): void;
   set(key: Element, value: ElementInternals): void;
   set(key: Attr, value: AttrInternals): void;
   set(key: DocumentType, value: DocumentTypeInternals): void;
@@ -21,6 +24,7 @@ export interface InternalSlots {
 
   has(key: object): boolean;
 
+  get(key: HTMLTemplateElement): HTMLTemplateElementInternals;
   get(key: Element): ElementInternals;
   get(key: Attr): AttrInternals;
   get(key: DocumentType): DocumentTypeInternals;

@@ -9,7 +9,6 @@ import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
 import { Document } from "../dom/nodes/documents/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
-import { $templateContents } from "../dom/nodes/internal.ts";
 import { HTMLTemplateElement } from "./elements/html_template_element.ts";
 import { $ } from "../internal.ts";
 
@@ -66,15 +65,14 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     templateElement: HTMLTemplateElement,
     contentElement: DocumentFragment,
   ): void {
-    const fragment = templateElement[$templateContents];
+    const fragment = $(templateElement).templateContents;
     $(contentElement).nodeDocument = $(fragment).nodeDocument;
     $(contentElement).host = $(fragment).host;
-
-    templateElement[$templateContents] = contentElement;
+    $(templateElement).templateContents = contentElement;
   }
 
   getTemplateContent(templateElement: HTMLTemplateElement): DocumentFragment {
-    return templateElement.content;
+    return templateElement.content as any;
   }
 
   setDocumentType(

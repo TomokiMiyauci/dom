@@ -402,7 +402,6 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#dom-range-intersectsnode
    */
   intersectsNode(node: Node): boolean {
-    console.log(node);
     // 1. If node’s root is different from this’s root, return false.
     if (getRoot(node) !== this.#root) return false;
 
