@@ -62,6 +62,10 @@
       {
         "name": "Adopting a non-orphan",
         "reason": "globalThis#frames is not supported"
+      },
+      {
+        "name": "WebIDL tests",
+        "reason": "compiler error"
       }
     ],
     "dom/nodes/Node-removeChild.html": [
@@ -125,6 +129,10 @@
       },
       {
         "name": "Calling insertBefore with a non-Node first argument on a leaf node ProcessingInstruction must throw TypeError.",
+        "reason": "compiler error"
+      },
+      {
+        "name": "Calling insertBefore with a non-Node first argument must throw TypeError.",
         "reason": "compiler error"
       }
     ],
@@ -2369,6 +2377,73 @@
       {
         "name": "First parameter to initEvent should be mandatory.",
         "reason": "compiler error"
+      }
+    ],
+    "dom/ranges/Range-intersectsNode-binding.html": [
+      {
+        "name": "Calling intersectsNode without an argument or with an invalid argument should throw a TypeError.",
+        "reason": "compiler error"
+      }
+    ],
+    "dom/traversal/TreeWalker-walking-outside-a-tree.html": [
+      { "name": "walking outside a tree", "reason": "linked tree effect" }
+    ],
+    "dom/nodes/Node-textContent.html": [
+      {
+        "name": "Element with descendants set to null",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to null",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to undefined",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to undefined",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to \"\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to \"\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to 42",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to 42",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to \"abc\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to \"abc\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to \"<b>xyz</b>\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to \"<b>xyz</b>\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "Element with descendants set to \"d\\0e\"",
+        "reason": "linked tree effect"
+      },
+      {
+        "name": "DocumentFragment with descendants set to \"d\\0e\"",
+        "reason": "linked tree effect"
       }
     ]
   }
