@@ -44,9 +44,8 @@ import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
-import { getFirstChild, getNextSibling } from "../../infra/tree.ts";
 import { Steps } from "../../infra/applicable.ts";
-import { $, internalSlots } from "../../../internal.ts";
+import { $, internalSlots, tree } from "../../../internal.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
@@ -1021,7 +1020,7 @@ export function getAttributeByName(
  */
 export function replaceAllString(string: string, parent: Node): void {
   // 1. Let node be null.
-  let node = null;
+  let node: Node | null = null;
 
   // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
   if (string !== "") {
@@ -1064,12 +1063,12 @@ export function hasAttributeByQualifiedName(
 export function insertAdjacent(
   element: Element,
   where: string,
-  node: Node,
-): Node | null {
+  node: globalThis.Node,
+): globalThis.Node | null {
   // run the steps associated with the first ASCII case-insensitive match for where:
   switch (toASCIILowerCase(where)) {
     case "beforebegin": {
-      const parent = element._parent;
+      const parent = tree.parent(element);
       // If element’s parent is null, return null.
       if (!parent) return null;
 
@@ -1078,19 +1077,19 @@ export function insertAdjacent(
     }
     case "afterbegin": {
       // Return the result of pre-inserting node into element before element’s first child.
-      return preInsertNode(node, element, getFirstChild(element));
+      return preInsertNode(node, element, tree.firstChild(element));
     }
     case "beforeend": {
       // Return the result of pre-inserting node into element before null.
       return preInsertNode(node, element, null);
     }
     case "afterend": {
-      const parent = element._parent;
+      const parent = tree.parent(element);
       // If element’s parent is null, return null.
       if (!parent) return null;
 
       // Return the result of pre-inserting node into element’s parent before element’s next sibling.
-      return preInsertNode(node, parent, getNextSibling(element));
+      return preInsertNode(node, parent, tree.nextSibling(element));
     }
     default:
       // Throw a "SyntaxError" DOMException.

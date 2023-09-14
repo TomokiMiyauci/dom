@@ -1,5 +1,4 @@
 import { type Element } from "../elements/element.ts";
-import { type Node } from "../node.ts";
 import type { IHTMLCollection } from "../../../interface.d.ts";
 import { at, find, len, range } from "../../../deps.ts";
 import { Namespace } from "../../../infra/namespace.ts";
@@ -11,9 +10,8 @@ import {
   LegacyUnenumerableNamedProperties,
 } from "../../../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
-import { orderSubtree } from "../../infra/tree.ts";
 import { convert, DOMString, unsignedLong } from "../../../webidl/types.ts";
-import { $ } from "../../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 
 @Exposed(Window)
 @LegacyUnenumerableNamedProperties
@@ -83,7 +81,7 @@ export class HTMLCollection extends LegacyPlatformObject
   }
 
   protected *represent(): IterableIterator<Element> {
-    for (const node of orderSubtree(this[$root])) {
+    for (const node of tree.inclusiveDescendants(this[$root])) {
       if (isElement(node) && this[$filter](node)) yield node;
     }
   }

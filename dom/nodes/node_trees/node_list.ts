@@ -1,11 +1,10 @@
-import { Node } from "../node.ts";
 import { at, ifilter, len, range } from "../../../deps.ts";
 import { INodeList } from "../../../interface.d.ts";
 import { Iterable, iterable } from "../../../webidl/iterable.ts";
 import { LegacyPlatformObject } from "../../../webidl/legacy_extended_attributes.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import { $filter, $root } from "../internal.ts";
-import { orderSubtree } from "../../infra/tree.ts";
+import { tree } from "../../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-collection
@@ -54,7 +53,7 @@ export class NodeList extends CollectiveNodeList implements INodeList {
 
   protected override represent(): globalThis.Iterable<Node> {
     return ifilter(
-      orderSubtree(this[$root]),
+      tree.inclusiveDescendants(this[$root]),
       (node) => this[$filter](node, this[$root]),
     );
   }

@@ -1,4 +1,3 @@
-import { type Node } from "../node.ts";
 import { type Document } from "../documents/document.ts";
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
@@ -24,9 +23,8 @@ import {
   preInsertNode,
   replaceAllNode,
 } from "../node_trees/mutation.ts";
-import { getFirstChild } from "../../infra/tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
-import { $ } from "../../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 
 export function ParentNode<T extends Constructor<Node>>(
   Ctor: T,
@@ -37,14 +35,14 @@ export function ParentNode<T extends Constructor<Node>>(
      */
     get childElementCount(): number {
       // return the number of children of this that are elements.
-      return len(ifilter(this._children, isElement));
+      return len(ifilter(tree.children(this), isElement));
     }
 
     get children(): HTMLCollection {
       return new HTMLCollection({
         root: this,
         filter: (node) => {
-          return this._children.contains(node);
+          return tree.children(this).contains(node);
         },
       });
     }
@@ -54,7 +52,7 @@ export function ParentNode<T extends Constructor<Node>>(
      */
     get firstElementChild(): Element | null {
       // return the first child that is an element; otherwise null.
-      return first(ifilter(this._children, isElement)) ?? null;
+      return first(ifilter(tree.children(this), isElement)) ?? null;
     }
 
     /**
@@ -62,7 +60,7 @@ export function ParentNode<T extends Constructor<Node>>(
      */
     get lastElementChild(): Element | null {
       // return the last child that is an element; otherwise null.
-      return last(ifilter(this._children, isElement)) ?? null;
+      return last(ifilter(tree.children(this), isElement)) ?? null;
     }
 
     /**
@@ -74,7 +72,7 @@ export function ParentNode<T extends Constructor<Node>>(
       const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 2. Pre-insert node into this before this’s first child.
-      preInsertNode(node, this, getFirstChild(this));
+      preInsertNode(node, this, tree.firstChild(this));
     }
 
     /**

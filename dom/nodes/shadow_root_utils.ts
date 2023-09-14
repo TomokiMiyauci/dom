@@ -1,20 +1,20 @@
-import { getRoot, isChildOf, isTree, Tree } from "../infra/tree.ts";
+import { tree } from "../../internal.ts";
 import { isNodeLike, isShadowRoot } from "./utils.ts";
 
 /**
  * @see [DOM Living Standard](https://triple-underscore.github.io/DOM4-ja.html#concept-shadow-including-inclusive-ancestor)
  */
-export function isShadowInclusiveAncestor(A: Tree, B: Tree): boolean {
+export function isShadowInclusiveAncestor(A: Node, B: unknown): boolean {
   return A === B || isShadowIncludingDescendant(A, B);
 }
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-shadow-including-descendant)
  */
-export function isShadowIncludingDescendant(A: Tree, B: Tree): boolean {
-  if (isChildOf(A, B)) return true;
+export function isShadowIncludingDescendant(A: Node, B: unknown): boolean {
+  if (tree.isChild(A, B)) return true;
 
-  const root = getRoot(A);
+  const root = tree.root(A);
 
   return isNodeLike(root) && isShadowRoot(root) &&
     isShadowInclusiveAncestor(root["_host"], B);
@@ -28,13 +28,13 @@ export function retarget<T extends object | null>(
   B: object,
 ): T {
   while (true) {
-    if (!A || !isTree(A) || !isNodeLike(A)) return A;
+    if (!A || !isNodeLike(A)) return A;
 
-    const root = getRoot(A);
+    const root = tree.root(A as Node);
 
     if (
       !isShadowRoot(root) ||
-      (isTree(B) && isNodeLike(B) && isShadowInclusiveAncestor(root, B))
+      (isNodeLike(B) && isShadowInclusiveAncestor(root, B))
     ) return A;
 
     A = root["_host"] as T;

@@ -25,17 +25,17 @@ const L = { _: "L" };
 
 const tree = new Tree();
 
-tree.appendChild(A, B);
-tree.appendChild(B, C);
-tree.appendChild(C, D);
-tree.appendChild(C, E);
-tree.appendChild(B, F);
-tree.appendChild(F, G);
-tree.appendChild(F, H);
-tree.appendChild(F, I);
-tree.appendChild(A, J);
-tree.appendChild(J, K);
-tree.appendChild(J, L);
+tree.children(A).append(B);
+tree.children(B).append(C);
+tree.children(C).append(D);
+tree.children(C).append(E);
+tree.children(B).append(F);
+tree.children(F).append(G);
+tree.children(F).append(H);
+tree.children(F).append(I);
+tree.children(A).append(J);
+tree.children(J).append(K);
+tree.children(J).append(L);
 
 describe("tree", () => {
   it("firstChild", () => {
@@ -392,6 +392,48 @@ describe("tree", () => {
 
     table.forEach(([node, expected]) => {
       assertEquals([...tree.follows(node)], expected);
+    });
+  });
+
+  it("precedeSiblings", () => {
+    const table: [object, unknown[]][] = [
+      [A, []],
+      [B, []],
+      [C, []],
+      [D, []],
+      [E, [D]],
+      [F, [C]],
+      [G, []],
+      [H, [G]],
+      [I, [H, G]],
+      [J, [B]],
+      [K, []],
+      [L, [K]],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals([...tree.precedeSiblings(node)], expected);
+    });
+  });
+
+  it("index", () => {
+    const table: [object, number][] = [
+      [A, 0],
+      [B, 0],
+      [C, 0],
+      [D, 0],
+      [E, 1],
+      [F, 1],
+      [G, 0],
+      [H, 1],
+      [I, 2],
+      [J, 1],
+      [K, 0],
+      [L, 1],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals(tree.index(node), expected);
     });
   });
 });

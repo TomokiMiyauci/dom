@@ -1,188 +1,120 @@
-import { insert, last, some } from "../../deps.ts";
-import { tree } from "../../internal.ts";
+import { insert, last, len, some, takewhile } from "../../deps.ts";
+import { Entry } from "../../infra/data_structures/common.ts";
+import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { Steps } from "./applicable.ts";
+
+class TrappedOrderedSet<T> extends OrderedSet<T> {
+  insertionSteps: Steps<[T]> = new Steps();
+  deletionSteps: Steps<[T]> = new Steps();
+
+  override append(item: T): void {
+    super.append(item);
+    this.insertionSteps.run(item);
+  }
+
+  override prepend(item: T): void {
+    super.prepend(item);
+    this.insertionSteps.run(item);
+  }
+
+  override insert(index: number, item: T): boolean {
+    const result = super.insert(index, item);
+
+    if (result) this.insertionSteps.run(item);
+
+    return result;
+  }
+
+  override remove(
+    predicate: (item: T, index: number, list: this) => boolean,
+  ): Entry<T>[] {
+    const result = super.remove(predicate);
+
+    result.forEach(([_, item]) => {
+      this.deletionSteps.run(item);
+    });
+
+    return result;
+  }
+}
+
+class TreeNode<Parent extends object = object, Child extends object = object> {
+  parent: Parent | null = null;
+
+  children: TrappedOrderedSet<Child> = new TrappedOrderedSet();
+}
 
 export class Tree<
   T extends object = object,
   Parent extends T = T,
   Child extends T = T,
 > {
-  #map: WeakMap<T, TreeNode<T, Parent, Child>> = new WeakMap();
+  #map: WeakMap<object, TreeNode<Parent, Child>> = new WeakMap();
 
-  #ref(object: T): TreeNode<T, Parent, Child> {
-    const node = insert(this.#map, object, () => new TreeNode());
+  protected ref(object: T): TreeNode<Parent, Child> {
+    return insert(this.#map, object, () => {
+      const tree = new TreeNode<Parent, Child>();
 
-    return node;
+      tree.children.insertionSteps.define((child) => {
+        this.ref(child).parent = object as Parent;
+      });
+
+      tree.children.deletionSteps.define((child) => {
+        this.ref(child).parent = null;
+      });
+
+      return tree;
+    });
   }
 
-  /** Return first child of {@linkcode node}. O(1) */
-  firstChild(node: T): Child | null {
-    return this.#ref(node).firstChild;
-  }
-
-  /** Return last child of {@linkcode node}. O(1) */
-  lastChild(node: T): Child | null {
-    return this.#ref(node).lastChild;
-  }
-
-  /** Return previous sibling of {@linkcode node}. O(1) */
-  previousSibling(node: T): Child | null {
-    return this.#ref(node).previousSibling;
-  }
-
-  /** Return next sibling of {@linkcode node}. O(1) */
-  nextSibling(node: T): Child | null {
-    return this.#ref(node).nextSibling;
-  }
-
-  /** Return parent of {@linkcode node}. O(1) */
   parent(node: T): Parent | null {
-    return this.#ref(node).parent;
+    return this.ref(node).parent;
   }
 
-  /** Return root of {@linkcode node}. O(n) */
+  children(node: T): OrderedSet<Child> {
+    return this.ref(node).children;
+  }
+
+  firstChild(node: T): Child | null {
+    return this.children(node)[0] ?? null;
+  }
+
+  lastChild(node: T): Child | null {
+    const children = this.children(node);
+
+    return children[children.size - 1] ?? null;
+  }
+
   root(node: T): T {
     const ancestors = this.ancestors(node);
 
     return last(ancestors) ?? node;
   }
 
-  insertAfter(referenceNode: T, newObject: Child): Child {
-    const newNode = this.#ref(newObject);
-
-    assertNotParticipate(newNode, "newObject already present in Tree");
-
-    const refTree = this.#ref(referenceNode);
-    const nextNode = refTree.nextSibling
-      ? this.#ref(refTree.nextSibling)
-      : null;
-    const parentNode = refTree.parent ? this.#ref(refTree.parent) : null;
-
-    newNode.parent = refTree.parent;
-    newNode.previousSibling = referenceNode as any;
-    newNode.nextSibling = refTree.nextSibling;
-    refTree.nextSibling = newObject;
-
-    if (nextNode) nextNode.previousSibling = newObject;
-
-    if (parentNode && parentNode.lastChild === referenceNode) {
-      parentNode.lastChild = newObject;
-    }
-
-    return newObject;
-  }
-
-  insertBefore(referenceNode: T, newObject: Child): Child {
-    const newNode = this.#ref(newObject);
-
-    assertNotParticipate(newNode, "newObject already present in Tree");
-
-    const refTree = this.#ref(referenceNode);
-    const prevNode = refTree.previousSibling
-      ? this.#ref(refTree.previousSibling)
-      : null;
-    const parentNode = refTree.parent ? this.#ref(refTree.parent) : null;
-
-    newNode.parent = refTree.parent;
-    newNode.previousSibling = refTree.previousSibling;
-    newNode.nextSibling = referenceNode as any;
-    refTree.previousSibling = newObject;
-
-    if (prevNode) prevNode.nextSibling = newObject;
-
-    if (parentNode && parentNode.firstChild === referenceNode) {
-      parentNode.firstChild = newObject;
-    }
-
-    return newObject;
-  }
-
-  /** Yield all child of {@linkcode node}. O(n) */
-  *children(node: T): IterableIterator<Child> {
-    let current = this.firstChild(node);
-
-    while (current) {
-      yield current;
-
-      current = this.nextSibling(current);
-    }
-  }
-
-  /** Yield all ancestors of {@linkcode node} in order of proximity. O(n) */
-  *ancestors(node: T): IterableIterator<T> {
-    const { parent } = this.#ref(node);
-
-    if (parent) {
-      yield parent;
-      yield* this.ancestors(parent);
-    }
-  }
-
-  /** Yield all inclusive ancestors of {@linkcode node} in order of proximity. O(n) */
-  *inclusiveAncestors(node: T): IterableIterator<T> {
-    yield node;
-    yield* this.ancestors(node);
-  }
-
-  /** Yield all descendant of {@linkcode node} with depth first order. O(n) */
-  *descendants(node: T): IterableIterator<T> {
-    const children = this.children(node);
-
-    for (const child of children) {
-      yield child;
-      yield* this.descendants(child);
-    }
-  }
-
-  /** Yield all inclusive descendants of {@linkcode node} with depth first order. O(n) */
-  *inclusiveDescendants(node: T): IterableIterator<T> {
-    yield node;
-    yield* this.descendants(node);
-  }
-
-  *siblings(node: T): IterableIterator<T> {
-    for (const sibling of this.inclusiveSiblings(node)) {
-      if (node !== sibling) yield sibling;
-    }
-  }
-
-  *inclusiveSiblings(node: T): IterableIterator<T> {
+  previousSibling(node: T): Child | null {
     const parent = this.parent(node);
 
-    if (parent) yield* this.children(parent);
+    if (!parent) return null;
+
+    const index = this.index(node) - 1;
+    return this.children(parent)[index] ?? null;
   }
 
-  /** Yield all previous siblings of {@linkcode node} in order of proximity. O(n) */
-  *previousSiblings(node: T): IterableIterator<T> {
-    const { previousSibling } = this.#ref(node);
+  nextSibling(node: T): Child | null {
+    const parent = this.parent(node);
 
-    if (previousSibling) {
-      yield previousSibling;
-      yield* this.previousSiblings(previousSibling);
-    }
-  }
+    if (!parent) return null;
 
-  /** Yield all next siblings of {@linkcode node} in order of proximity. O(n) */
-  *nextSiblings(node: T): IterableIterator<T> {
-    const { nextSibling } = this.#ref(node);
-
-    if (nextSibling) {
-      yield nextSibling;
-      yield* this.nextSiblings(nextSibling);
-    }
+    const index = this.index(node) + 1;
+    return this.children(parent)[index] ?? null;
   }
 
   precede(node: T): T | null {
-    const { previousSibling, parent } = this.#ref(node);
+    const previousSibling = this.previousSibling(node);
 
     if (previousSibling) return this.#prev(previousSibling);
 
-    return parent;
-  }
-
-  #prev(node: T): T {
-    const lastChild = this.lastChild(node);
-
-    return lastChild ? this.#prev(lastChild) : node;
+    return this.parent(node);
   }
 
   *precedes(node: T): IterableIterator<T> {
@@ -195,15 +127,19 @@ export class Tree<
   }
 
   follow(node: T): T | null {
-    const { nextSibling, parent, firstChild } = this.#ref(node);
+    const firstChild = this.firstChild(node);
 
     if (firstChild) return firstChild;
+
+    const nextSibling = this.nextSibling(node);
+
     if (nextSibling) return nextSibling;
+
+    const parent = this.parent(node);
 
     return parent ? this.#nextNodeDescendant(parent) : null;
   }
 
-  /** Yield all following nodes of {@linkcode node}. O(n) */
   *follows(node: T): IterableIterator<T> {
     const follow = this.follow(node);
 
@@ -213,190 +149,130 @@ export class Tree<
     }
   }
 
-  #nextNodeDescendant(node: T): T | null {
-    let current: T | null = node;
+  #prev(node: T): T {
+    const lastChild = this.lastChild(node);
 
-    while (current) {
-      const { nextSibling, parent } = this.#ref(current);
-
-      if (!nextSibling) current = parent;
-      else break;
-    }
-
-    if (!current) return null;
-    return this.#ref(current).nextSibling;
-  }
-
-  appendChild(referenceNode: T, newObject: Child): Child {
-    const newNode = this.#ref(newObject);
-
-    assertNotParticipate(
-      newNode,
-      "Given object is already present in this SymbolTree, remove it first",
-    );
-
-    const refTree = this.#ref(referenceNode);
-
-    if (refTree.hasChild) {
-      this.insertAfter(refTree.lastChild!, newObject);
-    } else {
-      newNode.parent = referenceNode as any;
-      refTree.firstChild = newObject;
-      refTree.lastChild = newObject;
-    }
-
-    return newObject;
-  }
-
-  prependChild(reference: T, newObject: Child): Child {
-    const newNode = this.#ref(newObject);
-
-    assertNotParticipate(
-      newNode,
-      "Given object is already present in this SymbolTree, remove it first",
-    );
-
-    const referenceNode = this.#ref(reference);
-
-    if (referenceNode.hasChild) {
-      this.insertBefore(referenceNode.firstChild!, newObject);
-    } else {
-      newNode.parent = reference as any;
-      referenceNode.firstChild = newObject;
-      referenceNode.lastChild = newObject;
-    }
-
-    return newObject;
-  }
-
-  remove(node: T): T {
-    const treeNode = this.#ref(node);
-    const { parent, nextSibling, previousSibling } = treeNode;
-    const parentNode = parent ? this.#ref(parent) : null;
-
-    if (parentNode) {
-      if (parentNode.firstChild === node) parentNode.firstChild = nextSibling;
-      if (parentNode.lastChild === node) parentNode.lastChild = previousSibling;
-    }
-
-    const prevNode = previousSibling ? this.#ref(previousSibling) : null;
-
-    if (prevNode) prevNode.nextSibling = nextSibling;
-
-    const nextNode = nextSibling ? this.#ref(nextSibling) : null;
-
-    if (nextNode) nextNode.previousSibling = previousSibling;
-
-    treeNode.parent = null;
-    treeNode.previousSibling = null;
-    treeNode.nextSibling = null;
-    treeNode.firstChild = null;
-    treeNode.lastChild = null;
-
-    return node;
+    return lastChild ? this.#prev(lastChild) : node;
   }
 
   index(node: T): number {
-    const childNode = this.#ref(node);
-    const parentNode = childNode.parent ? this.#ref(childNode.parent) : null;
+    const parent = this.parent(node);
 
-    if (!parentNode) return 0;
+    if (!parent) return 0;
 
-    let index = 0;
-    let object = parentNode.firstChild;
+    const parentChildren = this.children(parent);
 
-    while (object) {
-      const nodeTree = this.#ref(object);
+    return len(takewhile(parentChildren, (child) => child !== node));
+  }
 
-      if (object === node) break;
+  *ancestors(node: T): IterableIterator<Parent> {
+    const parent = this.parent(node);
 
-      ++index;
-      object = nodeTree.nextSibling;
+    if (parent) {
+      yield parent;
+      yield* this.ancestors(parent);
     }
-
-    return index;
-  }
-}
-
-export class TreeNode<
-  T extends object = object,
-  Parent extends T = T,
-  Child extends T = T,
-> {
-  parent: Parent | null = null;
-  firstChild: Child | null = null;
-  lastChild: Child | null = null;
-  previousSibling: Child | null = null;
-  nextSibling: Child | null = null;
-
-  get isAttached(): boolean {
-    return !!(this.parent || this.previousSibling || this.nextSibling);
   }
 
-  get hasChild(): boolean {
-    return !!this.firstChild;
+  *inclusiveAncestors(node: T): IterableIterator<T> {
+    yield node;
+    yield* this.ancestors(node);
   }
-}
 
-export function assertNotParticipate(
-  node: TreeNode,
-  message: string,
-): void {
-  if (node.isAttached) throw new Error(message);
-}
+  *descendants(node: T): IterableIterator<Child> {
+    for (const child of this.children(node)) {
+      yield child;
+      yield* this.descendants(child);
+    }
+  }
 
-/**
- * @see https://dom.spec.whatwg.org/#concept-tree-inclusive-ancestor
- */
-export function isInclusiveAncestorOf(target: Node, of: Node): boolean {
-  return target === of || isAncestorOf(target, of);
-}
+  /** Yield all inclusive descendants of {@linkcode node} with depth first order. O(n) */
+  *inclusiveDescendants(node: T): IterableIterator<T> {
+    yield node;
+    yield* this.descendants(node);
+  }
 
-export function isAncestorOf(target: Node, of: Node): boolean {
-  return isDescendantOf(of, target);
-}
+  *precedeSiblings(node: T): IterableIterator<Child> {
+    const previousSibling = this.previousSibling(node);
 
-export function isDescendantOf(target: Node, of: Node): boolean {
-  return isChildOf(target, of) ||
-    some(tree.descendants(of), (descendant) => isChildOf(target, descendant));
-}
+    if (previousSibling) {
+      yield previousSibling;
+      yield* this.precedeSiblings(previousSibling);
+    }
+  }
 
-export function isInclusiveDescendantOf(target: Node, of: Node): boolean {
-  return target === of || isDescendantOf(target, of);
-}
+  *followSiblings(node: T): IterableIterator<Child> {
+    const nextSibling = this.nextSibling(node);
 
-export function isChildOf(target: Node, of: unknown): boolean {
-  return tree.parent(target) === of;
-}
+    if (nextSibling) {
+      yield nextSibling;
+      yield* this.followSiblings(nextSibling);
+    }
+  }
 
-export function isSameTree(left: Node, right: Node): boolean {
-  return left === right || tree.root(left) === tree.root(right);
-}
+  #nextNodeDescendant(node: T): T | null {
+    const nextSibling = this.nextSibling(node);
 
-export function isSiblingOf(target: Node, of: Node): boolean {
-  const parent = tree.parent(target);
-  return !!parent && parent === tree.parent(of);
-}
+    if (nextSibling) return nextSibling;
 
-export function isInclusiveSiblingOf(target: Node, of: Node): boolean {
-  return target === of || isSiblingOf(target, of);
-}
+    const parent = this.parent(node);
 
-/**
- * @see https://dom.spec.whatwg.org/#concept-tree-preceding
- */
-export function isPrecedeOf(target: Node, of: Node): boolean {
-  // A and B are in the same tree and A comes before B in tree order.
-  if (target === of) return false;
-  if (!isSameTree(target, of)) return false;
+    return parent ? this.#nextNodeDescendant(parent) : null;
+  }
 
-  return some(tree.precedes(of), (tree) => tree === target);
-}
+  *siblings(node: T): IterableIterator<Child> {
+    for (const sibling of this.inclusiveSiblings(node)) {
+      if (node !== sibling) yield sibling;
+    }
+  }
 
-export function isFollowOf(target: Node, of: Node): boolean {
-  // A and B are in the same tree and A comes after B in tree order.
-  if (target === of) return false;
-  if (!isSameTree(target, of)) return false;
+  *inclusiveSiblings(node: T): IterableIterator<Child> {
+    const parent = this.parent(node);
 
-  return some(tree.follows(of), (tree) => tree === target);
+    if (parent) yield* this.children(parent);
+  }
+
+  isChild(target: T, of: unknown): boolean {
+    return this.parent(target) === of;
+  }
+
+  isFollow(target: T, of: T): boolean {
+    // A and B are in the same tree and A comes after B in tree order.
+    if (target === of) return false;
+    if (!this.isSameTree(target, of)) return false;
+
+    return some(this.follows(of), (tree) => tree === target);
+  }
+
+  isSameTree(left: T, right: T): boolean {
+    return left === right || this.root(left) === this.root(right);
+  }
+
+  isAncestor(target: T, of: T): boolean {
+    return this.isDescendant(of, target);
+  }
+
+  isDescendant(target: T, of: T): boolean {
+    return this.isChild(target, of) ||
+      some(
+        this.descendants(of),
+        (descendant) => this.isChild(target, descendant),
+      );
+  }
+
+  isInclusiveAncestor(target: T, of: T): boolean {
+    return target === of || this.isAncestor(target, of);
+  }
+
+  isInclusiveDescendant(target: T, of: T): boolean {
+    return target === of || this.isDescendant(target, of);
+  }
+
+  isPrecede(target: T, of: T): boolean {
+    // A and B are in the same tree and A comes before B in tree order.
+    if (target === of) return false;
+    if (!this.isSameTree(target, of)) return false;
+
+    return some(this.precedes(of), (tree) => tree === target);
+  }
 }

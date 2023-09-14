@@ -1,10 +1,9 @@
 import type { INodeIterator } from "../../interface.d.ts";
-import type { Node } from "../nodes/node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import { orderSubtree } from "../infra/tree.ts";
 import { filter } from "./traversal.ts";
 import { NodeFilter } from "./node_filter.ts";
 import { dropwhile, first, last, takewhile } from "../../deps.ts";
+import { tree } from "../../internal.ts";
 
 @Exposed(Window)
 export class NodeIterator implements INodeIterator {
@@ -99,7 +98,7 @@ export class NodeIterator implements INodeIterator {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
    */
   protected get _iteratorCollection(): IterableIterator<Node> {
-    return orderSubtree(this._root);
+    return tree.inclusiveDescendants(this.root);
   }
 
   /**

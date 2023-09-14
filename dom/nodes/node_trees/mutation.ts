@@ -8,23 +8,10 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { type Node, NodeType } from "../node.ts";
+import { NodeType } from "../node.ts";
 import { type Document } from "../documents/document.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
-import {
-  getFollows,
-  getInclusiveAncestors,
-  getInclusiveDescendants,
-  getIndex,
-  getLastChild,
-  getNextSibling,
-  getPrecedings,
-  getPreviousSibling,
-  getRoot,
-  hasParent,
-} from "../../infra/tree.ts";
-import type { Child, Parent } from "../types.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
 import { filter, find, some } from "../../../deps.ts";
 import {
@@ -33,7 +20,7 @@ import {
   signalSlotChange,
 } from "../node_trees/node_tree.ts";
 import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
-import { $ } from "../../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -54,7 +41,7 @@ export function replaceChild<T extends Node>(
   }
 
   // 3. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
-  if (child._parent !== parent) {
+  if (tree.parent(child) !== parent) {
     throw new DOMException("<message>", DOMExceptionName.NotFoundError);
   }
 
@@ -83,18 +70,18 @@ export function replaceChild<T extends Node>(
     switch (node.nodeType) {
       case NodeType.DOCUMENT_FRAGMENT_NODE: {
         // If node has more than one element child or has a Text node child.
-        const elementsCount = filter(node._children, isElement).length;
+        const elementsCount = filter(tree.children(node), isElement).length;
 
-        if (elementsCount > 1 || find(node._children, isText)) return true;
+        if (elementsCount > 1 || find(tree.children(node), isText)) return true;
 
         // Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child.
         if (
           elementsCount === 1 && (
             some(
-              filter(parent._children, isElement),
+              filter(tree.children(parent), isElement),
               (value) => !Object.is(value, child),
             ) ||
-            some(getFollows(child), isDocumentType)
+            some(tree.follows(child), isDocumentType)
           )
         ) return true;
 
@@ -103,18 +90,18 @@ export function replaceChild<T extends Node>(
 
       case NodeType.ELEMENT_NODE: {
         // parent has an element child that is not child or a doctype is following child.
-        const element = find(parent._children, isElement);
+        const element = find(tree.children(parent), isElement);
 
         return (element && !Object.is(element, child)) ||
-          some(getFollows(child), isDocumentType);
+          some(tree.follows(child), isDocumentType);
       }
 
       case NodeType.DOCUMENT_TYPE_NODE: {
         // parent has a doctype child that is not child, or an element is preceding child.
-        const doctype = find(parent._children, isDocumentType);
+        const doctype = find(tree.children(parent), isDocumentType);
 
         return ((doctype && !Object.is(doctype, child)) ||
-          some(getPrecedings(child), isElement));
+          some(tree.precedes(child), isElement));
       }
 
       default:
@@ -123,19 +110,19 @@ export function replaceChild<T extends Node>(
   }
 
   // 7. Let referenceChild be child’s next sibling.
-  let referenceChild = getNextSibling(child);
+  let referenceChild = tree.nextSibling(child);
 
   // 8. If referenceChild is node, then set referenceChild to node’s next sibling.
-  if (referenceChild === node) referenceChild = getNextSibling(node);
+  if (referenceChild === node) referenceChild = tree.nextSibling(node);
 
   // 9. Let previousSibling be child’s previous sibling.
-  const previousSibling = getPreviousSibling(child);
+  const previousSibling = tree.previousSibling(child);
 
   // 10. Let removedNodes be the empty set.
   let removedNodes = new OrderedSet<Node>();
 
   // 11. If child’s parent is non-null, then:
-  if (child._parent) {
+  if (tree.parent(child)) {
     // 1. Set removedNodes to « child ».
     removedNodes = new OrderedSet([child]);
 
@@ -145,7 +132,7 @@ export function replaceChild<T extends Node>(
 
   // 12. Let nodes be node’s children if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
-    ? node._children
+    ? tree.children(node)
     : new OrderedSet([node]);
 
   // 13. Insert node into parent before referenceChild with the suppress observers flag set.
@@ -175,7 +162,7 @@ export function insertNode(
 ) {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
-    ? node._children.clone()
+    ? tree.children(node).clone()
     : new OrderedSet<Node>([node]);
 
   // 2. Let count be nodes’s size.
@@ -187,7 +174,9 @@ export function insertNode(
   // 4. If node is a DocumentFragment node, then:
   if (isDocumentFragment(node)) {
     // 1. Remove its children with the suppress observers flag set.
-    for (const child of node._children) removeNode(child, suppressObservers);
+    for (const child of [...tree.children(node)]) {
+      removeNode(child, suppressObservers);
+    }
 
     // 2. Queue a tree mutation record for node with « », nodes, null, and null.
     queueTreeMutationRecord(node, new OrderedSet(), nodes, null, null);
@@ -201,8 +190,8 @@ export function insertNode(
 
   // 6. Let previousSibling be child’s previous sibling or parent’s last child if child is null.
   const previousSibling = child
-    ? getPreviousSibling(child)
-    : getLastChild(parent);
+    ? tree.previousSibling(child)
+    : tree.lastChild(parent);
 
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) { // The iteration order of nodes is tree order
@@ -210,11 +199,11 @@ export function insertNode(
     adoptNode(node, $(parent).nodeDocument);
 
     // 2. If child is null, then append node to parent’s children.
-    if (child === null) parent._children.append(node as Child);
+    if (child === null) tree.children(parent).append(node as any);
     // 3. Otherwise, insert node into parent’s children before child’s index.
-    else parent._children.insert(getIndex(child), node as Child);
-    // sync parent
-    node._parent = parent as Parent;
+    else {
+      tree.children(parent).insert(tree.index(child), node as any);
+    }
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -226,18 +215,16 @@ export function insertNode(
 
     // 5. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
     // TODO
-    if (isShadowRoot(getRoot(parent))) signalSlotChange(parent as any);
+    if (isShadowRoot(tree.root(parent))) signalSlotChange(parent as any);
 
     // 6. Run assign slottables for a tree with node’s root.
     // assignSlottablesForTree(getRoot(node));
 
     // 7. For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order:
     // TODO
-    for (
-      let inclusiveDescendant of getInclusiveDescendants(node) as Iterable<Node>
-    ) {
+    for (const inclusiveDescendant of tree.inclusiveDescendants(node)) {
       // 1. Run the insertion steps with inclusiveDescendant.
-      node["insertionSteps"].run(inclusiveDescendant);
+      $(node).insertionSteps.run(inclusiveDescendant);
 
       // 2. If inclusiveDescendant is connected, then:
     }
@@ -283,7 +270,7 @@ export function ensurePreInsertionValidity(
   }
 
   // 3. If child is non-null and its parent is not parent, then throw a "NotFoundError" DOMException.
-  if (child !== null && child._parent !== parent) {
+  if (child !== null && tree.parent(child) !== parent) {
     throw new DOMException("<message>", DOMExceptionName.NotFoundError);
   }
 
@@ -303,10 +290,10 @@ export function ensurePreInsertionValidity(
   if (isDocument(parent)) {
     // DocumentFragment
     if (isDocumentFragment(node)) {
-      const elementsCount = filter(node._children, isElement).length;
+      const elementsCount = filter(tree.children(node), isElement).length;
 
       // If node has more than one element child or has a Text node child.
-      if (elementsCount > 1 || some(node._children, isText)) {
+      if (elementsCount > 1 || some(tree.children(node), isText)) {
         throw new DOMException(
           "<message>",
           DOMExceptionName.HierarchyRequestError,
@@ -316,9 +303,9 @@ export function ensurePreInsertionValidity(
       // Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
       if (
         elementsCount === 1 && (
-          some(parent._children, isElement) ||
+          some(tree.children(parent), isElement) ||
           (child && isDocumentType(child)) ||
-          (child && some(getFollows(child), isDocumentType))
+          (child && some(tree.follows(child), isDocumentType))
         )
       ) {
         throw new DOMException(
@@ -330,9 +317,9 @@ export function ensurePreInsertionValidity(
     } else if (isElement(node)) {
       // parent has an element child, child is a doctype, or child is non-null and a doctype is following child.
       if (
-        some(parent._children, isElement) ||
+        some(tree.children(parent), isElement) ||
         (child && isDocumentType(child)) ||
-        (child && some(getFollows(child), isDocumentType))
+        (child && some(tree.follows(child), isDocumentType))
       ) {
         throw new DOMException(
           "<message>",
@@ -343,9 +330,9 @@ export function ensurePreInsertionValidity(
     else if (isDocumentType(node)) {
       // parent has a doctype child, child is non-null and an element is preceding child, or child is null and parent has an element child.
       if (
-        some(parent._children, isDocumentType) ||
-        (child && some(getPrecedings(child), isElement)) ||
-        (!child && some(parent._children, isElement))
+        some(tree.children(parent), isDocumentType) ||
+        (child && some(tree.precedes(child), isElement)) ||
+        (!child && some(tree.children(parent), isElement))
       ) {
         throw new DOMException(
           "<message>",
@@ -371,7 +358,7 @@ export function preInsertNode(
   let referenceChild = child;
 
   // 3. If referenceChild is node, then set referenceChild to node’s next sibling.
-  if (referenceChild === node) referenceChild = getNextSibling(node);
+  if (referenceChild === node) referenceChild = tree.nextSibling(node);
 
   // 4. Insert node into parent before referenceChild.
   insertNode(node, parent, referenceChild);
@@ -388,20 +375,20 @@ export function replaceAllNode(
   parent: Node,
 ): void {
   // 1. Let removedNodes be parent’s children.
-  const removeNodes = parent._children;
+  const removeNodes = tree.children(parent);
 
   // 2. Let addedNodes be the empty set.
   const addNodes = !node
     ? new OrderedSet<Node>()
     // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
     : isDocumentFragment(node)
-    ? node._children.clone()
+    ? tree.children(node).clone()
     // 4. Otherwise, if node is non-null, set addedNodes to « node ».
     : new OrderedSet([node]);
 
   // 5. Remove all parent’s children, in tree order, with the suppress observers flag set.
   // removeNode delete parent's children, so not lazy.
-  for (const node of [...parent._children]) removeNode(node, true);
+  for (const node of [...tree.children(parent)]) removeNode(node, true);
 
   // 6. If node is non-null, then insert node into parent before null with the suppress observers flag set.
   if (node) insertNode(node, parent, null, true);
@@ -417,7 +404,7 @@ export function replaceAllNode(
  */
 export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
   // 1. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
-  if (child._parent !== parent) {
+  if (tree.parent(child) !== parent) {
     throw new DOMException("<message>", DOMExceptionName.NotFoundError);
   }
 
@@ -436,12 +423,12 @@ export function removeNode(
   suppressObservers: boolean | null = null,
 ) {
   // 1. Let parent be node’s parent.
-  const parent = node._parent;
+  const parent = tree.parent(node);
   // 2. Assert: parent is non-null.
   if (!parent) return;
 
   // 3. Let index be node’s index.
-  const index = getIndex(node);
+  const index = tree.index(node);
 
   // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).
 
@@ -454,15 +441,13 @@ export function removeNode(
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
 
   // 9. Let oldPreviousSibling be node’s previous sibling.
-  const oldPreviousSibling = getPreviousSibling(node);
+  const oldPreviousSibling = tree.previousSibling(node);
 
   // 10. Let oldNextSibling be node’s next sibling.
-  const oldNextSibling = getNextSibling(node);
+  const oldNextSibling = tree.nextSibling(node);
 
   // 11. Remove node from its parent’s children.
-  parent._children.remove((target) => target === node);
-  // sync parent
-  node._parent = null;
+  tree.children(parent).remove((child) => child === node);
 
   // 12. If node is assigned, then run assign slottables for node’s assigned slot.
 
@@ -487,20 +472,18 @@ export function removeNode(
   // 20. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
 
   // 21. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
-  for (
-    const inclusiveAncestor of getInclusiveAncestors(parent) as Iterable<Node>
-  ) {
-    const list = inclusiveAncestor["registeredObserverList"];
-    for (const registered of [...list]) {
-      if (registered.options.subtree) {
-        list.append({
-          observer: registered.observer,
-          options: registered.options,
-          source: registered,
-        });
-      }
-    }
-  }
+  // for (const inclusiveAncestor of tree.inclusiveAncestors(parent)) {
+  //   const list = $(inclusiveAncestor).registeredObserverList;
+  //   for (const registered of [...list]) {
+  //     if (registered.options.subtree) {
+  //       list.append({
+  //         observer: registered.observer,
+  //         options: registered.options,
+  //         source: registered,
+  //       });
+  //     }
+  //   }
+  // }
 
   // 22. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
   if (suppressObservers === null) {
@@ -532,16 +515,12 @@ export function adoptNode(node: Node, document: Document): void {
   const oldDocument = $(node).nodeDocument;
 
   // 2. If node’s parent is non-null, then remove node.
-  if (hasParent(node)) removeNode(node);
+  if (tree.parent(node)) removeNode(node);
 
   // 3. If document is not oldDocument, then:
   if (document !== oldDocument) {
     // 1. For each inclusiveDescendant in node’s shadow-including inclusive descendants:
-    for (
-      const inclusiveDescendant of getInclusiveDescendants(node) as Iterable<
-        Node
-      >
-    ) { // TODO(miyauci): shadow-including
+    for (const inclusiveDescendant of tree.inclusiveDescendants(node)) { // TODO(miyauci): shadow-including
       // 1. Set inclusiveDescendant’s node document to document.
       $(inclusiveDescendant).nodeDocument = document;
 

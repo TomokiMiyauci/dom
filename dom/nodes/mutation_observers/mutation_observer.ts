@@ -6,6 +6,7 @@ import { Queue } from "../../../infra/data_structures/queue.ts";
 import { ifilter } from "../../../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { RegisteredObserver } from "./queue.ts";
+import { $ } from "../../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-mutationobserver)
@@ -72,13 +73,13 @@ export class MutationObserver implements IMutationObserver {
     // 7. For each registered of target’s registered observer list, if registered’s observer is this:
     for (
       const registered of ifilter(
-        target["registeredObserverList"],
-        this.#isRegisteredObserverThis,
+        $(target).registeredObserverList,
+        this.#isRegisteredObserverThis.bind(this),
       )
     ) {
       // 1. For each node of this’s node list, remove all transient registered observers whose source is registered from node’s registered observer list.
       for (const node of [...this.nodeList]) {
-        const list = node["registeredObserverList"];
+        const list = $(node).registeredObserverList;
         list.remove((observer) => {
           return "source" in observer && observer.source === registered;
         });
@@ -89,9 +90,9 @@ export class MutationObserver implements IMutationObserver {
     }
 
     // 8. Otherwise:
-    if (target["registeredObserverList"].isEmpty) {
+    if ($(target).registeredObserverList.isEmpty) {
       // 1. Append a new registered observer whose observer is this and options is options to target’s registered observer list.
-      target["registeredObserverList"].append({ observer: this, options });
+      $(target).registeredObserverList.append({ observer: this, options });
 
       // 2. Append a weak reference to target to this’s node list.
       this.nodeList.append(target);
@@ -104,7 +105,7 @@ export class MutationObserver implements IMutationObserver {
   disconnect(): void {
     // 1. For each node of this’s node list, remove any registered observer from node’s registered observer list for which this is the observer.
     for (const node of this.nodeList) {
-      node["registeredObserverList"].remove(
+      $(node).registeredObserverList.remove(
         this.#isRegisteredObserverThis.bind(this),
       );
     }

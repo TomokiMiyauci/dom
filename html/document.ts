@@ -2,15 +2,13 @@
 import { Constructor, first } from "../deps.ts";
 import { find, ifilter } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
-import { type Node } from "../dom/nodes/node.ts";
 import { type Element } from "../dom/nodes/elements/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
-import { orderTreeChildren } from "../dom/infra/tree.ts";
 import { getChildTextContent } from "../dom/nodes/text.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $ } from "../internal.ts";
+import { $, tree } from "../internal.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -117,7 +115,7 @@ export function Document_HTML<T extends Constructor<Node>>(
         // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
         ? first(
           ifilter(
-            ifilter(documentElement._children, isElement),
+            ifilter(tree.children(documentElement), isElement),
             isSVGTitle,
           ),
         )
@@ -143,7 +141,7 @@ export function Document_HTML<T extends Constructor<Node>>(
 
     get body(): HTMLElement {
       // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
-      const documentElement = find(this._children, isElement) as
+      const documentElement = find(tree.children(this), isElement) as
         | Element
         | undefined;
 
@@ -152,7 +150,7 @@ export function Document_HTML<T extends Constructor<Node>>(
       if ($(documentElement).localName !== "html") return null as any;
 
       const bodyOrFrameSet =
-        find(documentElement._children, isBodyOrFrameset) ?? null;
+        find(tree.children(documentElement), isBodyOrFrameset) ?? null;
 
       return bodyOrFrameSet as any as HTMLElement;
     }
@@ -167,7 +165,7 @@ export function Document_HTML<T extends Constructor<Node>>(
      */
     get head(): HTMLHeadElement {
       // return the head element of the document (a head element or null).
-      const elements = ifilter(this._children, isElement);
+      const elements = ifilter(tree.children(this), isElement);
       const head = find(
         elements,
         (element) => $(element).localName === "html",
@@ -310,7 +308,7 @@ export interface Document_HTML extends IDocument_HTML, Document_Obsolete {}
 export function getTitleElement(node: Node): Element | null {
   // the first title element in the document (in tree order), if there is one, or null otherwise.
   return first(ifilter(
-    ifilter(orderTreeChildren(node._children), isElement),
+    ifilter(tree.descendants(node), isElement),
     (element) => $(element).localName === "title",
   )) ?? null;
 }

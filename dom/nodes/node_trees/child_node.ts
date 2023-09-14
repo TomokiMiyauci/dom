@@ -1,4 +1,3 @@
-import { type Node } from "../node.ts";
 import type { IChildNode } from "../../../interface.d.ts";
 import { type Constructor, find, isObject } from "../../../deps.ts";
 import {
@@ -6,15 +5,9 @@ import {
   removeNode,
   replaceChild,
 } from "../node_trees/mutation.ts";
-import {
-  getFirstChild,
-  getFollowingSiblings,
-  getNextSibling,
-  getPrecedingSiblings,
-} from "../../infra/tree.ts";
 import { convertNodesToNode } from "../node_trees/parent_node.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
-import { $ } from "../../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 
 export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class ChildNode extends Ctor implements ChildNode {
@@ -24,12 +17,12 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
     @convert
     after(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // 1. Let parent be this’s parent.
-      const parent = this._parent;
+      const parent = tree.parent(this);
 
       // 2. If parent is null, then return.
       if (!parent) return;
 
-      const followingSiblings = getFollowingSiblings(this);
+      const followingSiblings = tree.followSiblings(this);
       const set = new Set(nodes);
       const notHas = (node: Node): boolean => !set.has(node);
       // 3. Let viableNextSibling be this’s first following sibling not in nodes; otherwise null.
@@ -48,12 +41,12 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
     @convert
     before(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // 1. Let parent be this’s parent.
-      const parent = this._parent;
+      const parent = tree.parent(this);
 
       // 2. If parent is null, then return.
       if (!parent) return;
 
-      const precedingSiblings = getPrecedingSiblings(this);
+      const precedingSiblings = tree.precedeSiblings(this);
       const set = new Set(nodes);
       const notHas = (node: Node): boolean => !set.has(node);
 
@@ -64,9 +57,10 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 5. If viablePreviousSibling is null, then set it to parent’s first child;
-      if (!viablePreviousSibling) viablePreviousSibling = getFirstChild(parent);
-      // otherwise to viablePreviousSibling’s next sibling.
-      else viablePreviousSibling = getNextSibling(viablePreviousSibling);
+      if (!viablePreviousSibling) {
+        viablePreviousSibling = tree.firstChild(parent);
+      } // otherwise to viablePreviousSibling’s next sibling.
+      else viablePreviousSibling = tree.nextSibling(viablePreviousSibling);
 
       // 6. Pre-insert node into parent before viablePreviousSibling.
       preInsertNode(node, parent, viablePreviousSibling);
@@ -77,12 +71,12 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       @DOMString.exclude(isObject) ...nodes: (string | Node)[]
     ): void {
       // 1. Let parent be this’s parent.
-      const parent = this._parent;
+      const parent = tree.parent(this);
 
       // 2. If parent is null, then return.
       if (!parent) return;
 
-      const followingSiblings = getFollowingSiblings(this);
+      const followingSiblings = tree.followSiblings(this);
       const set = new Set(nodes);
       const notHas = (node: Node): boolean => !set.has(node);
       // 3. Let viableNextSibling be this’s first following sibling not in nodes; otherwise null.
@@ -92,7 +86,7 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
       const node = convertNodesToNode(nodes, $(this).nodeDocument);
 
       // 5. If this’s parent is parent, replace this with node within parent.
-      if (this._parent === parent) replaceChild(this, node, parent);
+      if (tree.parent(this) === parent) replaceChild(this, node, parent);
       // 6. Otherwise, pre-insert node into parent before viableNextSibling.
       else preInsertNode(node, parent, viableNextSibling);
     }
@@ -102,7 +96,7 @@ export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
      */
     remove(): void {
       // If this’s parent is null, then return.
-      if (!this._parent) return;
+      if (!tree.parent(this)) return;
 
       // Remove this.
       removeNode(this);

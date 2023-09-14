@@ -25,20 +25,6 @@ import {
   replaceChild,
 } from "./node_trees/mutation.ts";
 import { HTMLCollection } from "./node_trees/html_collection.ts";
-import {
-  getDescendants,
-  getFirstChild,
-  getFollowingSiblings,
-  getLastChild,
-  getNextSibling,
-  getPrecedingSiblings,
-  getPreviousSibling,
-  getRoot,
-  isAncestorOf,
-  isDescendantOf,
-  isInclusiveDescendantOf,
-  isPrecedeOf,
-} from "../infra/tree.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import {
   every,
@@ -50,14 +36,12 @@ import {
   some,
   takewhile,
 } from "../../deps.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
 import {
   concatString,
   matchASCIICaseInsensitive,
   toASCIILowerCase,
 } from "../../infra/string.ts";
 import { parseOrderSet } from "../infra/ordered_set.ts";
-import type { ParentNode } from "./node_trees/parent_node.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
 import { type Attr } from "./elements/attr.ts";
@@ -72,7 +56,7 @@ import {
 import { Child } from "./types.ts";
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
-import { $, internalSlots } from "../../internal.ts";
+import { $, internalSlots, tree } from "../../internal.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -180,14 +164,6 @@ export abstract class Node extends EventTarget implements INode {
     internalSlots.set(this, new NodeInternals(nodeDocument));
   }
 
-  _parent: (Node & ParentNode) | null = null;
-  _children: OrderedSet<Node & ChildNode> = new OrderedSet();
-
-  /** @see https://dom.spec.whatwg.org/#registered-observer-list */
-  private registeredObserverList: List<
-    RegisteredObserver | TransientRegisteredObserver
-  > = new List();
-
   get baseURI(): string {
     throw new UnImplemented("baseURI");
   }
@@ -205,29 +181,29 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-getrootnode
    */
-  getRootNode(options?: GetRootNodeOptions | undefined): Node {
+  getRootNode(options?: GetRootNodeOptions | undefined): globalThis.Node {
     // return this’s shadow-including root if options["composed"] is true; otherwise this’s root.
     if (options?.composed) {
       throw new Error("getRootNode is not supported composed");
     }
 
-    return getRoot(this);
+    return tree.root(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-parentnode
    */
-  get parentNode(): (Node & ParentNode) | null {
+  get parentNode(): globalThis.ParentNode | null {
     // return this’s parent.
-    return this._parent;
+    return tree.parent(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-haschildnodes
    */
   hasChildNodes(): boolean {
-    // return true if this has children; otherwise fals
-    return !this._children.isEmpty;
+    // return true if this has children; otherwise false
+    return !tree.children(this).isEmpty;
   }
 
   @SameObject
@@ -235,7 +211,7 @@ export abstract class Node extends EventTarget implements INode {
     return new NodeList({
       root: this,
       filter: (node, root): boolean => {
-        return (root._children as OrderedSet<Node>).contains(node);
+        return tree.children(root).contains(node as globalThis.ChildNode);
       },
     }) as any as NodeListOf<
       Node & ChildNode
@@ -245,40 +221,40 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-firstchild
    */
-  get firstChild(): (Node & ChildNode) | null {
+  get firstChild(): globalThis.ChildNode | null {
     // return this’s first child.
-    return getFirstChild(this);
+    return tree.firstChild(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-lastchild
    */
-  get lastChild(): (Node & ChildNode) | null {
+  get lastChild(): (globalThis.ChildNode) | null {
     // return this’s last child.
-    return getLastChild(this);
+    return tree.lastChild(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-previoussibling
    */
-  get previousSibling(): (Node & ChildNode) | null {
-    // TODO(miyauci): O(1)
-    return getPreviousSibling(this);
+  get previousSibling(): globalThis.ChildNode | null {
+    // return this’s previous sibling.
+    return tree.previousSibling(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nextsibling
    */
-  get nextSibling(): (Node & ChildNode) | null {
-    // TODO(miyauci): O(1)
-    return getNextSibling(this);
+  get nextSibling(): globalThis.ChildNode | null {
+    // return this’s next sibling.
+    return tree.nextSibling(this);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-normalize
    */
   normalize(): void {
-    const descendants = getDescendants(this) as Iterable<Node>;
+    const descendants = tree.descendants(this);
     const descendantExclusiveTextNodes = ifilter(descendants, isText);
 
     for (const node of [...descendantExclusiveTextNodes]) { // remove will occurs, use spread.
@@ -304,7 +280,7 @@ export abstract class Node extends EventTarget implements INode {
       replaceData(node, length, 0, data);
 
       // 5. Let currentNode be node’s next sibling.
-      let currentNode = getNextSibling(node);
+      let currentNode = tree.nextSibling(node);
 
       // 6. While currentNode is an exclusive Text node:
       while (currentNode && isText(currentNode)) {
@@ -320,7 +296,7 @@ export abstract class Node extends EventTarget implements INode {
         length = nodeLength(currentNode);
 
         // 6. Set currentNode to its next sibling.
-        currentNode = getNextSibling(currentNode);
+        currentNode = tree.nextSibling(currentNode);
       }
 
       // 7. Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order.
@@ -337,7 +313,7 @@ export abstract class Node extends EventTarget implements INode {
     if (isDocument(copy)) document = copy;
 
     if (deep) {
-      for (const child of this._children) {
+      for (const child of tree.children(this)) {
         appendNode(Node.prototype.cloneNode.call(child, deep), copy);
       }
     }
@@ -412,21 +388,23 @@ export abstract class Node extends EventTarget implements INode {
       }
     }
     // 6. If node1 or node2 is null, or node1’s root is not node2’s root, then return the result of adding DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC, and either DOCUMENT_POSITION_PRECEDING or DOCUMENT_POSITION_FOLLOWING, with the constraint that this is to be consistent, together.
-    if (!node1 || !node2 || getRoot(node1) !== getRoot(node2)) {
+    if (!node1 || !node2 || tree.root(node1) !== tree.root(node2)) {
       return Position.DOCUMENT_POSITION_DISCONNECTED +
         Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC +
         Position.DOCUMENT_POSITION_PRECEDING;
     }
 
     // 7. If node1 is an ancestor of node2 and attr1 is null, or node1 is node2 and attr2 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINS to DOCUMENT_POSITION_PRECEDING.
-    if ((isAncestorOf(node1, node2) && !attr1) || (node1 === node2 && !attr2)) {
+    if (
+      (tree.isAncestor(node1, node2) && !attr1) || (node1 === node2 && !attr2)
+    ) {
       return Position.DOCUMENT_POSITION_CONTAINS +
         Position.DOCUMENT_POSITION_PRECEDING;
     }
 
     // 8. If node1 is a descendant of node2 and attr2 is null, or node1 is node2 and attr1 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINED_BY to DOCUMENT_POSITION_FOLLOWING.
     if (
-      (isDescendantOf(node1, node2) && !attr2) ||
+      (tree.isDescendant(node1, node2) && !attr2) ||
       (node1 === node2 && attr1)
     ) {
       return Position.DOCUMENT_POSITION_CONTAINED_BY +
@@ -434,7 +412,9 @@ export abstract class Node extends EventTarget implements INode {
     }
 
     // 9. If node1 is preceding node2, then return DOCUMENT_POSITION_PRECEDING.
-    if (isPrecedeOf(node1, node2)) return Position.DOCUMENT_POSITION_PRECEDING;
+    if (tree.isPrecede(node1, node2)) {
+      return Position.DOCUMENT_POSITION_PRECEDING;
+    }
 
     // 10. Return DOCUMENT_POSITION_FOLLOWING.
     return Position.DOCUMENT_POSITION_FOLLOWING;
@@ -447,7 +427,7 @@ export abstract class Node extends EventTarget implements INode {
     if (!other) return false;
 
     // return true if other is an inclusive descendant of this; otherwise false (including when other is null).
-    return isInclusiveDescendantOf(other, this);
+    return tree.isInclusiveDescendant(other, this);
   }
 
   /**
@@ -493,12 +473,12 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-insertbefore
    */
-  insertBefore<T>(node: T & Node, child: Child | null): T {
+  insertBefore<T extends globalThis.Node>(node: T, child: Child | null): T {
     // return the result of pre-inserting node into this before child.
     return preInsertNode(node, this, child) as T;
   }
 
-  appendChild<T>(node: T & Node): T {
+  appendChild<T extends globalThis.Node>(node: T): T {
     return appendNode(node, this) as T;
   }
 
@@ -523,13 +503,8 @@ export abstract class Node extends EventTarget implements INode {
 
   [inspect](): string {
     return `${this.nodeName}
-  ${[...this._children].map((node) => this[inspect].call(node)).join("")}`;
+  ${[...tree.children(this)].map((node) => this[inspect].call(node)).join("")}`;
   }
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
-   */
-  protected insertionSteps: Steps<[insertedNode: this]> = new Steps();
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
@@ -573,12 +548,17 @@ export class NodeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
    */
-  insertionSteps: Steps<[insertedNode: this]> = new Steps();
+  insertionSteps: Steps<[insertedNode: globalThis.Node]> = new Steps();
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
    */
   childrenChangedSteps: Steps<[]> = new Steps();
+
+  /** @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-list) */
+  registeredObserverList: List<
+    RegisteredObserver | TransientRegisteredObserver
+  > = new List();
 
   constructor(nodeDocument: Document) {
     this.nodeDocument = nodeDocument;
@@ -708,7 +688,7 @@ export function getElementsByNamespaceAndLocalName(
  * @see https://dom.spec.whatwg.org/#parent-element
  */
 export function getParentElement(node: Node): Element | null {
-  const parent = node._parent;
+  const parent = tree.parent(node);
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
@@ -863,17 +843,17 @@ export function locateNamespace(
   }
 }
 
-export function equals(A: Node, B: Node): boolean {
+export function equals(A: globalThis.Node, B: globalThis.Node): boolean {
   // A and B implement the same interfaces.
   if (A.nodeType !== B.nodeType) return false;
 
   // A and B have the same number of children.
-  if (A._children.size !== B._children.size) return false;
+  if (tree.children(A).size !== tree.children(B).size) return false;
 
   // The following are equal, switching on the interface A implements:
   if (!equalsInternalSlot(A, B)) return false;
 
-  const pair = izip(A._children, B._children);
+  const pair = izip(tree.children(A), tree.children(B));
 
   // Each child of A equals the child of B at the identical index.
   return every(pair, ([left, right]) => equals(left, right));
@@ -890,7 +870,10 @@ export function equalsDocumentType(
     _.systemId === __.systemId;
 }
 
-export function equalsInternalSlot(left: Node, right: Node): boolean {
+export function equalsInternalSlot(
+  left: globalThis.Node,
+  right: globalThis.Node,
+): boolean {
   switch (left.nodeType) {
     case NodeType.DOCUMENT_TYPE_NODE:
       return equalsDocumentType(<DocumentType> left, <DocumentType> right);
@@ -957,12 +940,12 @@ export function equalsProcessingInstruction(
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
 function* contiguousTextNodesExclusive(node: Node): Iterable<Text> {
-  const preceding = getPrecedingSiblings(node) as Iterable<Node>;
+  const preceding = tree.precedeSiblings(node);
   const precedingTexts: Iterable<Text> = takewhile(
     preceding,
     isText,
   ) as Iterable<never>;
-  const following = getFollowingSiblings(node);
+  const following = tree.followSiblings(node);
   const followingTexts: Iterable<Text> = takewhile(
     following,
     isText,

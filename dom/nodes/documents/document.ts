@@ -54,7 +54,7 @@ import { TreeWalker } from "../../traversals/tree_walker.ts";
 import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
-import { $, internalSlots } from "../../../internal.ts";
+import { $, internalSlots, tree } from "../../../internal.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 
@@ -195,7 +195,7 @@ export class Document extends Node implements IDocument {
    */
   get doctype(): DocumentType | null {
     // return the child of this that is a doctype; otherwise null.
-    return (find(this._children, isDocumentType) ?? null) as
+    return (find(tree.children(this), isDocumentType) ?? null) as
       | DocumentType
       | null;
   }

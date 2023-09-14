@@ -204,7 +204,10 @@ export class AttrInternals extends NodeInternals {
 
   constructor(
     { namespace, nodeDocument, localName, value, element, namespacePrefix }:
-      & Omit<AttrInternals, "childrenChangedSteps" | "insertionSteps">
+      & Omit<
+        AttrInternals,
+        "childrenChangedSteps" | "insertionSteps" | "registeredObserverList"
+      >
       & Pick<NodeInternals, "nodeDocument">,
   ) {
     super(nodeDocument);

@@ -12,17 +12,10 @@ import { List } from "../../infra/data_structures/list.ts";
 import { insertNode } from "./node_trees/mutation.ts";
 import type { IText } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import {
-  getDescendants,
-  getFollowingSiblings,
-  getNextSibling,
-  getPrecedingSiblings,
-  orderTreeChildren,
-} from "../infra/tree.ts";
 import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { concatString } from "../../infra/string.ts";
-import { $ } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
 
 @Slottable
 export class Text extends CharacterData implements IText {
@@ -109,12 +102,12 @@ export function splitText(node: Text, offset: number): Text {
   });
 
   // 6 Let parent be node’s parent.
-  const parent = node._parent;
+  const parent = tree.parent(node);
 
   // 7 If parent is not null, then:
   if (isNotNull(parent)) {
     // 1 Insert new node into parent before node’s next sibling.
-    insertNode(newNode, parent, getNextSibling(node));
+    insertNode(newNode, parent, tree.nextSibling(node));
 
     // 2 For each live range whose start node is node and start offset is greater than offset, set its start node to new node and decrease its start offset by offset.
 
@@ -138,7 +131,7 @@ export function splitText(node: Text, offset: number): Text {
 export function getChildTextContent(node: Node): string {
   // concatenation of the data of all the Text node children of node, in tree order.
   return [...imap(
-    ifilter(orderTreeChildren(node._children), isText),
+    ifilter(tree.children(node), isText),
     (text) => $(text).data,
   )].join("");
 }
@@ -147,9 +140,9 @@ export function getChildTextContent(node: Node): string {
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
 export function* contiguousTextNodes(node: Text): Iterable<Text> {
-  const preceding = getPrecedingSiblings(node);
+  const preceding = tree.precedeSiblings(node);
   const precedingTexts = takewhile(preceding, isText) as Iterable<Text>;
-  const following = getFollowingSiblings(node);
+  const following = tree.followSiblings(node);
   const followingTexts = takewhile(following, isText) as Iterable<Text>;
 
   yield* [...precedingTexts].reverse();
@@ -161,7 +154,7 @@ export function* contiguousTextNodes(node: Text): Iterable<Text> {
  * @see https://dom.spec.whatwg.org/#concept-descendant-text-content
  */
 export function descendantTextContent(node: Node): string {
-  const descendants = getDescendants(node) as Iterable<Node>;
+  const descendants = tree.descendants(node);
   const textDescendants = ifilter(descendants, isText);
   const dataList = imap(textDescendants, (text) => $(text).data);
 

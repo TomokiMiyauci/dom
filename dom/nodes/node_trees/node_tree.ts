@@ -7,16 +7,14 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { getRoot } from "../../infra/tree.ts";
 import { type Attr } from "../elements/attr.ts";
 import { type Document } from "../documents/document.ts";
 import { type DocumentFragment } from "../document_fragment.ts";
 import { type DocumentType } from "../document_type.ts";
 import { type Element } from "../elements/element.ts";
 import { type Text } from "../text.ts";
-import { type Node } from "../node.ts";
 import { type CharacterData } from "../character_data.ts";
-import { $ } from "../../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -38,7 +36,7 @@ export function nodeLength(
   if (isCharacterData(node)) return $(node).data.length;
 
   // 3. Return the number of node’s children.
-  return node._children.size;
+  return tree.children(node).size;
 }
 
 type Slottable = Element | Text;
@@ -106,7 +104,7 @@ export function isConnected(node: Node): boolean {
  */
 export function getShadowIncludingRoot(node: Node): Node {
   // object is its root’s host’s shadow-including root, if the object’s root is a shadow root; otherwise its root.
-  const root = getRoot(node);
+  const root = tree.root(node);
 
   if (isShadowRoot(root)) {
     const host = root["_host"];
@@ -119,8 +117,8 @@ export function getShadowIncludingRoot(node: Node): Node {
 /** Return document element of document.
  * @see https://dom.spec.whatwg.org/#document-element
  */
-export function getDocumentElement<T extends Node>(tree: T): Element | null {
-  for (const node of tree._children) if (isElement(node)) return node;
+export function getDocumentElement<T extends Node>(node: T): Element | null {
+  for (const child of tree.children(node)) if (isElement(child)) return child;
 
   return null;
 }

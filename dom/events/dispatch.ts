@@ -5,10 +5,10 @@ import { retarget } from "../nodes/shadow_root_utils.ts";
 import { type ShadowRoot } from "../nodes/shadow_root.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
-import { getRoot, isTree } from "../infra/tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
 import { ifilter, last, lastItem, some } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
+import { tree } from "../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -89,7 +89,7 @@ export function dispatch(
         slottable = null;
 
         // 3. If parent’s root is a shadow root whose mode is "closed", then set slot-in-closed-tree to true.
-        const root = getRoot(parent as Node) as Node;
+        const root = tree.root(parent as Node);
         if (isShadowRoot(root) && root["_mode"] === "closed") {
           slotInClosedTree = true;
         }
@@ -160,8 +160,8 @@ export function dispatch(
           clearTargetsStruct.relatedTarget,
           ...clearTargetsStruct.touchTargetList,
         ], (potential) => {
-          return !!potential && isTree(potential) && isNodeLike(potential) &&
-            isShadowRoot(getRoot(potential));
+          return !!potential && isNodeLike(potential) &&
+            isShadowRoot(tree.root(potential as Node));
         })
       ) clearTargets = true;
     }
@@ -286,7 +286,7 @@ function resolveRoot(
 ): { isShadowRoot: false } | { isShadowRoot: true; root: ShadowRoot } {
   if (!isNodeLike(eventTarget)) return { isShadowRoot: false };
 
-  const root = getRoot(eventTarget as Node);
+  const root = tree.root(eventTarget as Node);
 
   if (isShadowRoot(root)) return { isShadowRoot: true, root };
 

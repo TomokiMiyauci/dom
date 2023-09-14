@@ -1,4 +1,3 @@
-import type { Node } from "../node.ts";
 import type { IMutationRecord } from "../../../interface.d.ts";
 import { Exposed } from "../../../webidl/extended_attribute.ts";
 

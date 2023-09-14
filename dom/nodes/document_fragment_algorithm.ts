@@ -4,19 +4,19 @@
  * @module
  */
 
-import { getRoot, isInclusiveAncestorOf, Tree } from "../infra/tree.ts";
+import { tree } from "../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor
  */
 export function isHostIncludingInclusiveAncestorOf(
-  target: Tree,
-  of: Tree,
+  target: Node,
+  of: Node,
 ): boolean {
-  if (isInclusiveAncestorOf(target, of)) return true;
+  if (tree.isInclusiveAncestor(target, of)) return true;
 
-  const root = getRoot(of);
+  const root = tree.root(of);
 
   return "_host" in root && root["_host"] !== null &&
-    isHostIncludingInclusiveAncestorOf(target, root["_host"] as Tree);
+    isHostIncludingInclusiveAncestorOf(target, root["_host"] as Node);
 }

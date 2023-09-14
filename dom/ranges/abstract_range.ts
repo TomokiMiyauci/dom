@@ -1,4 +1,3 @@
-import type { Node } from "../nodes/node.ts";
 import type { IAbstractRange } from "../../interface.d.ts";
 import { BoundaryPoint } from "./boundary_point.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";

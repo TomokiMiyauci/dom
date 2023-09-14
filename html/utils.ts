@@ -1,6 +1,4 @@
-import { Node } from "../dom/nodes/node.ts";
 import { Text } from "../dom/nodes/text.ts";
-import { type ChildNode } from "../dom/nodes/node_trees/child_node.ts";
 import { Attr } from "../dom/nodes/elements/attr.ts";
 import { isText } from "../dom/nodes/utils.ts";
 import { Comment } from "../dom/nodes/comment.ts";
@@ -17,7 +15,7 @@ type Child = Node & ChildNode;
 export type DOMTreeAdapterMap = TreeAdapterTypeMap<
   Node,
   ParentNode,
-  Child,
+  ChildNode,
   Document,
   DocumentFragment,
   Element,
@@ -151,7 +149,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     throw new Error("insertTextBefore");
   }
 
-  appendChild(parentNode: Element, newNode: Child): void {
+  appendChild(parentNode: Element, newNode: ChildNode): void {
     parentNode.appendChild(newNode);
   }
 
@@ -193,7 +191,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     return element.namespaceURI as html.NS;
   }
 
-  getFirstChild(node: Element): Child | null {
+  getFirstChild(node: Element): ChildNode | null {
     return node.firstChild;
   }
 

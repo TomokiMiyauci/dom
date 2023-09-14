@@ -2,7 +2,6 @@ import type { Element } from "../dom/nodes/elements/element.ts";
 import type { Node } from "../dom/nodes/node.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { parseHTMLFragment } from "../html/html_parser.ts";
-import { orderTreeChildren } from "../dom/infra/tree.ts";
 import { appendNode } from "../dom/nodes/node_trees/mutation.ts";
 import { isHTMLDocument } from "../dom/nodes/documents/document.ts";
 import { serialize } from "npm:parse5@7.1.2";
@@ -33,7 +32,7 @@ export function parseFragment(
   });
 
   // 4. Append each Node in new children to fragment (in tree order).
-  for (const node of orderTreeChildren(newChildren)) appendNode(node, fragment);
+  for (const node of newChildren) appendNode(node, fragment);
 
   // 5. Return the value of fragment.
   return fragment;

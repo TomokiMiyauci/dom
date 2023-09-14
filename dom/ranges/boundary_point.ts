@@ -1,10 +1,4 @@
-import type { Node } from "../nodes/node.ts";
-import {
-  getIndex,
-  isAncestorOf,
-  isChildOf,
-  isFollowOf,
-} from "../infra/tree.ts";
+import { tree } from "../../internal.ts";
 
 export enum Position {
   Before = "before",
@@ -42,7 +36,7 @@ export class BoundaryPoint {
     }
 
     // 3. If nodeA is following nodeB, then if the position of (nodeB, offsetB) relative to (nodeA, offsetA) is before, return after, and if it is after, return before.
-    if (isFollowOf(nodeA, nodeB)) {
+    if (tree.isFollow(nodeA, nodeB)) {
       const position = new BoundaryPoint({ node: nodeB, offset: offsetB })
         .positionOf(new BoundaryPoint({ node: nodeA, offset: offsetA }));
 
@@ -55,20 +49,20 @@ export class BoundaryPoint {
     }
 
     // 4. If nodeA is an ancestor of nodeB:
-    if (isAncestorOf(nodeA, nodeB)) {
+    if (tree.isAncestor(nodeA, nodeB)) {
       // 1. Let child be nodeB.
       let child = nodeB;
 
       // 2. While child is not a child of nodeA, set child to its parent.
-      while (!isChildOf(child, nodeA)) {
-        const parent = child._parent;
+      while (!tree.isChild(child, nodeA)) {
+        const parent = tree.parent(child);
         if (!parent) break;
 
         child = parent;
       }
 
       // 3. If child’s index is less than offsetA, then return after.
-      if (getIndex(child) < offsetA) return Position.After;
+      if (tree.index(child) < offsetA) return Position.After;
     }
 
     // 5. Return before.

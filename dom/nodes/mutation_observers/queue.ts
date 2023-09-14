@@ -1,10 +1,8 @@
-import type { Node } from "../node.ts";
 import { StaticNodeList } from "../node_trees/node_list.ts";
-import { getInclusiveAncestors } from "../../infra/tree.ts";
 import { MutationRecord } from "./mutation_record.ts";
-import type { Child } from "../types.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { MutationObserver } from "./mutation_observer.ts";
+import { $, tree } from "../../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
@@ -85,7 +83,7 @@ export function notifyMutationObservers(): void {
 
     // 3. For each node of mo’s node list, remove all transient registered observers whose observer is mo from node’s registered observer list.
     for (const node of [...mo["nodeList"]]) {
-      node["registeredObserverList"].remove((registered) => {
+      $(node).registeredObserverList.remove((registered) => {
         return "source" in registered && registered.observer === mo;
       });
     }
@@ -107,7 +105,7 @@ export function queueTreeMutationRecord(
   target: Node,
   addedNodes: OrderedSet<Node>,
   removedNodes: OrderedSet<Node>,
-  previousSibling: Child | null,
+  previousSibling: Node | null,
   nextSibling: Node | null,
 ): void {
   // 1. Assert: either addedNodes or removedNodes is not empty.
@@ -143,11 +141,11 @@ export function queueMutationRecord(
   const interestedObservers = new Map<MutationObserver, string | null>();
 
   // 2. Let nodes be the inclusive ancestors of target.
-  const nodes = getInclusiveAncestors(target) as Iterable<Node>;
+  const nodes = tree.inclusiveAncestors(target);
 
   // 3. For each node in nodes, and then for each registered of node’s registered observer list:
   for (const node of nodes) {
-    for (const registered of node["registeredObserverList"]) {
+    for (const registered of $(node).registeredObserverList) {
       // 1. Let options be registered’s options.
       const options = registered.options;
 

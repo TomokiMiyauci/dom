@@ -9,6 +9,7 @@ import { type ProcessingInstructionInternals } from "./dom/nodes/processing_inst
 import { type NodeInternals } from "./dom/nodes/node.ts";
 
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
+import { Tree } from "./dom/infra/tree.ts";
 
 export interface InternalSlots {
   set(key: HTMLTemplateElement, value: HTMLTemplateElementInternals): void;
@@ -56,3 +57,5 @@ export class InternalSlotsMap {
 export const internalSlots = new InternalSlotsMap() as InternalSlots;
 
 export const $ = internalSlots.get.bind(internalSlots);
+
+export const tree = new Tree<Node, ParentNode, ChildNode>();

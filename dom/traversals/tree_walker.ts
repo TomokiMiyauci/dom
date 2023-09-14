@@ -1,14 +1,8 @@
-import { Node } from "../nodes/node.ts";
 import type { ITreeWalker } from "../../interface.d.ts";
 import { filter } from "./traversal.ts";
 import { NodeFilter } from "./node_filter.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import {
-  getFirstChild,
-  getLastChild,
-  getNextSibling,
-  getPreviousSibling,
-} from "../infra/tree.ts";
+import { tree } from "../../internal.ts";
 
 @Exposed(Window)
 export class TreeWalker implements ITreeWalker {
@@ -63,7 +57,7 @@ export class TreeWalker implements ITreeWalker {
     // 2. While node is non-null and is not this’s root:
     while (node && node !== this._root) {
       // 1. Set node to node’s parent.
-      node = node._parent;
+      node = tree.parent(node);
 
       // 2. If node is non-null and filtering node within this returns FILTER_ACCEPT, then set this’s current to node and return node.
       if (node && filter(node, this) === NodeFilter.FILTER_ACCEPT) {
@@ -118,7 +112,7 @@ export class TreeWalker implements ITreeWalker {
     // 2. While node is not this’s root:
     while (node !== this._root) {
       // 1. Let sibling be node’s previous sibling.
-      let sibling = getPreviousSibling(node);
+      let sibling = tree.previousSibling(node);
 
       // 2. While sibling is non-null:
       while (sibling) {
@@ -129,9 +123,11 @@ export class TreeWalker implements ITreeWalker {
         let result = filter(node, this);
 
         // 3. While result is not FILTER_REJECT and node has a child:
-        while (result !== NodeFilter.FILTER_REJECT && !node._children.isEmpty) {
+        while (
+          result !== NodeFilter.FILTER_REJECT && !tree.children(node).isEmpty
+        ) {
           // 1. Set node to node’s last child.
-          node = getLastChild(node)!; // Assert child exists
+          node = tree.lastChild(node)!; // Assert child exists
 
           // 2. Set result to the result of filtering node within this.
           result = filter(node, this);
@@ -144,14 +140,15 @@ export class TreeWalker implements ITreeWalker {
         }
 
         // 5. Set sibling to node’s previous sibling.
-        sibling = getPreviousSibling(node);
+        sibling = tree.previousSibling(node);
       }
 
+      const parent = tree.parent(node);
       // 3. If node is this’s root or node’s parent is null, then return null.
-      if (node === this._root || !node._parent) return null;
+      if (node === this._root || !parent) return null;
 
       // 4. Set node to node’s parent.
-      node = node._parent;
+      node = parent;
 
       // 5. If the return value of filtering node within this is FILTER_ACCEPT, then set this’s current to node and return node.
       if (filter(node, this) === NodeFilter.FILTER_ACCEPT) {
@@ -177,9 +174,11 @@ export class TreeWalker implements ITreeWalker {
     // 3. While true:
     while (true) {
       // 1. While result is not FILTER_REJECT and node has a child:
-      while (result !== NodeFilter.FILTER_REJECT && !node._children.isEmpty) {
+      while (
+        result !== NodeFilter.FILTER_REJECT && !tree.children(node).isEmpty
+      ) {
         // 1. Set node to its first child.
-        node = getFirstChild(node)!; // Assert child exists
+        node = tree.firstChild(node)!; // Assert child exists
 
         // 2. Set result to the result of filtering node within this.
         result = filter(node, this);
@@ -203,7 +202,7 @@ export class TreeWalker implements ITreeWalker {
         if (temporary === this._root) return null;
 
         // 2. Set sibling to temporary’s next sibling.
-        sibling = getNextSibling(temporary);
+        sibling = tree.nextSibling(temporary);
 
         // 3. If sibling is non-null, then set node to sibling and break.
         if (sibling) {
@@ -212,7 +211,7 @@ export class TreeWalker implements ITreeWalker {
         }
 
         // 4. Set temporary to temporary’s parent.
-        temporary = temporary._parent;
+        temporary = tree.parent(temporary);
       }
 
       // 5. Set result to the result of filtering node within this.
@@ -251,7 +250,7 @@ export function traverseChildren(
   let node: Node | null = walker["_current"];
 
   // 2. Set node to node’s first child if type is first, and node’s last child if type is last.
-  node = type === "first" ? getFirstChild(node) : getLastChild(node);
+  node = type === "first" ? tree.firstChild(node) : tree.lastChild(node);
 
   // 3. While node is non-null:
   while (node) {
@@ -267,7 +266,9 @@ export function traverseChildren(
     // 3. If result is FILTER_SKIP, then:
     if (result === NodeFilter.FILTER_SKIP) {
       // 1. Let child be node’s first child if type is first, and node’s last child if type is last.
-      const child = type === "first" ? getFirstChild(node) : getLastChild(node);
+      const child = type === "first"
+        ? tree.firstChild(node)
+        : tree.lastChild(node);
 
       // 2. If child is non-null, then set node to child and continue.
       if (child) {
@@ -280,8 +281,8 @@ export function traverseChildren(
     while (node) {
       // 1. Let sibling be node’s next sibling if type is first, and node’s previous sibling if type is last.
       const sibling = type === "first"
-        ? getNextSibling(node)
-        : getPreviousSibling(node);
+        ? tree.nextSibling(node)
+        : tree.previousSibling(node);
 
       // 2. If sibling is non-null, then set node to sibling and break.
       if (sibling) {
@@ -290,7 +291,7 @@ export function traverseChildren(
       }
 
       // 3. Let parent be node’s parent.
-      const parent: Node | null = node._parent;
+      const parent = tree.parent(node);
 
       // 4. If parent is null, walker’s root, or walker’s current, then return null.
       if (
@@ -325,8 +326,8 @@ export function traverseSiblings(
   while (true) {
     // 1. Let sibling be node’s next sibling if type is next, and node’s previous sibling if type is previous.
     let sibling = type === "next"
-      ? getNextSibling(node)
-      : getPreviousSibling(node);
+      ? tree.nextSibling(node)
+      : tree.previousSibling(node);
 
     // 2. While sibling is non-null:
     while (sibling) {
@@ -343,18 +344,18 @@ export function traverseSiblings(
       }
 
       // 4. Set sibling to node’s first child if type is next, and node’s last child if type is previous.
-      sibling = type === "next" ? getFirstChild(node) : getLastChild(node);
+      sibling = type === "next" ? tree.firstChild(node) : tree.lastChild(node);
 
       // 5. If result is FILTER_REJECT or sibling is null, then set sibling to node’s next sibling if type is next, and node’s previous sibling if type is previous.
       if (result === NodeFilter.FILTER_REJECT || !sibling) {
         sibling = type === "next"
-          ? getNextSibling(node)
-          : getPreviousSibling(node);
+          ? tree.nextSibling(node)
+          : tree.previousSibling(node);
       }
     }
 
     // 3. Set node to node’s parent.
-    node = node._parent!;
+    node = tree.parent(node)!;
 
     // 4. If node is null or walker’s root, then return null.
     if (!node || node === walker["_root"]) return null;

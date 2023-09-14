@@ -1,16 +1,8 @@
-import type { Node } from "../nodes/node.ts";
 import type { CharacterData } from "../nodes/character_data.ts";
 import type { Document } from "../nodes/documents/document.ts";
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
-import {
-  getFollow,
-  getIndex,
-  getNextSibling,
-  getRoot,
-  isInclusiveAncestorOf,
-} from "../infra/tree.ts";
 import { AbstractRange } from "./abstract_range.ts";
 import { BoundaryPoint, Position } from "./boundary_point.ts";
 import {
@@ -40,7 +32,7 @@ import { convert, unsignedLong, unsignedShort } from "../../webidl/types.ts";
 import { splitText } from "../nodes/text.ts";
 import { Range_CSSOM } from "../../cssom/range.ts";
 import { Range_DOMParsing } from "../../domparsing/range.ts";
-import { $ } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
@@ -72,8 +64,8 @@ export class Range extends AbstractRange implements IRange {
     const endNode = this._endNode;
 
     // 2. While container is not an inclusive ancestor of end node, let container be container’s parent.
-    while (!isInclusiveAncestorOf(container, endNode)) {
-      const parent = container._parent;
+    while (!tree.isInclusiveAncestor(container, endNode)) {
+      const parent = tree.parent(container);
 
       if (!parent) break;
 
@@ -105,7 +97,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setStartBefore(node: Node): void {
     // 1. Let parent be node’s parent.
-    const parent = node._parent;
+    const parent = tree.parent(node);
 
     // 2. If parent is null, then throw an "InvalidNodeTypeError" DOMException.
     if (!parent) {
@@ -119,7 +111,7 @@ export class Range extends AbstractRange implements IRange {
     this.#setStartOrEnd(
       "start",
       this,
-      new BoundaryPoint({ node: parent, offset: getIndex(node) }),
+      new BoundaryPoint({ node: parent, offset: tree.index(node) }),
     );
   }
 
@@ -128,7 +120,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setStartAfter(node: Node): void {
     // 1. Let parent be node’s parent.
-    const parent = node._parent;
+    const parent = tree.parent(node);
 
     // 2. If parent is null, then throw an "InvalidNodeTypeError" DOMException.
     if (!parent) {
@@ -142,7 +134,7 @@ export class Range extends AbstractRange implements IRange {
     this.#setStartOrEnd(
       "start",
       this,
-      new BoundaryPoint({ node: parent, offset: getIndex(node) + 1 }),
+      new BoundaryPoint({ node: parent, offset: tree.index(node) + 1 }),
     );
   }
 
@@ -151,7 +143,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setEndBefore(node: Node): void {
     // 1. Let parent be node’s parent.
-    const parent = node._parent;
+    const parent = tree.parent(node);
 
     // 2. If parent is null, then throw an "InvalidNodeTypeError" DOMException.
     if (!parent) {
@@ -165,7 +157,7 @@ export class Range extends AbstractRange implements IRange {
     this.#setStartOrEnd(
       "end",
       this,
-      new BoundaryPoint({ node: parent, offset: getIndex(node) }),
+      new BoundaryPoint({ node: parent, offset: tree.index(node) }),
     );
   }
 
@@ -174,7 +166,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setEndAfter(node: Node): void {
     // 1. Let parent be node’s parent.
-    const parent = node._parent;
+    const parent = tree.parent(node);
 
     // 2. If parent is null, then throw an "InvalidNodeTypeError" DOMException.
     if (!parent) {
@@ -188,7 +180,7 @@ export class Range extends AbstractRange implements IRange {
     this.#setStartOrEnd(
       "end",
       this,
-      new BoundaryPoint({ node: parent, offset: getIndex(node) + 1 }),
+      new BoundaryPoint({ node: parent, offset: tree.index(node) + 1 }),
     );
   }
 
@@ -337,7 +329,7 @@ export class Range extends AbstractRange implements IRange {
   @convert
   isPointInRange(node: Node, @unsignedLong offset: number): boolean {
     // 1. If node’s root is different from this’s root, return false.
-    if (getRoot(node) !== this.#root) return false;
+    if (tree.root(node) !== this.#root) return false;
 
     // 2. If node is a doctype, then throw an "InvalidNodeTypeError" DOMException.
     if (isDocumentType(node)) {
@@ -369,7 +361,7 @@ export class Range extends AbstractRange implements IRange {
   @convert
   comparePoint(node: Node, @unsignedLong offset: number): number {
     // 1. If node’s root is different from this’s root, then throw a "WrongDocumentError" DOMException.
-    if (getRoot(node) !== this.#root) {
+    if (tree.root(node) !== this.#root) {
       throw new DOMException("<message>", DOMExceptionName.WrongDocumentError);
     }
 
@@ -403,16 +395,16 @@ export class Range extends AbstractRange implements IRange {
    */
   intersectsNode(node: Node): boolean {
     // 1. If node’s root is different from this’s root, return false.
-    if (getRoot(node) !== this.#root) return false;
+    if (tree.root(node) !== this.#root) return false;
 
     // 2. Let parent be node’s parent.
-    const parent = node._parent;
+    const parent = tree.parent(node);
 
     // 3. If parent is null, return true.
     if (!parent) return true;
 
     // 4. Let offset be node’s index.
-    const offset = getIndex(node);
+    const offset = tree.index(node);
     const startBp = new BoundaryPoint({ node: parent, offset });
     const endBp = new BoundaryPoint({ node: parent, offset: offset + 1 });
 
@@ -463,7 +455,7 @@ export class Range extends AbstractRange implements IRange {
         s += currentNode.data;
       }
 
-      currentNode = getFollow(currentNode) as Node | null;
+      currentNode = tree.follow(currentNode);
     }
 
     // 5. If this’s end node is a Text node, then append the substring of that node’s data from its start until this’s end offset to s.
@@ -506,7 +498,7 @@ export class Range extends AbstractRange implements IRange {
       case "start": {
         // If range’s root is not equal to node’s root, or if bp is after the range’s end, set range’s end to bp.
         if (
-          range.#root !== getRoot(node) ||
+          range.#root !== tree.root(node) ||
           bp.positionOf(range.end) === Position.After
         ) range.end = bp;
 
@@ -519,7 +511,7 @@ export class Range extends AbstractRange implements IRange {
       case "end": {
         // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start, set range’s start to bp.
         if (
-          range.#root !== getRoot(node) ||
+          range.#root !== tree.root(node) ||
           bp.positionOf(range.start) === Position.Before
         ) range.start = bp;
 
@@ -534,11 +526,11 @@ export class Range extends AbstractRange implements IRange {
    */
   get #root(): Node {
     // the root of its start node.
-    return getRoot(this._startNode);
+    return tree.root(this._startNode);
   }
 
   #contained(node: Node, range: Range): boolean {
-    return getRoot(node) === range.#root &&
+    return tree.root(node) === range.#root &&
       new BoundaryPoint({ node, offset: 0 }).positionOf(range.start) ===
         Position.After &&
       new BoundaryPoint({ node, offset: nodeLength(node) }).positionOf(
@@ -548,13 +540,13 @@ export class Range extends AbstractRange implements IRange {
 }
 
 function nextNodeDescendant(node: Node | null): Node | null {
-  while (node && getNextSibling(node)) {
-    node = node._parent;
+  while (node && tree.nextSibling(node)) {
+    node = tree.parent(node);
   }
 
   if (!node) return null;
 
-  return getNextSibling(node);
+  return tree.nextSibling(node);
 }
 
 export interface Range
@@ -606,8 +598,8 @@ function cloneContents(range: Range): DocumentFragment {
   let commonAncestor = originalStartNode;
 
   // 6. While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent.
-  while (!isInclusiveAncestorOf(commonAncestor, originalEndNode)) {
-    const parent = commonAncestor._parent;
+  while (!tree.isInclusiveAncestor(commonAncestor, originalEndNode)) {
+    const parent = tree.parent(commonAncestor);
     if (!parent) break;
 
     commonAncestor = parent;
@@ -617,7 +609,7 @@ function cloneContents(range: Range): DocumentFragment {
   let firstPartiallyContainedChild = null;
 
   // 8. If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range.
-  if (!isInclusiveAncestorOf(originalStartNode, originalEndNode)) {
+  if (!tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
     firstPartiallyContainedChild;
   }
 
@@ -726,8 +718,8 @@ function extract(range: Range): DocumentFragment {
   let commonAncestor = originalStartNode;
 
   // 6. While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent.
-  while (isInclusiveAncestorOf(commonAncestor, originalEndNode)) {
-    const parent = commonAncestor._parent;
+  while (tree.isInclusiveAncestor(commonAncestor, originalEndNode)) {
+    const parent = tree.parent(commonAncestor);
 
     if (!parent) break;
 
@@ -738,7 +730,7 @@ function extract(range: Range): DocumentFragment {
   let firstPartiallyContainedChild = null;
 
   // 8. If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range.
-  if (isInclusiveAncestorOf(originalStartNode, originalEndNode)) {}
+  if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {}
 
   // 9. Let last partially contained child be null.
   let lastPartiallyContainedChild = null;
@@ -802,7 +794,7 @@ function insert(node: Node, range: Range): void {
   // 1. If range’s start node is a ProcessingInstruction or Comment node, is a Text node whose parent is null, or is node, then throw a "HierarchyRequestError" DOMException.
   if (
     isProcessingInstruction(startNode) || isComment(startNode) ||
-    (isText(startNode) && !startNode._parent) ||
+    (isText(startNode) && !tree.parent(startNode)) ||
     startNode === node
   ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
@@ -812,10 +804,11 @@ function insert(node: Node, range: Range): void {
   // 3. If range’s start node is a Text node, set referenceNode to that Text node.
   if (isText(startNode)) referenceNode = startNode;
   // 4. Otherwise, set referenceNode to the child of start node whose index is start offset, and null if there is no such child.
-  else referenceNode = startNode._children[range["_startOffset"]] ?? null;
+  else {referenceNode = tree.children(startNode)[range["_startOffset"]] ??
+      null;}
 
   // 5. Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise.
-  const parent = !referenceNode ? startNode : referenceNode._parent;
+  const parent = !referenceNode ? startNode : tree.parent(referenceNode);
 
   if (!parent) return;
 
@@ -828,13 +821,15 @@ function insert(node: Node, range: Range): void {
   }
 
   // 8. If node is referenceNode, set referenceNode to its next sibling.
-  if (node === referenceNode) referenceNode = getNextSibling(node);
+  if (node === referenceNode) referenceNode = tree.nextSibling(node);
 
   // 9. If node’s parent is non-null, then remove node.
-  if (node._parent) removeNode(node);
+  if (tree.parent(node)) removeNode(node);
 
   // 10. Let newOffset be parent’s length if referenceNode is null; otherwise referenceNode’s index.
-  let newOffset = !referenceNode ? nodeLength(parent) : getIndex(referenceNode);
+  let newOffset = !referenceNode
+    ? nodeLength(parent)
+    : tree.index(referenceNode);
 
   // 11. Increase newOffset by node’s length if node is a DocumentFragment node; otherwise 1.
   newOffset += isDocumentFragment(node) ? nodeLength(node) : 1;
@@ -853,7 +848,7 @@ function insert(node: Node, range: Range): void {
  */
 function select(node: Node, range: Range): void {
   // 1. Let parent be node’s parent.
-  const parent = node._parent;
+  const parent = tree.parent(node);
 
   // 2. If parent is null, then throw an "InvalidNodeTypeError" DOMException.
   if (!parent) {
@@ -864,7 +859,7 @@ function select(node: Node, range: Range): void {
   }
 
   // 3. Let index be node’s index.
-  const index = getIndex(node);
+  const index = tree.index(node);
 
   // 4. Set range’s start to boundary point (parent, index).
   range["start"] = new BoundaryPoint({ node: parent, offset: index });

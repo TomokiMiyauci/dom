@@ -1,10 +1,16 @@
 import { ListCore } from "./common.ts";
-import { assert, assertEquals, describe, it, assertFalse } from "../../_dev_deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  describe,
+  it,
+} from "../../_dev_deps.ts";
 import { isOdd } from "https://deno.land/x/isx@1.5.0/number/is_odd.ts";
 
-class List<T> extends ListCore<T> {
-  protected override create(): this {
-    return Object.assign(new List());
+class List<T> extends ListCore<T, List<T>> {
+  protected override create(): List<T> {
+    return new List();
   }
 }
 

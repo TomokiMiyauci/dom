@@ -1,12 +1,7 @@
 import { type INonDocumentTypeChildNode } from "../../../interface.d.ts";
 import { isElement } from "../utils.ts";
-import type { Element } from "../elements/element.ts";
 import { type Constructor, find, first, ifilter } from "../../../deps.ts";
-import { type Node } from "../node.ts";
-import {
-  getFollowingSiblings,
-  getPrecedingSiblings,
-} from "../../infra/tree.ts";
+import { tree } from "../../../internal.ts";
 
 export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
   abstract class NonDocumentTypeChildNode extends Ctor
@@ -16,7 +11,7 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
      */
     get previousElementSibling(): Element | null {
       // return the first preceding sibling that is an element; otherwise null.
-      const precedeSiblings = getPrecedingSiblings(this);
+      const precedeSiblings = tree.precedeSiblings(this);
       const precedeElementSiblings = ifilter(precedeSiblings, isElement);
 
       return first(precedeElementSiblings) ?? null;
@@ -27,9 +22,9 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
      */
     get nextElementSibling(): Element | null {
       // return the first following sibling that is an element; otherwise null.
-      const followingSiblings = getFollowingSiblings(this);
+      const followingSiblings = tree.followSiblings(this);
 
-      return (find(followingSiblings, isElement) as Element) ?? null;
+      return ((find(followingSiblings, isElement)) ?? null) as Element | null;
     }
   }
 
