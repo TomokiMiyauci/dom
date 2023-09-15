@@ -3,7 +3,7 @@ import type { IMutationObserver } from "../../../interface.d.ts";
 import { Exposed } from "../../../webidl/extended_attribute.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 import { Queue } from "../../../infra/data_structures/queue.ts";
-import { ifilter } from "../../../deps.ts";
+import { iter } from "../../../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { RegisteredObserver } from "./queue.ts";
 import { $ } from "../../../internal.ts";
@@ -70,10 +70,10 @@ export class MutationObserver implements IMutationObserver {
       throw new TypeError("<message>");
     }
 
+    const { registeredObserverList } = $(target);
     // 7. For each registered of target’s registered observer list, if registered’s observer is this:
     for (
-      const registered of ifilter(
-        $(target).registeredObserverList,
+      const registered of iter(registeredObserverList).filter(
         this.#isRegisteredObserverThis.bind(this),
       )
     ) {

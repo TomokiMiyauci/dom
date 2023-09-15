@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-empty-interface
-import { Constructor, first } from "../deps.ts";
-import { find, ifilter } from "../deps.ts";
+import { Constructor, iter } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
@@ -112,12 +111,9 @@ export function Document_HTML<T extends Constructor<Node>>(
 
       const maybeTitle = $(documentElement).localName === "svg"
         // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
-        ? first(
-          ifilter(
-            ifilter(tree.children(documentElement), isElement),
-            isSVGTitle,
-          ),
-        )
+        ? iter(tree.children(documentElement))
+          .filter(isElement)
+          .find(isSVGTitle)
         // 2. Otherwise, let value be the child text content of the title element, or the empty string if the title element is null.
         : getTitleElement(this);
       const value = maybeTitle ? getChildTextContent(maybeTitle) : "";
@@ -139,19 +135,19 @@ export function Document_HTML<T extends Constructor<Node>>(
     }
 
     get body(): HTMLElement {
+      const children = tree.children(this);
       // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
-      const documentElement = find(tree.children(this), isElement) as
-        | globalThis.Element
-        | undefined;
+      const documentElement = iter(children).find(isElement);
 
       if (!documentElement) return null as any;
 
       if ($(documentElement).localName !== "html") return null as any;
 
-      const bodyOrFrameSet =
-        find(tree.children(documentElement), isBodyOrFrameset) ?? null;
+      const documentElementChildren = tree.children(documentElement);
+      const bodyOrFrameSet = iter(documentElementChildren)
+        .find(isBodyOrFrameset);
 
-      return bodyOrFrameSet as any as HTMLElement;
+      return (bodyOrFrameSet ?? null) as any as HTMLElement;
     }
 
     set body(value: HTMLElement) {
@@ -163,14 +159,14 @@ export function Document_HTML<T extends Constructor<Node>>(
      * @note The specification also allows null to be returned.
      */
     get head(): HTMLHeadElement {
+      const children = tree.children(this);
       // return the head element of the document (a head element or null).
-      const elements = ifilter(tree.children(this), isElement);
-      const head = find(
-        elements,
-        (element) => $(element).localName === "html",
-      );
+      const head =
+        iter(children).filter(isElement).find((element) =>
+          $(element).localName === "html"
+        ) ?? null;
 
-      return (head ?? null) as any as HTMLHeadElement;
+      return head as HTMLHeadElement;
     }
 
     get images(): HTMLCollectionOf<HTMLImageElement> {
@@ -303,11 +299,12 @@ export interface Document_HTML extends IDocument_HTML, Document_Obsolete {}
  * @see https://html.spec.whatwg.org/multipage/dom.html#the-title-element-2
  */
 export function getTitleElement(node: Node): Element | null {
+  const descendant = tree.descendants(node);
   // the first title element in the document (in tree order), if there is one, or null otherwise.
-  return first(ifilter(
-    ifilter(tree.descendants(node), isElement),
-    (element) => $(element).localName === "title",
-  )) ?? null;
+  return iter(descendant)
+    .filter(isElement)
+    .find((element) => $(element).localName === "title") ??
+    null;
 }
 
 function isSVGTitle(element: Element): boolean {

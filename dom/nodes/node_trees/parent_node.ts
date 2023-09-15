@@ -7,13 +7,11 @@ import { matchScopedSelectorsString } from "../../infra/selector.ts";
 import { HTMLCollection } from "./html_collection.ts";
 import {
   Constructor,
-  first,
-  ifilter,
   isObject,
   isSingle,
+  iter,
   last,
   len,
-  map,
 } from "../../../deps.ts";
 import {
   appendNode,
@@ -32,8 +30,9 @@ export function ParentNode<T extends Constructor<Node>>(
      * @see https://dom.spec.whatwg.org/#dom-parentnode-childelementcount
      */
     get childElementCount(): number {
+      const children = tree.children(this);
       // return the number of children of this that are elements.
-      return len(ifilter(tree.children(this), isElement));
+      return len(iter(children).filter(isElement));
     }
 
     get children(): HTMLCollection {
@@ -49,16 +48,19 @@ export function ParentNode<T extends Constructor<Node>>(
      * @see https://dom.spec.whatwg.org/#dom-parentnode-firstelementchild
      */
     get firstElementChild(): Element | null {
+      const children = tree.children(this);
       // return the first child that is an element; otherwise null.
-      return first(ifilter(tree.children(this), isElement)) ?? null;
+      return iter(children).find(isElement) ?? null;
     }
 
     /**
      * @see https://dom.spec.whatwg.org/#dom-parentnode-lastelementchild
      */
     get lastElementChild(): Element | null {
+      const children = tree.children(this);
       // return the last child that is an element; otherwise null.
-      return last(ifilter(tree.children(this), isElement)) ?? null;
+
+      return last(iter(children).filter(isElement)) ?? null;
     }
 
     /**
@@ -165,13 +167,13 @@ export function convertNodesToNode(
   document: Document,
 ): Node {
   // 2. Replace each string in nodes with a new Text node whose data is the string and node document is document.
-  const replaced = map(nodes, (node) => {
+  const replaced = iter(nodes).map((node) => {
     if (typeof node === "string") {
       return Text["create"]({ data: node, nodeDocument: document });
     }
 
     return node;
-  });
+  }).toArray();
 
   // 3. If nodes contains one node, then set node to nodes[0].
   if (isSingle(replaced)) return replaced[0];

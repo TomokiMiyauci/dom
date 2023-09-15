@@ -1,4 +1,4 @@
-import { at, ifilter, len, range } from "../../../deps.ts";
+import { at, iter, len, range } from "../../../deps.ts";
 import { INodeList } from "../../../interface.d.ts";
 import { Iterable, iterable } from "../../../webidl/iterable.ts";
 import { LegacyPlatformObject } from "../../../webidl/legacy_extended_attributes.ts";
@@ -52,9 +52,10 @@ export class NodeList extends CollectiveNodeList implements INodeList {
   }
 
   protected override represent(): globalThis.Iterable<Node> {
-    return ifilter(
-      tree.inclusiveDescendants(this[$root]),
-      (node) => this[$filter](node, this[$root]),
+    const inclusiveDescendants = tree.inclusiveDescendants(this[$root]);
+
+    return iter(inclusiveDescendants).filter((node) =>
+      this[$filter](node, this[$root])
     );
   }
 }

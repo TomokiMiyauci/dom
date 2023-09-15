@@ -4,7 +4,7 @@ import { retarget } from "../nodes/shadow_root_utils.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
-import { ifilter, last, lastItem, some } from "../../deps.ts";
+import { iter, last, lastItem } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
 import { $, tree } from "../../internal.ts";
 
@@ -143,21 +143,22 @@ export function dispatch(
       slotInClosedTree = false;
     }
 
-    const filtered = ifilter(
-      $(event).path,
-      (struct) => !!struct.shadowAdjustedTarget,
+    const path = $(event).path;
+    const filtered = iter(path).filter(({ shadowAdjustedTarget }) =>
+      !!shadowAdjustedTarget
     );
+
     // 10. Let clearTargetsStruct be the last struct in event’s path whose shadow-adjusted target is non-null.
     const clearTargetsStruct = last(filtered);
 
     if (clearTargetsStruct) {
       // 11. Let clearTargets be true if clearTargetsStruct’s shadow-adjusted target, clearTargetsStruct’s relatedTarget, or an EventTarget object in clearTargetsStruct’s touch target list is a node and its root is a shadow root; otherwise false.
       if (
-        some([
+        [
           clearTargetsStruct.shadowAdjustedTarget,
           clearTargetsStruct.relatedTarget,
           ...clearTargetsStruct.touchTargetList,
-        ], (potential) => {
+        ].some((potential) => {
           return !!potential && isNodeLike(potential) &&
             isShadowRoot(tree.root(potential as Node));
         })
@@ -395,7 +396,7 @@ export function innerInvoke(
   let found = false;
 
   // 2. For each listener in listeners, whose removed is false:
-  for (const listener of ifilter(listeners, (item) => !item.removed)) {
+  for (const listener of iter(listeners).filter(({ removed }) => !removed)) {
     // 1. If event’s type attribute value is not listener’s type, then continue.
     if (event.type !== listener.type) continue;
 

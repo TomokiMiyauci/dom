@@ -21,16 +21,7 @@ import {
 } from "./node_trees/mutation.ts";
 import { HTMLCollection } from "./node_trees/html_collection.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import {
-  every,
-  find,
-  html,
-  ifilter,
-  imap,
-  izip,
-  some,
-  takewhile,
-} from "../../deps.ts";
+import { html, ifilter, iter, izip, takewhile } from "../../deps.ts";
 import {
   concatString,
   matchASCIICaseInsensitive,
@@ -49,6 +40,8 @@ import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { Get } from "../../utils.ts";
+import { it } from "https://deno.land/std@0.198.0/testing/bdd.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -266,9 +259,8 @@ export abstract class Node extends EventTarget implements INode {
       }
 
       const contiguousExclusiveTextNodes = contiguousTextNodesExclusive(node);
-      const dataList = imap(
-        contiguousExclusiveTextNodes,
-        (text) => $(text).data,
+      const dataList = iter(contiguousExclusiveTextNodes).map((v) => $(v)).map(
+        Get.data,
       );
 
       // 3. Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order.
@@ -620,7 +612,7 @@ export function getElementsByClassName(
     filter: (node) => {
       if (node === root) return false;
 
-      return every(classes, (left) => {
+      return iter(classes).every((left) => {
         for (const right of node.classList) if (match(left, right)) return true;
 
         return false;
@@ -730,12 +722,11 @@ export function locateNamespacePrefix(
     $(element).namespace === namespace && $(element).namespacePrefix !== null
   ) return $(element).namespacePrefix;
 
+  const { attributeList } = $(element);
   // 2. If element has an attribute whose namespace prefix is "xmlns" and value is namespace, then return element’s first such attribute’s local name.
-  const attribute = find(
-    $(element).attributeList,
-    (attr) =>
-      $(attr).namespacePrefix === Namespace.XMLNS &&
-      $(attr).value === namespace,
+  const attribute = iter(attributeList).find((attr) =>
+    $(attr).namespacePrefix === Namespace.XMLNS &&
+    $(attr).value === namespace
   );
 
   if (attribute) return $(attribute).localName;
@@ -776,26 +767,19 @@ export function locateNamespace(
       const attrList = $(element).attributeList;
 
       // 4. If it has an attribute whose namespace is the XMLNS namespace, namespace prefix is "xmlns", and local name is prefix,
-      const hasAttr = find(
-        attrList,
-        (attr) => {
+      const hasAttr = iter(attrList)
+        .find((attr) => {
           const { namespace, namespacePrefix, localName } = $(attr);
 
           return namespace === Namespace.XMLNS &&
             namespacePrefix === "xmlns" &&
             localName === prefix;
-        },
-      );
+        });
+
       // or if prefix is null and it has an attribute whose namespace is the XMLNS namespace, namespace prefix is null, and local name is "xmlns",
       const attribute = hasAttr ??
         (prefix === null
-          ? find(attrList, (attr) => {
-            const { namespace, namespacePrefix, localName } = $(attr);
-
-            return namespace === Namespace.XMLNS &&
-              namespacePrefix === null &&
-              localName === "xmlns";
-          })
+          ? iter(attrList).find((attr) => isXMLNamespace($(attr)))
           : null);
 
       // then return its value if it is not the empty string, and null otherwise.
@@ -846,6 +830,18 @@ export function locateNamespace(
   }
 }
 
+function isXMLNamespace(
+  { namespace, namespacePrefix, localName }: {
+    namespace: unknown;
+    namespacePrefix: unknown;
+    localName: string;
+  },
+): boolean {
+  return namespace === Namespace.XMLNS &&
+    namespacePrefix === null &&
+    localName === "xmlns";
+}
+
 export function equals(A: globalThis.Node, B: globalThis.Node): boolean {
   // A and B implement the same interfaces.
   if (A.nodeType !== B.nodeType) return false;
@@ -859,7 +855,7 @@ export function equals(A: globalThis.Node, B: globalThis.Node): boolean {
   const pair = izip(tree.children(A), tree.children(B));
 
   // Each child of A equals the child of B at the identical index.
-  return every(pair, ([left, right]) => equals(left, right));
+  return iter(pair).every(([left, right]) => equals(left, right));
 }
 
 export function equalsDocumentType(
@@ -908,9 +904,8 @@ export function equalsElement(left: Element, right: Element): boolean {
     _.attributeList.size === __.attributeList.size &&
     // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
     // TODO:(miyauci) improve performance. O(n²)
-    every(
-      _.attributeList,
-      (left) => some(__.attributeList, (right) => equalsAttr(left, right)),
+    iter(_.attributeList).every((left) =>
+      iter(__.attributeList).some((right) => equalsAttr(left, right))
     );
 }
 
@@ -944,15 +939,9 @@ export function equalsProcessingInstruction(
  */
 function* contiguousTextNodesExclusive(node: globalThis.Node): Iterable<Text> {
   const preceding = tree.precedeSiblings(node);
-  const precedingTexts: Iterable<Text> = takewhile(
-    preceding,
-    isText,
-  ) as Iterable<never>;
+  const precedingTexts = takewhile(preceding, isText);
   const following = tree.followSiblings(node);
-  const followingTexts: Iterable<Text> = takewhile(
-    following,
-    isText,
-  ) as Iterable<never>;
+  const followingTexts = takewhile(following, isText);
 
   yield* [...precedingTexts].reverse();
   yield* followingTexts;

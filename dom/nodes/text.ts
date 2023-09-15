@@ -1,7 +1,7 @@
-import { type Node, type NodeStates, NodeType } from "./node.ts";
-import { type Document } from "./documents/document.ts";
+import { type NodeStates, NodeType } from "./node.ts";
 import {
   CharacterData,
+  CharacterDataInternals,
   type CharacterDataStates,
   substringData,
 } from "./character_data.ts";
@@ -12,10 +12,11 @@ import { List } from "../../infra/data_structures/list.ts";
 import { insertNode } from "./node_trees/mutation.ts";
 import type { IText } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import { ifilter, imap, isNotNull, takewhile } from "../../deps.ts";
+import { isNotNull, iter, takewhile } from "../../deps.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { concatString } from "../../infra/string.ts";
 import { $, tree } from "../../internal.ts";
+import { Get } from "../../utils.ts";
 
 @Slottable
 export class Text extends CharacterData implements IText {
@@ -27,7 +28,7 @@ export class Text extends CharacterData implements IText {
     data = String(data);
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    super(data, globalThis.document as Document);
+    super(data, globalThis.document);
   }
 
   override get nodeType(): NodeType.TEXT_NODE | NodeType.CDATA_SECTION_NODE {
@@ -47,9 +48,11 @@ export class Text extends CharacterData implements IText {
    */
   get wholeText(): string {
     const textNodes = contiguousTextNodes(this);
-    const data = imap(textNodes, (text) => $(text).data);
+    const dataList = iter(textNodes)
+      .map<CharacterDataInternals>($)
+      .map(Get.data);
     // to return the concatenation of the data of the contiguous Text nodes of this, in tree order.
-    const list = new List(data);
+    const list = new List(dataList);
 
     return concatString(list);
   }
@@ -133,10 +136,12 @@ export function splitText(
  */
 export function getChildTextContent(node: globalThis.Node): string {
   // concatenation of the data of all the Text node children of node, in tree order.
-  return [...imap(
-    ifilter(tree.children(node), isText),
-    (text) => $(text).data,
-  )].join("");
+  return iter(tree.children(node))
+    .filter(isText)
+    .map<CharacterDataInternals>($)
+    .map(Get.data)
+    .toArray()
+    .join("");
 }
 
 /**
@@ -146,9 +151,9 @@ export function* contiguousTextNodes(
   node: globalThis.Text,
 ): Iterable<globalThis.Text> {
   const preceding = tree.precedeSiblings(node);
-  const precedingTexts = takewhile(preceding, isText) as Iterable<Text>;
+  const precedingTexts = takewhile(preceding, isText);
   const following = tree.followSiblings(node);
-  const followingTexts = takewhile(following, isText) as Iterable<Text>;
+  const followingTexts = takewhile(following, isText);
 
   yield* [...precedingTexts].reverse();
   yield node;
@@ -160,8 +165,10 @@ export function* contiguousTextNodes(
  */
 export function descendantTextContent(node: Node): string {
   const descendants = tree.descendants(node);
-  const textDescendants = ifilter(descendants, isText);
-  const dataList = imap(textDescendants, (text) => $(text).data);
+  const dataList = iter(descendants)
+    .filter(isText)
+    .map<CharacterDataInternals>($)
+    .map(Get.data);
 
   return concatString(new List(dataList));
 }

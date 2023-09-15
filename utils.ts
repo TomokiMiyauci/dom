@@ -1,4 +1,4 @@
-import { Constructor } from "./deps.ts";
+import { Constructor, prop } from "./deps.ts";
 
 interface IndexHandlers<This, T> {
   has?: (this: This, index: number) => boolean;
@@ -80,4 +80,8 @@ export function debug(node: Node, depth = 0): string[] {
   }
 
   return inputs;
+}
+
+export class Get {
+  static data = prop("data");
 }

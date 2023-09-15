@@ -1,6 +1,6 @@
 import { type INonDocumentTypeChildNode } from "../../../interface.d.ts";
 import { isElement } from "../utils.ts";
-import { type Constructor, find, first, ifilter } from "../../../deps.ts";
+import { type Constructor, iter } from "../../../deps.ts";
 import { tree } from "../../../internal.ts";
 
 export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
@@ -12,9 +12,8 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
     get previousElementSibling(): Element | null {
       // return the first preceding sibling that is an element; otherwise null.
       const precedeSiblings = tree.precedeSiblings(this);
-      const precedeElementSiblings = ifilter(precedeSiblings, isElement);
 
-      return first(precedeElementSiblings) ?? null;
+      return iter(precedeSiblings).find(isElement) ?? null;
     }
 
     /**
@@ -24,7 +23,7 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
       // return the first following sibling that is an element; otherwise null.
       const followingSiblings = tree.followSiblings(this);
 
-      return ((find(followingSiblings, isElement)) ?? null) as Element | null;
+      return iter(followingSiblings).find(isElement) ?? null;
     }
   }
 
