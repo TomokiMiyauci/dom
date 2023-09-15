@@ -3,7 +3,6 @@ import type { IDOMTokenList } from "../../interface.d.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import {
   AttributesContext,
-  type Element,
   getAttributeValue,
   setAttributeValue,
 } from "../nodes/elements/element.ts";

@@ -3,12 +3,10 @@ import { find, html, map, range } from "../../../deps.ts";
 import { getQualifiedName } from "../utils.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 import {
-  type Element,
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
 } from "../elements/element.ts";
-import type { Attr } from "../elements/attr.ts";
 import { $element } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import {

@@ -1,4 +1,3 @@
-import { type Element } from "../elements/element.ts";
 import type { IHTMLCollection } from "../../../interface.d.ts";
 import { at, find, len, range } from "../../../deps.ts";
 import { Namespace } from "../../../infra/namespace.ts";

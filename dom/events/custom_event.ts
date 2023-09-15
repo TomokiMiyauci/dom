@@ -42,7 +42,7 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     detail?: T,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
-    if (this._dispatch) return;
+    if (this._.dispatch) return;
 
     // 2. Initialize this with type, bubbles, and cancelable.
     initialize(this, type, bubbles, cancelable);

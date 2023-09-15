@@ -8,8 +8,6 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { NodeType } from "../node.ts";
-import { type Document } from "../documents/document.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
@@ -68,7 +66,7 @@ export function replaceChild<T extends Node>(
 
   function checkNode(node: Node): boolean {
     switch (node.nodeType) {
-      case NodeType.DOCUMENT_FRAGMENT_NODE: {
+      case node.DOCUMENT_FRAGMENT_NODE: {
         // If node has more than one element child or has a Text node child.
         const elementsCount = filter(tree.children(node), isElement).length;
 
@@ -88,7 +86,7 @@ export function replaceChild<T extends Node>(
         return false;
       }
 
-      case NodeType.ELEMENT_NODE: {
+      case node.ELEMENT_NODE: {
         // parent has an element child that is not child or a doctype is following child.
         const element = find(tree.children(parent), isElement);
 
@@ -96,7 +94,7 @@ export function replaceChild<T extends Node>(
           some(tree.follows(child), isDocumentType);
       }
 
-      case NodeType.DOCUMENT_TYPE_NODE: {
+      case node.DOCUMENT_TYPE_NODE: {
         // parent has a doctype child that is not child, or an element is preceding child.
         const doctype = find(tree.children(parent), isDocumentType);
 
@@ -199,17 +197,19 @@ export function insertNode(
     adoptNode(node, $(parent).nodeDocument);
 
     // 2. If child is null, then append node to parent’s children.
-    if (child === null) tree.children(parent).append(node as any);
+    if (child === null) tree.children(parent).append(node as ChildNode);
     // 3. Otherwise, insert node into parent’s children before child’s index.
     else {
-      tree.children(parent).insert(tree.index(child), node as any);
+      tree.children(parent).insert(tree.index(child), node as ChildNode);
     }
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
       isElement(parent) &&
       isShadowHost(parent) &&
-      parent["_shadowRoot"]["_slotAssignment"] === "named" &&
+      // TODO
+      $(parent).shadowRoot &&
+      $($(parent).shadowRoot!).slotAssignment === "named" &&
       isSlottable(node)
     ) assignSlot(node);
 
@@ -346,11 +346,11 @@ export function ensurePreInsertionValidity(
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-pre-insert
  */
-export function preInsertNode(
-  node: Node,
+export function preInsertNode<T extends Node>(
+  node: T,
   parent: Node,
   child: Node | null,
-): Node {
+): T {
   // 1. Ensure pre-insertion validity of node into parent before child.
   ensurePreInsertionValidity(node, parent, child);
 
@@ -502,7 +502,7 @@ export function removeNode(
 /** To append a node to a parent, pre-insert node into parent before null.
  * @see https://dom.spec.whatwg.org/#concept-node-append
  */
-export function appendNode(node: Node, parent: Node): Node {
+export function appendNode<T extends Node>(node: T, parent: Node): T {
   // To append a node to a parent, pre-insert node into parent before null.
   return preInsertNode(node, parent, null);
 }

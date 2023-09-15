@@ -1,5 +1,3 @@
-import type { CharacterData } from "../nodes/character_data.ts";
-import type { Document } from "../nodes/documents/document.ts";
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
@@ -283,7 +281,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-extractcontents
    */
-  extractContents(): DocumentFragment {
+  extractContents(): globalThis.DocumentFragment {
     // return the result of extracting this.
     return extract(this);
   }
@@ -291,7 +289,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-clonecontents
    */
-  cloneContents(): DocumentFragment {
+  cloneContents(): globalThis.DocumentFragment {
     // return the result of cloning the contents of this.
     return cloneContents(this);
   }
@@ -558,7 +556,7 @@ export interface Range
     Range_CSSOM,
     Range_DOMParsing {}
 
-function cloneContents(range: Range): DocumentFragment {
+function cloneContents(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
     nodeDocument: $(range["_startNode"]).nodeDocument,
@@ -667,7 +665,7 @@ function cloneContents(range: Range): DocumentFragment {
 /**
  * @see https://dom.spec.whatwg.org/#concept-range-extract
  */
-function extract(range: Range): DocumentFragment {
+function extract(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
     nodeDocument: $(range["_startNode"]).nodeDocument,
@@ -689,7 +687,7 @@ function extract(range: Range): DocumentFragment {
   ) {
     // 1. Let clone be a clone of original start node.
     // TODO(miyauci): use internal method
-    const clone = originalStartNode.cloneNode() as never as CharacterData;
+    const clone = originalStartNode.cloneNode() as CharacterData;
 
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset.
     const data = substringData(

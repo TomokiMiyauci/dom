@@ -6,6 +6,7 @@ import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "../../html/events.ts";
+import { internalSlots } from "../../internal.ts";
 
 @DocumentOrShadowRoot
 @InnerHTML
@@ -16,7 +17,9 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
   constructor({ host }: { host: Element }) {
     super();
 
-    this._host = host;
+    const _ = Object.assign(this._, new ShadowRootInternals(host));
+    this._ = _;
+    internalSlots.set(this, _);
   }
 
   /**
@@ -24,7 +27,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get mode(): ShadowRootMode {
     // return this’s mode.
-    return this._mode;
+    return this._.mode;
   }
 
   /**
@@ -40,7 +43,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get slotAssignment(): SlotAssignmentMode {
     // return this’s delegates focus.
-    return this._slotAssignment;
+    return this._.slotAssignment;
   }
 
   /**
@@ -48,7 +51,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get host(): Element {
     // return this’s host.
-    throw this._host;
+    throw this._.host;
   }
 
   /**
@@ -67,26 +70,33 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
     setEventHandlerIDLAttribute(this, "onslotchange", value);
   }
 
-  // internals
+  declare protected _: ShadowRootInternals & DocumentFragment["_"];
+}
+
+export interface ShadowRoot extends DocumentOrShadowRoot, InnerHTML {}
+
+export class ShadowRootInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-mode)
    */
 
-  protected _mode!: ShadowRootMode;
+  mode!: ShadowRootMode;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-delegates-focus)
    */
-  protected _delegatesFocus = false;
+  delegatesFocus = false;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-available-to-element-internals)
    */
 
-  protected _availableElementInternals = false;
+  availableElementInternals = false;
 
-  protected _slotAssignment: SlotAssignmentMode = "named";
-  protected _host: Element;
+  slotAssignment: SlotAssignmentMode = "named";
+  host: Element;
+
+  constructor(host: Element) {
+    this.host = host;
+  }
 }
-
-export interface ShadowRoot extends DocumentOrShadowRoot, InnerHTML {}

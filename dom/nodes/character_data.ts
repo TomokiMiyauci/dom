@@ -1,7 +1,6 @@
 import { Node, NodeInternals } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
-import { type Document } from "./documents/document.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
@@ -177,7 +176,7 @@ export class CharacterDataInternals extends NodeInternals {
  * @throws {DOMException}
  */
 export function substringData(
-  node: CharacterData,
+  node: globalThis.CharacterData,
   offset: number,
   count: number,
 ): string {

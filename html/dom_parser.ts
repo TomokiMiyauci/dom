@@ -4,8 +4,11 @@ import { $ } from "../internal.ts";
 import { HTMLParser } from "./html_parser.ts";
 
 export class DOMParser implements IDOMParser {
-  parseFromString(string: string, type: DOMParserSupportedType): Document {
-    const document = new Document();
+  parseFromString(
+    string: string,
+    type: DOMParserSupportedType,
+  ): globalThis.Document {
+    const document = new Document() as globalThis.Document;
     $(document).contentType = type;
     // document[$URL] = globalThis.window.document.URL;
 

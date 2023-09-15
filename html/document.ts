@@ -2,7 +2,6 @@
 import { Constructor, first } from "../deps.ts";
 import { find, ifilter } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
-import { type Element } from "../dom/nodes/elements/element.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { getChildTextContent } from "../dom/nodes/text.ts";
@@ -142,7 +141,7 @@ export function Document_HTML<T extends Constructor<Node>>(
     get body(): HTMLElement {
       // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
       const documentElement = find(tree.children(this), isElement) as
-        | Element
+        | globalThis.Element
         | undefined;
 
       if (!documentElement) return null as any;
@@ -290,11 +289,9 @@ export function Document_HTML<T extends Constructor<Node>>(
       throw new Error();
     }
 
-    onreadystatechange: ((this: globalThis.Document, ev: Event) => any) | null =
-      null;
+    onreadystatechange: ((this: Document, ev: Event) => any) | null = null;
 
-    onvisibilitychange: ((this: globalThis.Document, ev: Event) => any) | null =
-      null;
+    onvisibilitychange: ((this: Document, ev: Event) => any) | null = null;
   }
 
   return Mixin;

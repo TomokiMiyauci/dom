@@ -1,9 +1,7 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
-import { Document } from "../../dom/nodes/documents/document.ts";
-import { ElementInternals } from "../../dom/nodes/elements/element.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { insert } from "../../deps.ts";
-import { $ } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 /**
  * @see https://html.spec.whatwg.org/multipage/scripting.html#the-template-element
@@ -14,7 +12,7 @@ export class HTMLTemplateElement extends HTMLElement
     super(...args);
 
     // 1. Let doc be the template element's node document's appropriate template contents owner document.
-    const doc = appropriateTemplateContentsOwnerDocument($(this).nodeDocument);
+    const doc = appropriateTemplateContentsOwnerDocument(this._.nodeDocument);
 
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = new DocumentFragment();
@@ -22,7 +20,10 @@ export class HTMLTemplateElement extends HTMLElement
     $(fragment).host = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
-    $(this).templateContents = fragment;
+    const _ = Object.assign(this._, { templateContents: fragment });
+
+    this._ = _;
+    internalSlots.set(this, _);
   }
 
   /**
@@ -30,11 +31,13 @@ export class HTMLTemplateElement extends HTMLElement
    */
   get content(): DocumentFragment {
     // return the template element's template contents.
-    return $(this).templateContents;
+    return this._.templateContents;
   }
+
+  declare protected _: HTMLTemplateElementInternals & HTMLElement["_"];
 }
 
-export interface HTMLTemplateElementInternals extends ElementInternals {
+export interface HTMLTemplateElementInternals {
   templateContents: DocumentFragment;
 }
 

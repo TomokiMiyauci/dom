@@ -1,16 +1,13 @@
-import { type Document } from "../documents/document.ts";
-import { Node, NodeInternals, NodeType } from "../node.ts";
+import { Node, NodeType } from "../node.ts";
 import { type PartialBy } from "../../../deps.ts";
-import { type Element, isCustom } from "../elements/element.ts";
+import { isCustom } from "../elements/element.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { $, internalSlots } from "../../../internal.ts";
 
-type Required =
-  | "localName"
-  | "nodeDocument";
+type Required = "localName";
 
 type Optional =
   | "namespace"
@@ -19,13 +16,6 @@ type Optional =
   | "element";
 
 export class Attr extends Node implements IAttr {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
-   */
-  private get _qualifiedName(): string {
-    return getQualifiedName(this.#_.localName, this.#_.namespacePrefix);
-  }
-
   constructor(
     {
       namespace = null,
@@ -34,21 +24,23 @@ export class Attr extends Node implements IAttr {
       element = null,
       value = "",
       nodeDocument,
-    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional>,
+    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional> & {
+      nodeDocument: Document;
+    },
   ) {
     super(nodeDocument);
 
-    internalSlots.set(
-      this,
-      new AttrInternals({
-        namespace,
-        namespacePrefix,
-        value,
-        localName,
-        element,
-        nodeDocument,
-      }),
-    );
+    const internal = new AttrInternals({
+      namespace,
+      namespacePrefix,
+      value,
+      localName,
+      element,
+    });
+    const _ = Object.assign(this._, internal);
+
+    this._ = _;
+    internalSlots.set(this, _);
   }
 
   /**
@@ -59,7 +51,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return this._qualifiedName;
+    return this._.qualifiedName;
   }
 
   /**
@@ -67,7 +59,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this.#_.value;
+    return this._.value;
   }
 
   /**
@@ -83,7 +75,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this.#_.value;
+    return this._.value;
   }
 
   /**
@@ -100,7 +92,7 @@ export class Attr extends Node implements IAttr {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this.#_.nodeDocument;
+    return this._.nodeDocument;
   }
 
   protected override clone(document: Document): Attr {
@@ -112,7 +104,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this.#_.namespace;
+    return this._.namespace;
   }
 
   /**
@@ -120,7 +112,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this.#_.namespacePrefix;
+    return this._.namespacePrefix;
   }
 
   /**
@@ -128,7 +120,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this.#_.localName;
+    return this._.localName;
   }
 
   /**
@@ -136,7 +128,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return this._qualifiedName;
+    return this._.qualifiedName;
   }
 
   /**
@@ -144,7 +136,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this.#_.value;
+    return this._.value;
   }
 
   /**
@@ -160,7 +152,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this.#_.element;
+    return this._.element;
   }
 
   /**
@@ -171,12 +163,10 @@ export class Attr extends Node implements IAttr {
     return true;
   }
 
-  get #_(): AttrInternals {
-    return internalSlots.get(this);
-  }
+  declare protected _: AttrInternals & Node["_"];
 }
 
-export class AttrInternals extends NodeInternals {
+export class AttrInternals {
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
    */
@@ -203,21 +193,30 @@ export class AttrInternals extends NodeInternals {
   element: Element | null;
 
   constructor(
-    { namespace, nodeDocument, localName, value, element, namespacePrefix }:
-      & Omit<
-        AttrInternals,
-        "childrenChangedSteps" | "insertionSteps" | "registeredObserverList"
-      >
-      & Pick<NodeInternals, "nodeDocument">,
+    { namespace, localName, value, element, namespacePrefix }: Pick<
+      AttrInternals,
+      | "namespace"
+      | "localName"
+      | "value"
+      | "element"
+      | "namespacePrefix"
+    >,
   ) {
-    super(nodeDocument);
-
     this.namespace = namespace;
     this.localName = localName;
     this.value = value;
     this.element = element;
     this.namespacePrefix = namespacePrefix;
+
+    Object.defineProperty(this, "qualifiedName", {
+      get: () => getQualifiedName(this.localName, this.namespacePrefix),
+    });
   }
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
+   */
+  qualifiedName!: string;
 }
 
 /**
@@ -238,7 +237,10 @@ export function setAnExistingAttributeValue(
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-change
  */
-export function changeAttributes(attribute: Attr, value: string): void {
+export function changeAttributes(
+  attribute: globalThis.Attr,
+  value: string,
+): void {
   const _ = $(attribute);
 
   // 1. Let oldValue be attribute’s value.
@@ -257,7 +259,7 @@ export function changeAttributes(attribute: Attr, value: string): void {
  * @see https://dom.spec.whatwg.org/#handle-attribute-changes
  */
 export function handleAttributesChanges(
-  attribute: Attr,
+  attribute: globalThis.Attr,
   element: Element,
   oldValue: string | null,
   newValue: string | null,
@@ -290,6 +292,6 @@ export function handleAttributesChanges(
   });
 }
 
-export function cloneAttr(attr: Attr, document: Document): Attr {
+export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
   return new Attr({ ...$(attr), nodeDocument: document });
 }

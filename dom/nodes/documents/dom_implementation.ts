@@ -5,7 +5,6 @@ import {
 } from "../documents/document.ts";
 import { DocumentType } from "../document_type.ts";
 import { Text } from "../text.ts";
-import type { Element } from "../elements/element.ts";
 import { createElement } from "../elements/element_algorithm.ts";
 import { appendNode } from "../node_trees/mutation.ts";
 import type { IDOMImplementation } from "../../../interface.d.ts";
@@ -42,13 +41,13 @@ export class DOMImplementation implements IDOMImplementation {
   createDocument(
     namespace: string | null,
     qualifiedName: string | null,
-    doctype: DocumentType | null = null,
-  ): XMLDocument {
+    doctype: globalThis.DocumentType | null = null,
+  ): globalThis.XMLDocument {
     // LegacyNullToEmptyString
     qualifiedName ??= "";
 
     // 1. Let document be a new XMLDocument.
-    const document = new XMLDocument();
+    const document = new XMLDocument() as globalThis.XMLDocument;
 
     // 2. Let element be null.
     let element: Element | null = null;
@@ -78,9 +77,11 @@ export class DOMImplementation implements IDOMImplementation {
    * @see https://dom.spec.whatwg.org/#dom-domimplementation-createhtmldocument
    */
   @convert
-  createHTMLDocument(@DOMString.exclude(isUndefined) title?: string): Document {
+  createHTMLDocument(
+    @DOMString.exclude(isUndefined) title?: string,
+  ): globalThis.Document {
     // 1. Let doc be a new document that is an HTML document.
-    const doc = new Document();
+    const doc = new Document() as globalThis.Document;
     $(doc).type = "html";
 
     // 2. Set doc’s content type to "text/html".
@@ -143,7 +144,7 @@ export interface DOMImplementationInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
    */
-  document: Document;
+  document: globalThis.Document;
 }
 
 function namespaceToContentType(namespace: string | null): string {

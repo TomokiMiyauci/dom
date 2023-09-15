@@ -3,12 +3,17 @@ import { List } from "../../infra/data_structures/list.ts";
 import type { IEventTarget } from "../../interface.d.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
-import { Event } from "./event.ts";
 import { dispatch } from "./dispatch.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 @Exposed("*")
 export class EventTarget implements IEventTarget {
-  constructor() {}
+  constructor() {
+    const _ = new EventTargetInternals();
+
+    this._ = _;
+    internalSlots.set(this, _);
+  }
 
   addEventListener(
     type: string,
@@ -42,7 +47,7 @@ export class EventTarget implements IEventTarget {
     const capture = flatten(options);
 
     const eventListener = find(
-      this._eventListenerList,
+      this._.eventListenerList,
       (listener) =>
         type === listener.type && callback === listener.callback &&
         capture === listener.capture,
@@ -53,41 +58,28 @@ export class EventTarget implements IEventTarget {
 
   dispatchEvent(event: Event): boolean {
     // 1. If event’s dispatch flag is set, or if its initialized flag is not set, then throw an "InvalidStateError" DOMException.
-    if (event["_dispatch"] && !event["_initialized"]) {
+    if ($(event).dispatch && !$(event).initialized) {
       throw new DOMException("<message>", DOMExceptionName.InvalidStateError);
     }
 
     // 2. Initialize event’s isTrusted attribute to false.
-    event["isTrusted"] = false;
+    $(event).isTrusted = false;
 
     // 3. Return the result of dispatching event to this.
     return dispatch(event, this);
   }
 
-  #activationBehavior: ActivationBehavior | undefined;
-  protected get _activationBehavior(): ActivationBehavior | null {
-    return this.#activationBehavior ?? null;
-  }
+  protected _: EventTargetInternals;
+}
 
-  protected set _activationBehavior(value: ActivationBehavior) {
-    this.#activationBehavior = value;
-  }
+export class EventTargetInternals {
+  eventListenerList: List<EventListener> = new List();
 
-  #legacyPreActivationBehavior: Function | undefined;
+  activationBehavior: ActivationBehavior | undefined;
 
-  protected get _legacyPreActivationBehavior(): Function | null {
-    return this.#legacyPreActivationBehavior ?? null;
-  }
-
-  #legacyCanceledActivation: Function | undefined;
-
-  protected get _legacyCanceledActivation(): Function | null {
-    return this.#legacyCanceledActivation ?? null;
-  }
-
-  protected _eventListenerList: List<EventListener> = new List();
-
-  protected _getParent: (event: Event) => EventTarget | null = () => null;
+  getParent: (event: Event) => globalThis.EventTarget | null = () => null;
+  legacyCanceledActivation: Function | undefined;
+  legacyPreActivationBehavior: Function | undefined;
 }
 
 interface ActivationBehavior {
@@ -206,7 +198,10 @@ const events = new Set<string>([
   "mousewheel",
 ]);
 
-export function defaultPassiveValue(type: string, eventTarget: EventTarget) {
+export function defaultPassiveValue(
+  type: string,
+  eventTarget: globalThis.EventTarget,
+): boolean {
   // 1. Return true if all of the following are true:
   if (
     // type is one of "touchstart", "touchmove", "wheel", or "mousewheel".
@@ -228,7 +223,7 @@ export function defaultPassiveValue(type: string, eventTarget: EventTarget) {
  * @see https://dom.spec.whatwg.org/#add-an-event-listener
  */
 export function addEventListener(
-  eventTarget: EventTarget,
+  eventTarget: globalThis.EventTarget,
   listener: EventListener,
 ): void {
   // 1. If eventTarget is a ServiceWorkerGlobalScope object, its service worker’s script resource’s has ever been evaluated flag is set, and listener’s type matches the type attribute value of any of the service worker events, then report a warning to the console that this might not give the expected results. [SERVICE-WORKERS]
@@ -246,13 +241,13 @@ export function addEventListener(
   }
 
   const contain = some(
-    eventTarget["_eventListenerList"],
+    $(eventTarget).eventListenerList,
     ({ type, callback, capture }) =>
       type === listener.type && callback === listener.callback &&
       capture === listener.capture,
   );
   // 5. If eventTarget’s event listener list does not contain an event listener whose type is listener’s type, callback is listener’s callback, and capture is listener’s capture, then append listener to eventTarget’s event listener list.
-  if (!contain) eventTarget["_eventListenerList"].append(listener);
+  if (!contain) $(eventTarget).eventListenerList.append(listener);
 
   // 6. If listener’s signal is not null, then add the following abort steps to it:
   // TODO
@@ -266,12 +261,12 @@ export function addEventListener(
  * @see https://dom.spec.whatwg.org/#remove-an-event-listener
  */
 export function removeEventListener(
-  eventTarget: EventTarget,
+  eventTarget: globalThis.EventTarget,
   listener: EventListener,
 ): void {
   // 1. If eventTarget is a ServiceWorkerGlobalScope object and its service worker’s set of event types to handle contains listener’s type, then report a warning to the console that this might not give the expected results.
 
   // 2. Set listener’s removed to true and remove listener from eventTarget’s event listener list.
   listener.removed = true,
-    eventTarget["_eventListenerList"].remove((target) => target === listener);
+    $(eventTarget).eventListenerList.remove((target) => target === listener);
 }

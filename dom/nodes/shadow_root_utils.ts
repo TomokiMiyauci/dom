@@ -1,4 +1,4 @@
-import { tree } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
 import { isNodeLike, isShadowRoot } from "./utils.ts";
 
 /**
@@ -17,7 +17,7 @@ export function isShadowIncludingDescendant(A: Node, B: unknown): boolean {
   const root = tree.root(A);
 
   return isNodeLike(root) && isShadowRoot(root) &&
-    isShadowInclusiveAncestor(root["_host"], B);
+    isShadowInclusiveAncestor($(root).host, B);
 }
 
 /**
@@ -37,6 +37,6 @@ export function retarget<T extends object | null>(
       (isNodeLike(B) && isShadowInclusiveAncestor(root, B))
     ) return A;
 
-    A = root["_host"] as T;
+    A = $(root).host as T;
   }
 }

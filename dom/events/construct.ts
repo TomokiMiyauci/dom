@@ -1,4 +1,4 @@
-import type { Event } from "./event.ts";
+import { $ } from "../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-create)
@@ -25,7 +25,7 @@ export function createEvent(
   );
 
   // 4. Initialize event’s isTrusted attribute to true.
-  event["isTrusted"] = true;
+  $(event).isTrusted = true;
 
   // 5. Return event.
   return event;
@@ -44,12 +44,12 @@ export function innerEventCreationSteps(
   const event: Event = new interface_("", dictionary);
 
   // 2. Set event’s initialized flag.
-  event["_initialized"] = true;
+  $(event).initialized = true;
 
   // 3. Initialize event’s timeStamp attribute to the relative high resolution coarse time given time and event’s relevant global object.
 
   // 5. Run the event constructing steps with event and dictionary.
-  event["eventConstructionSteps"].run(event, dictionary);
+  $(event).eventConstructionSteps.run(event, dictionary);
 
   // 6. Return event.
   return event;

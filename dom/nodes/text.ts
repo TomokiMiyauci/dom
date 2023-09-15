@@ -38,7 +38,7 @@ export class Text extends CharacterData implements IText {
     return "#text";
   }
 
-  protected override clone(document: Document): Text {
+  protected override clone(document: Document): globalThis.Text {
     return Text.create({ data: $(this).data, nodeDocument: document });
   }
 
@@ -57,7 +57,7 @@ export class Text extends CharacterData implements IText {
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-splittext
    */
-  splitText(offset: number): Text {
+  splitText(offset: number): globalThis.Text {
     // to split this with offset offset.
     return splitText(this, offset);
   }
@@ -79,7 +79,10 @@ export interface Text extends Slottable {}
 /**
  * @see https://dom.spec.whatwg.org/#concept-text-split
  */
-export function splitText(node: Text, offset: number): Text {
+export function splitText(
+  node: globalThis.Text,
+  offset: number,
+): globalThis.Text {
   // 1 Let length be node’s length.
   const length = nodeLength(node);
 
@@ -128,7 +131,7 @@ export function splitText(node: Text, offset: number): Text {
 /**
  * @see https://dom.spec.whatwg.org/#concept-child-text-content
  */
-export function getChildTextContent(node: Node): string {
+export function getChildTextContent(node: globalThis.Node): string {
   // concatenation of the data of all the Text node children of node, in tree order.
   return [...imap(
     ifilter(tree.children(node), isText),
@@ -139,7 +142,9 @@ export function getChildTextContent(node: Node): string {
 /**
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
-export function* contiguousTextNodes(node: Text): Iterable<Text> {
+export function* contiguousTextNodes(
+  node: globalThis.Text,
+): Iterable<globalThis.Text> {
   const preceding = tree.precedeSiblings(node);
   const precedingTexts = takewhile(preceding, isText) as Iterable<Text>;
   const following = tree.followSiblings(node);

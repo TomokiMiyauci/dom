@@ -1,6 +1,4 @@
 import { Document } from "../dom/nodes/documents/document.ts";
-import type { Element } from "../dom/nodes/elements/element.ts";
-import type { Node } from "../dom/nodes/node.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./utils.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
@@ -8,11 +6,11 @@ import { $ } from "../internal.ts";
 
 export class HTMLParser {
   #adaptor: DOMTreeAdapter;
-  constructor(public document: Document) {
+  constructor(public document: globalThis.Document) {
     this.#adaptor = new DOMTreeAdapter(document);
   }
 
-  parse(input: string): Document {
+  parse(input: string): globalThis.Document {
     return parse<DOMTreeAdapterMap>(input, { treeAdapter: this.#adaptor });
   }
 }
@@ -25,7 +23,7 @@ export function parseHTMLFragment(
   input: string,
 ): List<Node> {
   // 1. Create a new Document node, and mark it as being an HTML document.
-  const document = new Document();
+  const document = new Document() as globalThis.Document;
   $(document).type = "html";
 
   // 2. If the node document of the context element is in quirks mode, then let the Document be in quirks mode. Otherwise, the node document of the context element is in limited-quirks mode, then let the Document be in limited-quirks mode. Otherwise, leave the Document in no-quirks mode.

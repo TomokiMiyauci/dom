@@ -1,5 +1,3 @@
-import type { Element } from "../dom/nodes/elements/element.ts";
-import type { Node } from "../dom/nodes/node.ts";
 import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
 import { parseHTMLFragment } from "../html/html_parser.ts";
 import { appendNode } from "../dom/nodes/node_trees/mutation.ts";
@@ -14,7 +12,7 @@ import { $ } from "../internal.ts";
 export function parseFragment(
   markup: string,
   contextElement: Element,
-): DocumentFragment {
+): globalThis.DocumentFragment {
   // 1. If the context element's node document is an HTML document: let algorithm be the HTML fragment parsing algorithm.
   //    If the context element's node document is an XML document: let algorithm be the XML fragment parsing algorithm.
   const algorithm = isHTMLDocument($(contextElement).nodeDocument)

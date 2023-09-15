@@ -3,7 +3,6 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
   Node,
-  NodeInternals,
   NodeType,
 } from "../node.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
@@ -92,17 +91,19 @@ export class Document extends Node implements IDocument {
     // @ts-ignore
     super();
 
-    const _ = new DocumentInternals({
-      implementation: DOMImplementation["create"](this),
-      nodeDocument: this,
-    });
+    const _ = Object.assign(
+      this._,
+      new DocumentInternals({
+        implementation: DOMImplementation["create"](this),
+      }),
+      { nodeDocument: this },
+    );
 
+    this._ = _;
     internalSlots.set(this, _);
   }
 
-  get #_(): DocumentInternals {
-    return internalSlots.get(this);
-  }
+  declare protected _: DocumentInternals & Node["_"];
 
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
@@ -140,8 +141,8 @@ export class Document extends Node implements IDocument {
     // noop
   }
 
-  protected override clone(document: Document): Document {
-    const doc = new (this.constructor as typeof Document)();
+  protected override clone(document: globalThis.Document): globalThis.Document {
+    const doc = new (this.constructor as typeof globalThis.Document)();
 
     $(doc).type = $(document).type;
     $(doc).contentType = $(document).contentType;
@@ -154,7 +155,7 @@ export class Document extends Node implements IDocument {
    */
   get URL(): string {
     // return this’s URL, serialized.
-    return this.#_.URL.href;
+    return this._.URL.href;
   }
 
   /**
@@ -162,7 +163,7 @@ export class Document extends Node implements IDocument {
    */
   get characterSet(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this._.encoding.name;
   }
 
   /**
@@ -170,7 +171,7 @@ export class Document extends Node implements IDocument {
    */
   get charset(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this._.encoding.name;
   }
 
   /**
@@ -178,7 +179,7 @@ export class Document extends Node implements IDocument {
    */
   get compatMode(): CompatMode {
     // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
-    switch (this.#_.mode) {
+    switch (this._.mode) {
       case html.DOCUMENT_MODE.QUIRKS:
         return "BackCompat";
       default:
@@ -187,7 +188,7 @@ export class Document extends Node implements IDocument {
   }
 
   get contentType(): string {
-    return this.#_.contentType;
+    return this._.contentType;
   }
 
   /**
@@ -213,7 +214,7 @@ export class Document extends Node implements IDocument {
    */
   get documentURI(): string {
     // return this’s URL, serialized.
-    return this.#_.URL.href;
+    return this._.URL.href;
   }
 
   /**
@@ -221,7 +222,7 @@ export class Document extends Node implements IDocument {
    */
   get implementation(): DOMImplementation {
     // return the DOMImplementation object that is associated with this.
-    return this.#_.implementation;
+    return this._.implementation;
   }
 
   /**
@@ -229,7 +230,7 @@ export class Document extends Node implements IDocument {
    */
   get inputEncoding(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this._.encoding.name;
   }
 
   /**
@@ -243,7 +244,7 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-adoptnode
    */
-  adoptNode<T>(node: T & Node): T {
+  adoptNode<T extends globalThis.Node>(node: T): T {
     // 1. If node is a document, then throw a "NotSupportedError" DOMException.
     if (isDocument(node)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
@@ -271,7 +272,7 @@ export class Document extends Node implements IDocument {
    * @see https://dom.spec.whatwg.org/#dom-document-createattribute
    */
   @convert
-  createAttribute(@DOMString localName: string): Attr {
+  createAttribute(@DOMString localName: string): globalThis.Attr {
     // 1. If localName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException.
     if (!xmlValidator.name(localName)) {
       throw new DOMException(
@@ -290,7 +291,10 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createattributens
    */
-  createAttributeNS(namespace: string | null, qualifiedName: string): Attr {
+  createAttributeNS(
+    namespace: string | null,
+    qualifiedName: string,
+  ): globalThis.Attr {
     // 1. Let namespace, prefix, and localName be the result of passing namespace and qualifiedName to validate and extract.
     const { namespace: ns, prefix, localName } = validateAndExtract(
       namespace,
@@ -343,7 +347,7 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createdocumentfragment
    */
-  createDocumentFragment(): DocumentFragment {
+  createDocumentFragment(): globalThis.DocumentFragment {
     // return a new DocumentFragment node whose node document is this.
     return DocumentFragment["create"]({ nodeDocument: this });
   }
@@ -386,7 +390,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (isHTMLDocument(this) || this.#_.contentType === "application/xhtml+xml")
+      (isHTMLDocument(this) || this._.contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -538,15 +542,15 @@ export class Document extends Node implements IDocument {
     const event = createEvent(constructor as typeof Event);
 
     // 6. Initialize event’s type attribute to the empty string.
-    event["type"] = "";
+    $(event).type = "";
 
     // 7. Initialize event’s timeStamp attribute to the result of calling current high resolution time with this’s relevant global object.
 
     // 8. Initialize event’s isTrusted attribute to false.
-    event["isTrusted"] = false;
+    $(event).isTrusted = false;
 
     // 9. Unset event’s initialized flag.
-    event["_initialized"] = false;
+    $(event).initialized = false;
 
     // 10. Return event.
     return event;
@@ -656,7 +660,7 @@ export class Document extends Node implements IDocument {
   @convert
   getElementsByClassName(
     @DOMString classNames: string,
-  ): HTMLCollectionOf<Element> {
+  ): HTMLCollection {
     // return the list of elements with class names classNames for this.
     return getElementsByClassName(classNames, this);
   }
@@ -677,7 +681,7 @@ export class Document extends Node implements IDocument {
     qualifiedName: K,
   ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
   getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
-  getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element> {
+  getElementsByTagName(qualifiedName: string): HTMLCollection {
     return getElementsByQualifiedName(qualifiedName, this);
   }
 
@@ -700,12 +704,12 @@ export class Document extends Node implements IDocument {
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<globalThis.Element> {
+  ): HTMLCollection {
     return getElementsByNamespaceAndLocalName(
       namespace,
       localName,
       this,
-    ) as HTMLCollectionOf<Element>;
+    );
   }
 
   /**
@@ -768,7 +772,7 @@ export interface Document
   ): void;
 }
 
-export class DocumentInternals extends NodeInternals {
+export class DocumentInternals {
   /**
    * @default utf8
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
@@ -811,11 +815,8 @@ export class DocumentInternals extends NodeInternals {
   implementation: DOMImplementation;
 
   constructor(
-    { implementation, nodeDocument }:
-      & Pick<DocumentInternals, "implementation">
-      & Pick<NodeInternals, "nodeDocument">,
+    { implementation }: Pick<DocumentInternals, "implementation">,
   ) {
-    super(nodeDocument);
     this.implementation = implementation;
   }
 }
@@ -826,11 +827,11 @@ export class XMLDocument extends Document implements IXMLDocument {}
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps
  */
 export function internalCreateElement(
-  document: Document,
+  document: globalThis.Document,
   namespace: string | null,
   qualifiedName: string,
   options?: string | ElementCreationOptions,
-): Element {
+): globalThis.Element {
   // 1. Let namespace, prefix, and localName be the result of passing namespace and qualifiedName to validate and extract.
   const { namespace: $namespace, prefix, localName } = validateAndExtract(
     namespace,
@@ -852,7 +853,7 @@ export function internalCreateElement(
 /**
  * @see https://dom.spec.whatwg.org/#html-document
  */
-export function isHTMLDocument(document: Document): boolean {
+export function isHTMLDocument(document: globalThis.Document): boolean {
   // type is "xml"; otherwise an HTML document.
   return $(document).type !== "xml";
 }

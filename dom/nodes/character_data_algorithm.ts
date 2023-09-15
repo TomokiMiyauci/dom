@@ -5,7 +5,6 @@
 import { queueMutationRecord } from "./mutation_observers/queue.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import type { CharacterData } from "./character_data.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { $ } from "../../internal.ts";
 

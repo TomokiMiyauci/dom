@@ -5,17 +5,12 @@ import {
   isText,
   UnImplemented,
 } from "./utils.ts";
-import type { ChildNode } from "./node_trees/child_node.ts";
-import type { CharacterData } from "./character_data.ts";
-import type { ProcessingInstruction } from "./processing_instruction.ts";
 import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
 import {
   getDocumentElement,
   isConnected,
   nodeLength,
 } from "./node_trees/node_tree.ts";
-import { type Document } from "./documents/document.ts";
-import { type Text } from "./text.ts";
 import type { INode } from "../../interface.d.ts";
 import {
   appendNode,
@@ -44,19 +39,16 @@ import {
 import { parseOrderSet } from "../infra/ordered_set.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
-import { type Attr } from "./elements/attr.ts";
-import { type Element } from "./elements/element.ts";
-import { type DocumentType } from "./document_type.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { replaceData } from "./character_data_algorithm.ts";
 import {
   type RegisteredObserver,
   type TransientRegisteredObserver,
 } from "./mutation_observers/queue.ts";
-import { Child } from "./types.ts";
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
+import { OrderedSet } from "../../infra/data_structures/set.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -161,7 +153,13 @@ export abstract class Node extends EventTarget implements INode {
   constructor(nodeDocument: Document) {
     super();
 
-    internalSlots.set(this, new NodeInternals(nodeDocument));
+    const _ = Object.assign(
+      this._ as EventTarget["_"],
+      new NodeInternals(nodeDocument),
+    );
+
+    this._ = _;
+    internalSlots.set(this, _);
   }
 
   get baseURI(): string {
@@ -193,7 +191,7 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-parentnode
    */
-  get parentNode(): globalThis.ParentNode | null {
+  get parentNode(): ParentNode | null {
     // return this’s parent.
     return tree.parent(this);
   }
@@ -207,21 +205,21 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   @SameObject
-  get childNodes(): NodeListOf<Node & ChildNode> {
+  get childNodes(): NodeListOf<ChildNode> {
     return new NodeList({
       root: this,
       filter: (node, root): boolean => {
-        return tree.children(root).contains(node as globalThis.ChildNode);
+        return (tree.children(root) as OrderedSet<globalThis.Node>).contains(
+          node,
+        );
       },
-    }) as any as NodeListOf<
-      Node & ChildNode
-    >;
+    }) as NodeListOf<ChildNode>;
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-firstchild
    */
-  get firstChild(): globalThis.ChildNode | null {
+  get firstChild(): ChildNode | null {
     // return this’s first child.
     return tree.firstChild(this);
   }
@@ -306,7 +304,7 @@ export abstract class Node extends EventTarget implements INode {
     }
   }
 
-  cloneNode(deep?: boolean | undefined): Node {
+  cloneNode(deep?: boolean | undefined): globalThis.Node {
     let document = this.#_.nodeDocument;
     const copy = this.clone(document);
 
@@ -329,12 +327,12 @@ export abstract class Node extends EventTarget implements INode {
    * This API is used by {@linkcode cloneNode}.
    * It is not public API, so should be mark private.
    */
-  protected abstract clone(document: Document): Node;
+  protected abstract clone(document: Document): globalThis.Node;
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-isequalnode
    */
-  isEqualNode(otherNode: Node | null): boolean {
+  isEqualNode(otherNode: globalThis.Node | null): boolean {
     // return true if otherNode is non-null and this equals otherNode; otherwise false.
     return !!otherNode && equals(this, otherNode);
   }
@@ -342,7 +340,7 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-issamenode
    */
-  isSameNode(otherNode: Node | null): boolean {
+  isSameNode(otherNode: globalThis.Node | null): boolean {
     // return true if otherNode is this; otherwise false.
     return this === otherNode;
   }
@@ -350,14 +348,14 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-comparedocumentposition
    */
-  compareDocumentPosition(other: Node): number {
+  compareDocumentPosition(other: globalThis.Node): number {
     // 1. If this is other, then return zero.
     if (this === other) return 0;
 
     // 2. Let node1 be other and node2 be this.
-    let node1: Node | null = other;
+    let node1: globalThis.Node | null = other;
     // deno-lint-ignore no-this-alias
-    let node2: Node | Element | null = this;
+    let node2: globalThis.Node | Element | null = this;
     let attr1: Attr | null = null;
     let attr2: Attr | null = null;
 
@@ -473,24 +471,24 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-insertbefore
    */
-  insertBefore<T extends globalThis.Node>(node: T, child: Child | null): T {
+  insertBefore<T extends globalThis.Node>(node: T, child: ChildNode | null): T {
     // return the result of pre-inserting node into this before child.
-    return preInsertNode(node, this, child) as T;
+    return preInsertNode(node, this, child);
   }
 
   appendChild<T extends globalThis.Node>(node: T): T {
-    return appendNode(node, this) as T;
+    return appendNode(node, this);
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-replacechild)
    */
-  replaceChild<T>(node: T & Node, child: T): T {
+  replaceChild<T extends globalThis.Node>(node: Node, child: T): T {
     // return the result of replacing child with node within this.
-    return replaceChild<T & Node>(child as any, node, this);
+    return replaceChild(child, node, this);
   }
 
-  removeChild<T>(child: T & Node): T {
+  removeChild<T extends globalThis.Node>(child: T): T {
     return preRemoveChild(child, this);
   }
 
@@ -505,6 +503,8 @@ export abstract class Node extends EventTarget implements INode {
     return `${this.nodeName}
   ${[...tree.children(this)].map((node) => this[inspect].call(node)).join("")}`;
   }
+
+  declare protected _: NodeInternals & EventTarget["_"];
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
@@ -570,8 +570,8 @@ export class NodeInternals {
  */
 export function getElementsByQualifiedName(
   qualifiedName: string,
-  root: Node,
-): HTMLCollection {
+  root: globalThis.Node,
+): globalThis.HTMLCollection {
   // 1. If qualifiedName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches only descendant elements.
   if (qualifiedName === "*") {
     return new HTMLCollection({ root, filter: (node) => node !== root });
@@ -605,8 +605,8 @@ export function getElementsByQualifiedName(
  */
 export function getElementsByClassName(
   classNames: string,
-  root: Node,
-): HTMLCollection {
+  root: globalThis.Node,
+): globalThis.HTMLCollection {
   const classes = parseOrderSet(classNames);
 
   if (classes.isEmpty) return new HTMLCollection({ root, filter: () => false });
@@ -635,7 +635,7 @@ export function getElementsByClassName(
 export function getElementsByNamespaceAndLocalName(
   namespace: string | null,
   localName: string,
-  root: Node,
+  root: globalThis.Node,
 ): HTMLCollection {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
@@ -687,14 +687,17 @@ export function getElementsByNamespaceAndLocalName(
 /**
  * @see https://dom.spec.whatwg.org/#parent-element
  */
-export function getParentElement(node: Node): Element | null {
+export function getParentElement(node: globalThis.Node): Element | null {
   const parent = tree.parent(node);
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
 }
 
-function getInterface(node: Node, nodeType: NodeType): Element | null {
+function getInterface(
+  node: globalThis.Node,
+  nodeType: NodeType,
+): Element | null {
   switch (nodeType) {
     case NodeType.ELEMENT_NODE:
       // Return the result of locating a namespace prefix for it using namespace.
@@ -750,7 +753,7 @@ export function locateNamespacePrefix(
  * @see https://dom.spec.whatwg.org/#locate-a-namespace
  */
 export function locateNamespace(
-  node: Node,
+  node: globalThis.Node,
   prefix: string | null,
 ): string | null {
   // switch on the interface node implements:
@@ -939,7 +942,7 @@ export function equalsProcessingInstruction(
 /**
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
-function* contiguousTextNodesExclusive(node: Node): Iterable<Text> {
+function* contiguousTextNodesExclusive(node: globalThis.Node): Iterable<Text> {
   const preceding = tree.precedeSiblings(node);
   const precedingTexts: Iterable<Text> = takewhile(
     preceding,

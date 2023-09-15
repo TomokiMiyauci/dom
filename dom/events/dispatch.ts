@@ -1,14 +1,12 @@
-import { Event, type PotentialEventTarget, type Struct } from "./event.ts";
-import { Node } from "../nodes/node.ts";
-import { type EventListener, type EventTarget } from "./event_target.ts";
+import { type PotentialEventTarget, type Struct } from "./event.ts";
+import { EventListener } from "./event_target.ts";
 import { retarget } from "../nodes/shadow_root_utils.ts";
-import { type ShadowRoot } from "../nodes/shadow_root.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
 import { ifilter, last, lastItem, some } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
-import { tree } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -20,7 +18,7 @@ export function dispatch(
   legacyOutputDidListenersThrowFlag = false,
 ): boolean {
   // 1. Set event’s dispatch flag.
-  event["_dispatch"] = true;
+  $(event).dispatch = true;
 
   // 2. Let targetOverride be target, if legacy target override flag is not given, and target’s associated Document otherwise.
   const targetOverride = typeof legacyTargetOverride === "undefined"
@@ -32,17 +30,17 @@ export function dispatch(
   let activationTarget = null;
 
   // 4. Let relatedTarget be the result of retargeting event’s relatedTarget against target.
-  const relatedTarget = retarget(event["_relatedTarget"], target);
+  const relatedTarget = retarget($(event).relatedTarget, target);
 
   let clearTargets = false;
 
   // 5. If target is not relatedTarget or target is event’s relatedTarget, then:
-  if (target !== relatedTarget || target === event["_relatedTarget"]) {
+  if (target !== relatedTarget || target === $(event).relatedTarget) {
     // 1. Let touchTargets be a new list.
     const touchTargets = new List<PotentialEventTarget>();
 
     // 2. For each touchTarget of event’s touch target list, append the result of retargeting touchTarget against target to touchTargets.
-    for (const touchTarget of event["_touchTargetList"]) {
+    for (const touchTarget of $(event).touchTargetList) {
       const result = retarget(touchTarget, target);
       touchTargets.append(result);
     }
@@ -62,7 +60,7 @@ export function dispatch(
     const isActivationEvent = false;
 
     // 5. If isActivationEvent is true and target has activation behavior, then set activationTarget to target.
-    if (isActivationEvent && target["_activationBehavior"]) {
+    if (isActivationEvent && $(target).activationBehavior) {
       activationTarget = target;
     }
 
@@ -76,7 +74,7 @@ export function dispatch(
     let slotInClosedTree = false;
 
     // 8. Let parent be the result of invoking target’s get the parent with event.
-    let parent = target["_getParent"](event);
+    let parent = $(target).getParent(event);
 
     // 9. While parent is non-null:
     while (parent) {
@@ -90,7 +88,7 @@ export function dispatch(
 
         // 3. If parent’s root is a shadow root whose mode is "closed", then set slot-in-closed-tree to true.
         const root = tree.root(parent as Node);
-        if (isShadowRoot(root) && root["_mode"] === "closed") {
+        if (isShadowRoot(root) && $(root).mode === "closed") {
           slotInClosedTree = true;
         }
       }
@@ -100,13 +98,13 @@ export function dispatch(
       if (isNodeLike(parent) && isSlottable(parent as any)) slottable = parent;
 
       // 3. Let relatedTarget be the result of retargeting event’s relatedTarget against parent.
-      const relatedTarget = retarget(event["_relatedTarget"], parent);
+      const relatedTarget = retarget($(event).relatedTarget, parent);
 
       // 4. Let touchTargets be a new list.
       const touchTargets = new List<PotentialEventTarget>();
 
       // 5. For each touchTarget of event’s touch target list, append the result of retargeting touchTarget against parent to touchTargets.
-      for (const touchTarget of event["_touchTargetList"]) {
+      for (const touchTarget of $(event).touchTargetList) {
         const result = retarget(touchTarget, parent);
 
         touchTargets.append(result);
@@ -124,7 +122,7 @@ export function dispatch(
         // 1. If isActivationEvent is true, activationTarget is null, and target has activation behavior, then set activationTarget to target.
         if (
           isActivationEvent && activationTarget === null &&
-          target["_activationBehavior"]
+          $(target).activationBehavior
         ) activationTarget = target;
 
         // 2. Append to an event path with event, parent, target, relatedTarget, touchTargets, and slot-in-closed-tree.
@@ -139,14 +137,14 @@ export function dispatch(
       }
 
       // 9. If parent is non-null, then set parent to the result of invoking parent’s get the parent with event.
-      if (parent) parent = parent["_getParent"](event);
+      if (parent) parent = $(parent).getParent(event);
 
       // 10. Set slot-in-closed-tree to false.
       slotInClosedTree = false;
     }
 
     const filtered = ifilter(
-      event["_path"],
+      $(event).path,
       (struct) => !!struct.shadowAdjustedTarget,
     );
     // 10. Let clearTargetsStruct be the last struct in event’s path whose shadow-adjusted target is non-null.
@@ -167,32 +165,32 @@ export function dispatch(
     }
 
     // 12. If activationTarget is non-null and activationTarget has legacy-pre-activation behavior, then run activationTarget’s legacy-pre-activation behavior.
-    if (activationTarget && activationTarget["_legacyPreActivationBehavior"]) {
-      activationTarget["_legacyPreActivationBehavior"]();
+    if (activationTarget && $(activationTarget).legacyPreActivationBehavior) {
+      $(activationTarget).legacyPreActivationBehavior?.();
     }
 
     // 13. For each struct in event’s path, in reverse order:
-    for (const struct of [...event["_path"]].reverse()) {
+    for (const struct of [...$(event).path].reverse()) {
       // 1. If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET.
-      if (struct.shadowAdjustedTarget) event["eventPhase"] = event.AT_TARGET;
+      if (struct.shadowAdjustedTarget) $(event).eventPhase = event.AT_TARGET;
       // 2. Otherwise, set event’s eventPhase attribute to CAPTURING_PHASE.
-      else event["eventPhase"] = event.CAPTURING_PHASE;
+      else $(event).eventPhase = event.CAPTURING_PHASE;
 
       // 3. Invoke with struct, event, "capturing", and legacyOutputDidListenersThrowFlag if given.
       invoke(struct, event, "capturing", legacyOutputDidListenersThrowFlag);
     }
 
     // 14. For each struct in event’s path:
-    for (const struct of event["_path"]) {
+    for (const struct of $(event).path) {
       // 1. If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET.
-      if (struct["shadowAdjustedTarget"]) event["eventPhase"] = event.AT_TARGET;
+      if (struct["shadowAdjustedTarget"]) $(event).eventPhase = event.AT_TARGET;
       // 2. Otherwise:
       else {
         // 1. If event’s bubbles attribute is false, then continue.
         if (!event.bubbles) continue;
 
         // 2. Set event’s eventPhase attribute to BUBBLING_PHASE.
-        event["eventPhase"] = event.BUBBLING_PHASE;
+        $(event).eventPhase = event.BUBBLING_PHASE;
       }
 
       // 3. Invoke with struct, event, "bubbling", and legacyOutputDidListenersThrowFlag if given.
@@ -201,45 +199,45 @@ export function dispatch(
   }
 
   // 6. Set event’s eventPhase attribute to NONE.
-  event["eventPhase"] = event.NONE;
+  $(event).eventPhase = event.NONE;
 
   // 7. Set event’s currentTarget attribute to null.
-  event["currentTarget"] = null;
+  $(event).currentTarget = null;
 
   // 8. Set event’s path to the empty list.
-  event["_path"] = new List();
+  $(event).path = new List();
 
   // 9. Unset event’s dispatch flag, stop propagation flag, and stop immediate propagation flag.
-  event["_dispatch"] = false,
-    event["_stopPropagation"] = false,
-    event["_stopImmediatePropagation"] = false;
+  $(event).dispatch = false,
+    $(event).stopPropagation = false,
+    $(event).stopImmediatePropagation = false;
 
   // 10. If clearTargets, then:
   if (clearTargets) {
     // 1. Set event’s target to null.
-    event["_target"] = null;
+    $(event).target = null;
 
     // 2. Set event’s relatedTarget to null.
-    event["_relatedTarget"] = null;
+    $(event).relatedTarget = null;
 
     // 3. Set event’s touch target list to the empty list.
-    event["_touchTargetList"] = new List();
+    $(event).touchTargetList = new List();
   }
 
   // 11. If activationTarget is non-null, then:
   if (activationTarget) {
     // 1. If event’s canceled flag is unset, then run activationTarget’s activation behavior with event.
-    if (!event["_canceled"]) activationTarget["_activationBehavior"]?.(event);
+    if (!$(event).canceled) $(activationTarget).activationBehavior?.(event);
     // 2. Otherwise, if activationTarget has legacy-canceled-activation behavior, then run activationTarget’s legacy-canceled-activation behavior.
     else {
-      if (activationTarget["_legacyCanceledActivation"]) {
-        activationTarget["_legacyCanceledActivation"]();
+      if ($(activationTarget).legacyCanceledActivation) {
+        $(activationTarget).legacyCanceledActivation?.();
       }
     }
   }
 
   // 12. Return false if event’s canceled flag is set; otherwise true.
-  return !event["_canceled"];
+  return !$(event).canceled;
 }
 
 /**
@@ -265,12 +263,12 @@ export function appendEventPath(
   let rootOfClosedTree = false;
 
   // 4. If invocationTarget is a shadow root whose mode is "closed", then set root-of-closed-tree to true.
-  if (resolved.isShadowRoot && resolved.root["_mode"] === "closed") {
+  if (resolved.isShadowRoot && $(resolved.root).mode === "closed") {
     rootOfClosedTree = true;
   }
 
   // 5. Append a new struct to event’s path whose invocation target is invocationTarget, invocation-target-in-shadow-tree is invocationTargetInShadowTree, shadow-adjusted target is shadowAdjustedTarget, relatedTarget is relatedTarget, touch target list is touchTargets, root-of-closed-tree is root-of-closed-tree, and slot-in-closed-tree is slot-in-closed-tree.
-  event["_path"].append({
+  $(event).path.append({
     invocationTarget,
     invocationTargetInShadowTree,
     shadowAdjustedTarget,
@@ -304,7 +302,7 @@ export function invoke(
   phase: string,
   legacyOutputDidListenersThrowFlag: boolean,
 ): void {
-  const path = [...event["_path"]];
+  const path = [...$(event).path];
   const index = path.findIndex((item) => item === struct);
   const candidates = index > -1
     ? path.slice(0, index + 1).filter((struct) => !!struct.shadowAdjustedTarget)
@@ -312,23 +310,25 @@ export function invoke(
   const lastStruct = lastItem(candidates);
 
   // 1. Set event’s target to the shadow-adjusted target of the last struct in event’s path, that is either struct or preceding struct, whose shadow-adjusted target is non-null.
-  if (lastStruct) event["_target"] = lastStruct.shadowAdjustedTarget;
+  if (lastStruct) $(event).target = lastStruct.shadowAdjustedTarget;
 
   // 2. Set event’s relatedTarget to struct’s relatedTarget.
-  event["_relatedTarget"] = struct.relatedTarget;
+  $(event).relatedTarget = struct.relatedTarget;
 
   // 3. Set event’s touch target list to struct’s touch target list.
-  event["_touchTargetList"] = struct.touchTargetList;
+  $(event).touchTargetList = struct.touchTargetList;
 
   // 4. If event’s stop propagation flag is set, then return.
-  if (event["_stopPropagation"]) return;
+  if ($(event).stopPropagation) return;
 
   // 5. Initialize event’s currentTarget attribute to struct’s invocation target.
-  event["currentTarget"] = struct.invocationTarget;
+  $(event).currentTarget = struct.invocationTarget;
 
+  const currentTarget = $(event).currentTarget;
   // 6. Let listeners be a clone of event’s currentTarget attribute value’s event listener list.
-  const listeners = event.currentTarget?.["_eventListenerList"].clone() ??
-    new List();
+  const listeners = currentTarget
+    ? $(currentTarget).eventListenerList.clone()
+    : new List<EventListener>();
 
   // 7. Let invocationTargetInShadowTree be struct’s invocation-target-in-shadow-tree.
   const invocationTargetInShadowTree = struct.invocationTargetInShadowTree;
@@ -349,7 +349,7 @@ export function invoke(
 
     // 2. If event’s type attribute value is a match for any of the strings in the first column in the following table, set event’s type attribute value to the string in the second column on the same row as the matching string, and return otherwise.
     if (eventTypeMap.has(event.type)) {
-      event["type"] = eventTypeMap.get(event.type)!;
+      $(event).type = eventTypeMap.get(event.type)!;
     } else return;
 
     // 3. Inner invoke with event, listeners, phase, invocationTargetInShadowTree, and legacyOutputDidListenersThrowFlag if given.
@@ -362,7 +362,7 @@ export function invoke(
     );
 
     // 4. Set event’s type attribute value to originalEventType.
-    event["type"] = originalEventType;
+    $(event).type = originalEventType;
   }
 }
 
@@ -410,7 +410,7 @@ export function innerInvoke(
 
     // 5. If listener’s once is true, then remove listener from event’s currentTarget attribute value’s event listener list.
     if (listener.once && event.currentTarget) {
-      event.currentTarget["_eventListenerList"].remove((eventListener) =>
+      $(event.currentTarget).eventListenerList.remove((eventListener) =>
         eventListener === listener
       );
     }
@@ -427,7 +427,7 @@ export function innerInvoke(
     // 2. If invocationTargetInShadowTree is false, then set global’s current event to event.
 
     // 9. If listener’s passive is true, then set event’s in passive listener flag.
-    if (listener.passive) event["_inPassiveListener"] = true;
+    if (listener.passive) $(event).inPassiveListener = true;
 
     // 10. Call a user object’s operation with listener’s callback, "handleEvent", « event », and event’s currentTarget attribute value. If this throws an exception, then:
     try {
@@ -446,12 +446,12 @@ export function innerInvoke(
     }
 
     // 11. Unset event’s in passive listener flag.
-    event["_inPassiveListener"] = false;
+    $(event).inPassiveListener = false;
 
     // 12. If global is a Window object, then set global’s current event to currentEvent.
 
     // 13. If event’s stop immediate propagation flag is set, then return found.
-    if (event["_stopImmediatePropagation"]) return found;
+    if ($(event).stopImmediatePropagation) return found;
   }
 
   // 3. Return found.

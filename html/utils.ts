@@ -1,13 +1,9 @@
 import { Text } from "../dom/nodes/text.ts";
 import { Attr } from "../dom/nodes/elements/attr.ts";
 import { isText } from "../dom/nodes/utils.ts";
-import { Comment } from "../dom/nodes/comment.ts";
-import { Element, setAttributeValue } from "../dom/nodes/elements/element.ts";
-import { DocumentFragment } from "../dom/nodes/document_fragment.ts";
+import { setAttributeValue } from "../dom/nodes/elements/element.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
-import { Document } from "../dom/nodes/documents/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
-import { HTMLTemplateElement } from "./elements/html_template_element.ts";
 import { $ } from "../internal.ts";
 
 type Child = Node & ChildNode;
@@ -70,7 +66,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTemplateContent(templateElement: HTMLTemplateElement): DocumentFragment {
-    return templateElement.content as any;
+    return templateElement.content;
   }
 
   setDocumentType(
@@ -89,7 +85,10 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     document.appendChild(documentType);
   }
 
-  setDocumentMode(document: Document, mode: html.DOCUMENT_MODE): void {
+  setDocumentMode(
+    document: globalThis.Document,
+    mode: html.DOCUMENT_MODE,
+  ): void {
     $(document).mode = mode;
   }
 
@@ -216,7 +215,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
 }
 
 class AttrConvertor {
-  static from(attr: Attr): Token.Attribute {
+  static from(attr: globalThis.Attr): Token.Attribute {
     return {
       name: attr.localName,
       namespace: attr.namespaceURI ?? undefined,

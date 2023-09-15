@@ -7,13 +7,6 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { type Attr } from "../elements/attr.ts";
-import { type Document } from "../documents/document.ts";
-import { type DocumentFragment } from "../document_fragment.ts";
-import { type DocumentType } from "../document_type.ts";
-import { type Element } from "../elements/element.ts";
-import { type Text } from "../text.ts";
-import { type CharacterData } from "../character_data.ts";
 import { $, tree } from "../../../internal.ts";
 
 /**
@@ -107,7 +100,7 @@ export function getShadowIncludingRoot(node: Node): Node {
   const root = tree.root(node);
 
   if (isShadowRoot(root)) {
-    const host = root["_host"];
+    const host = $(root).host;
     return getShadowIncludingRoot(host);
   }
 
@@ -117,7 +110,9 @@ export function getShadowIncludingRoot(node: Node): Node {
 /** Return document element of document.
  * @see https://dom.spec.whatwg.org/#document-element
  */
-export function getDocumentElement<T extends Node>(node: T): Element | null {
+export function getDocumentElement<T extends Node>(
+  node: T,
+): globalThis.Element | null {
   for (const child of tree.children(node)) if (isElement(child)) return child;
 
   return null;

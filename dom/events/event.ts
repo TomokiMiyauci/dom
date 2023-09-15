@@ -1,9 +1,9 @@
 import { List } from "../../infra/data_structures/list.ts";
 import type { IEvent } from "../../interface.d.ts";
+import { $, internalSlots } from "../../internal.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
 import { Steps } from "../infra/applicable.ts";
-import { type EventTarget } from "./event_target.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#potential-event-target)
@@ -18,22 +18,22 @@ export class Event implements IEvent {
   constructor(type: string, eventInitDict: EventInit = {}) {
     const { bubbles = false, cancelable = false, composed = false } =
       eventInitDict;
-    this._composed = composed;
-    this.#type = type;
-    this.#bubbles = bubbles;
-    this.#cancelable = cancelable;
     this.#timestamp = Date.now();
+
+    const _ = new EventInternals();
+    _.type = type;
+    _.composed = composed;
+    _.bubbles = bubbles;
+    _.cancelable = cancelable;
+
+    internalSlots.set(this, _);
+
+    this._ = _;
   }
 
-  // When an event is created the attribute must be initialized to the empty string.
-  #type: string;
   get type(): string {
     // return the value it was initialized to
-    return this.#type;
-  }
-
-  private set type(value: string) {
-    this.#type = value;
+    return this._.type;
   }
 
   /**
@@ -41,7 +41,7 @@ export class Event implements IEvent {
    */
   get target(): EventTarget | null {
     // return this’s target.
-    return this._target;
+    return this._.target;
   }
 
   /**
@@ -49,22 +49,15 @@ export class Event implements IEvent {
    */
   get srcElement(): EventTarget | null {
     // return this’s target.
-    return this._target;
+    return this._.target;
   }
-
-  // When an event is created the attribute must be initialized to null.
-  #currentTarget: EventTarget | null = null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-currenttarget)
    */
   get currentTarget(): EventTarget | null {
     // return the value it was initialized to
-    return this.#currentTarget;
-  }
-
-  private set currentTarget(value: EventTarget) {
-    this.#currentTarget = value;
+    return this._.currentTarget;
   }
 
   /**
@@ -75,7 +68,7 @@ export class Event implements IEvent {
     const composedPath = new List<EventTarget>();
 
     // 2. Let path be this’s path.
-    const path = this._path;
+    const path = this._.path;
 
     // 3. If path is empty, then return composedPath.
     if (path.isEmpty) return [...composedPath];
@@ -196,18 +189,12 @@ export class Event implements IEvent {
   @constant
   static BUBBLING_PHASE = 3 as const;
 
-  #eventPhase: 0 | 1 | 2 | 3 = 0;
-
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-eventphase)
    */
   get eventPhase(): number {
     // return the value it was initialized to
-    return this.#eventPhase;
-  }
-
-  private set eventPhase(value: 0 | 1 | 2 | 3) {
-    this.#eventPhase = value;
+    return this._.eventPhase;
   }
 
   /**
@@ -215,7 +202,7 @@ export class Event implements IEvent {
    */
   stopPropagation(): void {
     // set this’s stop propagation flag.
-    this._stopPropagation = true;
+    this._.stopPropagation = true;
   }
 
   /**
@@ -223,7 +210,7 @@ export class Event implements IEvent {
    */
   get cancelBubble(): boolean {
     // return true if this’s stop propagation flag is set; otherwise false.
-    return this._stopPropagation;
+    return this._.stopPropagation;
   }
 
   /**
@@ -231,7 +218,7 @@ export class Event implements IEvent {
    */
   private set cancelBubble(value: boolean) {
     // set this’s stop propagation flag if the given value is true; otherwise do nothing.
-    if (value) this._stopPropagation = true;
+    if (value) this._.stopPropagation = true;
   }
 
   /**
@@ -239,33 +226,21 @@ export class Event implements IEvent {
    */
   stopImmediatePropagation(): void {
     // set this’s stop propagation flag and this’s stop immediate propagation flag.
-    this._stopPropagation = true, this._stopImmediatePropagation = true;
+    this._.stopPropagation = true, this._.stopImmediatePropagation = true;
   }
-
-  #bubbles: boolean;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-bubbles)
    */
   get bubbles(): boolean {
-    return this.#bubbles;
+    return this._.bubbles;
   }
-
-  private set bubbles(value: boolean) {
-    this.#bubbles = value;
-  }
-
-  #cancelable: boolean;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-cancelable)
    */
   get cancelable(): boolean {
-    return this.#cancelable;
-  }
-
-  private set cancelable(value: boolean) {
-    this.#cancelable = value;
+    return this._.cancelable;
   }
 
   /**
@@ -273,7 +248,7 @@ export class Event implements IEvent {
    */
   get returnValue(): boolean {
     // return false if this’s canceled flag is set; otherwise true.
-    return !this._canceled;
+    return !this._.canceled;
   }
 
   /**
@@ -297,7 +272,7 @@ export class Event implements IEvent {
    */
   get defaultPrevented(): boolean {
     // return true if this’s canceled flag is set; otherwise false.
-    return this._canceled;
+    return this._.canceled;
   }
 
   /**
@@ -305,22 +280,15 @@ export class Event implements IEvent {
    */
   get composed(): boolean {
     // return true if this’s composed flag is set; otherwise false.
-    return this._composed;
+    return this._.composed;
   }
-
-  // When an event is created the attribute must be initialized to false.
-  #isTrusted = false;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-istrusted)
    */
   get isTrusted(): boolean {
     // return the value it was initialized to
-    return this.#isTrusted;
-  }
-
-  private set isTrusted(value: boolean) {
-    this.#isTrusted = value;
+    return this._.isTrusted;
   }
 
   #timestamp: number;
@@ -346,31 +314,13 @@ export class Event implements IEvent {
     cancelable = false,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
-    if (this._dispatch) return;
+    if (this._.dispatch) return;
 
     // 2. Initialize this with type, bubbles, and cancelable.
     initialize(this, type, bubbles, cancelable);
   }
 
-  protected _target: PotentialEventTarget = null;
-
-  protected _relatedTarget: PotentialEventTarget = null;
-  protected _touchTargetList: List<PotentialEventTarget> = new List();
-  protected _path: List<Struct> = new List();
-  protected _stopPropagation = false;
-  protected _stopImmediatePropagation = false;
-  protected _canceled = false;
-  protected _inPassiveListener = false;
-  protected _composed: boolean;
-  protected _initialized = false;
-  protected _dispatch = false;
-
-  /**
-   *  @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-constructor-ext)
-   */
-  protected eventConstructionSteps: Steps<
-    [event: Event, eventInitDict: EventInit]
-  > = new Steps();
+  protected _: EventInternals;
 }
 
 export interface Event
@@ -379,6 +329,40 @@ export interface Event
     Const<"CAPTURING_PHASE", 1>,
     Const<"AT_TARGET", 2>,
     Const<"BUBBLING_PHASE", 3> {}
+
+export class EventInternals {
+  target: PotentialEventTarget = null;
+  relatedTarget: PotentialEventTarget = null;
+  touchTargetList: List<PotentialEventTarget> = new List();
+  path: List<Struct> = new List();
+  stopPropagation = false;
+  stopImmediatePropagation = false;
+  canceled = false;
+  cancelable = false;
+  inPassiveListener = false;
+  composed = false;
+  initialized = false;
+  dispatch = false;
+  bubbles = false;
+
+  // When an event is created the attribute must be initialized to the empty string.
+  type = "";
+
+  // When an event is created the attribute must be initialized to false.
+  isTrusted = false;
+
+  eventPhase: 0 | 1 | 2 | 3 = 0;
+
+  // When an event is created the attribute must be initialized to null.
+  currentTarget: EventTarget | null = null;
+
+  /**
+   *  @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-constructor-ext)
+   */
+  eventConstructionSteps: Steps<
+    [event: globalThis.Event, eventInitDict: EventInit]
+  > = new Steps();
+}
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#event-path)
@@ -430,27 +414,27 @@ export function initialize(
   cancelable: boolean,
 ) {
   // 1. Set event’s initialized flag.
-  event["_initialized"] = true;
+  $(event).initialized = true;
 
   // 2. Unset event’s stop propagation flag, stop immediate propagation flag, and canceled flag.
-  event["_stopPropagation"] = false,
-    event["_stopImmediatePropagation"] = false,
-    event["_canceled"] = false;
+  $(event).stopPropagation = false,
+    $(event).stopImmediatePropagation = false,
+    $(event).canceled = false;
 
   // 3. Set event’s isTrusted attribute to false.
-  event["isTrusted"] = false;
+  $(event).isTrusted = false;
 
   // 4. Set event’s target to null.
-  event["_target"] = null;
+  $(event).target = null;
 
   // 5. Set event’s type attribute to type.
-  event["type"] = type;
+  $(event).type = type;
 
   // 6. Set event’s bubbles attribute to bubbles.
-  event["bubbles"] = bubbles;
+  $(event).bubbles = bubbles;
 
   // 7. Set event’s cancelable attribute to cancelable.
-  event["cancelable"] = cancelable;
+  $(event).cancelable = cancelable;
 }
 
 /**
@@ -458,7 +442,7 @@ export function initialize(
  */
 export function setCanceled(event: Event): void {
   // if event’s cancelable attribute value is true and event’s in passive listener flag is unset, then set event’s canceled flag, and do nothing otherwise.
-  if (event.cancelable && !event["_inPassiveListener"]) {
-    event["_canceled"] = true;
+  if (event.cancelable && !$(event).inPassiveListener) {
+    $(event).canceled = true;
   }
 }

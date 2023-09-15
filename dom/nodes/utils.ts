@@ -1,14 +1,4 @@
 import { NodeType } from "./node.ts";
-import { type Text } from "./text.ts";
-import { type Document } from "./documents/document.ts";
-import { type DocumentFragment } from "./document_fragment.ts";
-import { type DocumentType } from "./document_type.ts";
-import { type Element } from "./elements/element.ts";
-import { type Attr } from "./elements/attr.ts";
-import { type Comment } from "./comment.ts";
-import { type CharacterData } from "./character_data.ts";
-import { type ShadowRoot } from "./shadow_root.ts";
-import type { ProcessingInstruction } from "./processing_instruction.ts";
 import { $, internalSlots } from "../../internal.ts";
 
 export class UnImplemented extends Error {}
