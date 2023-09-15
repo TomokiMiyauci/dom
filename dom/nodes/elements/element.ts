@@ -5,12 +5,8 @@ import {
   getElementsByQualifiedName,
 } from "../node_utils.ts";
 import { getQualifiedName, UnImplemented } from "../utils.ts";
-import {
-  Attr,
-  changeAttributes,
-  cloneAttr,
-  handleAttributesChanges,
-} from "./attr.ts";
+import { Attr, cloneAttr } from "./attr.ts";
+import { changeAttributes, handleAttributesChanges } from "./attr_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";

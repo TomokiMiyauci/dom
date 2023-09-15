@@ -1,11 +1,9 @@
 import { Node, NodeType } from "../node.ts";
 import { type PartialBy } from "../../../deps.ts";
-import { isCustom } from "../elements/element.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
-import { queueMutationRecord } from "../mutation_observers/queue.ts";
-import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { $, internalSlots } from "../../../internal.ts";
+import { setExistAttributeValue } from "./attr_utils.ts";
 
 type Required = "localName";
 
@@ -67,7 +65,7 @@ export class Attr extends Node implements IAttr {
    */
   override set nodeValue(value: string) {
     // Set an existing attribute value with this and the given value.
-    setAnExistingAttributeValue(this, value);
+    setExistAttributeValue(this, value);
   }
 
   /**
@@ -83,7 +81,7 @@ export class Attr extends Node implements IAttr {
    */
   override set textContent(value: string) {
     // Set an existing attribute value with this and the given value.
-    setAnExistingAttributeValue(this, value);
+    setExistAttributeValue(this, value);
   }
 
   /**
@@ -144,7 +142,7 @@ export class Attr extends Node implements IAttr {
    */
   set value(value: string) {
     // The value getter steps are to return this’s value.
-    setAnExistingAttributeValue(this, value);
+    setExistAttributeValue(this, value);
   }
 
   /**
@@ -217,79 +215,6 @@ export class AttrInternals {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
    */
   qualifiedName!: string;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#set-an-existing-attribute-value
- */
-export function setAnExistingAttributeValue(
-  attribute: Attr,
-  value: string,
-): void {
-  const _ = $(attribute);
-
-  // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (_.element === null) _.value = value;
-  // 2. Otherwise, change attribute to value.
-  else changeAttributes(attribute, value);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-change
- */
-export function changeAttributes(
-  attribute: globalThis.Attr,
-  value: string,
-): void {
-  const _ = $(attribute);
-
-  // 1. Let oldValue be attribute’s value.
-  const oldValue = _.value;
-
-  // 2. Set attribute’s value to value.
-  _.value = value;
-
-  // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  if (_.element) {
-    handleAttributesChanges(attribute, _.element, oldValue, value);
-  }
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#handle-attribute-changes
- */
-export function handleAttributesChanges(
-  attribute: globalThis.Attr,
-  element: Element,
-  oldValue: string | null,
-  newValue: string | null,
-): void {
-  const { namespace, localName } = $(attribute);
-
-  // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
-  queueMutationRecord(
-    "attributes",
-    element,
-    localName,
-    namespace,
-    oldValue,
-    new OrderedSet(),
-    new OrderedSet(),
-    null,
-    null,
-  );
-
-  // 2. If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  if (isCustom(element)) throw new Error("handleAttributesChanges");
-
-  // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  $(element).attributeChangeSteps.run({
-    element,
-    localName,
-    oldValue,
-    value: newValue,
-    namespace,
-  });
 }
 
 export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
