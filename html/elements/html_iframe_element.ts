@@ -4,7 +4,7 @@ import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
-import { type Element, reflectSet } from "../../dom/nodes/elements/element.ts";
+import { reflectSet } from "../../dom/nodes/elements/element_utils.ts";
 import { $ } from "../../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 

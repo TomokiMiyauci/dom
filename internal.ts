@@ -44,7 +44,7 @@ export interface InternalSlots {
     & ElementInternals
     & NodeInternals
     & EventTargetInternals;
-  get(key: ShadowRoot): ShadowRootInternals;
+  get(key: ShadowRoot): ShadowRootInternals & NodeInternals;
   get(key: Element): ElementInternals & NodeInternals & EventTargetInternals;
   get(key: Attr): AttrInternals;
   get(key: DocumentType): DocumentTypeInternals;

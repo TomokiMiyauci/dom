@@ -1,4 +1,4 @@
-import { isCustom } from "../elements/element.ts";
+import { isCustom } from "../elements/element_utils.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { $ } from "../../../internal.ts";
@@ -22,7 +22,7 @@ export function setExistAttributeValue(
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-change
  */
 export function changeAttributes(
-  attribute: globalThis.Attr,
+  attribute: Attr,
   value: string,
 ): void {
   const _ = $(attribute);
@@ -43,7 +43,7 @@ export function changeAttributes(
  * @see https://dom.spec.whatwg.org/#handle-attribute-changes
  */
 export function handleAttributesChanges(
-  attribute: globalThis.Attr,
+  attribute: Attr,
   element: Element,
   oldValue: string | null,
   newValue: string | null,

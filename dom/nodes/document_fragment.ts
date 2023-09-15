@@ -3,7 +3,7 @@ import { ParentNode } from "./node_trees/parent_node.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
 import { descendantTextContent } from "./text.ts";
-import { replaceAllString } from "./elements/element.ts";
+import { replaceAllString } from "./elements/element_utils.ts";
 import { $, internalSlots } from "../../internal.ts";
 
 @ParentNode

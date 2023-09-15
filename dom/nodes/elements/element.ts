@@ -6,7 +6,7 @@ import {
 } from "../node_utils.ts";
 import { getQualifiedName, UnImplemented } from "../utils.ts";
 import { Attr, cloneAttr } from "./attr.ts";
-import { changeAttributes, handleAttributesChanges } from "./attr_utils.ts";
+import { changeAttributes } from "./attr_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
@@ -17,7 +17,6 @@ import { List } from "../../../infra/data_structures/list.ts";
 import { descendantTextContent, Text } from "../text.ts";
 import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
-import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
 import { InnerHTML } from "../../../domparsing/inner_html.ts";
@@ -37,18 +36,25 @@ import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "./element_algorithm.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Steps } from "../../infra/applicable.ts";
-import { $, internalSlots, tree } from "../../../internal.ts";
-
-/**
- * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
- */
-enum CustomElementState {
-  Undefined = "undefined",
-  Failed = "failed",
-  Uncustomized = "uncustomized",
-  Precustomized = "precustomized",
-  Custom = "custom",
-}
+import { $, internalSlots } from "../../../internal.ts";
+import { ShadowRoot } from "../shadow_root.ts";
+import {
+  appendAttribute,
+  CustomElementState,
+  getAttributeByName,
+  getAttributeByNamespaceAndLocalName,
+  getAttributeValue,
+  hasAttributeByQualifiedName,
+  insertAdjacent,
+  reflectGet,
+  reflectSet,
+  removeAttribute,
+  removeAttributeByName,
+  removeAttributeByNamespaceAndLocalName,
+  replaceAllString,
+  setAttribute,
+  setAttributeValue,
+} from "./element_utils.ts";
 
 export interface ElementInits {
   namespace: string | null;
@@ -251,7 +257,7 @@ export class Element extends Node implements IElement {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-element-shadowroot)
    */
-  get shadowRoot(): ShadowRoot | null {
+  get shadowRoot(): globalThis.ShadowRoot | null {
     // 1. Let shadow be this’s shadow root.
     const shadow = this._.shadowRoot;
 
@@ -725,7 +731,7 @@ export class ElementInternals {
    * @default null
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-shadow-root)
    */
-  shadowRoot: ShadowRoot | null = null;
+  shadowRoot: globalThis.ShadowRoot | null = null;
 
   /**
    * @default new List()
@@ -778,327 +784,6 @@ export class ElementInternals {
     Object.defineProperty(this, "qualifiedName", {
       get: () => getQualifiedName(this.localName, this.namespacePrefix),
     });
-  }
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
- */
-export function getAttributeValue(
-  element: globalThis.Element,
-  localName: string,
-  namespace: string | null = null,
-): string {
-  // 1. Let attr be the result of getting an attribute given namespace, localName, and element.
-  const attr = getAttributeByNamespaceAndLocalName(
-    namespace,
-    localName,
-    element,
-  );
-
-  // 2. If attr is null, then return the empty string.
-  if (attr === null) return "";
-
-  // 3. Return attr’s value.
-  return $(attr).value;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
- */
-export function setAttribute(
-  attr: globalThis.Attr,
-  element: globalThis.Element,
-): globalThis.Attr | null {
-  // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
-  if (!($(attr).element === null || $(attr).element === element)) {
-    throw new DOMException(
-      "The attribute is in use by another element",
-      "InUseAttributeError",
-    );
-  }
-
-  // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
-  const oldAttr = getAttributeByNamespaceAndLocalName(
-    $(attr).namespace,
-    $(attr).localName,
-    element,
-  );
-
-  // 3. If oldAttr is attr, return attr.
-  if (oldAttr === attr) return attr;
-
-  // 4. If oldAttr is non-null, then replace oldAttr with attr.
-  if (oldAttr) replaceAttribute(oldAttr, attr);
-  // 5. Otherwise, append attr to element.
-  else appendAttribute(attr, element);
-
-  // 6. Return oldAttr.
-  return oldAttr;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-set-value
- */
-export function setAttributeValue(
-  element: globalThis.Element,
-  localName: string,
-  value: string,
-  prefix: string | null = null,
-  namespace: string | null = null,
-): void {
-  // 1. Let attribute be the result of getting an attribute given namespace, localName, and element.
-  const attribute = getAttributeByNamespaceAndLocalName(
-    namespace,
-    localName,
-    element,
-  );
-
-  // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
-  if (attribute === null) {
-    const attr = new Attr({
-      namespace,
-      namespacePrefix: prefix,
-      localName,
-      value,
-      nodeDocument: $(element).nodeDocument,
-    });
-
-    appendAttribute(attr, element);
-    return;
-  }
-  // 3. Change attribute to value.
-  changeAttributes(attribute, value);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace
- */
-export function getAttributeByNamespaceAndLocalName(
-  namespace: string | null,
-  localName: string,
-  element: globalThis.Element,
-): globalThis.Attr | null {
-  // 1. If namespace is the empty string, then set it to null.
-  namespace ||= null;
-
-  // 2. Return the attribute in element’s attribute list whose namespace is namespace and local name is localName, if any; otherwise null.
-  return find(
-    $(element).attributeList,
-    (attribute) =>
-      $(attribute).namespace === namespace &&
-      $(attribute).localName === localName,
-  ) ?? null;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-append
- */
-export function appendAttribute(
-  attribute: globalThis.Attr,
-  element: globalThis.Element,
-): void {
-  // 1. Append attribute to element’s attribute list.
-  $(element).attributeList.append(attribute);
-
-  // 2. Set attribute’s element to element.
-  $(attribute).element = element;
-
-  // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
-  handleAttributesChanges(attribute, element, null, $(attribute).value);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
- */
-export function replaceAttribute(
-  oldAttr: globalThis.Attr,
-  newAttr: globalThis.Attr,
-): void {
-  const oldElement = $(oldAttr).element;
-  // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
-  oldElement && $(oldElement).attributeList.replace(
-    newAttr,
-    (attr) => attr === oldAttr,
-  );
-
-  // 2. Set newAttr’s element to oldAttr’s element.
-  $(newAttr).element = $(oldAttr).element;
-
-  // 3. Set oldAttr’s element to null.
-  $(oldAttr).element = null;
-
-  const element = $(newAttr).element;
-  // 4. Handle attribute changes for oldAttr with newAttr’s element, oldAttr’s value, and newAttr’s value.
-  element &&
-    handleAttributesChanges(
-      oldAttr,
-      element,
-      $(oldAttr).value,
-      $(newAttr).value,
-    );
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove
- */
-export function removeAttribute(attribute: globalThis.Attr): void {
-  // Unclear whether there is always a element in attribute.
-  // 1. Let element be attribute’s element.
-  const element = $(attribute).element;
-
-  // 2. Remove attribute from element’s attribute list.
-  element && $(element).attributeList.remove((attr) => attr === attribute);
-
-  // 3. Set attribute’s element to null.
-  $(attribute).element = null;
-
-  // 4. Handle attribute changes for attribute with element, attribute’s value, and null.
-  element &&
-    handleAttributesChanges(attribute, element, $(attribute).value, null);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-name
- */
-export function removeAttributeByName(
-  qualifiedName: string,
-  element: globalThis.Element,
-): globalThis.Attr | null {
-  // 1. Let attr be the result of getting an attribute given qualifiedName and element.
-  const attr = getAttributeByName(qualifiedName, element);
-
-  // 2. If attr is non-null, then remove attr.
-  if (attr) removeAttribute(attr);
-
-  // 3. Return attr.
-  return attr;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-namespace
- */
-export function removeAttributeByNamespaceAndLocalName(
-  namespace: string | null,
-  localName: string,
-  element: globalThis.Element,
-): globalThis.Attr | null {
-  // 1. Let attr be the result of getting an attribute given namespace, localName, and element.
-  const attr = getAttributeByNamespaceAndLocalName(
-    namespace,
-    localName,
-    element,
-  );
-
-  // 2. If attr is non-null, then remove attr.
-  if (attr) removeAttribute(attr);
-
-  // 3. Return attr.
-  return attr;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name
- */
-export function getAttributeByName(
-  qualifiedName: string,
-  element: globalThis.Element,
-): globalThis.Attr | null {
-  // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
-  if (
-    $(element).namespace === Namespace.HTML &&
-    $($(element).nodeDocument).type !== "xml"
-  ) qualifiedName = toASCIILowerCase(qualifiedName);
-
-  // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
-  return find(
-    $(element).attributeList,
-    (attribute) => $(attribute).qualifiedName === qualifiedName,
-  ) ?? null;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#string-replace-all
- */
-export function replaceAllString(
-  string: string,
-  parent: globalThis.Node,
-): void {
-  // 1. Let node be null.
-  let node: globalThis.Node | null = null;
-
-  // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
-  if (string !== "") {
-    node = Text["create"]({
-      data: string,
-      nodeDocument: $(parent).nodeDocument,
-    });
-  }
-
-  // 3. Replace all with node within parent.
-  replaceAllNode(node, parent);
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-custom
- */
-export function isCustom(element: globalThis.Element): boolean {
-  // An element whose custom element state is "custom
-  return $(element).customElementState === CustomElementState.Custom;
-}
-
-export const reflectGet = getAttributeValue;
-export const reflectSet = setAttributeValue;
-
-export function hasAttributeByQualifiedName(
-  qualifiedName: string,
-  element: globalThis.Element,
-): boolean {
-  for (const attr of $(element).attributeList) {
-    if ($(attr).qualifiedName === qualifiedName) return true;
-  }
-
-  return false;
-}
-
-/**
- * @throws {DOMException}
- * @see https://dom.spec.whatwg.org/#insert-adjacent
- */
-export function insertAdjacent(
-  element: globalThis.Element,
-  where: string,
-  node: globalThis.Node,
-): globalThis.Node | null {
-  // run the steps associated with the first ASCII case-insensitive match for where:
-  switch (toASCIILowerCase(where)) {
-    case "beforebegin": {
-      const parent = tree.parent(element);
-      // If element’s parent is null, return null.
-      if (!parent) return null;
-
-      // Return the result of pre-inserting node into element’s parent before element.
-      return preInsertNode(node, parent, element);
-    }
-    case "afterbegin": {
-      // Return the result of pre-inserting node into element before element’s first child.
-      return preInsertNode(node, element, tree.firstChild(element));
-    }
-    case "beforeend": {
-      // Return the result of pre-inserting node into element before null.
-      return preInsertNode(node, element, null);
-    }
-    case "afterend": {
-      const parent = tree.parent(element);
-      // If element’s parent is null, return null.
-      if (!parent) return null;
-
-      // Return the result of pre-inserting node into element’s parent before element’s next sibling.
-      return preInsertNode(node, parent, tree.nextSibling(element));
-    }
-    default:
-      // Throw a "SyntaxError" DOMException.
-      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
   }
 }
 

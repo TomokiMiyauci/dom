@@ -3,7 +3,6 @@ import { $ } from "../../internal.ts";
 import { createEvent } from "./construct.ts";
 import { dispatch } from "./dispatch.ts";
 import { Event } from "./event.ts";
-import { type EventTarget } from "./event_target.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-fire)

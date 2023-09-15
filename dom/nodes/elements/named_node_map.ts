@@ -6,7 +6,7 @@ import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "../elements/element.ts";
+} from "../elements/element_utils.ts";
 import { $element } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import {

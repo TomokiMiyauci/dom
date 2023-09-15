@@ -64,4 +64,9 @@ export interface CustomElementDefinition {
 
   /** A local name. */
   localName: string;
+
+  /** Controls [attachShadow()](https://dom.spec.whatwg.org/#dom-element-attachshadow).
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/custom-elements.html#concept-custom-element-definition-disable-shadow)
+   */
+  disableShadow: boolean;
 }

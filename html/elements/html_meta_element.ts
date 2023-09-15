@@ -1,6 +1,9 @@
 import type { IHTMLMetaElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { reflectGet, reflectSet } from "../../dom/nodes/elements/element.ts";
+import {
+  reflectGet,
+  reflectSet,
+} from "../../dom/nodes/elements/element_utils.ts";
 
 export class HTMLMetaElement extends HTMLElement implements IHTMLMetaElement {
   get content(): string {

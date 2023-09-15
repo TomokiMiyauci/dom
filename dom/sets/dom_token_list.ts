@@ -1,11 +1,11 @@
 import { Iterable, iterable } from "../../webidl/iterable.ts";
 import type { IDOMTokenList } from "../../interface.d.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { type AttributesContext } from "../nodes/elements/element.ts";
 import {
-  AttributesContext,
   getAttributeValue,
   setAttributeValue,
-} from "../nodes/elements/element.ts";
+} from "../nodes/elements/element_utils.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { parseOrderSet, serializeOrderSet } from "../infra/ordered_set.ts";
 import { reAsciiWhitespace } from "../../infra/code_point.ts";
