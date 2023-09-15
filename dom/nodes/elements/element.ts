@@ -1,11 +1,9 @@
+import { Node, NodeStates, NodeType } from "../node.ts";
 import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
-  Node,
-  NodeStates,
-  NodeType,
-} from "../node.ts";
+} from "../node_utils.ts";
 import { getQualifiedName, UnImplemented } from "../utils.ts";
 import {
   Attr,

@@ -1,10 +1,9 @@
+import { Node, NodeType } from "../node.ts";
 import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
-  Node,
-  NodeType,
-} from "../node.ts";
+} from "../node_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { DocumentOrShadowRoot } from "../node_trees/document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../../../dom/xpath/x_path_evaluator_base.ts";
