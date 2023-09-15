@@ -4,14 +4,18 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
 } from "../node_utils.ts";
-import { getQualifiedName, UnImplemented } from "../utils.ts";
+import { getQualifiedName, isShadowHost, UnImplemented } from "../utils.ts";
 import { Attr, cloneAttr } from "./attr.ts";
 import { changeAttributes } from "./attr_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
 import { isHTMLDocument } from "../documents/document.ts";
-import { CustomElementDefinition } from "../../../html/custom_element.ts";
+import {
+  CustomElementDefinition,
+  isValidCustomElementName,
+  lookUpCustomElementDefinition,
+} from "../../../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 import { descendantTextContent, Text } from "../text.ts";
@@ -46,6 +50,7 @@ import {
   getAttributeValue,
   hasAttributeByQualifiedName,
   insertAdjacent,
+  isValidShadowHostName,
   reflectGet,
   reflectSet,
   removeAttribute,
@@ -276,8 +281,64 @@ export class Element extends Node implements IElement {
     reflectSet(this, "slot", value);
   }
 
-  attachShadow(init: ShadowRootInit): ShadowRoot {
-    throw new UnImplemented("attachShadow");
+  attachShadow(init: ShadowRootInit): globalThis.ShadowRoot {
+    init.slotAssignment ??= "named";
+    init.delegatesFocus ??= false;
+
+    // 1. If this’s namespace is not the HTML namespace, then throw a "NotSupportedError" DOMException.
+    if (this._.namespace !== Namespace.HTML) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 2. If this’s local name is not a valid shadow host name, then throw a "NotSupportedError" DOMException.
+    if (!isValidShadowHostName(this._.localName)) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 3. If this’s local name is a valid custom element name, or this’s is value is not null, then:
+    if (isValidCustomElementName(this._.localName) || this._.isValue !== null) {
+      // 1. Let definition be the result of looking up a custom element definition given this’s node document, its namespace, its local name, and its is value.
+      const definition = lookUpCustomElementDefinition(
+        this._.nodeDocument,
+        this._.namespace,
+        this._.localName,
+        this._.isValue,
+      );
+
+      // 2. If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException.
+      if (definition && definition.disableShadow) {
+        throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+      }
+    }
+
+    // 4. If this is a shadow host, then throw an "NotSupportedError" DOMException.
+    if (isShadowHost(this)) {
+      throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
+    }
+
+    // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
+    const shadow = new ShadowRoot({ host: this }) as globalThis.ShadowRoot;
+    $(shadow).mode = init.mode;
+    $(shadow).nodeDocument = this._.nodeDocument;
+
+    // 6. Set shadow’s delegates focus to init["delegatesFocus"].
+    $(shadow).delegatesFocus = init.delegatesFocus ?? false;
+
+    const { customElementState } = this._;
+    // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
+    if (
+      customElementState === CustomElementState.Precustomized ||
+      customElementState === CustomElementState.Custom
+    ) $(shadow).availableElementInternals;
+
+    // 8. Set shadow’s slot assignment to init["slotAssignment"].
+    $(shadow).slotAssignment = init.slotAssignment;
+
+    // 9. Set this’s shadow root to shadow.
+    this._.shadowRoot = shadow;
+
+    // 10 .Return shadow.
+    return shadow;
   }
 
   closest<K extends keyof HTMLElementTagNameMap>(
