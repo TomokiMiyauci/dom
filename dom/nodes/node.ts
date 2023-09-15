@@ -1,4 +1,4 @@
-import { isAttr, isDocument, isText, UnImplemented } from "./utils.ts";
+import { isAttr, isDocument, isText } from "./utils.ts";
 import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
 import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
 import type { INode } from "../../interface.d.ts";
@@ -32,6 +32,8 @@ import {
   locateNamespace,
   locateNamespacePrefix,
 } from "./node_utils.ts";
+import { documentBaseURL } from "../../html/infra/url.ts";
+import { URLSerializer } from "../../url/serializer.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -145,8 +147,13 @@ export abstract class Node extends EventTarget implements INode {
     internalSlots.set(this, _);
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-baseuri)
+   */
   get baseURI(): string {
-    throw new UnImplemented("baseURI");
+    const url = documentBaseURL(this._.nodeDocument);
+    // return this’s node document’s document base URL, serialized.
+    return URLSerializer.serialize(url);
   }
 
   /**

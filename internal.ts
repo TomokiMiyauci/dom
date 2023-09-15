@@ -11,6 +11,8 @@ import { type EventInternals } from "./dom/events/event.ts";
 import { type EventTargetInternals } from "./dom/events/event_target.ts";
 import { type ShadowRootInternals } from "./dom/nodes/shadow_root.ts";
 
+import type * as HTML from "./html/document.ts";
+
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
 import { Tree } from "./dom/infra/tree.ts";
 
@@ -46,11 +48,13 @@ export interface InternalSlots {
   get(key: Attr): AttrInternals;
   get(key: DocumentType): DocumentTypeInternals;
   get(key: ProcessingInstruction): ProcessingInstructionInternals;
-  get(key: CharacterData): CharacterDataInternals;
+  get(
+    key: CharacterData,
+  ): CharacterDataInternals & NodeInternals & EventTargetInternals;
   get(key: DocumentFragment): DocumentFragmentInternals & NodeInternals;
-  get(key: Document): DocumentInternals;
+  get(key: Document): DocumentInternals & HTML.DocumentInternals;
   get(key: DOMImplementation): DOMImplementationInternals;
-  get(key: Node): NodeInternals;
+  get(key: Node): NodeInternals & EventTargetInternals;
   get(key: Event): EventInternals;
   get(key: EventTarget): EventTargetInternals;
 }

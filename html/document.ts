@@ -6,7 +6,7 @@ import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { getChildTextContent } from "../dom/nodes/text.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $, tree } from "../internal.ts";
+import { $, internalSlots, tree } from "../internal.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -61,6 +61,13 @@ export function Document_HTML<T extends Constructor<Node>>(
      * @see https://momdo.github.io/html/dom.html#current-document-readiness
      */
     _currentDocumentReadiness: DocumentReadyState = "complete";
+
+    constructor(...args: any) {
+      super(...args);
+
+      const _ = Object.assign(internalSlots.get(this), new DocumentInternals());
+      internalSlots.set(this, _);
+    }
 
     get location(): Location {
       throw new Error("location#getter");
@@ -294,6 +301,13 @@ export function Document_HTML<T extends Constructor<Node>>(
 }
 
 export interface Document_HTML extends IDocument_HTML, Document_Obsolete {}
+
+export class DocumentInternals {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-about-base-url)
+   */
+  aboutBaseURL: URL | null = null;
+}
 
 /**
  * @see https://html.spec.whatwg.org/multipage/dom.html#the-title-element-2

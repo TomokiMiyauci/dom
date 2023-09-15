@@ -6,6 +6,7 @@ import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
 import { type Element, reflectSet } from "../../dom/nodes/elements/element.ts";
 import { $ } from "../../internal.ts";
+import { matchAboutBlank } from "../infra/url.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
@@ -191,15 +192,6 @@ export function processIframeAttributes(
 
     // 7. Navigate: navigate an iframe or frame given element, url, and referrerPolicy.
   }
-}
-
-/**
- * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#matches-about:blank)
- */
-export function matchAboutBlank(url: URL): boolean {
-  // TODO
-  return url.protocol === "about:" && url.pathname === "blank" &&
-    url.username === "" && url.password === "" && url.host === "";
 }
 
 /**
