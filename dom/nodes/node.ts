@@ -169,13 +169,9 @@ export abstract class Node extends EventTarget implements INode {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-getrootnode
    */
-  getRootNode(options?: GetRootNodeOptions | undefined): globalThis.Node {
+  getRootNode(options: GetRootNodeOptions = {}): globalThis.Node {
     // return this’s shadow-including root if options["composed"] is true; otherwise this’s root.
-    if (options?.composed) {
-      throw new Error("getRootNode is not supported composed");
-    }
-
-    return tree.root(this);
+    return options.composed ? tree.shadowIncludingRoot(this) : tree.root(this);
   }
 
   /**

@@ -15,6 +15,7 @@ import type * as HTML from "./html/document.ts";
 
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
 import { Tree } from "./dom/infra/tree.ts";
+import { ShadowTree } from "./dom/nodes/shadow_root_utils.ts";
 
 export interface InternalSlots {
   set(key: HTMLTemplateElement, value: HTMLTemplateElementInternals): void;
@@ -80,4 +81,6 @@ export const internalSlots = new InternalSlotsMap() as InternalSlots;
 
 export const $ = internalSlots.get.bind(internalSlots);
 
-export const tree = new Tree<Node, ParentNode, ChildNode>();
+const ExtendedTree = ShadowTree(Tree);
+
+export const tree = new ExtendedTree<Node, ParentNode, ChildNode>();
