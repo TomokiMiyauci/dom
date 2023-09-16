@@ -391,7 +391,7 @@ export abstract class Node extends EventTarget implements INode {
     }
 
     // 9. If node1 is preceding node2, then return DOCUMENT_POSITION_PRECEDING.
-    if (tree.isPrecede(node1, node2)) {
+    if (tree.isPreceding(node1, node2)) {
       return Position.DOCUMENT_POSITION_PRECEDING;
     }
 

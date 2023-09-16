@@ -40,7 +40,7 @@ export function position(
   }
 
   // 3. If nodeA is following nodeB, then if the position of (nodeB, offsetB) relative to (nodeA, offsetA) is before, return after, and if it is after, return before.
-  if (tree.isFollow(nodeA, nodeB)) {
+  if (tree.isFollowing(nodeA, nodeB)) {
     const pos = position([nodeB, offsetB], [nodeA, offsetA]);
 
     switch (pos) {

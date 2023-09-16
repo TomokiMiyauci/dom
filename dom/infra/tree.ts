@@ -274,25 +274,6 @@ export class Tree<
     return this.parent(target) === of;
   }
 
-  isFollow(target: T, of: T): boolean {
-    // A and B are in the same tree and A comes after B in tree order.
-    if (target === of) return false;
-    if (!this.isSameTree(target, of)) return false;
-
-    return some(this.follows(of), (tree) => tree === target);
-  }
-
-  isSameTree(left: T, right: T): boolean {
-    return left === right || this.root(left) === this.root(right);
-  }
-
-  /** Whether the {@linkcode target} is ancestor of {@linkcode of} or not. O(n)
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-ancestor)
-   */
-  isAncestor(target: T, of: T): boolean {
-    return this.isDescendant(of, target);
-  }
-
   /** Whether the {@linkcode target} is descendant of {@linkcode of} or not. O(n)
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-descendant)
    */
@@ -302,19 +283,50 @@ export class Tree<
       some(this.children(of), (child) => this.isDescendant(target, child));
   }
 
-  isInclusiveAncestor(target: T, of: T): boolean {
-    return target === of || this.isAncestor(target, of);
-  }
-
+  /** Whether the {@linkcode target} is inclusive descendant of {@linkcode of} or not. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-inclusive-descendant)
+   */
   isInclusiveDescendant(target: T, of: T): boolean {
     return target === of || this.isDescendant(target, of);
   }
 
-  isPrecede(target: T, of: T): boolean {
+  /** Whether the {@linkcode target} is ancestor of {@linkcode of} or not. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-ancestor)
+   */
+  isAncestor(target: T, of: T): boolean {
+    return this.isDescendant(of, target);
+  }
+
+  /** Whether the {@linkcode target} is inclusive ancestor of {@linkcode of} or not. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-inclusive-ancestor)
+   */
+  isInclusiveAncestor(target: T, of: T): boolean {
+    return target === of || this.isAncestor(target, of);
+  }
+
+  /** Whether the {@linkcode target} is preceding of {@linkcode of} or not.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-preceding)
+   */
+  isPreceding(target: T, of: T): boolean {
     // A and B are in the same tree and A comes before B in tree order.
     if (target === of) return false;
     if (!this.isSameTree(target, of)) return false;
 
     return some(this.precedes(of), (tree) => tree === target);
+  }
+
+  /** Whether the {@linkcode target} is following of {@linkcode of} or not.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-following)
+   */
+  isFollowing(target: T, of: T): boolean {
+    // A and B are in the same tree and A comes after B in tree order.
+    if (target === of) return false;
+    if (!this.isSameTree(target, of)) return false;
+
+    return some(this.follows(of), (tree) => tree === target);
+  }
+
+  isSameTree(left: T, right: T): boolean {
+    return left === right || this.root(left) === this.root(right);
   }
 }
