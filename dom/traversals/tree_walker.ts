@@ -2,7 +2,8 @@ import type { ITreeWalker } from "../../interface.d.ts";
 import { filter } from "./traversal.ts";
 import { NodeFilter } from "./node_filter.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import { tree } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
+import { traverseChildren, traverseSiblings } from "./tree_walker_utils.ts";
 
 @Exposed(Window)
 export class TreeWalker implements ITreeWalker {
@@ -12,7 +13,7 @@ export class TreeWalker implements ITreeWalker {
   @SameObject
   get root(): Node {
     // return this’s root.
-    return this._root;
+    return this.#_.root;
   }
 
   /**
@@ -20,7 +21,7 @@ export class TreeWalker implements ITreeWalker {
    */
   get whatToShow(): number {
     // return this’s whatToShow.
-    return this._whatToShow;
+    return this.#_.whatToShow;
   }
 
   /**
@@ -28,7 +29,7 @@ export class TreeWalker implements ITreeWalker {
    */
   get filter(): NodeFilter | null {
     // return this’s filter.
-    return this._filter;
+    return this.#_.filter;
   }
 
   /**
@@ -36,7 +37,7 @@ export class TreeWalker implements ITreeWalker {
    */
   get currentNode(): Node {
     // return this’s current.
-    return this._current;
+    return this.#_.current;
   }
 
   /**
@@ -44,7 +45,7 @@ export class TreeWalker implements ITreeWalker {
    */
   set currentNode(value: Node) {
     // set this’s current to the given value.
-    this._current = value;
+    this.#_.current = value;
   }
 
   /**
@@ -52,16 +53,16 @@ export class TreeWalker implements ITreeWalker {
    */
   parentNode(): Node | null {
     // 1. Let node be this’s current.
-    let node: Node | null = this._current;
+    let node: Node | null = this.#_.current;
 
     // 2. While node is non-null and is not this’s root:
-    while (node && node !== this._root) {
+    while (node && node !== this.#_.root) {
       // 1. Set node to node’s parent.
       node = tree.parent(node);
 
       // 2. If node is non-null and filtering node within this returns FILTER_ACCEPT, then set this’s current to node and return node.
       if (node && filter(node, this) === NodeFilter.FILTER_ACCEPT) {
-        this._current = node;
+        this.#_.current = node;
         return node;
       }
     }
@@ -107,10 +108,10 @@ export class TreeWalker implements ITreeWalker {
    */
   previousNode(): Node | null {
     // 1. Let node be this’s current.
-    let node = this._current;
+    let node = this.#_.current;
 
     // 2. While node is not this’s root:
-    while (node !== this._root) {
+    while (node !== this.#_.root) {
       // 1. Let sibling be node’s previous sibling.
       let sibling = tree.previousSibling(node);
 
@@ -135,7 +136,7 @@ export class TreeWalker implements ITreeWalker {
 
         // 4. If result is FILTER_ACCEPT, then set this’s current to node and return node.
         if (result === NodeFilter.FILTER_ACCEPT) {
-          this._current = node;
+          this.#_.current = node;
           return node;
         }
 
@@ -145,14 +146,14 @@ export class TreeWalker implements ITreeWalker {
 
       const parent = tree.parent(node);
       // 3. If node is this’s root or node’s parent is null, then return null.
-      if (node === this._root || !parent) return null;
+      if (node === this.#_.root || !parent) return null;
 
       // 4. Set node to node’s parent.
       node = parent;
 
       // 5. If the return value of filtering node within this is FILTER_ACCEPT, then set this’s current to node and return node.
       if (filter(node, this) === NodeFilter.FILTER_ACCEPT) {
-        this._current = node;
+        this.#_.current = node;
         return node;
       }
     }
@@ -166,7 +167,7 @@ export class TreeWalker implements ITreeWalker {
    */
   nextNode(): Node | null {
     // 1. Let node be this’s current.
-    let node = this._current;
+    let node = this.#_.current;
 
     // 2. Let result be FILTER_ACCEPT.
     let result: number = NodeFilter.FILTER_ACCEPT;
@@ -185,7 +186,7 @@ export class TreeWalker implements ITreeWalker {
 
         // 3. If result is FILTER_ACCEPT, then set this’s current to node and return node.
         if (result === NodeFilter.FILTER_ACCEPT) {
-          this._current = node;
+          this.#_.current = node;
           return node;
         }
       }
@@ -199,7 +200,7 @@ export class TreeWalker implements ITreeWalker {
       // 4. While temporary is non-null:
       while (temporary) {
         // 1. If temporary is this’s root, then return null.
-        if (temporary === this._root) return null;
+        if (temporary === this.#_.root) return null;
 
         // 2. Set sibling to temporary’s next sibling.
         sibling = tree.nextSibling(temporary);
@@ -219,7 +220,7 @@ export class TreeWalker implements ITreeWalker {
 
       // 6. If result is FILTER_ACCEPT, then set this’s current to node and return node.
       if (result === NodeFilter.FILTER_ACCEPT) {
-        this._current = node;
+        this.#_.current = node;
         return node;
       }
     }
@@ -227,140 +228,34 @@ export class TreeWalker implements ITreeWalker {
 
   [Symbol.toStringTag] = "TreeWalker";
 
-  // internal
+  get #_(): TreeWalkerInternals {
+    return $(this);
+  }
+}
+
+export class TreeWalkerInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-active)
    */
-  protected _activeFlag: boolean | null = null;
+  activeFlag: boolean | null = null;
 
-  protected _root!: Node;
+  root: Node;
 
-  protected _whatToShow!: number;
+  whatToShow: number;
 
-  protected _filter!: NodeFilter | null;
+  filter: NodeFilter | null;
 
-  protected _current!: Node;
-}
+  current: Node;
 
-export function traverseChildren(
-  walker: TreeWalker,
-  type: "first" | "last",
-): Node | null {
-  // 1. Let node be walker’s current.
-  let node: Node | null = walker["_current"];
-
-  // 2. Set node to node’s first child if type is first, and node’s last child if type is last.
-  node = type === "first" ? tree.firstChild(node) : tree.lastChild(node);
-
-  // 3. While node is non-null:
-  while (node) {
-    // 1. Let result be the result of filtering node within walker.
-    const result = filter(node, walker);
-
-    // 2. If result is FILTER_ACCEPT, then set walker’s current to node and return node.
-    if (result === NodeFilter.FILTER_ACCEPT) {
-      walker["_current"] = node;
-      return node;
-    }
-
-    // 3. If result is FILTER_SKIP, then:
-    if (result === NodeFilter.FILTER_SKIP) {
-      // 1. Let child be node’s first child if type is first, and node’s last child if type is last.
-      const child = type === "first"
-        ? tree.firstChild(node)
-        : tree.lastChild(node);
-
-      // 2. If child is non-null, then set node to child and continue.
-      if (child) {
-        node = child;
-        continue;
-      }
-    }
-
-    // 4. While node is non-null:
-    while (node) {
-      // 1. Let sibling be node’s next sibling if type is first, and node’s previous sibling if type is last.
-      const sibling = type === "first"
-        ? tree.nextSibling(node)
-        : tree.previousSibling(node);
-
-      // 2. If sibling is non-null, then set node to sibling and break.
-      if (sibling) {
-        node = sibling;
-        break;
-      }
-
-      // 3. Let parent be node’s parent.
-      const parent = tree.parent(node);
-
-      // 4. If parent is null, walker’s root, or walker’s current, then return null.
-      if (
-        !parent ||
-        parent === walker["_root"] ||
-        parent === walker["_current"]
-      ) return null;
-
-      // 5. Set node to parent.
-      node = parent;
-    }
-  }
-
-  // 4. Return null.
-  return null;
-}
-
-/**
- * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traverse-siblings)
- */
-export function traverseSiblings(
-  walker: TreeWalker,
-  type: "next" | "previous",
-): Node | null {
-  // 1. Let node be walker’s current.
-  let node = walker["_current"];
-
-  // 2. If node is root, then return null.
-  if (node === walker["_root"]) return null;
-
-  // 3. While true:
-  while (true) {
-    // 1. Let sibling be node’s next sibling if type is next, and node’s previous sibling if type is previous.
-    let sibling = type === "next"
-      ? tree.nextSibling(node)
-      : tree.previousSibling(node);
-
-    // 2. While sibling is non-null:
-    while (sibling) {
-      // 1. Set node to sibling.
-      node = sibling;
-
-      // 2. Let result be the result of filtering node within walker.
-      const result = filter(node, walker);
-
-      // 3. If result is FILTER_ACCEPT, then set walker’s current to node and return node.
-      if (result === NodeFilter.FILTER_ACCEPT) {
-        walker["_current"] = node;
-        return node;
-      }
-
-      // 4. Set sibling to node’s first child if type is next, and node’s last child if type is previous.
-      sibling = type === "next" ? tree.firstChild(node) : tree.lastChild(node);
-
-      // 5. If result is FILTER_REJECT or sibling is null, then set sibling to node’s next sibling if type is next, and node’s previous sibling if type is previous.
-      if (result === NodeFilter.FILTER_REJECT || !sibling) {
-        sibling = type === "next"
-          ? tree.nextSibling(node)
-          : tree.previousSibling(node);
-      }
-    }
-
-    // 3. Set node to node’s parent.
-    node = tree.parent(node)!;
-
-    // 4. If node is null or walker’s root, then return null.
-    if (!node || node === walker["_root"]) return null;
-
-    // 5. If the return value of filtering node within walker is FILTER_ACCEPT, then return null.
-    if (filter(node, walker) === NodeFilter.FILTER_ACCEPT) return null;
+  constructor({ filter, whatToShow, root, current }: {
+    filter: NodeFilter | null;
+    whatToShow: number;
+    root: Node;
+    current: Node;
+  }) {
+    this.filter = filter;
+    this.whatToShow = whatToShow;
+    this.root = root;
+    this.current = current;
   }
 }

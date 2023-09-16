@@ -1,9 +1,7 @@
 import type { INodeIterator } from "../../interface.d.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import { filter } from "./traversal.ts";
-import { NodeFilter } from "./node_filter.ts";
-import { dropwhile, first, last, takewhile } from "../../deps.ts";
-import { tree } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
+import { Direction, traverse } from "./node_iterator_utils.ts";
 
 @Exposed(Window)
 export class NodeIterator implements INodeIterator {
@@ -13,7 +11,7 @@ export class NodeIterator implements INodeIterator {
   @SameObject
   get root(): Node {
     // return this’s root.
-    return this._root;
+    return this.#_.root;
   }
 
   /**
@@ -21,7 +19,7 @@ export class NodeIterator implements INodeIterator {
    */
   get referenceNode(): Node {
     // return this’s reference.
-    return this._reference;
+    return this.#_.reference;
   }
 
   /**
@@ -29,7 +27,7 @@ export class NodeIterator implements INodeIterator {
    */
   get pointerBeforeReferenceNode(): boolean {
     // return this’s pointer before reference.
-    return this._pointerBeforeReference;
+    return this.#_.pointerBeforeReference;
   }
 
   /**
@@ -37,14 +35,14 @@ export class NodeIterator implements INodeIterator {
    */
   get whatToShow(): number {
     // return this’s whatToShow.
-    return this._whatToShow;
+    return this.#_.whatToShow;
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-nodeiterator-filter)
    */
   get filter(): NodeFilter | null {
-    return this._filter;
+    return this.#_.filter;
   }
 
   /**
@@ -73,119 +71,63 @@ export class NodeIterator implements INodeIterator {
   // It does not seem to be defined in the specification. For test pass.
   [Symbol.toStringTag] = "NodeIterator";
 
-  // internal
+  get #_(): NodeIteratorInternals {
+    return $(this);
+  }
+}
+
+export class NodeIteratorInternals {
   /**
+   * @default false
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-active)
    */
-  protected _activeFlag: boolean | null = null;
+  activeFlag = false;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-root)
    */
-  protected _root!: Node;
+  root: Node;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-whattoshow)
    */
-  protected _whatToShow!: number;
+  whatToShow: number;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-filter)
    */
-  protected _filter!: NodeFilter | null;
+  filter: NodeFilter | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
    */
-  protected get _iteratorCollection(): IterableIterator<Node> {
+  get iteratorCollection(): IterableIterator<Node> {
     return tree.inclusiveDescendants(this.root);
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-reference)
    */
-  protected _reference!: Node;
+  reference: Node;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pointer-before-reference)
    */
-  protected _pointerBeforeReference!: boolean;
-}
+  pointerBeforeReference: boolean;
 
-enum Direction {
-  Next,
-  Previous,
-}
-
-/**
- * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-nodeiterator-traverse)
- */
-export function traverse(
-  iterator: NodeIterator,
-  direction: Direction,
-): Node | null {
-  // 1. Let node be iterator’s reference.
-  let node = iterator["_reference"];
-
-  // 2. Let beforeNode be iterator’s pointer before reference.
-  let beforeNode = iterator["_pointerBeforeReference"];
-
-  // 3. While true:
-  while (true) {
-    // 1. Branch on direction:
-    switch (direction) {
-      // next
-      case Direction.Next: {
-        // If beforeNode is false, then set node to the first node following node in iterator’s iterator collection. If there is no such node, then return null.
-        if (!beforeNode) {
-          const following = dropwhile(
-            iterator["_iteratorCollection"],
-            (_, prev) => node !== prev,
-          );
-          const firstNode = first(following);
-
-          if (!firstNode) return null;
-          node = firstNode;
-        }
-
-        // If beforeNode is true, then set it to false.
-        if (beforeNode) beforeNode = false;
-        break;
-      }
-
-      // previous
-      case Direction.Previous: {
-        // If beforeNode is true, then set node to the first node preceding node in iterator’s iterator collection. If there is no such node, then return null.
-        if (beforeNode) {
-          const preceding = takewhile(
-            iterator["_iteratorCollection"],
-            (other) => node !== other,
-          );
-          const lastNode = last(preceding);
-
-          if (!lastNode) return null;
-
-          node = lastNode;
-        }
-
-        // If beforeNode is false, then set it to true.
-        if (!beforeNode) beforeNode = true;
-      }
-    }
-
-    // 2. Let result be the result of filtering node within iterator.
-    const result = filter(node, iterator);
-
-    // 3. If result is FILTER_ACCEPT, then break.
-    if (result === NodeFilter.FILTER_ACCEPT) break;
+  constructor(
+    { reference, pointerBeforeReference, filter, whatToShow, root }: {
+      reference: Node;
+      pointerBeforeReference: boolean;
+      filter: NodeFilter | null;
+      whatToShow: number;
+      root: Node;
+    },
+  ) {
+    this.reference = reference;
+    this.pointerBeforeReference = pointerBeforeReference;
+    this.filter = filter;
+    this.whatToShow = whatToShow;
+    this.root = root;
   }
-
-  // 4. Set iterator’s reference to node.
-  iterator["_reference"] = node;
-
-  // 5. Set iterator’s pointer before reference to beforeNode.
-  iterator["_pointerBeforeReference"] = beforeNode;
-
-  // 6. Return node.
-  return node;
 }

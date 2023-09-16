@@ -45,10 +45,15 @@ import { convert, DOMString } from "../../../webidl/types.ts";
 import { adoptNode } from "../node_trees/mutation.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Range } from "../../ranges/range.ts";
-import { BoundaryPoint } from "../../ranges/boundary_point.ts";
 import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
-import { NodeIterator } from "../../traversals/node_iterator.ts";
-import { TreeWalker } from "../../traversals/tree_walker.ts";
+import {
+  NodeIterator,
+  NodeIteratorInternals,
+} from "../../traversals/node_iterator.ts";
+import {
+  TreeWalker,
+  TreeWalkerInternals,
+} from "../../traversals/tree_walker.ts";
 import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
@@ -566,18 +571,18 @@ export class Document extends Node implements IDocument {
   ): NodeIterator {
     // 1. Let iterator be a new NodeIterator object.
     const iterator = new NodeIterator();
-
-    // 2. Set iterator’s root and iterator’s reference to root.
-    iterator["_root"] = root, iterator["_reference"] = root;
-
-    // 3. Set iterator’s pointer before reference to true.
-    iterator["_pointerBeforeReference"] = true;
-
-    // 4. Set iterator’s whatToShow to whatToShow.
-    iterator["_whatToShow"] = whatToShow;
-
-    // 5. Set iterator’s filter to filter.
-    iterator["_filter"] = filter;
+    const _ = new NodeIteratorInternals({
+      // 2. Set iterator’s root and iterator’s reference to root.
+      root,
+      reference: root,
+      // 3. Set iterator’s pointer before reference to true.
+      pointerBeforeReference: true,
+      // 4. Set iterator’s whatToShow to whatToShow.
+      whatToShow,
+      // 5. Set iterator’s filter to filter.
+      filter,
+    });
+    internalSlots.set(iterator, _);
 
     // 6. Return iterator.
     return iterator;
@@ -638,15 +643,16 @@ export class Document extends Node implements IDocument {
   ): TreeWalker {
     // 1. Let walker be a new TreeWalker object.
     const walker = new TreeWalker();
-
-    // 2. Set walker’s root and walker’s current to root.
-    walker["_root"] = root, walker["_current"] = root;
-
-    // 3. Set walker’s whatToShow to whatToShow.
-    walker["_whatToShow"] = whatToShow;
-
-    // 4. Set walker’s filter to filter.
-    walker["_filter"] = filter;
+    const _ = new TreeWalkerInternals({
+      // 2. Set walker’s root and walker’s current to root.
+      root,
+      current: root,
+      // 3. Set walker’s whatToShow to whatToShow.
+      whatToShow,
+      // 4. Set walker’s filter to filter.
+      filter,
+    });
+    internalSlots.set(walker, _);
 
     // 5. Return walker.
     return walker;
