@@ -614,7 +614,7 @@ export class Document extends Node implements IDocument {
   createRange(): Range {
     // return a new live range with (this, 0) as its start an end.
     const range = new Range();
-    range["start"] = [this, 0], range["end"] = [this, 0];
+    $(range).start = [this, 0], $(range).end = [this, 0];
 
     return range;
   }

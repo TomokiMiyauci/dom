@@ -16,6 +16,7 @@ import type * as HTML from "./html/document.ts";
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
 import { Tree } from "./dom/infra/tree.ts";
 import { ShadowTree } from "./dom/nodes/shadow_root_utils.ts";
+import { AbstractRangeInternals } from "./dom/ranges/abstract_range.ts";
 
 export interface InternalSlots {
   set(key: HTMLTemplateElement, value: HTMLTemplateElementInternals): void;
@@ -34,6 +35,7 @@ export interface InternalSlots {
   set(key: Node, value: NodeInternals & EventTargetInternals): void;
   set(key: Event, value: EventInternals): void;
   set(key: EventTarget, value: EventTargetInternals): void;
+  set(key: AbstractRange, value: AbstractRangeInternals): void;
 
   has(key: object): boolean;
 
@@ -58,6 +60,7 @@ export interface InternalSlots {
   get(key: Node): NodeInternals & EventTargetInternals;
   get(key: Event): EventInternals;
   get(key: EventTarget): EventTargetInternals;
+  get(key: AbstractRange): AbstractRangeInternals;
 }
 
 export class InternalSlotsMap {

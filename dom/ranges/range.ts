@@ -1,7 +1,7 @@
 import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
-import { AbstractRange } from "./abstract_range.ts";
+import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 import { BoundaryPoint, Position, position } from "./boundary_point.ts";
 import {
   isCharacterData,
@@ -30,20 +30,23 @@ import { convert, unsignedLong, unsignedShort } from "../../webidl/types.ts";
 import { splitText } from "../nodes/text.ts";
 import { Range_CSSOM } from "../../cssom/range.ts";
 import { Range_DOMParsing } from "../../domparsing/range.ts";
-import { $, tree } from "../../internal.ts";
+import { $, internalSlots, tree } from "../../internal.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
 @Exposed(Window)
 export class Range extends AbstractRange implements IRange {
-  protected override start: BoundaryPoint;
-  protected override end: BoundaryPoint;
+  protected override _: AbstractRangeInternals;
 
   constructor() {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    this.start = [globalThis.document, 0], this.end = [globalThis.document, 0];
+    this._ = new AbstractRangeInternals([globalThis.document, 0], [
+      globalThis.document,
+      0,
+    ]);
+    internalSlots.set(this, this._);
   }
 
   /**
@@ -51,8 +54,8 @@ export class Range extends AbstractRange implements IRange {
    */
   get commonAncestorContainer(): Node {
     // 1. Let container be start node.
-    let container = this._startNode;
-    const endNode = this._endNode;
+    let container = this._.startNode;
+    const endNode = this._.endNode;
 
     // 2. While container is not an inclusive ancestor of end node, let container be container’s parent.
     while (!tree.isInclusiveAncestor(container, endNode)) {
@@ -164,8 +167,8 @@ export class Range extends AbstractRange implements IRange {
    */
   collapse(toStart?: boolean): void {
     // if toStart is true, set end to start; otherwise set start to end.
-    if (toStart) this.end = this.start;
-    else this.start = this.end;
+    if (toStart) this._.end = this._.start;
+    else this._.start = this._.end;
   }
 
   /**
@@ -192,10 +195,10 @@ export class Range extends AbstractRange implements IRange {
     const length = nodeLength(node);
 
     // 3. Set start to the boundary point (node, 0).
-    this.start = [node, 0];
+    this._.start = [node, 0];
 
     // 4. Set end to the boundary point (node, length).
-    this.end = [node, length];
+    this._.end = [node, length];
   }
 
   @constant
@@ -232,12 +235,12 @@ export class Range extends AbstractRange implements IRange {
     }
 
     const { point, otherPoint } = how === Range.START_TO_START
-      ? { point: this.start, otherPoint: sourceRange.start }
+      ? { point: this._.start, otherPoint: sourceRange._.start }
       : how === Range.START_TO_END
-      ? { point: this.end, otherPoint: sourceRange.start }
+      ? { point: this._.end, otherPoint: sourceRange._.start }
       : how === Range.END_TO_START
-      ? { point: this.end, otherPoint: sourceRange.end }
-      : { point: this.start, otherPoint: sourceRange.end };
+      ? { point: this._.end, otherPoint: sourceRange._.end }
+      : { point: this._.start, otherPoint: sourceRange._.end };
 
     const pos = position(point, otherPoint);
 
@@ -288,7 +291,7 @@ export class Range extends AbstractRange implements IRange {
    */
   cloneRange(): Range {
     const range = new Range();
-    range.start = this.start, range.end = this.end;
+    range._.start = this._.start, range._.end = this._.end;
 
     // return a new live range with the same start and end as this.
     return range;
@@ -322,8 +325,8 @@ export class Range extends AbstractRange implements IRange {
     const bp: BoundaryPoint = [node, offset];
     // 4. If (node, offset) is before start or after end, return false.
     if (
-      position(bp, this.start) === Position.Before ||
-      position(bp, this.end) === Position.After
+      position(bp, this._.start) === Position.Before ||
+      position(bp, this._.end) === Position.After
     ) return false;
 
     // 5. Return true.
@@ -356,10 +359,10 @@ export class Range extends AbstractRange implements IRange {
     const bp: BoundaryPoint = [node, offset];
 
     // 4. If (node, offset) is before start, return −1.
-    if (position(bp, this.start) === Position.Before) return -1;
+    if (position(bp, this._.start) === Position.Before) return -1;
 
     // 5. If (node, offset) is after end, return 1.
-    if (position(bp, this.end) === Position.After) return 1;
+    if (position(bp, this._.end) === Position.After) return 1;
 
     // 6. Return 0.
     return 0;
@@ -385,8 +388,8 @@ export class Range extends AbstractRange implements IRange {
 
     // 5. If (parent, offset) is before end and (parent, offset plus 1) is after start, return true.
     if (
-      position(startBp, this.end) === Position.Before &&
-      position(endBp, this.start) === Position.After
+      position(startBp, this._.end) === Position.Before &&
+      position(endBp, this._.start) === Position.After
     ) return true;
 
     // 6. Return false.
@@ -400,10 +403,10 @@ export class Range extends AbstractRange implements IRange {
     // 1. Let s be the empty string.
     let s = "";
 
-    const startNode = this._startNode,
-      endNode = this._endNode,
-      startOffset = this._startOffset,
-      endOffset = this._endOffset;
+    const startNode = this._.startNode,
+      endNode = this._.endNode,
+      startOffset = this._.startOffset,
+      endOffset = this._.endOffset;
 
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
     if (startNode === endNode && isText(startNode)) {
@@ -474,11 +477,11 @@ export class Range extends AbstractRange implements IRange {
         // If range’s root is not equal to node’s root, or if bp is after the range’s end, set range’s end to bp.
         if (
           range.#root !== tree.root(node) ||
-          position(bp, range.end) === Position.After
-        ) range.end = bp;
+          position(bp, range._.end) === Position.After
+        ) range._.end = bp;
 
         // 2. Set range’s start to bp.
-        range.start = bp;
+        range._.start = bp;
         break;
       }
 
@@ -487,11 +490,11 @@ export class Range extends AbstractRange implements IRange {
         // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start, set range’s start to bp.
         if (
           range.#root !== tree.root(node) ||
-          position(bp, range.start) === Position.Before
-        ) range.start = bp;
+          position(bp, range._.start) === Position.Before
+        ) range._.start = bp;
 
         // 2. Set range’s end to bp.
-        range.end = bp;
+        range._.end = bp;
       }
     }
   }
@@ -501,13 +504,13 @@ export class Range extends AbstractRange implements IRange {
    */
   get #root(): Node {
     // the root of its start node.
-    return tree.root(this._startNode);
+    return tree.root(this._.startNode);
   }
 
   #contained(node: Node, range: Range): boolean {
     return tree.root(node) === range.#root &&
-      position([node, 0], range.start) === Position.After &&
-      position([node, nodeLength(node)], range.end) === Position.Before;
+      position([node, 0], range._.start) === Position.After &&
+      position([node, nodeLength(node)], range._.end) === Position.Before;
   }
 }
 
@@ -533,17 +536,17 @@ export interface Range
 function cloneContents(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
-    nodeDocument: $(range["_startNode"]).nodeDocument,
+    nodeDocument: $($(range).startNode).nodeDocument,
   });
 
   // 2. If range is collapsed, then return fragment.
-  if (range["_collapsed"]) return fragment;
+  if ($(range).collapsed) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
-  const originalStartNode = range["_startNode"],
-    originalStartOffset = range["_startOffset"],
-    originalEndNode = range["_endNode"],
-    originalEndOffset = range["_endOffset"];
+  const originalStartNode = $(range).startNode,
+    originalStartOffset = $(range).startOffset,
+    originalEndNode = $(range).endNode,
+    originalEndOffset = $(range).endOffset;
 
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
@@ -642,17 +645,19 @@ function cloneContents(range: Range): globalThis.DocumentFragment {
 function extract(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = DocumentFragment["create"]({
-    nodeDocument: $(range["_startNode"]).nodeDocument,
+    nodeDocument: $($(range).startNode).nodeDocument,
   });
 
   // 2. If range is collapsed, then return fragment.
-  if (range["_collapsed"]) return fragment;
+  if ($(range).collapsed) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
-  const originalStartNode = range["_startNode"],
-    originalStartOffset = range["_startOffset"],
-    originalEndNode = range["_endNode"],
-    originalEndOffset = range["_endOffset"];
+  const {
+    startNode: originalStartNode,
+    startOffset: originalStartOffset,
+    endNode: originalEndNode,
+    endOffset: originalEndOffset,
+  } = $(range);
 
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
@@ -761,7 +766,7 @@ function extract(range: Range): globalThis.DocumentFragment {
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-insert)
  */
 function insert(node: Node, range: Range): void {
-  const startNode = range["_startNode"];
+  const { startNode } = $(range);
 
   // 1. If range’s start node is a ProcessingInstruction or Comment node, is a Text node whose parent is null, or is node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -776,7 +781,7 @@ function insert(node: Node, range: Range): void {
   // 3. If range’s start node is a Text node, set referenceNode to that Text node.
   if (isText(startNode)) referenceNode = startNode;
   // 4. Otherwise, set referenceNode to the child of start node whose index is start offset, and null if there is no such child.
-  else {referenceNode = tree.children(startNode)[range["_startOffset"]] ??
+  else {referenceNode = tree.children(startNode)[$(range).startOffset] ??
       null;}
 
   // 5. Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise.
@@ -789,7 +794,7 @@ function insert(node: Node, range: Range): void {
 
   // 7. If range’s start node is a Text node, set referenceNode to the result of splitting it with offset range’s start offset.
   if (isText(startNode)) {
-    referenceNode = splitText(startNode, range["_startOffset"]);
+    referenceNode = splitText(startNode, $(range).startOffset);
   }
 
   // 8. If node is referenceNode, set referenceNode to its next sibling.
@@ -810,7 +815,7 @@ function insert(node: Node, range: Range): void {
   preInsertNode(node, parent, referenceNode);
 
   // 13. If range is collapsed, then set range’s end to (parent, newOffset).
-  if (range["_collapsed"]) range["end"] = [parent, newOffset];
+  if ($(range).collapsed) $(range).end = [parent, newOffset];
 }
 
 /**
@@ -832,8 +837,8 @@ function select(node: Node, range: Range): void {
   const index = tree.index(node);
 
   // 4. Set range’s start to boundary point (parent, index).
-  range["start"] = [parent, index];
+  $(range).start = [parent, index];
 
   // 5. Set range’s end to boundary point (parent, index plus 1).
-  range["end"] = [parent, index + 1];
+  $(range).end = [parent, index + 1];
 }

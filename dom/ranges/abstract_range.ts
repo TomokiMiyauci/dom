@@ -2,14 +2,14 @@ import type { IAbstractRange } from "../../interface.d.ts";
 import { BoundaryPoint } from "./boundary_point.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
-Exposed(Window);
+@Exposed(Window)
 export abstract class AbstractRange implements IAbstractRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-startcontainer
    */
   get startContainer(): Node {
     // return this’s start node.
-    return this._startNode;
+    return this._.startNode;
   }
 
   /**
@@ -17,7 +17,7 @@ export abstract class AbstractRange implements IAbstractRange {
    */
   get startOffset(): number {
     // return this’s start offset.
-    return this._startOffset;
+    return this._.startOffset;
   }
 
   /**
@@ -25,7 +25,7 @@ export abstract class AbstractRange implements IAbstractRange {
    */
   get endContainer(): Node {
     // return this’s end node.
-    return this._endNode;
+    return this._.endNode;
   }
 
   /**
@@ -33,7 +33,7 @@ export abstract class AbstractRange implements IAbstractRange {
    */
   get endOffset(): number {
     // return this’s end offset.
-    return this._endOffset;
+    return this._.endOffset;
   }
 
   /**
@@ -41,47 +41,55 @@ export abstract class AbstractRange implements IAbstractRange {
    */
   get collapsed(): boolean {
     // return true if this is collapsed; otherwise false.
-    return this._collapsed;
+    return this._.collapsed;
   }
 
-  // internal slots
-  protected abstract start: BoundaryPoint;
-  protected abstract end: BoundaryPoint;
+  protected abstract _: AbstractRangeInternals;
+}
+
+export class AbstractRangeInternals {
+  start: BoundaryPoint;
+  end: BoundaryPoint;
+
+  constructor(start: BoundaryPoint, end: BoundaryPoint) {
+    this.start = start;
+    this.end = end;
+  }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-start-node)
    */
-  protected get _startNode(): Node {
+  get startNode(): Node {
     return this.start[0];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-start-offset)
    */
-  protected get _startOffset(): number {
+  get startOffset(): number {
     return this.start[1];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-end-node)
    */
-  protected get _endNode(): Node {
+  get endNode(): Node {
     return this.end[0];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-end-offset)
    */
-  protected get _endOffset(): number {
+  get endOffset(): number {
     return this.end[1];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#range-collapsed)
    */
-  protected get _collapsed(): boolean {
+  get collapsed(): boolean {
     // its start node is its end node and its start offset is its end offset.
-    return this._startNode === this._endNode &&
-      this._startOffset === this._endOffset;
+    return this.startNode === this.endNode &&
+      this.startOffset === this.endOffset;
   }
 }
