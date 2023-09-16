@@ -18,7 +18,9 @@ import {
   cloneContents,
   extract,
   insert,
+  isContained,
   nextNodeDescendant,
+  root,
   select,
 } from "./range_utils.ts";
 
@@ -415,7 +417,7 @@ export class Range extends AbstractRange implements IRange {
     const end = nextNodeDescendant(endNode);
 
     while (currentNode && currentNode !== end) {
-      if (isText(currentNode) && this.#contained(currentNode, this)) {
+      if (isText(currentNode) && this.#contained(currentNode)) {
         // 4. Append the concatenation of the data of all Text nodes that are contained in this, in tree order, to s.
         s += currentNode.data;
       }
@@ -490,14 +492,11 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#concept-range-root
    */
   get #root(): Node {
-    // the root of its start node.
-    return tree.root(this._.startNode);
+    return root(this);
   }
 
-  #contained(node: Node, range: Range): boolean {
-    return tree.root(node) === range.#root &&
-      position([node, 0], range._.start) === Position.After &&
-      position([node, nodeLength(node)], range._.end) === Position.Before;
+  #contained(node: Node): boolean {
+    return isContained(node, this);
   }
 }
 

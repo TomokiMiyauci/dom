@@ -2,6 +2,7 @@ import {
   isCharacterData,
   isComment,
   isDocumentFragment,
+  isDocumentType,
   isProcessingInstruction,
   isText,
 } from "../nodes/utils.ts";
@@ -18,6 +19,44 @@ import {
 import { replaceData } from "../nodes/character_data_algorithm.ts";
 import { splitText } from "../nodes/text.ts";
 import { $, tree } from "../../internal.ts";
+import { iter, last } from "../../deps.ts";
+import { Position, position } from "./boundary_point.ts";
+import { Range } from "./range.ts";
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)
+ */
+export function root(range: Range): Node {
+  const { startNode } = $(range);
+
+  // the root of its start node.
+  return tree.root(startNode);
+}
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#contained)
+ */
+export function isContained(node: Node, range: Range): boolean {
+  // if node’s root is range’s root,
+  return tree.root(node) === root(range) &&
+    // and (node, 0) is after range’s start,
+    position([node, 0], $(range).start) === Position.After &&
+    // and (node, node’s length) is before range’s end.
+    position([node, nodeLength(node)], $(range).end) === Position.Before;
+}
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#partially-contained)
+ */
+export function isPartiallyContained(node: Node, range: Range): boolean {
+  const { startNode, endNode } = $(range);
+
+  // if it’s an inclusive ancestor of the live range’s start node but not its end node, or vice versa.
+  return (tree.isInclusiveAncestor(node, startNode) &&
+    !tree.isInclusiveAncestor(node, endNode)) ||
+    (!tree.isInclusiveAncestor(node, startNode) &&
+      tree.isInclusiveAncestor(node, endNode));
+}
 
 export function nextNodeDescendant(node: Node | null): Node | null {
   while (node && tree.nextSibling(node)) {
@@ -80,19 +119,40 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   }
 
   // 7. Let first partially contained child be null.
-  let firstPartiallyContainedChild = null;
+  let firstPartiallyContainedChild: ChildNode | null = null;
 
-  // 8. If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range.
+  // 8. If original start node is not an inclusive ancestor of original end node,
   if (!tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
-    firstPartiallyContainedChild;
+    // set first partially contained child to the first child of common ancestor that is partially contained in range.
+    const children = tree.children(commonAncestor);
+    const firstChild = iter(children).find((node) =>
+      isPartiallyContained(node, range)
+    );
+    if (firstChild) firstPartiallyContainedChild = firstChild;
   }
 
   // 9. Let last partially contained child be null.
-  let lastPartiallyContainedChild: Node | null = null;
+  let lastPartiallyContainedChild: ChildNode | null = null;
 
-  // 10. If original end node is not an inclusive ancestor of original start node, set last partially contained child to the last child of common ancestor that is partially contained in range.
+  // 10. If original end node is not an inclusive ancestor of original start node,
+  if (!tree.isInclusiveAncestor(originalEndNode, originalStartNode)) {
+    // set last partially contained child to the last child of common ancestor that is partially contained in range.
+    const children = tree.children(commonAncestor);
+    const partiallyContained = iter(children).filter((node) =>
+      isPartiallyContained(node, range)
+    );
+    const lastChild = last(partiallyContained);
+    if (lastChild) lastPartiallyContainedChild = lastChild;
+  }
+
+  const children = tree.children(commonAncestor);
   // 11. Let contained children be a list of all children of common ancestor that are contained in range, in tree order.
+  const containedChildren = iter(children).filter(contained);
+
   // 12. If any member of contained children is a doctype, then throw a "HierarchyRequestError" DOMException.
+  if (containedChildren.some(isDocumentType)) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
 
   // 13. If first partially contained child is a CharacterData node, then:
   if (
@@ -100,42 +160,100 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
     isCharacterData(firstPartiallyContainedChild)
   ) {
     // 1. Let clone be a clone of original start node.
+    // TODO use clone
+    const clone = originalStartNode.cloneNode();
+
+    const data = substringData(
+      originalStartNode as CharacterData,
+      originalStartOffset,
+      nodeLength(originalStartNode) - originalStartOffset,
+    );
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.
+    $(clone as CharacterData).data = data;
+
     // 3. Append clone to fragment.
+    appendNode(clone, fragment);
 
     // 14. Otherwise, if first partially contained child is not null:
   } else if (firstPartiallyContainedChild) {
+    // TODO use clone
     // 1. Let clone be a clone of first partially contained child.
+    const clone = firstPartiallyContainedChild.cloneNode();
+
     // 2. Append clone to fragment.
+    appendNode(clone, fragment);
+
     // 3. Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length).
+    const subrange = new Range();
+    $(subrange).start = [originalStartNode, originalStartOffset],
+      $(subrange).end = [
+        firstPartiallyContainedChild,
+        nodeLength(firstPartiallyContainedChild),
+      ];
+
     // 4. Let subfragment be the result of cloning the contents of subrange.
+    const subfragment = cloneContents(subrange);
+
     // 5. Append subfragment to clone.
+    appendNode(subfragment, clone);
   }
 
   // 15. For each contained child in contained children:
-  // 1. Let clone be a clone of contained child with the clone children flag set.
-  // 2. Append clone to fragment.
+  for (const containedChild of containedChildren) {
+    // 1. Let clone be a clone of contained child with the clone children flag set.
+    // TODO use clone
+    const clone = containedChild.cloneNode(true);
+
+    // 2. Append clone to fragment.
+    appendNode(clone, fragment);
+  }
 
   // 16. If last partially contained child is a CharacterData node, then:
   if (
     lastPartiallyContainedChild && isCharacterData(lastPartiallyContainedChild)
   ) {
     // 1. Let clone be a clone of original end node.
+    // TODO use clone
+    const clone = originalEndNode.cloneNode();
+
+    const data = substringData(
+      originalEndNode as CharacterData,
+      0,
+      originalEndOffset,
+    );
     // 2. Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset.
+    $(clone as CharacterData).data = data;
+
     // 3. Append clone to fragment.
+    appendNode(clone, fragment);
 
     // 17. Otherwise, if last partially contained child is not null:
   } else if (lastPartiallyContainedChild) {
+    // TODO use clone
     // 1. Let clone be a clone of last partially contained child.
+    const clone = lastPartiallyContainedChild.cloneNode();
 
     // 2. Append clone to fragment.
+    appendNode(clone, fragment);
+
     // 3. Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset).
+    const subrange = new Range();
+    $(subrange).start = [lastPartiallyContainedChild, 0],
+      $(subrange).end = [originalEndNode, originalEndOffset];
+
     // 4. Let subfragment be the result of cloning the contents of subrange.
+    const subfragment = cloneContents(subrange);
+
     // 5. Append subfragment to clone.
+    appendNode(subfragment, clone);
   }
 
   // 18. Return fragment.
   return fragment;
+
+  function contained(node: Node): boolean {
+    return isContained(node, range);
+  }
 }
 
 /**
