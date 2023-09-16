@@ -321,60 +321,169 @@ export function extract(range: Range): globalThis.DocumentFragment {
   }
 
   // 7. Let first partially contained child be null.
-  let firstPartiallyContainedChild = null;
+  let firstPartiallyContainedChild: ChildNode | null = null;
 
-  // 8. If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range.
-  if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {}
-
-  // 9. Let last partially contained child be null.
-  let lastPartiallyContainedChild = null;
-
-  // 10. If original end node is not an inclusive ancestor of original start node, set last partially contained child to the last child of common ancestor that is partially contained in range.
-
-  // 11. Let contained children be a list of all children of common ancestor that are contained in range, in tree order.
-
-  // 12. If any member of contained children is a doctype, then throw a "HierarchyRequestError" DOMException.
-
-  // 13. If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset.
-
-  // 14. Otherwise:
-  // 1. Let reference node equal original start node.
-  // 2. While reference node’s parent is not null and is not an inclusive ancestor of original end node, set reference node to its parent.
-  // 3. Set new node to the parent of reference node, and new offset to one plus reference node’s index.
-
-  // 15. If first partially contained child is a CharacterData node, then:
-  if (isCharacterData(firstPartiallyContainedChild as any)) {
-    // 1. Let clone be a clone of original start node.
-
-    // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.
-
-    // 3. Append clone to fragment.
-
-    // 4. Replace data with node original start node, offset original start offset, count original start node’s length − original start offset, and data the empty string.
+  function partiallyContained(node: Node): boolean {
+    return isPartiallyContained(node, range);
   }
 
-  // 16. Otherwise, if first partially contained child is not null:
-  // 1. Let clone be a clone of first partially contained child.
-  // 2. Append clone to fragment.
-  // 3. Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length).
-  // 4. Let subfragment be the result of extracting subrange.
-  // 5. Append subfragment to clone.
+  function contained(node: Node): boolean {
+    return isContained(node, range);
+  }
+
+  // 8. If original start node is not an inclusive ancestor of original end node,
+  if (!tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
+    const children = tree.children(commonAncestor);
+    const first = iter(children).find(partiallyContained);
+    // set first partially contained child to the first child of common ancestor that is partially contained in range.
+    if (first) firstPartiallyContainedChild = first;
+  }
+
+  // 9. Let last partially contained child be null.
+  let lastPartiallyContainedChild: ChildNode | null = null;
+
+  // 10. If original end node is not an inclusive ancestor of original start node,
+  if (!tree.isInclusiveAncestor(originalEndNode, originalStartNode)) {
+    const children = tree.children(commonAncestor);
+    const partiallyContains = iter(children).filter(partiallyContained);
+    const lastChild = last(partiallyContains);
+    // set last partially contained child to the last child of common ancestor that is partially contained in range.
+    if (lastChild) lastPartiallyContainedChild = lastChild;
+  }
+
+  const commonAncestorChildren = tree.children(commonAncestor);
+  // 11. Let contained children be a list of all children of common ancestor that are contained in range, in tree order.
+  const containedChildren = iter(commonAncestorChildren).filter(contained);
+
+  // 12. If any member of contained children is a doctype, then throw a "HierarchyRequestError" DOMException.
+  if (containedChildren.some(isDocumentType)) {
+    throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
+  }
+
+  let newNode: Node, newOffset: number;
+
+  // 13. If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset.
+  if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
+    newNode = originalStartNode, newOffset = originalStartOffset;
+    // 14. Otherwise:
+  } else {
+    // 1. Let reference node equal original start node.
+    let referenceNode = originalStartNode;
+
+    // 2. While reference node’s parent is not null and is not an inclusive ancestor of original end node, set reference node to its parent.
+    while (
+      tree.parent(referenceNode) &&
+      !tree.isInclusiveAncestor(tree.parent(referenceNode)!, originalEndNode)
+    ) referenceNode = tree.parent(referenceNode)!;
+
+    // 3. Set new node to the parent of reference node, and new offset to one plus reference node’s index.
+    newNode = tree.parent(referenceNode)!,
+      newOffset = tree.index(referenceNode) + 1;
+  }
+
+  // 15. If first partially contained child is a CharacterData node, then:
+  if (
+    firstPartiallyContainedChild &&
+    isCharacterData(firstPartiallyContainedChild)
+  ) {
+    // TODO use clone
+    // 1. Let clone be a clone of original start node.
+    const clone = originalStartNode.cloneNode();
+
+    const data = substringData(
+      originalStartNode as CharacterData,
+      originalStartOffset,
+      nodeLength(originalStartNode) - originalStartOffset,
+    );
+    // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.
+    $(clone as CharacterData).data = data;
+
+    // 3. Append clone to fragment.
+    appendNode(clone, fragment);
+
+    // 4. Replace data with node original start node, offset original start offset, count original start node’s length − original start offset, and data the empty string.
+    replaceData(
+      originalStartNode as CharacterData,
+      originalStartOffset,
+      nodeLength(originalStartNode) - originalStartOffset,
+      "",
+    );
+
+    // 16. Otherwise, if first partially contained child is not null:
+  } else if (firstPartiallyContainedChild) {
+    // TODO use clone
+    // 1. Let clone be a clone of first partially contained child.
+    const clone = firstPartiallyContainedChild.cloneNode();
+
+    // 2. Append clone to fragment.
+    appendNode(clone, fragment);
+
+    // 3. Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length).
+    const subrange = new Range();
+    $(subrange).start = [originalStartNode, originalStartOffset],
+      $(subrange).end = [
+        firstPartiallyContainedChild,
+        nodeLength(firstPartiallyContainedChild),
+      ];
+
+    // 4. Let subfragment be the result of extracting subrange.
+    const subfragment = extract(subrange);
+
+    // 5. Append subfragment to clone.
+    appendNode(subfragment, clone);
+  }
 
   // 17. For each contained child in contained children, append contained child to fragment.
-  // 18. If last partially contained child is a CharacterData node, then:
+  for (const containedChild of containedChildren) {
+    appendNode(containedChild, fragment);
+  }
 
-  // 1. Let clone be a clone of original end node.
-  // 2. Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset.
-  // 3. Append clone to fragment.
-  // 4. Replace data with node original end node, offset 0, count original end offset, and data the empty string.
-  // 19. Otherwise, if last partially contained child is not null:
-  // 1. Let clone be a clone of last partially contained child.
-  // 2. Append clone to fragment.
-  // 3. Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset).
-  // 4. Let subfragment be the result of extracting subrange.
-  // 5. Append subfragment to clone.
+  // 18. If last partially contained child is a CharacterData node, then:
+  if (
+    lastPartiallyContainedChild && isCharacterData(lastPartiallyContainedChild)
+  ) {
+    // TODO use clone
+    // 1. Let clone be a clone of original end node.
+    const clone = originalEndNode.cloneNode();
+
+    const data = substringData(
+      originalEndNode as CharacterData,
+      0,
+      originalEndOffset,
+    );
+    // 2. Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset.
+    $(clone as CharacterData).data = data;
+
+    // 3. Append clone to fragment.
+    appendNode(clone, fragment);
+
+    // 4. Replace data with node original end node, offset 0, count original end offset, and data the empty string.
+    replaceData(originalEndNode as CharacterData, 0, originalEndOffset, "");
+
+    // 19. Otherwise, if last partially contained child is not null:
+  } else if (lastPartiallyContainedChild) {
+    // TODO use clone
+    // 1. Let clone be a clone of last partially contained child.
+    const clone = lastPartiallyContainedChild.cloneNode();
+
+    // 2. Append clone to fragment.
+    appendNode(clone, fragment);
+
+    // 3. Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset).
+    const subrange = new Range();
+    $(subrange).start = [lastPartiallyContainedChild, 0],
+      $(subrange).end = [originalEndNode, originalEndOffset];
+
+    // 4. Let subfragment be the result of extracting subrange.
+    const subfragment = extract(subrange);
+
+    // 5. Append subfragment to clone.
+    appendNode(subfragment, clone);
+  }
 
   // 20. Set range’s start and end to (new node, new offset).
+  $(range).start = [newNode, newOffset], $(range).end = [newNode, newOffset];
+
   // 21. Return fragment.
   return fragment;
 }
