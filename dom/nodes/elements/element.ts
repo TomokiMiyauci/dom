@@ -10,7 +10,7 @@ import { changeAttributes } from "./attr_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
 import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { isHTMLDocument } from "../documents/document.ts";
+import { isHTMLDocument } from "../documents/document_utils.ts";
 import {
   CustomElementDefinition,
   isValidCustomElementName,

@@ -1,8 +1,5 @@
-import {
-  Document,
-  internalCreateElement,
-  XMLDocument,
-} from "../documents/document.ts";
+import { Document, XMLDocument } from "../documents/document.ts";
+import { internalCreateElement } from "../documents/document_utils.ts";
 import { DocumentType } from "../document_type.ts";
 import { Text } from "../text.ts";
 import { createElement } from "../elements/element_algorithm.ts";

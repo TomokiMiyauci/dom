@@ -14,7 +14,7 @@ import {
   LegacyUnenumerableNamedProperties,
 } from "../../../webidl/legacy_extended_attributes.ts";
 import { Namespace } from "../../../infra/namespace.ts";
-import { isHTMLDocument } from "../documents/document.ts";
+import { isHTMLDocument } from "../documents/document_utils.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { $ } from "../../../internal.ts";

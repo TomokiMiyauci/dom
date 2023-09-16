@@ -2,7 +2,7 @@ import type { IRange } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
 import { AbstractRange } from "./abstract_range.ts";
-import { BoundaryPoint, Position } from "./boundary_point.ts";
+import { BoundaryPoint, Position, position } from "./boundary_point.ts";
 import {
   isCharacterData,
   isComment,
@@ -43,14 +43,7 @@ export class Range extends AbstractRange implements IRange {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    this.start = new BoundaryPoint({
-      node: globalThis.document as Document,
-      offset: 0,
-    });
-    this.end = new BoundaryPoint({
-      node: globalThis.document as Document,
-      offset: 0,
-    });
+    this.start = [globalThis.document, 0], this.end = [globalThis.document, 0];
   }
 
   /**
@@ -79,7 +72,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setStart(node: Node, offset: number): void {
     // set the start of this to boundary point (node, offset).
-    this.#setStartOrEnd("start", this, new BoundaryPoint({ node, offset }));
+    this.#setStartOrEnd("start", this, [node, offset]);
   }
 
   /**
@@ -87,7 +80,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setEnd(node: Node, offset: number): void {
     // set the end of this to boundary point (node, offset).
-    this.#setStartOrEnd("end", this, new BoundaryPoint({ node, offset }));
+    this.#setStartOrEnd("end", this, [node, offset]);
   }
 
   /**
@@ -106,11 +99,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the start of this to boundary point (parent, node’s index).
-    this.#setStartOrEnd(
-      "start",
-      this,
-      new BoundaryPoint({ node: parent, offset: tree.index(node) }),
-    );
+    this.#setStartOrEnd("start", this, [parent, tree.index(node)]);
   }
 
   /**
@@ -129,11 +118,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the start of this to boundary point (parent, node’s index plus 1).
-    this.#setStartOrEnd(
-      "start",
-      this,
-      new BoundaryPoint({ node: parent, offset: tree.index(node) + 1 }),
-    );
+    this.#setStartOrEnd("start", this, [parent, tree.index(node) + 1]);
   }
 
   /**
@@ -152,11 +137,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the end of this to boundary point (parent, node’s index).
-    this.#setStartOrEnd(
-      "end",
-      this,
-      new BoundaryPoint({ node: parent, offset: tree.index(node) }),
-    );
+    this.#setStartOrEnd("end", this, [parent, tree.index(node)]);
   }
 
   /**
@@ -175,11 +156,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the end of this to boundary point (parent, node’s index plus 1).
-    this.#setStartOrEnd(
-      "end",
-      this,
-      new BoundaryPoint({ node: parent, offset: tree.index(node) + 1 }),
-    );
+    this.#setStartOrEnd("end", this, [parent, tree.index(node) + 1]);
   }
 
   /**
@@ -215,10 +192,10 @@ export class Range extends AbstractRange implements IRange {
     const length = nodeLength(node);
 
     // 3. Set start to the boundary point (node, 0).
-    this.start = new BoundaryPoint({ node, offset: 0 });
+    this.start = [node, 0];
 
     // 4. Set end to the boundary point (node, length).
-    this.end = new BoundaryPoint({ node, offset: length });
+    this.end = [node, length];
   }
 
   @constant
@@ -262,9 +239,9 @@ export class Range extends AbstractRange implements IRange {
       ? { point: this.end, otherPoint: sourceRange.end }
       : { point: this.start, otherPoint: sourceRange.end };
 
-    const position = point.positionOf(otherPoint);
+    const pos = position(point, otherPoint);
 
-    switch (position) {
+    switch (pos) {
       case Position.Before:
         return -1;
       case Position.Equal:
@@ -342,11 +319,11 @@ export class Range extends AbstractRange implements IRange {
       throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
     }
 
-    const bp = new BoundaryPoint({ node, offset });
+    const bp: BoundaryPoint = [node, offset];
     // 4. If (node, offset) is before start or after end, return false.
     if (
-      bp.positionOf(this.start) === Position.Before ||
-      bp.positionOf(this.end) === Position.After
+      position(bp, this.start) === Position.Before ||
+      position(bp, this.end) === Position.After
     ) return false;
 
     // 5. Return true.
@@ -376,13 +353,13 @@ export class Range extends AbstractRange implements IRange {
       throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
     }
 
-    const bp = new BoundaryPoint({ node, offset });
+    const bp: BoundaryPoint = [node, offset];
 
     // 4. If (node, offset) is before start, return −1.
-    if (bp.positionOf(this.start) === Position.Before) return -1;
+    if (position(bp, this.start) === Position.Before) return -1;
 
     // 5. If (node, offset) is after end, return 1.
-    if (bp.positionOf(this.end) === Position.After) return 1;
+    if (position(bp, this.end) === Position.After) return 1;
 
     // 6. Return 0.
     return 0;
@@ -403,13 +380,13 @@ export class Range extends AbstractRange implements IRange {
 
     // 4. Let offset be node’s index.
     const offset = tree.index(node);
-    const startBp = new BoundaryPoint({ node: parent, offset });
-    const endBp = new BoundaryPoint({ node: parent, offset: offset + 1 });
+    const startBp: BoundaryPoint = [parent, offset];
+    const endBp: BoundaryPoint = [parent, offset + 1];
 
     // 5. If (parent, offset) is before end and (parent, offset plus 1) is after start, return true.
     if (
-      startBp.positionOf(this.end) === Position.Before &&
-      endBp.positionOf(this.start) === Position.After
+      position(startBp, this.end) === Position.Before &&
+      position(endBp, this.start) === Position.After
     ) return true;
 
     // 6. Return false.
@@ -488,7 +465,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Let bp be the boundary point (node, offset).
-    const bp = new BoundaryPoint({ node, offset });
+    const bp: BoundaryPoint = [node, offset];
 
     // 4.
     switch (step) {
@@ -497,7 +474,7 @@ export class Range extends AbstractRange implements IRange {
         // If range’s root is not equal to node’s root, or if bp is after the range’s end, set range’s end to bp.
         if (
           range.#root !== tree.root(node) ||
-          bp.positionOf(range.end) === Position.After
+          position(bp, range.end) === Position.After
         ) range.end = bp;
 
         // 2. Set range’s start to bp.
@@ -510,7 +487,7 @@ export class Range extends AbstractRange implements IRange {
         // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start, set range’s start to bp.
         if (
           range.#root !== tree.root(node) ||
-          bp.positionOf(range.start) === Position.Before
+          position(bp, range.start) === Position.Before
         ) range.start = bp;
 
         // 2. Set range’s end to bp.
@@ -529,11 +506,8 @@ export class Range extends AbstractRange implements IRange {
 
   #contained(node: Node, range: Range): boolean {
     return tree.root(node) === range.#root &&
-      new BoundaryPoint({ node, offset: 0 }).positionOf(range.start) ===
-        Position.After &&
-      new BoundaryPoint({ node, offset: nodeLength(node) }).positionOf(
-          range.end,
-        ) === Position.Before;
+      position([node, 0], range.start) === Position.After &&
+      position([node, nodeLength(node)], range.end) === Position.Before;
   }
 }
 
@@ -836,9 +810,7 @@ function insert(node: Node, range: Range): void {
   preInsertNode(node, parent, referenceNode);
 
   // 13. If range is collapsed, then set range’s end to (parent, newOffset).
-  if (range["_collapsed"]) {
-    range["end"] = new BoundaryPoint({ node: parent, offset: newOffset });
-  }
+  if (range["_collapsed"]) range["end"] = [parent, newOffset];
 }
 
 /**
@@ -860,8 +832,8 @@ function select(node: Node, range: Range): void {
   const index = tree.index(node);
 
   // 4. Set range’s start to boundary point (parent, index).
-  range["start"] = new BoundaryPoint({ node: parent, offset: index });
+  range["start"] = [parent, index];
 
   // 5. Set range’s end to boundary point (parent, index plus 1).
-  range["end"] = new BoundaryPoint({ node: parent, offset: index + 1 });
+  range["end"] = [parent, index + 1];
 }
