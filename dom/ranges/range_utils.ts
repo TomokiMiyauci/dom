@@ -22,6 +22,7 @@ import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
 import { Position, position } from "./boundary_point.ts";
 import { Range } from "./range.ts";
+import { isCollapsed } from "./abstract_range_utils.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)
@@ -78,7 +79,7 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   });
 
   // 2. If range is collapsed, then return fragment.
-  if ($(range).collapsed) return fragment;
+  if (isCollapsed(range)) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
   const originalStartNode = $(range).startNode,
@@ -266,7 +267,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
   });
 
   // 2. If range is collapsed, then return fragment.
-  if ($(range).collapsed) return fragment;
+  if (isCollapsed(range)) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
   const {
@@ -541,7 +542,7 @@ export function insert(node: Node, range: Range): void {
   preInsertNode(node, parent, referenceNode);
 
   // 13. If range is collapsed, then set range’s end to (parent, newOffset).
-  if ($(range).collapsed) $(range).end = [parent, newOffset];
+  if (isCollapsed(range)) $(range).end = [parent, newOffset];
 }
 
 /**

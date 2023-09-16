@@ -1,4 +1,5 @@
 import type { IStaticRange } from "../../interface.d.ts";
+import { internalSlots } from "../../internal.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { isAttr, isDocumentType } from "../nodes/utils.ts";
@@ -27,6 +28,7 @@ export class StaticRange extends AbstractRange implements IStaticRange {
       endContainer,
       init.endOffset,
     ]);
+    internalSlots.set(this, this._);
   }
 
   protected override _: AbstractRangeInternals;

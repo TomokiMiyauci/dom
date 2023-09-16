@@ -1,6 +1,7 @@
 import type { IAbstractRange } from "../../interface.d.ts";
 import { BoundaryPoint } from "./boundary_point.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
+import { isCollapsed } from "./abstract_range_utils.ts";
 
 @Exposed(Window)
 export abstract class AbstractRange implements IAbstractRange {
@@ -41,7 +42,7 @@ export abstract class AbstractRange implements IAbstractRange {
    */
   get collapsed(): boolean {
     // return true if this is collapsed; otherwise false.
-    return this._.collapsed;
+    return isCollapsed(this);
   }
 
   protected abstract _: AbstractRangeInternals;
@@ -82,14 +83,5 @@ export class AbstractRangeInternals {
    */
   get endOffset(): number {
     return this.end[1];
-  }
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#range-collapsed)
-   */
-  get collapsed(): boolean {
-    // its start node is its end node and its start offset is its end offset.
-    return this.startNode === this.endNode &&
-      this.startOffset === this.endOffset;
   }
 }
