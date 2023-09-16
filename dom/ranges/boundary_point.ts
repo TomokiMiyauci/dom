@@ -1,16 +1,30 @@
 import { tree } from "../../internal.ts";
 
 export enum Position {
+  /**
+   * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp-before)
+   */
   Before = "before",
+
+  /**
+   * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp-equal)
+   */
   Equal = "equal",
+
+  /**
+   * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp-after)
+   */
   After = "after",
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#concept-range-bp
+ * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp)
  */
 export type BoundaryPoint = [node: Node, offset: number];
 
+/**
+ * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp-position)
+ */
 export function position(
   of: BoundaryPoint,
   relativeTo: BoundaryPoint,
