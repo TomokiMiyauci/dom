@@ -1,5 +1,12 @@
 import { Tree } from "./tree.ts";
-import { assert, assertEquals, describe, it } from "../../_dev_deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  describe,
+  equal,
+  it,
+} from "../../_dev_deps.ts";
 
 /**
  *                 ______________A______________
@@ -36,6 +43,12 @@ tree.children(F).append(I);
 tree.children(A).append(J);
 tree.children(J).append(K);
 tree.children(J).append(L);
+
+import { permutationsWithReplacement } from "npm:combinatorial-generators";
+
+const allCombinations = [
+  ...permutationsWithReplacement([A, B, C, D, E, F, G, H, I, J, K, L], 2),
+] as [object, object][];
 
 describe("tree", () => {
   it("firstChild", () => {
@@ -436,4 +449,121 @@ describe("tree", () => {
       assertEquals(tree.index(node), expected);
     });
   });
+
+  it("isChild", () => {
+    const table: [object, object][] = [
+      [B, A],
+      [J, A],
+      [C, B],
+      [F, B],
+      [D, C],
+      [E, C],
+      [G, F],
+      [H, F],
+      [I, F],
+      [K, J],
+      [L, J],
+    ];
+
+    testAll(table, tree.isChild.bind(tree));
+  });
+
+  it("isChild", () => {
+    const table: [object, object][] = [
+      [B, A],
+      [J, A],
+      [C, B],
+      [F, B],
+      [D, C],
+      [E, C],
+      [G, F],
+      [H, F],
+      [I, F],
+      [K, J],
+      [L, J],
+    ];
+
+    testAll(table, tree.isChild.bind(tree));
+  });
+
+  it("isAncestor", () => {
+    const table: [object, object][] = [
+      [A, B],
+      [A, C],
+      [A, D],
+      [A, E],
+      [A, F],
+      [A, G],
+      [A, H],
+      [A, I],
+      [A, J],
+      [A, K],
+      [A, L],
+      [B, C],
+      [B, D],
+      [B, E],
+      [B, F],
+      [B, G],
+      [B, H],
+      [B, I],
+      [C, D],
+      [C, E],
+      [F, G],
+      [F, H],
+      [F, I],
+      [J, K],
+      [J, L],
+    ];
+
+    testAll(table, tree.isAncestor.bind(tree));
+  });
+
+  it("isDescendant", () => {
+    const table: [object, object][] = [
+      [B, A],
+      [C, A],
+      [C, B],
+      [D, A],
+      [D, B],
+      [D, C],
+      [E, A],
+      [E, B],
+      [E, C],
+      [F, A],
+      [F, B],
+      [G, A],
+      [G, B],
+      [G, F],
+      [H, A],
+      [H, B],
+      [H, F],
+      [I, A],
+      [I, B],
+      [I, F],
+      [J, A],
+      [K, A],
+      [K, J],
+      [L, A],
+      [L, J],
+    ];
+
+    testAll(table, tree.isDescendant.bind(tree));
+  });
 });
+
+function testAll(
+  success: [object, object][],
+  predicate: (left: object, right: object) => boolean,
+): void {
+  const fails = allCombinations.filter((array) => {
+    return !success.some((v) => equal(v, array));
+  });
+
+  success.forEach(([target, of]) => {
+    assert(predicate(target, of), Deno.inspect([target, of]));
+  });
+
+  fails.forEach(([target, of]) => {
+    assertFalse(predicate(target, of), Deno.inspect([target, of]));
+  });
+}

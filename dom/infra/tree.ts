@@ -67,14 +67,14 @@ export class Tree<
     });
   }
 
-  /** Return parent of {@linkcode node}.
+  /** Return parent of {@linkcode node}. O(1)
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-parent)
    */
   parent(node: T): Parent | null {
     return this.ref(node).parent;
   }
 
-  /** Return children of {@linkcode node}.
+  /** Return children of {@linkcode node}. O(1)
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-child)
    */
   children(node: T): OrderedSet<Child> {
@@ -267,6 +267,9 @@ export class Tree<
     if (parent) yield* this.children(parent);
   }
 
+  /** Whether the {@linkcode target} is child of {@linkcode of} or not. O(1)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-child)
+   */
   isChild(target: T, of: unknown): boolean {
     return this.parent(target) === of;
   }
@@ -283,16 +286,20 @@ export class Tree<
     return left === right || this.root(left) === this.root(right);
   }
 
+  /** Whether the {@linkcode target} is ancestor of {@linkcode of} or not. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-ancestor)
+   */
   isAncestor(target: T, of: T): boolean {
     return this.isDescendant(of, target);
   }
 
+  /** Whether the {@linkcode target} is descendant of {@linkcode of} or not. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-descendant)
+   */
   isDescendant(target: T, of: T): boolean {
+    // if either A is a child of B or A is a child of an object C that is a descendant of B.
     return this.isChild(target, of) ||
-      some(
-        this.descendants(of),
-        (descendant) => this.isChild(target, descendant),
-      );
+      some(this.children(of), (child) => this.isDescendant(target, child));
   }
 
   isInclusiveAncestor(target: T, of: T): boolean {
