@@ -67,30 +67,48 @@ export class Tree<
     });
   }
 
+  /** Return parent of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-parent)
+   */
   parent(node: T): Parent | null {
     return this.ref(node).parent;
   }
 
+  /** Return children of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-child)
+   */
   children(node: T): OrderedSet<Child> {
     return this.ref(node).children;
   }
 
+  /** Return first child of {@linkcode node}. O(1)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-first-child)
+   */
   firstChild(node: T): Child | null {
     return this.children(node)[0] ?? null;
   }
 
+  /** Return last child of {@linkcode node}. O(1)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-last-child)
+   */
   lastChild(node: T): Child | null {
     const children = this.children(node);
 
     return children[children.size - 1] ?? null;
   }
 
+  /** Return root of {@linkcode node}. O(n)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-root)
+   */
   root(node: T): T {
     const ancestors = this.ancestors(node);
 
     return last(ancestors) ?? node;
   }
 
+  /** Return previous sibling of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-previous-sibling)
+   */
   previousSibling(node: T): Child | null {
     const parent = this.parent(node);
 
@@ -100,6 +118,9 @@ export class Tree<
     return this.children(parent)[index] ?? null;
   }
 
+  /** Return next sibling of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-next-sibling)
+   */
   nextSibling(node: T): Child | null {
     const parent = this.parent(node);
 
@@ -109,6 +130,7 @@ export class Tree<
     return this.children(parent)[index] ?? null;
   }
 
+  /** Return preceding node of {@linkcode node}. */
   precede(node: T): T | null {
     const previousSibling = this.previousSibling(node);
 
@@ -117,6 +139,7 @@ export class Tree<
     return this.parent(node);
   }
 
+  /** Yield preceding nodes of {@linkcode node}. */
   *precedes(node: T): IterableIterator<T> {
     const precede = this.precede(node);
 
@@ -126,6 +149,7 @@ export class Tree<
     }
   }
 
+  /** Return following node of {@linkcode node}. */
   follow(node: T): T | null {
     const firstChild = this.firstChild(node);
 
@@ -140,6 +164,7 @@ export class Tree<
     return parent ? this.#nextNodeDescendant(parent) : null;
   }
 
+  /** Yield following nodes of {@linkcode node}. */
   *follows(node: T): IterableIterator<T> {
     const follow = this.follow(node);
 
@@ -155,6 +180,9 @@ export class Tree<
     return lastChild ? this.#prev(lastChild) : node;
   }
 
+  /** Return index of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-tree-index)
+   */
   index(node: T): number {
     const parent = this.parent(node);
 
@@ -165,6 +193,7 @@ export class Tree<
     return len(takewhile(parentChildren, (child) => child !== node));
   }
 
+  /** Yield ancestors of {@linkcode node} in order of proximity. O(n) */
   *ancestors(node: T): IterableIterator<Parent> {
     const parent = this.parent(node);
 
@@ -174,11 +203,13 @@ export class Tree<
     }
   }
 
+  /** Yield inclusive ancestors of {@linkcode node} in order of proximity. O(n) */
   *inclusiveAncestors(node: T): IterableIterator<T> {
     yield node;
     yield* this.ancestors(node);
   }
 
+  /** Yield descendant of {@linkcode node} in depth first order. O(n) */
   *descendants(node: T): IterableIterator<Child> {
     for (const child of this.children(node)) {
       yield child;
@@ -186,12 +217,13 @@ export class Tree<
     }
   }
 
-  /** Yield all inclusive descendants of {@linkcode node} with depth first order. O(n) */
+  /** Yield inclusive descendants of {@linkcode node} in depth first order. O(n) */
   *inclusiveDescendants(node: T): IterableIterator<T> {
     yield node;
     yield* this.descendants(node);
   }
 
+  /** Yield previous siblings of {@linkcode node} in order of proximity. O(n) */
   *precedeSiblings(node: T): IterableIterator<Child> {
     const previousSibling = this.previousSibling(node);
 
@@ -201,6 +233,7 @@ export class Tree<
     }
   }
 
+  /** Yield following siblings of {@linkcode node} in tree order. O(n) */
   *followSiblings(node: T): IterableIterator<Child> {
     const nextSibling = this.nextSibling(node);
 
@@ -220,12 +253,14 @@ export class Tree<
     return parent ? this.#nextNodeDescendant(parent) : null;
   }
 
+  /** Yield siblings of {@linkcode node} in tree order. O(n) */
   *siblings(node: T): IterableIterator<Child> {
     for (const sibling of this.inclusiveSiblings(node)) {
       if (node !== sibling) yield sibling;
     }
   }
 
+  /** Yield inclusive siblings of {@linkcode node} in tree order. O(n) */
   *inclusiveSiblings(node: T): IterableIterator<Child> {
     const parent = this.parent(node);
 
