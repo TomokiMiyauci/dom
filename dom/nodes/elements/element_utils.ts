@@ -1,10 +1,8 @@
-import { Attr } from "./attr.ts";
-import { changeAttributes, handleAttributesChanges } from "./attr_utils.ts";
+import { handleAttributesChanges } from "./attr_utils.ts";
 import { isValidCustomElementName } from "../../../html/custom_element.ts";
 import { Namespace } from "../../../infra/namespace.ts";
-import { Text } from "../text.ts";
 import { find } from "../../../deps.ts";
-import { preInsertNode, replaceAllNode } from "../node_trees/mutation.ts";
+import { preInsertNode } from "../node_trees/mutation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { $, tree } from "../../../internal.ts";
@@ -74,40 +72,6 @@ export function setAttribute(
 
   // 6. Return oldAttr.
   return oldAttr;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-element-attributes-set-value
- */
-export function setAttributeValue(
-  element: globalThis.Element,
-  localName: string,
-  value: string,
-  prefix: string | null = null,
-  namespace: string | null = null,
-): void {
-  // 1. Let attribute be the result of getting an attribute given namespace, localName, and element.
-  const attribute = getAttributeByNamespaceAndLocalName(
-    namespace,
-    localName,
-    element,
-  );
-
-  // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
-  if (attribute === null) {
-    const attr = new Attr({
-      namespace,
-      namespacePrefix: prefix,
-      localName,
-      value,
-      nodeDocument: $(element).nodeDocument,
-    });
-
-    appendAttribute(attr, element);
-    return;
-  }
-  // 3. Change attribute to value.
-  changeAttributes(attribute, value);
 }
 
 /**
@@ -257,28 +221,6 @@ export function getAttributeByName(
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#string-replace-all
- */
-export function replaceAllString(
-  string: string,
-  parent: globalThis.Node,
-): void {
-  // 1. Let node be null.
-  let node: globalThis.Node | null = null;
-
-  // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
-  if (string !== "") {
-    node = Text["create"]({
-      data: string,
-      nodeDocument: $(parent).nodeDocument,
-    });
-  }
-
-  // 3. Replace all with node within parent.
-  replaceAllNode(node, parent);
-}
-
-/**
  * @see https://dom.spec.whatwg.org/#concept-element-custom
  */
 export function isCustom(element: globalThis.Element): boolean {
@@ -287,7 +229,6 @@ export function isCustom(element: globalThis.Element): boolean {
 }
 
 export const reflectGet = getAttributeValue;
-export const reflectSet = setAttributeValue;
 
 export function hasAttributeByQualifiedName(
   qualifiedName: string,

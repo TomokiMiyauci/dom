@@ -1,8 +1,6 @@
 import { Document, XMLDocument } from "../documents/document.ts";
-import { internalCreateElement } from "../documents/document_utils.ts";
 import { DocumentType } from "../document_type.ts";
 import { Text } from "../text.ts";
-import { createElement } from "../elements/element_algorithm.ts";
 import { appendNode } from "../node_trees/mutation.ts";
 import type { IDOMImplementation } from "../../../interface.d.ts";
 import { Namespace } from "../../../infra/namespace.ts";
@@ -10,6 +8,8 @@ import { validate } from "../../../infra/namespace.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { isUndefined } from "../../../deps.ts";
 import { $, internalSlots } from "../../../internal.ts";
+import { internalCreateElement } from "../utils/internal_create_element.ts";
+import { createElement } from "../utils/create_element.ts";
 
 export class DOMImplementation implements IDOMImplementation {
   /**

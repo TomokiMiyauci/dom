@@ -1,5 +1,5 @@
 import type { ICSSStyleDeclaration } from "../interface.d.ts";
-import { setAttributeValue } from "../dom/nodes/elements/element_utils.ts";
+import { setAttributeValue } from "../dom/nodes/utils/set_attribute_value.ts";
 
 export class CSSStyleDeclaration implements ICSSStyleDeclaration {
   #ownerNode: Element;

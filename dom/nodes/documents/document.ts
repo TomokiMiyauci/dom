@@ -16,7 +16,7 @@ import {
 import { Attr } from "../elements/attr.ts";
 import { Text } from "../text.ts";
 import { Comment } from "../comment.ts";
-import { createElement } from "../elements/element_algorithm.ts";
+import { createElement } from "../utils/create_element.ts";
 import { type Element } from "../elements/element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { DocumentFragment } from "../document_fragment.ts";
@@ -58,7 +58,8 @@ import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
-import { internalCreateElement, isHTMLDocument } from "./document_utils.ts";
+import { isHTMLDocument } from "./document_utils.ts";
+import { internalCreateElement } from "../utils/internal_create_element.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;
 

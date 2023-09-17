@@ -37,7 +37,7 @@ import { Element_CSSShadowParts } from "../../../css/css_shadow_parts/element.ts
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
-import { createElement } from "./element_algorithm.ts";
+import { createElement } from "../utils/create_element.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Steps } from "../../infra/applicable.ts";
 import { $, internalSlots } from "../../../internal.ts";
@@ -52,14 +52,13 @@ import {
   insertAdjacent,
   isValidShadowHostName,
   reflectGet,
-  reflectSet,
   removeAttribute,
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
-  replaceAllString,
   setAttribute,
-  setAttributeValue,
 } from "./element_utils.ts";
+import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
+import { replaceAllString } from "../utils/replace_all_string.ts";
 
 export interface ElementInits {
   namespace: string | null;
