@@ -11,7 +11,7 @@ import {
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
-import { filter, find, some } from "../../../deps.ts";
+import { filter, find, iter, some } from "../../../deps.ts";
 import {
   assignSlot,
   isSlottable,
@@ -157,7 +157,7 @@ export function insertNode(
   parent: Node,
   child: Node | null,
   suppressObservers: boolean | null = null,
-) {
+): void {
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
     ? tree.children(node).clone()
@@ -182,8 +182,28 @@ export function insertNode(
 
   // 5. If child is non-null, then:
   if (child) {
+    const { nodeDocument } = $(node);
+    const { ranges: _ranges } = $(nodeDocument);
+    const ranges = iter(_ranges);
+    const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
+    const isStartOffsetGtChildIndex = isStartOffsetGtIndex.bind(null, child);
+
     // 1. For each live range whose start node is parent and start offset is greater than child’s index, increase its start offset by count.
+    for (
+      const range of ranges.filter(isStartNodeParent).filter(
+        isStartOffsetGtChildIndex,
+      )
+    ) $(range).start[1] += count;
+
+    const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
+    const isEndOffsetGtChildIndex = isEndOffsetGtIndex.bind(null, child);
+
     // 2. For each live range whose end node is parent and end offset is greater than child’s index, increase its end offset by count.
+    for (
+      const range of ranges.filter(isEndNodeParent).filter(
+        isEndOffsetGtChildIndex,
+      )
+    ) $(range).end[1] += count;
   }
 
   // 6. Let previousSibling be child’s previous sibling or parent’s last child if child is null.
@@ -246,6 +266,22 @@ export function insertNode(
   }
 
   // 9. Run the children changed steps for parent.
+}
+
+function isStartOffsetGtIndex(node: Node, range: Range): boolean {
+  return $(range).startOffset > tree.index(node);
+}
+
+function isEndOffsetGtIndex(node: Node, range: Range): boolean {
+  return $(range).endOffset > tree.index(node);
+}
+
+function equalsNodeEndNode(node: Node, range: Range): boolean {
+  return $(range).startNode === node;
+}
+
+function equalsNodeStartNode(node: Node, range: Range): boolean {
+  return $(range).startNode === node;
 }
 
 /**
@@ -430,15 +466,41 @@ export function removeNode(
   // 3. Let index be node’s index.
   const index = tree.index(node);
 
+  const { nodeDocument } = $(node);
+  const { iterators, ranges: _ranges } = $(nodeDocument);
+  const ranges = iter(_ranges);
+
   // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).
+  for (const range of ranges.filter(isStartNodeInclusiveDescendantOfNode)) {
+    $(range).start = [parent, index];
+  }
 
   // 5. For each live range whose end node is an inclusive descendant of node, set its end to (parent, index).
+  for (const range of ranges.filter(isEndNodeInclusiveDescendantOfNode)) {
+    $(range).end = [parent, index];
+  }
+
+  const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
+  const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
 
   // 6. For each live range whose start node is parent and start offset is greater than index, decrease its start offset by 1.
+  for (
+    const range of ranges.filter(isStartNodeParent).filter(isStartOffsetGtIndex)
+  ) $(range).start[1]--;
 
   // 7. For each live range whose end node is parent and end offset is greater than index, decrease its end offset by 1.
+  for (
+    const range of ranges.filter(isEndNodeParent).filter(isEndOffsetGtIndex)
+  ) $(range).end[1]--;
 
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
+  for (const iterator of iterators) {
+    const { root, preRemovingSteps } = $(iterator);
+
+    if ($(root).nodeDocument === nodeDocument) {
+      preRemovingSteps.run(iterator, node);
+    }
+  }
 
   // 9. Let oldPreviousSibling be node’s previous sibling.
   const oldPreviousSibling = tree.previousSibling(node);
@@ -497,6 +559,27 @@ export function removeNode(
   }
 
   // 23. Run the children changed steps for parent.
+  $(parent).childrenChangedSteps.run();
+
+  function isStartNodeInclusiveDescendantOfNode(range: Range): boolean {
+    const { startNode } = $(range);
+
+    return tree.isInclusiveDescendant(startNode, node);
+  }
+
+  function isEndNodeInclusiveDescendantOfNode(range: Range): boolean {
+    const { endNode } = $(range);
+
+    return tree.isInclusiveDescendant(endNode, node);
+  }
+
+  function isStartOffsetGtIndex(range: Range): boolean {
+    return $(range).startOffset > index;
+  }
+
+  function isEndOffsetGtIndex(range: Range): boolean {
+    return $(range).endOffset > index;
+  }
 }
 
 /** To append a node to a parent, pre-insert node into parent before null.
@@ -525,6 +608,10 @@ export function adoptNode(node: Node, document: Document): void {
       $(inclusiveDescendant).nodeDocument = document;
 
       // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
+      if (isElement(inclusiveDescendant)) {
+        const { attributeList } = $(inclusiveDescendant);
+        iter(attributeList).forEach((attr) => $(attr).nodeDocument = document);
+      }
     }
   }
 

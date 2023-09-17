@@ -447,7 +447,7 @@ export class Document extends Node implements IDocument {
     namespace: string | null,
     qualifiedName: string,
     options?: string | ElementCreationOptions,
-  ): any {
+  ): globalThis.Element {
     // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
     return internalCreateElement(this, namespace, qualifiedName, options);
   }
@@ -584,6 +584,9 @@ export class Document extends Node implements IDocument {
     });
     internalSlots.set(iterator, _);
 
+    // Non-standard process
+    this._.iterators.add(iterator);
+
     // 6. Return iterator.
     return iterator;
   }
@@ -620,6 +623,8 @@ export class Document extends Node implements IDocument {
     // return a new live range with (this, 0) as its start an end.
     const range = new Range();
     $(range).start = [this, 0], $(range).end = [this, 0];
+
+    this._.ranges.add(range);
 
     return range;
   }
@@ -817,6 +822,16 @@ export class DocumentInternals {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
    */
   implementation: DOMImplementation;
+
+  /**
+   * Non standard field
+   */
+  iterators: Set<NodeIterator> = new Set();
+
+  /**
+   * Non standard field
+   */
+  ranges: Set<globalThis.Range> = new Set();
 
   constructor(
     { implementation }: Pick<DocumentInternals, "implementation">,
