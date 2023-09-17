@@ -4,10 +4,12 @@ import {
   isDocument,
   isDocumentType,
   isElement,
-  isShadowRoot,
   isText,
 } from "../utils.ts";
 import { $, tree } from "../../../internal.ts";
+import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
+import { iter } from "../../../deps.ts";
+import { List } from "../../../infra/data_structures/list.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -52,59 +54,104 @@ export function assignSlot(slottable: Slottable): void {
   if (slot) assignSlottables(slot);
 }
 
+export function findSlot(
+  slottable: Slottable,
+  open?: boolean,
+): Slottable | null {
+  // 1. If slottable’s parent is null, then return null.
+
+  // 2. Let shadow be slottable’s parent’s shadow root.
+
+  // 3. If shadow is null, then return null.
+
+  // 4. If the open flag is set and shadow’s mode is not "open", then return null.
+
+  // 5. If shadow’s slot assignment is "manual", then return the slot in shadow’s descendants whose manually assigned nodes contains slottable, if any; otherwise null.
+
+  // 6. Return the first slot in tree order in shadow’s descendants whose name is slottable’s name, if any; otherwise null.
+  return null;
+}
+
 /**
  * @see https://dom.spec.whatwg.org/#find-a-slot
  */
-export function findSlot(slottable: Slottable, open?: boolean): null {
-  throw new Error("findSlot");
+export function findSlottables(slottable: Slottable): List<Slottable> {
+  // 1. Let result be an empty list.
+  const result = new List<Slottable>();
+
+  // 2. Let root be slot’s root.
+
+  // 3. If root is not a shadow root, then return result.
+
+  // 4.  Let host be root’s host.
+
+  // 5. If root’s slot assignment is "manual", then:
+
+  // 1. Let result be « ».
+
+  // 2. For each slottable slottable of slot’s manually assigned nodes, if slottable’s parent is host, append slottable to result.
+
+  // 6.  Otherwise, for each slottable child slottable of host, in tree order:
+
+  // 1. Let foundSlot be the result of finding a slot given slottable.
+
+  // 2. If foundSlot is slot, then append slottable to result.
+
+  // 7. Return result.
+  return result;
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#assign-slotables-for-a-tree
  */
 export function assignSlottablesForTree(root: Node): void {
-  throw new Error("assignSlottablesForTree");
+  const inclusiveDescendants = tree.inclusiveDescendants(root);
+
+  // run assign slottables for each slot slot in root’s inclusive descendants, in tree order.
+  for (
+    const slot of iter(inclusiveDescendants).filter(isElement).filter(isSlot)
+  ) assignSlottables(slot);
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#assign-slotables
  */
-export function assignSlottables(slot: HTMLSlotElement): void {
-  throw new Error("assignSlottables");
+export function assignSlottables(slot: Slottable): void {
+  // 1. Let slottables be the result of finding slottables for slot.
+  const slottables = findSlottables(slot);
+
+  // 2. If slottables and slot’s assigned nodes are not identical, then run signal a slot change for slot.
+
+  // 3. Set slot’s assigned nodes to slottables.
+
+  // 4. For each slottable in slottables, set slottable’s assigned slot to slot.
+  for (const slottable of slottables) $(slottable).assignedSlot = slot;
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#signal-a-slot-change
  */
 export function signalSlotChange(slot: Element): void {
-  // 1. Append slot to slot’s relevant agent’s signal slots.
   // TODO
+  // 1. Append slot to slot’s relevant agent’s signal slots.
   // 2. Queue a mutation observer microtask.
+  queueMutationObserverMicrotask();
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#connected
  */
-export function isConnected(node: Node): boolean {
+export function isConnected(node: Node): node is Element {
+  const root = tree.shadowIncludingRoot(node);
   // if its shadow-including root is a document.
-  const root = getShadowIncludingRoot(node);
-
   return isDocument(root);
 }
 
 /**
- * @see https://dom.spec.whatwg.org/#concept-shadow-including-root
+ * @see https://dom.spec.whatwg.org/#concept-slot
  */
-export function getShadowIncludingRoot(node: Node): Node {
-  // object is its root’s host’s shadow-including root, if the object’s root is a shadow root; otherwise its root.
-  const root = tree.root(node);
-
-  if (isShadowRoot(root)) {
-    const host = $(root).host;
-    return getShadowIncludingRoot(host);
-  }
-
-  return root;
+export function isSlot(element: Element): boolean {
+  return $(element).name === "slot";
 }
 
 /** Return document element of document.

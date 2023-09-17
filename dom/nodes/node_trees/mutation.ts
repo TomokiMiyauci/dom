@@ -14,11 +14,19 @@ import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorit
 import { filter, find, iter, some } from "../../../deps.ts";
 import {
   assignSlot,
+  assignSlottables,
+  assignSlottablesForTree,
+  isConnected,
+  isSlot,
   isSlottable,
   signalSlotChange,
 } from "../node_trees/node_tree.ts";
 import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
 import { $, tree } from "../../../internal.ts";
+import { isCustom } from "../elements/element_utils.ts";
+import { enqueueCustomElementCallbackReaction } from "../../../html/elements/custom_elements/custom_element_reaction.ts";
+import { isAssigned } from "./slottable_utils.ts";
+import { tryUpgradeElement } from "../../../html/elements/custom_elements/upgrade.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -238,20 +246,30 @@ export function insertNode(
     if (isShadowRoot(tree.root(parent))) signalSlotChange(parent as any);
 
     // 6. Run assign slottables for a tree with node’s root.
-    // assignSlottablesForTree(getRoot(node));
+    assignSlottablesForTree(tree.root(node));
 
     // 7. For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order:
-    // TODO
-    for (const inclusiveDescendant of tree.inclusiveDescendants(node)) {
+    for (
+      const inclusiveDescendant of tree.shadowIncludingInclusiveDescendants(
+        node,
+      )
+    ) {
       // 1. Run the insertion steps with inclusiveDescendant.
       $(node).insertionSteps.run(inclusiveDescendant);
 
       // 2. If inclusiveDescendant is connected, then:
+      if (isConnected(inclusiveDescendant)) {
+        // 1. If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list.
+        if (isCustom(inclusiveDescendant)) {
+          enqueueCustomElementCallbackReaction(
+            inclusiveDescendant,
+            "connectedCallback",
+            [],
+          );
+          // 2. Otherwise, try to upgrade inclusiveDescendant.
+        } else tryUpgradeElement(inclusiveDescendant);
+      }
     }
-
-    ///// 1. If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list.
-
-    ///// 2. Otherwise, try to upgrade inclusiveDescendant.
   }
 
   // 8. If suppress observers flag is unset, then queue a tree mutation record for parent with nodes, « », previousSibling, and child.
@@ -266,6 +284,7 @@ export function insertNode(
   }
 
   // 9. Run the children changed steps for parent.
+  $(parent).childrenChangedSteps.run();
 }
 
 function isStartOffsetGtIndex(node: Node, range: Range): boolean {
@@ -512,42 +531,66 @@ export function removeNode(
   tree.children(parent).remove((child) => child === node);
 
   // 12. If node is assigned, then run assign slottables for node’s assigned slot.
+  if (isSlottable(node) && isAssigned(node)) {
+    const { assignedSlot } = $(node);
+    assignSlottables(assignedSlot!);
+  }
 
+  const root = tree.root(parent);
   // 13. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
+  if (isShadowRoot(root) && isElement(parent) && isSlot(parent)) {}
 
+  const inclusiveDescendants = tree.inclusiveDescendants(node);
   // 14. If node has an inclusive descendant that is a slot, then:
+  if (iter(inclusiveDescendants).filter(isElement).some(isSlot)) {
+    // 1. Run assign slottables for a tree with parent’s root.
+    assignSlottablesForTree(tree.root(parent));
 
-  // 1. Run assign slottables for a tree with parent’s root.
-
-  // 2. Run assign slottables for a tree with node.
+    // 2. Run assign slottables for a tree with node.
+    assignSlottablesForTree(node);
+  }
 
   // 15. Run the removing steps with node and parent.
+  $(node).removingSteps.run(node, parent);
 
   // 16. Let isParentConnected be parent’s connected.
+  const isParentConnected = isConnected(parent);
 
   // 17. If node is custom and isParentConnected is true, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list.
+  if (isElement(node) && isCustom(node) && isParentConnected) {
+    enqueueCustomElementCallbackReaction(node, "disconnectedCallback", []);
+  }
 
   // 18. For each shadow-including descendant descendant of node, in shadow-including tree order, then:
+  for (const descendant of tree.shadowIncludingDescendants(node)) {
+    // 1. Run the removing steps with descendant and null.
+    $(node).removingSteps.run(descendant, null);
 
-  // 19. Run the removing steps with descendant and null.
+    // 2. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
+    if (isElement(descendant) && isCustom(descendant) && isParentConnected) {
+      enqueueCustomElementCallbackReaction(
+        descendant,
+        "disconnectedCallback",
+        [],
+      );
+    }
+  }
 
-  // 20. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
+  // 19. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
+  for (const inclusiveAncestor of tree.inclusiveAncestors(parent)) {
+    const { registeredObserverList } = $(inclusiveAncestor);
+    for (const registered of [...registeredObserverList]) {
+      if (registered.options.subtree) {
+        registeredObserverList.append({
+          observer: registered.observer,
+          options: registered.options,
+          source: registered,
+        });
+      }
+    }
+  }
 
-  // 21. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
-  // for (const inclusiveAncestor of tree.inclusiveAncestors(parent)) {
-  //   const list = $(inclusiveAncestor).registeredObserverList;
-  //   for (const registered of [...list]) {
-  //     if (registered.options.subtree) {
-  //       list.append({
-  //         observer: registered.observer,
-  //         options: registered.options,
-  //         source: registered,
-  //       });
-  //     }
-  //   }
-  // }
-
-  // 22. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
+  // 20. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
   if (suppressObservers === null) {
     queueTreeMutationRecord(
       parent,
@@ -558,7 +601,7 @@ export function removeNode(
     );
   }
 
-  // 23. Run the children changed steps for parent.
+  // 21. Run the children changed steps for parent.
   $(parent).childrenChangedSteps.run();
 
   function isStartNodeInclusiveDescendantOfNode(range: Range): boolean {
@@ -615,7 +658,22 @@ export function adoptNode(node: Node, document: Document): void {
     }
   }
 
+  const shadowIncludingInclusiveDescendants = tree
+    .shadowIncludingInclusiveDescendants(node);
   // 2. For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom, enqueue a custom element callback reaction with inclusiveDescendant, callback name "adoptedCallback", and an argument list containing oldDocument and document.
+  for (
+    const inclusiveDescendant of iter(shadowIncludingInclusiveDescendants)
+      .filter(isElement).filter(isCustom)
+  ) {
+    enqueueCustomElementCallbackReaction(
+      inclusiveDescendant,
+      "adoptedCallback",
+      [oldDocument, document],
+    );
+  }
 
   // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order, run the adopting steps with inclusiveDescendant and oldDocument.
+  for (const inclusiveDescendant of shadowIncludingInclusiveDescendants) {
+    $(node).adoptingSteps.run(inclusiveDescendant, oldDocument);
+  }
 }

@@ -527,9 +527,22 @@ export class NodeInternals {
   insertionSteps: Steps<[insertedNode: globalThis.Node]> = new Steps();
 
   /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-adopt-ext)
+   */
+  adoptingSteps: Steps<[node: globalThis.Node, oldDocument: Document]> =
+    new Steps();
+
+  /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
    */
   childrenChangedSteps: Steps<[]> = new Steps();
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-remove-ext)
+   */
+  removingSteps: Steps<
+    [removedNode: globalThis.Node, oldParent: globalThis.Node | null]
+  > = new Steps();
 
   /** @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-list) */
   registeredObserverList: List<

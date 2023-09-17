@@ -11,8 +11,6 @@ export function Slottable<T extends Constructor>(Ctor: T) {
     set assignedSlot(value: HTMLSlotElement | null) {
       throw new UnImplemented("assignedSlot");
     }
-
-    protected _assignedSlot: Element | null = null;
   }
 
   return Slottable;
@@ -20,3 +18,20 @@ export function Slottable<T extends Constructor>(Ctor: T) {
 
 // deno-lint-ignore no-empty-interface
 export interface Slottable extends ISlottable {}
+
+export class SlottableInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#slotable-name)
+   */
+  name = "";
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#slotable-assigned-slot)
+   */
+  assignedSlot: Element | Text | null = null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#slottable-manual-slot-assignment)
+   */
+  manualSlotAssignment: Element | null = null;
+}
