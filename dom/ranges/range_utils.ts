@@ -512,9 +512,7 @@ export function insert(node: Node, range: Range): void {
       null;}
 
   // 5. Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise.
-  const parent = !referenceNode ? startNode : tree.parent(referenceNode);
-
-  if (!parent) return;
+  const parent = !referenceNode ? startNode : tree.parent(referenceNode)!; // maybe ensure parent
 
   // 6. Ensure pre-insertion validity of node into parent before referenceNode.
   ensurePreInsertionValidity(node, parent, referenceNode);
