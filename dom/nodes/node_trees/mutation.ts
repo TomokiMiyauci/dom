@@ -194,7 +194,13 @@ export function insertNode(
     const { ranges: _ranges } = $(nodeDocument);
     const ranges = iter(_ranges);
     const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
-    const isStartOffsetGtChildIndex = isStartOffsetGtIndex.bind(null, child);
+    const childIndex = tree.index(child);
+    const isStartOffsetGtChildIndex = compareRangeOffset.bind(
+      null,
+      Operator.Gt,
+      childIndex,
+      true,
+    );
 
     // 1. For each live range whose start node is parent and start offset is greater than child’s index, increase its start offset by count.
     for (
@@ -204,7 +210,12 @@ export function insertNode(
     ) $(range).start[1] += count;
 
     const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
-    const isEndOffsetGtChildIndex = isEndOffsetGtIndex.bind(null, child);
+    const isEndOffsetGtChildIndex = compareRangeOffset.bind(
+      null,
+      Operator.Gt,
+      childIndex,
+      false,
+    );
 
     // 2. For each live range whose end node is parent and end offset is greater than child’s index, increase its end offset by count.
     for (
@@ -287,19 +298,11 @@ export function insertNode(
   $(parent).childrenChangedSteps.run();
 }
 
-function isStartOffsetGtIndex(node: Node, range: Range): boolean {
-  return $(range).startOffset > tree.index(node);
-}
-
-function isEndOffsetGtIndex(node: Node, range: Range): boolean {
-  return $(range).endOffset > tree.index(node);
-}
-
-function equalsNodeEndNode(node: Node, range: Range): boolean {
+export function equalsNodeEndNode(node: Node, range: Range): boolean {
   return $(range).startNode === node;
 }
 
-function equalsNodeStartNode(node: Node, range: Range): boolean {
+export function equalsNodeStartNode(node: Node, range: Range): boolean {
   return $(range).startNode === node;
 }
 
@@ -501,15 +504,28 @@ export function removeNode(
 
   const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
   const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
+  const startOffsetIsGtIndex = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    index,
+    true,
+  );
 
   // 6. For each live range whose start node is parent and start offset is greater than index, decrease its start offset by 1.
   for (
-    const range of ranges.filter(isStartNodeParent).filter(isStartOffsetGtIndex)
+    const range of ranges.filter(isStartNodeParent).filter(startOffsetIsGtIndex)
   ) $(range).start[1]--;
+
+  const endOffsetIsGtIndex = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    index,
+    false,
+  );
 
   // 7. For each live range whose end node is parent and end offset is greater than index, decrease its end offset by 1.
   for (
-    const range of ranges.filter(isEndNodeParent).filter(isEndOffsetGtIndex)
+    const range of ranges.filter(isEndNodeParent).filter(endOffsetIsGtIndex)
   ) $(range).end[1]--;
 
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
@@ -615,14 +631,6 @@ export function removeNode(
 
     return tree.isInclusiveDescendant(endNode, node);
   }
-
-  function isStartOffsetGtIndex(range: Range): boolean {
-    return $(range).startOffset > index;
-  }
-
-  function isEndOffsetGtIndex(range: Range): boolean {
-    return $(range).endOffset > index;
-  }
 }
 
 /** To append a node to a parent, pre-insert node into parent before null.
@@ -675,5 +683,27 @@ export function adoptNode(node: Node, document: Document): void {
   // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order, run the adopting steps with inclusiveDescendant and oldDocument.
   for (const inclusiveDescendant of shadowIncludingInclusiveDescendants) {
     $(node).adoptingSteps.run(inclusiveDescendant, oldDocument);
+  }
+}
+
+export enum Operator {
+  Eq,
+  Gt,
+}
+
+export function compareRangeOffset(
+  operator: Operator,
+  offset: number,
+  isStart: boolean,
+  range: Range,
+): boolean {
+  const _ = $(range);
+  const rangeOffset = isStart ? _.startOffset : _.endOffset;
+
+  switch (operator) {
+    case Operator.Eq:
+      return rangeOffset === offset;
+    case Operator.Gt:
+      return rangeOffset > offset;
   }
 }
