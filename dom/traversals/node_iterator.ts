@@ -2,6 +2,9 @@ import type { INodeIterator } from "../../interface.d.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { $, tree } from "../../internal.ts";
 import { Direction, traverse } from "./node_iterator_utils.ts";
+import { Steps } from "../infra/applicable.ts";
+import { iter, last } from "../../deps.ts";
+import { first } from "npm:itertools@2.1.2";
 
 @Exposed(Window)
 export class NodeIterator implements INodeIterator {
@@ -101,9 +104,7 @@ export class NodeIteratorInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
    */
-  get iteratorCollection(): IterableIterator<Node> {
-    return tree.inclusiveDescendants(this.root);
-  }
+  iteratorCollection: Iterable<Node>;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-reference)
@@ -114,6 +115,13 @@ export class NodeIteratorInternals {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pointer-before-reference)
    */
   pointerBeforeReference: boolean;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pre-removing-steps)
+   */
+  preRemovingSteps: Steps<
+    [nodeIterator: globalThis.NodeIterator, toBeRemovedNode: Node]
+  > = new Steps();
 
   constructor(
     { reference, pointerBeforeReference, filter, whatToShow, root }: {
@@ -129,5 +137,43 @@ export class NodeIteratorInternals {
     this.filter = filter;
     this.whatToShow = whatToShow;
     this.root = root;
+    this.iteratorCollection = {
+      [Symbol.iterator]: () => {
+        return tree.inclusiveDescendants(this.root);
+      },
+    };
+    const steps = new Steps<[globalThis.NodeIterator, Node]>();
+
+    steps.define((nodeIterator, toBeRemovedNode) => {
+      // 1. If toBeRemovedNode is not an inclusive ancestor of nodeIterator’s reference, or toBeRemovedNode is nodeIterator’s root, then return.
+      if (
+        !tree.isInclusiveAncestor(toBeRemovedNode, $(nodeIterator).reference) ||
+        toBeRemovedNode === $(nodeIterator).root
+      ) return;
+
+      // 2. If nodeIterator’s pointer before reference is true, then:
+      if ($(nodeIterator).pointerBeforeReference) return;
+
+      const { root } = $(nodeIterator);
+      const follows = iter(tree.follows(toBeRemovedNode)).filter((node) =>
+        tree.isInclusiveDescendant(node, root)
+      ).filter((node) => !tree.isInclusiveDescendant(node, toBeRemovedNode));
+      // 1. Let next be toBeRemovedNode’s first following node that is an inclusive descendant of nodeIterator’s root and is not an inclusive descendant of toBeRemovedNode, and null if there is no such node.
+      const next = first(follows) ?? null;
+
+      // 2. If next is non-null, then set nodeIterator’s reference to next and return.
+      if (next) {
+        $(nodeIterator).reference = next;
+        return;
+        // 3. Otherwise, set nodeIterator’s pointer before reference to false.
+      } else $(nodeIterator).pointerBeforeReference = false;
+
+      const previousSibling = tree.previousSibling(toBeRemovedNode);
+      // 3. Set nodeIterator’s reference to toBeRemovedNode’s parent, if toBeRemovedNode’s previous sibling is null, and to the inclusive descendant of toBeRemovedNode’s previous sibling that appears last in tree order otherwise.
+      $(nodeIterator).reference = previousSibling === null
+        ? tree.parent(toBeRemovedNode)!
+        : last(tree.inclusiveDescendants(previousSibling))!;
+    });
+    this.preRemovingSteps = steps;
   }
 }
