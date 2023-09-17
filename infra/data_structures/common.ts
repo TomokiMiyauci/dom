@@ -3,7 +3,8 @@ import { Indexer } from "../utils.ts";
 
 export type Entry<T = unknown> = [index: number, item: T];
 
-export abstract class ListCore<T> extends Indexer<T | undefined> {
+export abstract class ListCore<T, U extends { append(item: T): void }>
+  extends Indexer<T | undefined> {
   readonly [index: number]: T;
 
   protected list: T[];
@@ -17,7 +18,7 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
     this.list = list;
   }
 
-  protected abstract create(): this;
+  protected abstract create(): U;
 
   /** Add item to end of list. O(1)
    *
@@ -108,7 +109,7 @@ export abstract class ListCore<T> extends Indexer<T | undefined> {
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-clone)
    */
-  clone(): this {
+  clone(): U {
     // create a new list clone, of the same designation,
     const clone = this.create();
 

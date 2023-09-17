@@ -4,7 +4,7 @@ import { ListCore } from "./common.ts";
  *
  * [Infra Living Standard](https://infra.spec.whatwg.org/#list)
  */
-export class List<T> extends ListCore<T> {
+export class List<T> extends ListCore<T, List<T>> {
   /** Replace with {@linkcode item} if condition matches.
    *
    * [Infra Living Standard](https://infra.spec.whatwg.org/#list-replace)
@@ -18,7 +18,7 @@ export class List<T> extends ListCore<T> {
     }
   }
 
-  protected override create(): this {
-    return Object.assign(new List());
+  protected override create(): List<T> {
+    return new List();
   }
 }

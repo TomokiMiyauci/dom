@@ -9,7 +9,7 @@ import { Entry, ListCore } from "./common.ts";
  *
  * [Infra Living Standard](https://infra.spec.whatwg.org/#ordered-set)
  */
-export class OrderedSet<T> extends ListCore<T> {
+export class OrderedSet<T> extends ListCore<T, OrderedSet<T>> {
   #set: Set<T>;
 
   constructor(iterable?: Iterable<T>) {
@@ -60,8 +60,8 @@ export class OrderedSet<T> extends ListCore<T> {
     return false;
   }
 
-  protected override create(): this {
-    return Object.assign(new OrderedSet());
+  protected override create(): OrderedSet<T> {
+    return new OrderedSet();
   }
 
   /** Replace {@linkcode item} to {@linkcode replacement}. O(n)
