@@ -3,7 +3,7 @@ import { Constructor, iter } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
-import { getChildTextContent } from "../dom/nodes/text.ts";
+import { getChildTextContent } from "../dom/nodes/text_utils.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $, internalSlots, tree } from "../internal.ts";

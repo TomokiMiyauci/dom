@@ -17,12 +17,12 @@ import {
   removeNode,
 } from "../nodes/node_trees/mutation.ts";
 import { replaceData } from "../nodes/character_data_algorithm.ts";
-import { splitText } from "../nodes/text.ts";
 import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
 import { Position, position } from "./boundary_point.ts";
 import { Range } from "./range.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
+import { splitText } from "../nodes/utils/split_text.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)

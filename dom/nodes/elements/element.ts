@@ -18,7 +18,8 @@ import {
 } from "../../../html/custom_element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { List } from "../../../infra/data_structures/list.ts";
-import { descendantTextContent, Text } from "../text.ts";
+import { Text } from "../text.ts";
+import { descendantTextContent } from "../text_utils.ts";
 import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
