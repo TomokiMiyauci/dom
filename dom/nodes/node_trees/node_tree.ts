@@ -10,6 +10,7 @@ import { $, tree } from "../../../internal.ts";
 import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
 import { iter } from "../../../deps.ts";
 import { List } from "../../../infra/data_structures/list.ts";
+import { isShadowRoot } from "../shadow_root_utils.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -54,48 +55,88 @@ export function assignSlot(slottable: Slottable): void {
   if (slot) assignSlottables(slot);
 }
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#find-a-slot)
+ */
 export function findSlot(
   slottable: Slottable,
-  open?: boolean,
-): Slottable | null {
+  open = false,
+): HTMLSlotElement | null {
+  const parent = tree.parent(slottable);
   // 1. If slottable’s parent is null, then return null.
+  if (!parent) return null;
 
   // 2. Let shadow be slottable’s parent’s shadow root.
+  const shadow =
+    ($(parent) as any as { shadowRoot: ShadowRoot | null }).shadowRoot;
 
   // 3. If shadow is null, then return null.
+  if (!shadow) return null;
 
   // 4. If the open flag is set and shadow’s mode is not "open", then return null.
+  if (open && $(shadow).mode !== "open") return null;
 
+  const shadowDescendants = iter(tree.descendants(shadow));
   // 5. If shadow’s slot assignment is "manual", then return the slot in shadow’s descendants whose manually assigned nodes contains slottable, if any; otherwise null.
+  if ($(shadow).slotAssignment === "manual") {
+    return shadowDescendants.filter(isElement).filter(isSlot).find(
+      slotManuallyAssignedNodesContainsSlottable,
+    ) ?? null;
+  }
 
   // 6. Return the first slot in tree order in shadow’s descendants whose name is slottable’s name, if any; otherwise null.
-  return null;
+  return shadowDescendants.filter(isElement).filter(isSlot).find(
+    nameIsSlottableName,
+  ) ?? null;
+
+  function slotManuallyAssignedNodesContainsSlottable(
+    slot: HTMLSlotElement,
+  ): boolean {
+    return $(slot).manuallyAssignedNodes.contains(slottable);
+  }
+
+  function nameIsSlottableName(element: Element): boolean {
+    return $(element).name === $(slottable).name;
+  }
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#find-a-slot
  */
-export function findSlottables(slottable: Slottable): List<Slottable> {
+export function findSlottables(slot: HTMLSlotElement): List<Slottable> {
   // 1. Let result be an empty list.
   const result = new List<Slottable>();
 
   // 2. Let root be slot’s root.
+  const root = tree.root(slot);
 
   // 3. If root is not a shadow root, then return result.
+  if (!isShadowRoot(root)) return result;
 
-  // 4.  Let host be root’s host.
+  // 4. Let host be root’s host.
+  const { host } = $(root);
 
   // 5. If root’s slot assignment is "manual", then:
+  if ($(root).slotAssignment === "manual") {
+    // 1. Let result be « ». // This is not necessary
 
-  // 1. Let result be « ».
+    // 2. For each slottable slottable of slot’s manually assigned nodes,
+    for (const slottable of $(slot).manuallyAssignedNodes) {
+      // if slottable’s parent is host, append slottable to result.
+      if (tree.parent(slottable) === host) result.append(slottable);
+    }
+    // 6.  Otherwise,
+  } else {
+    const hostChildren = tree.children(host);
+    // for each slottable child slottable of host, in tree order:
+    for (const slottable of iter(hostChildren).filter(isSlottable)) {
+      // 1. Let foundSlot be the result of finding a slot given slottable.
+      const foundSlot = findSlot(slottable);
 
-  // 2. For each slottable slottable of slot’s manually assigned nodes, if slottable’s parent is host, append slottable to result.
-
-  // 6.  Otherwise, for each slottable child slottable of host, in tree order:
-
-  // 1. Let foundSlot be the result of finding a slot given slottable.
-
-  // 2. If foundSlot is slot, then append slottable to result.
+      // 2. If foundSlot is slot, then append slottable to result.
+      if (foundSlot) result.append(foundSlot);
+    }
+  }
 
   // 7. Return result.
   return result;
@@ -116,13 +157,15 @@ export function assignSlottablesForTree(root: Node): void {
 /**
  * @see https://dom.spec.whatwg.org/#assign-slotables
  */
-export function assignSlottables(slot: Slottable): void {
+export function assignSlottables(slot: HTMLSlotElement): void {
   // 1. Let slottables be the result of finding slottables for slot.
   const slottables = findSlottables(slot);
 
   // 2. If slottables and slot’s assigned nodes are not identical, then run signal a slot change for slot.
+  if (slottables !== $(slot).assignedNodes) signalSlotChange(slot);
 
   // 3. Set slot’s assigned nodes to slottables.
+  $(slot).assignedNodes = slottables;
 
   // 4. For each slottable in slottables, set slottable’s assigned slot to slot.
   for (const slottable of slottables) $(slottable).assignedSlot = slot;
@@ -150,7 +193,7 @@ export function isConnected(node: Node): node is Element {
 /**
  * @see https://dom.spec.whatwg.org/#concept-slot
  */
-export function isSlot(element: Element): boolean {
+export function isSlot(element: Element): element is HTMLSlotElement {
   return $(element).name === "slot";
 }
 
