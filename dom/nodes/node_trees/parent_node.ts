@@ -179,7 +179,8 @@ export function convertNodesToNode(
   if (isSingle(replaced)) return replaced[0];
 
   // 1. Let node be null. // 4. Otherwise, set node to a new DocumentFragment node whose node document is document, and then append each node in nodes, if any, to it.
-  const fragment = DocumentFragment["create"]({ nodeDocument: document });
+  const fragment = new DocumentFragment();
+  $(fragment).nodeDocument = document;
   replaced.forEach((node) => appendNode(node, fragment));
 
   // 5. Return node.

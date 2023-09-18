@@ -73,9 +73,8 @@ export function nextNodeDescendant(node: Node | null): Node | null {
  */
 export function cloneContents(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
-  const fragment = DocumentFragment["create"]({
-    nodeDocument: $($(range).startNode).nodeDocument,
-  });
+  const fragment = new DocumentFragment();
+  $(fragment).nodeDocument = $($(range).startNode).nodeDocument;
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;
@@ -261,9 +260,8 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
  */
 export function extract(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
-  const fragment = DocumentFragment["create"]({
-    nodeDocument: $($(range).startNode).nodeDocument,
-  });
+  const fragment = new DocumentFragment();
+  $(fragment).nodeDocument = $($(range).startNode).nodeDocument;
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;

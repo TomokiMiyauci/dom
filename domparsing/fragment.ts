@@ -25,9 +25,8 @@ export function parseFragment(
   const newChildren = algorithm(contextElement, markup);
 
   // 3. Let fragment be a new DocumentFragment whose node document is context element's node document.
-  const fragment = DocumentFragment["create"]({
-    nodeDocument: $(contextElement).nodeDocument,
-  });
+  const fragment = new DocumentFragment();
+  $(fragment).nodeDocument = $(contextElement).nodeDocument;
 
   // 4. Append each Node in new children to fragment (in tree order).
   for (const node of newChildren) appendNode(node, fragment);

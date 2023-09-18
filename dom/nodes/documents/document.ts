@@ -355,7 +355,10 @@ export class Document extends Node implements IDocument {
    */
   createDocumentFragment(): globalThis.DocumentFragment {
     // return a new DocumentFragment node whose node document is this.
-    return DocumentFragment["create"]({ nodeDocument: this });
+    const fragment = new DocumentFragment();
+    $(fragment).nodeDocument = this;
+
+    return fragment;
   }
 
   /**

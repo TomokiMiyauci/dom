@@ -1,4 +1,4 @@
-import { Node, NodeStates, NodeType } from "./node.ts";
+import { Node, NodeType } from "./node.ts";
 import { ParentNode } from "./node_trees/parent_node.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
@@ -80,14 +80,10 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   }
 
   protected override clone(document: Document): globalThis.DocumentFragment {
-    return DocumentFragment.create({ nodeDocument: document });
-  }
+    const fragment = new DocumentFragment();
+    $(fragment).nodeDocument = document;
 
-  protected static create(states: NodeStates): globalThis.DocumentFragment {
-    const node = new DocumentFragment() as globalThis.DocumentFragment;
-    $(node).nodeDocument = states.nodeDocument;
-
-    return node;
+    return fragment;
   }
 
   declare protected _: DocumentFragmentInternals & Node["_"];
