@@ -2384,6 +2384,12 @@
         "name": "Calling intersectsNode without an argument or with an invalid argument should throw a TypeError.",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/insert-adjacent.html": [
+      {
+        "name": "invalid object argument insertAdjacentElement",
+        "reason": "compiler error"
+      }
     ]
   }
 }
