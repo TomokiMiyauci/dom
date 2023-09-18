@@ -337,7 +337,10 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new CDATASection node with its data set to data and node document set to this.
-    return CDATASection["create"]({ data, nodeDocument: this });
+    const cdataSection = new CDATASection();
+    $(cdataSection).data = data;
+    $(cdataSection).nodeDocument = this;
+    return cdataSection;
   }
 
   /**
@@ -347,7 +350,10 @@ export class Document extends Node implements IDocument {
   @convert
   createComment(@DOMString data: string): Comment {
     // return a new Comment node whose data is data and node document is this.
-    return Comment["create"]({ data, nodeDocument: this });
+    const comment = new Comment();
+    $(comment).data = data, $(comment).nodeDocument = this;
+
+    return comment;
   }
 
   /**
@@ -639,7 +645,9 @@ export class Document extends Node implements IDocument {
   @convert
   createTextNode(@DOMString data: string): Text {
     // return a new Text node whose data is data and node document is this.
-    return Text["create"]({ data, nodeDocument: this });
+    const text = new Text();
+    $(text).data = data, $(text).nodeDocument = this;
+    return text;
   }
 
   /**

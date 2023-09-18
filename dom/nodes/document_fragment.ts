@@ -65,6 +65,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
    */
   override set textContent(value: string | null) {
     value ??= "";
+    value = String(value); // TODO DOMString setter
 
     // String replace all with the given value within this.
     replaceAllString(value, this);

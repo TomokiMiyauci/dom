@@ -169,7 +169,9 @@ export function convertNodesToNode(
   // 2. Replace each string in nodes with a new Text node whose data is the string and node document is document.
   const replaced = iter(nodes).map((node) => {
     if (typeof node === "string") {
-      return Text["create"]({ data: node, nodeDocument: document });
+      const text = new Text();
+      $(text).data = node, $(text).nodeDocument = document;
+      return text;
     }
 
     return node;

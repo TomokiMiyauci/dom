@@ -102,11 +102,10 @@ export class DOMImplementation implements IDOMImplementation {
       const titleElement = createElement(doc, "title", Namespace.HTML);
       appendNode(titleElement, headElement);
 
+      const text = new Text();
+      $(text).data = title, $(text).nodeDocument = doc;
       // 2. Append a new Text node, with its data set to title (which could be the empty string) and its node document set to doc, to the title element created earlier.
-      appendNode(
-        Text["create"]({ data: title, nodeDocument: doc }),
-        titleElement,
-      );
+      appendNode(text, titleElement);
     }
 
     // 7. Append the result of creating an element given doc, body, and the HTML namespace, to the html element created earlier.

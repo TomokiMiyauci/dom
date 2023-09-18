@@ -1,9 +1,5 @@
-import { type NodeStates, NodeType } from "./node.ts";
-import {
-  CharacterData,
-  CharacterDataInternals,
-  type CharacterDataStates,
-} from "./character_data.ts";
+import { NodeType } from "./node.ts";
+import { CharacterData, CharacterDataInternals } from "./character_data.ts";
 import { Slottable } from "./node_trees/slottable.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import type { IText } from "../../interface.d.ts";
@@ -13,8 +9,10 @@ import { $ } from "../../internal.ts";
 import { Get } from "../../utils.ts";
 import { contiguousTextNodes } from "./text_utils.ts";
 import { splitText } from "./utils/split_text.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @Slottable
+@Exposed(Window)
 export class Text extends CharacterData implements IText {
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-text
@@ -36,7 +34,9 @@ export class Text extends CharacterData implements IText {
   }
 
   protected override clone(document: Document): globalThis.Text {
-    return Text.create({ data: $(this).data, nodeDocument: document });
+    const text = new Text();
+    $(text).data = $(this).data, $(text).nodeDocument = document;
+    return text;
   }
 
   /**
@@ -59,16 +59,6 @@ export class Text extends CharacterData implements IText {
   splitText(offset: number): globalThis.Text {
     // to split this with offset offset.
     return splitText(this, offset);
-  }
-
-  protected static create(
-    { data, nodeDocument }: CharacterDataStates & NodeStates,
-  ): Text {
-    const node = new Text(data);
-
-    $(node).nodeDocument = nodeDocument;
-
-    return node;
   }
 }
 

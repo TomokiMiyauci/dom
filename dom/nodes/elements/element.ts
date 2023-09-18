@@ -156,6 +156,7 @@ export class Element extends Node implements IElement {
    */
   override set textContent(value: string | null) {
     value ??= "";
+    value = String(value); // TODO DOMString setter
 
     // String replace all with the given value within this.
     replaceAllString(value, this);
@@ -544,8 +545,9 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-insertadjacenttext
    */
   insertAdjacentText(where: InsertPosition, data: string): void {
+    const text = new Text();
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    const text = Text["create"]({ data, nodeDocument: $(this).nodeDocument });
+    $(text).data = data, $(text).nodeDocument = $(this).nodeDocument;
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);

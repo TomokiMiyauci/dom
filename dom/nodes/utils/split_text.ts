@@ -34,11 +34,9 @@ export function splitText(
   // 4 Let new data be the result of substringing data with node node, offset offset, and count count.
   const newData = substringData(node, offset, count);
 
+  const newNode = new Text();
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
-  const newNode = Text["create"]({
-    data: newData,
-    nodeDocument: $(node).nodeDocument,
-  });
+  $(newNode).data = newData, $(newNode).nodeDocument = $(node).nodeDocument;
 
   // 6 Let parent be node’s parent.
   const parent = tree.parent(node);

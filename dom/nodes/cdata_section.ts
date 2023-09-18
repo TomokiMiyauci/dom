@@ -1,10 +1,9 @@
 import { Text } from "./text.ts";
-import { type NodeStates } from "./node.ts";
 import { NodeType } from "./node.ts";
-import { type CharacterDataStates } from "./character_data.ts";
 import type { ICDATASection } from "../../interface.d.ts";
-import { $ } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed(Window)
 export class CDATASection extends Text implements ICDATASection {
   constructor() {
     super();
@@ -16,16 +15,5 @@ export class CDATASection extends Text implements ICDATASection {
 
   override get nodeName(): "#cdata-section" {
     return "#cdata-section";
-  }
-
-  protected static override create(
-    { data, nodeDocument }: CharacterDataStates & NodeStates,
-  ): CDATASection {
-    const node = new CDATASection();
-
-    $(node).data = data;
-    $(node).nodeDocument = nodeDocument;
-
-    return node;
   }
 }

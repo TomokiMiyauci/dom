@@ -10,14 +10,13 @@ export function replaceAllString(
   parent: Node,
 ): void {
   // 1. Let node be null.
-  let node: Node | null = null;
+  let node: Text | null = null;
 
-  // 2. If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document.
+  // 2. If string is not the empty string,
   if (string !== "") {
-    node = Text["create"]({
-      data: string,
-      nodeDocument: $(parent).nodeDocument,
-    });
+    node = new Text();
+    // then set node to a new Text node whose data is string and node document is parent’s node document.
+    $(node).data = string, $(node).nodeDocument = $(parent).nodeDocument;
   }
 
   // 3. Replace all with node within parent.
