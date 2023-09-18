@@ -6,23 +6,13 @@ import { Queue } from "../../../infra/data_structures/queue.ts";
 import { iter } from "../../../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { RegisteredObserver } from "./queue.ts";
-import { $ } from "../../../internal.ts";
+import { $, internalSlots } from "../../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-mutationobserver)
  */
-Exposed(Window);
+@Exposed(Window)
 export class MutationObserver implements IMutationObserver {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationobserver-node-list)
-   */
-  private nodeList: List<Node> = new List();
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-queue)
-   */
-  private recordQueue: Queue<MutationRecord> = new Queue();
-
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-mutationobserver)
    */
@@ -30,9 +20,13 @@ export class MutationObserver implements IMutationObserver {
     /**
      * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-callback)
      */
-    private callback: MutationCallback,
+    callback: MutationCallback,
   ) {
     // set this’s callback to callback.
+    const _ = new MutationObserverInternals(callback);
+
+    internalSlots.set(this, _);
+    this.#_ = _;
   }
 
   /**
@@ -78,7 +72,7 @@ export class MutationObserver implements IMutationObserver {
       )
     ) {
       // 1. For each node of this’s node list, remove all transient registered observers whose source is registered from node’s registered observer list.
-      for (const node of [...this.nodeList]) {
+      for (const node of [...this.#_.nodeList]) {
         const list = $(node).registeredObserverList;
         list.remove((observer) => {
           return "source" in observer && observer.source === registered;
@@ -95,7 +89,7 @@ export class MutationObserver implements IMutationObserver {
       $(target).registeredObserverList.append({ observer: this, options });
 
       // 2. Append a weak reference to target to this’s node list.
-      this.nodeList.append(target);
+      this.#_.nodeList.append(target);
     }
   }
 
@@ -104,14 +98,14 @@ export class MutationObserver implements IMutationObserver {
    */
   disconnect(): void {
     // 1. For each node of this’s node list, remove any registered observer from node’s registered observer list for which this is the observer.
-    for (const node of this.nodeList) {
+    for (const node of this.#_.nodeList) {
       $(node).registeredObserverList.remove(
         this.#isRegisteredObserverThis.bind(this),
       );
     }
 
     // 2. Empty this’s record queue.
-    this.recordQueue.empty();
+    this.#_.recordQueue.empty();
   }
 
   /**
@@ -119,10 +113,10 @@ export class MutationObserver implements IMutationObserver {
    */
   takeRecords(): MutationRecord[] {
     // 1. Let records be a clone of this’s record queue.
-    const records = this.recordQueue.clone();
+    const records = this.#_.recordQueue.clone();
 
     // 2. Empty this’s record queue.
-    this.recordQueue.empty();
+    this.#_.recordQueue.empty();
 
     // 3. Return records.
     return Array.from(records);
@@ -130,5 +124,27 @@ export class MutationObserver implements IMutationObserver {
 
   #isRegisteredObserverThis({ observer }: RegisteredObserver): boolean {
     return observer === this;
+  }
+
+  #_: MutationObserverInternals;
+}
+
+export class MutationObserverInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationobserver-node-list)
+   */
+  nodeList: List<Node> = new List();
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-queue)
+   */
+  recordQueue: Queue<MutationRecord> = new Queue();
+
+  constructor(
+    /**
+     * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-mo-callback)
+     */
+    public callback: MutationCallback,
+  ) {
   }
 }

@@ -1,8 +1,8 @@
 import { StaticNodeList } from "../node_trees/node_list.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { OrderedSet } from "../../../infra/data_structures/set.ts";
-import { MutationObserver } from "./mutation_observer.ts";
 import { $, tree } from "../../../internal.ts";
+import { fireEvent } from "../../events/fire.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
@@ -35,7 +35,7 @@ export interface TransientRegisteredObserver extends RegisteredObserver {
 const surroundingAgent = {
   mutationObserverMicrotaskQueued: false,
   pendingMutationObservers: new OrderedSet<MutationObserver>(),
-  signalSlots: new OrderedSet<unknown>(),
+  signalSlots: new OrderedSet<EventTarget>(),
 };
 
 /**
@@ -73,16 +73,14 @@ export function notifyMutationObservers(): void {
 
   // 6. For each mo of notifySet:
   for (const mo of [...notifySet]) {
-    const recordQueue = mo["recordQueue"];
-
     // 1. Let records be a clone of mo’s record queue.
-    const records = recordQueue.clone();
+    const records = $(mo).recordQueue.clone();
 
     // 2. Empty mo’s record queue.
-    recordQueue.empty();
+    $(mo).recordQueue.empty();
 
     // 3. For each node of mo’s node list, remove all transient registered observers whose observer is mo from node’s registered observer list.
-    for (const node of [...mo["nodeList"]]) {
+    for (const node of [...$(mo).nodeList]) {
       $(node).registeredObserverList.remove((registered) => {
         return "source" in registered && registered.observer === mo;
       });
@@ -90,12 +88,12 @@ export function notifyMutationObservers(): void {
 
     // 4. If records is not empty, then invoke mo’s callback with « records, mo », and mo. If this throws an exception, catch it, and report the exception.
     if (!records.isEmpty) {
-      mo["callback"].apply(mo, [Array.from(records), mo]);
+      $(mo).callback.apply(mo, [Array.from(records), mo]);
     }
   }
 
   // 7. For each slot of signalSet, fire an event named slotchange, with its bubbles attribute set to true, at slot.
-  // TODO
+  for (const slot of signalSet) fireEvent("slotchange", slot); // TODO bubbles
 }
 
 /**
@@ -201,7 +199,7 @@ export function queueMutationRecord(
     );
 
     // 2. Enqueue record to observer’s record queue.
-    observer["recordQueue"].enqueue(record);
+    $(observer).recordQueue.enqueue(record);
 
     // 3. Append observer to the surrounding agent’s pending mutation observers.
     surroundingAgent.pendingMutationObservers.append(observer);
