@@ -3,7 +3,7 @@ import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 import { BoundaryPoint, Position, position } from "./boundary_point.ts";
-import { isDocumentType, isText } from "../nodes/utils.ts";
+import { isCharacterData, isDocumentType, isText } from "../nodes/utils.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import {
@@ -16,6 +16,7 @@ import { Range_DOMParsing } from "../../domparsing/range.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
 import {
   cloneContents,
+  containedNodes,
   extract,
   insert,
   isContained,
@@ -23,22 +24,28 @@ import {
   root,
   select,
 } from "./range_utils.ts";
+import { isCollapsed } from "./abstract_range_utils.ts";
+import { replaceData } from "../nodes/character_data_algorithm.ts";
+import { iter } from "../../deps.ts";
+import { removeNode } from "../nodes/node_trees/mutation.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
 @Exposed(Window)
 export class Range extends AbstractRange implements IRange {
-  protected override _: AbstractRangeInternals;
+  protected override get _(): AbstractRangeInternals {
+    return $(this);
+  }
 
   constructor() {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    this._ = new AbstractRangeInternals([globalThis.document, 0], [
+    const _ = new AbstractRangeInternals([globalThis.document, 0], [
       globalThis.document,
       0,
     ]);
-    internalSlots.set(this, this._);
+    internalSlots.set(this, _);
   }
 
   /**
@@ -187,6 +194,7 @@ export class Range extends AbstractRange implements IRange {
     const length = nodeLength(node);
 
     // 3. Set start to the boundary point (node, 0).
+    $(this).start = [node, 0];
     this._.start = [node, 0];
 
     // 4. Set end to the boundary point (node, length).
@@ -246,8 +254,96 @@ export class Range extends AbstractRange implements IRange {
     }
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-deletecontents)
+   */
   deleteContents(): void {
-    throw new Error("deleteContents");
+    // 1. If this is collapsed, then return.
+    if (isCollapsed(this)) return;
+
+    // 2. Let original start node, original start offset, original end node, and original end offset be this’s start node, start offset, end node, and end offset, respectively.
+    const {
+      startNode: originalStartNode,
+      startOffset: originalStartOffset,
+      endNode: originalEndNode,
+      endOffset: originalEndOffset,
+    } = this._;
+
+    // 3. If original start node is original end node and it is a CharacterData node,
+    if (
+      originalStartNode === originalEndNode &&
+      isCharacterData(originalStartNode)
+    ) {
+      // then replace data with node original start node, offset original start offset, count original end offset minus original start offset, and data the empty string,
+      replaceData(
+        originalStartNode,
+        originalStartOffset,
+        originalEndOffset - originalStartOffset,
+        "",
+      );
+      // and then return.
+      return;
+    }
+
+    const nodeParentIsNotContained = (node: Node): boolean => {
+      const parent = tree.parent(node);
+
+      return !!parent && !isContained(parent, this);
+    };
+    // 4. Let nodes to remove be a list of all the nodes that are contained in this, in tree order, omitting any node whose parent is also contained in this.
+    const nodesToRemove = iter(containedNodes(this)).filter(
+      nodeParentIsNotContained,
+    );
+
+    let newNode: Node, newOffset: number;
+
+    // 5. If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset.
+    if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
+      newNode = originalStartNode, newOffset = originalStartOffset;
+
+      // 6. Otherwise:
+    } else {
+      // 1. Let reference node equal original start node.
+      let referenceNode = originalStartNode;
+
+      do {
+        const parent = tree.parent(referenceNode);
+
+        // reference node’s parent is not null and is not an inclusive ancestor of original end node,
+        if (parent && !tree.isInclusiveAncestor(parent, originalEndNode)) {
+          // set reference node to its parent.
+          referenceNode = parent;
+        } else break;
+        // 2. While
+      } while (true);
+
+      // 3. Set new node to the parent of reference node, and new offset to one plus the index of reference node.
+      newNode = tree.parent(referenceNode)!,
+        newOffset = 1 + tree.index(referenceNode);
+    }
+
+    // 7. If original start node is a CharacterData node,
+    if (isCharacterData(originalStartNode)) {
+      // then replace data with node original start node, offset original start offset, count original start node’s length − original start offset, data the empty string.
+      replaceData(
+        originalStartNode,
+        originalStartOffset,
+        nodeLength(originalStartNode) - originalStartOffset,
+        "",
+      );
+    }
+
+    // 8. For each node in nodes to remove, in tree order, remove node.
+    for (const node of nodesToRemove) removeNode(node);
+
+    // 9. If original end node is a CharacterData node,
+    if (isCharacterData(originalEndNode)) {
+      // then replace data with node original end node, offset 0, count original end offset and data the empty string.
+      replaceData(originalEndNode, 0, originalEndOffset, "");
+    }
+
+    // 10. Set start and end to (new node, new offset).
+    $(this).start = [newNode, newOffset], $(this).end = [newNode, newOffset];
   }
 
   /**

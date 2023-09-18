@@ -20,7 +20,6 @@ import { replaceData } from "../nodes/character_data_algorithm.ts";
 import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
 import { Position, position } from "./boundary_point.ts";
-import { Range } from "./range.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
 import { splitText } from "../nodes/utils/split_text.ts";
 
@@ -566,4 +565,22 @@ export function select(node: Node, range: Range): void {
 
   // 5. Set range’s end to boundary point (parent, index plus 1).
   $(range).end = [parent, index + 1];
+}
+
+export function* containedNodes(
+  range: Range,
+): IterableIterator<Node> {
+  const { startNode, endNode } = $(range);
+  const endOfNode = tree.nextDescendant(endNode);
+
+  let current = startNode;
+
+  while (current !== endOfNode) {
+    if (isContained(current, range)) yield current;
+
+    const following = tree.follow(current);
+    if (!following) break;
+
+    current = following;
+  }
 }
