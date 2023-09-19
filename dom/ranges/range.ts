@@ -20,9 +20,9 @@ import {
   extract,
   insert,
   isContained,
-  nextNodeDescendant,
   root,
   select,
+  setStartOrEnd,
 } from "./range_utils.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
 import { replaceData } from "../nodes/character_data_utils.ts";
@@ -74,7 +74,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setStart(node: Node, offset: number): void {
     // set the start of this to boundary point (node, offset).
-    this.#setStartOrEnd("start", this, [node, offset]);
+    setStartOrEnd("start", this, [node, offset]);
   }
 
   /**
@@ -82,7 +82,7 @@ export class Range extends AbstractRange implements IRange {
    */
   setEnd(node: Node, offset: number): void {
     // set the end of this to boundary point (node, offset).
-    this.#setStartOrEnd("end", this, [node, offset]);
+    setStartOrEnd("end", this, [node, offset]);
   }
 
   /**
@@ -101,7 +101,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the start of this to boundary point (parent, node’s index).
-    this.#setStartOrEnd("start", this, [parent, tree.index(node)]);
+    setStartOrEnd("start", this, [parent, tree.index(node)]);
   }
 
   /**
@@ -120,7 +120,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the start of this to boundary point (parent, node’s index plus 1).
-    this.#setStartOrEnd("start", this, [parent, tree.index(node) + 1]);
+    setStartOrEnd("start", this, [parent, tree.index(node) + 1]);
   }
 
   /**
@@ -139,7 +139,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the end of this to boundary point (parent, node’s index).
-    this.#setStartOrEnd("end", this, [parent, tree.index(node)]);
+    setStartOrEnd("end", this, [parent, tree.index(node)]);
   }
 
   /**
@@ -158,7 +158,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Set the end of this to boundary point (parent, node’s index plus 1).
-    this.#setStartOrEnd("end", this, [parent, tree.index(node) + 1]);
+    setStartOrEnd("end", this, [parent, tree.index(node) + 1]);
   }
 
   /**
@@ -510,7 +510,7 @@ export class Range extends AbstractRange implements IRange {
     // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
     // TODO(miyauci): Follow spec
     let currentNode: Node | null = startNode;
-    const end = nextNodeDescendant(endNode);
+    const end = tree.nextDescendant(endNode);
 
     while (currentNode && currentNode !== end) {
       if (isText(currentNode) && this.#contained(currentNode)) {
@@ -528,60 +528,6 @@ export class Range extends AbstractRange implements IRange {
 
     // 6. Return s.
     return s;
-  }
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-range-bp-set
-   */
-  #setStartOrEnd(
-    step: "start" | "end",
-    range: Range,
-    boundaryPoint: BoundaryPoint,
-  ): void {
-    const node = boundaryPoint[0], offset = boundaryPoint[1];
-    // 1. If node is a doctype, then throw an "InvalidNodeTypeError" DOMException.
-    if (isDocumentType(node)) {
-      throw new DOMException(
-        "<message>",
-        DOMExceptionName.InvalidNodeTypeError,
-      );
-    }
-
-    // 2. If offset is greater than node’s length, then throw an "IndexSizeError" DOMException.
-    if (offset > nodeLength(node)) {
-      throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
-    }
-
-    // 3. Let bp be the boundary point (node, offset).
-    const bp: BoundaryPoint = [node, offset];
-
-    // 4.
-    switch (step) {
-      // If these steps were invoked as "set the start"
-      case "start": {
-        // If range’s root is not equal to node’s root, or if bp is after the range’s end, set range’s end to bp.
-        if (
-          range.#root !== tree.root(node) ||
-          position(bp, range._.end) === Position.After
-        ) range._.end = bp;
-
-        // 2. Set range’s start to bp.
-        range._.start = bp;
-        break;
-      }
-
-      // If these steps were invoked as "set the end"
-      case "end": {
-        // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start, set range’s start to bp.
-        if (
-          range.#root !== tree.root(node) ||
-          position(bp, range._.start) === Position.Before
-        ) range._.start = bp;
-
-        // 2. Set range’s end to bp.
-        range._.end = bp;
-      }
-    }
   }
 
   /**

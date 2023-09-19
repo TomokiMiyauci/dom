@@ -18,7 +18,7 @@ import {
 import { replaceData, substringData } from "../nodes/character_data_utils.ts";
 import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
-import { Position, position } from "./boundary_point.ts";
+import { type BoundaryPoint, Position, position } from "./boundary_point.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
 import { splitText } from "../nodes/utils/split_text.ts";
 
@@ -57,14 +57,60 @@ export function isPartiallyContained(node: Node, range: Range): boolean {
       tree.isInclusiveAncestor(node, endNode));
 }
 
-export function nextNodeDescendant(node: Node | null): Node | null {
-  while (node && tree.nextSibling(node)) {
-    node = tree.parent(node);
+/**
+ * @see https://dom.spec.whatwg.org/#concept-range-bp-set
+ */
+export function setStartOrEnd(
+  step: "start" | "end",
+  range: Range,
+  boundaryPoint: BoundaryPoint,
+): void {
+  const node = boundaryPoint[0], offset = boundaryPoint[1];
+  // 1. If node is a doctype, then throw an "InvalidNodeTypeError" DOMException.
+  if (isDocumentType(node)) {
+    throw new DOMException(
+      "<message>",
+      DOMExceptionName.InvalidNodeTypeError,
+    );
   }
 
-  if (!node) return null;
+  // 2. If offset is greater than node’s length, then throw an "IndexSizeError" DOMException.
+  if (offset > nodeLength(node)) {
+    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+  }
 
-  return tree.nextSibling(node);
+  // 3. Let bp be the boundary point (node, offset).
+  const bp: BoundaryPoint = [node, offset];
+
+  // 4.
+  switch (step) {
+    // If these steps were invoked as "set the start"
+    case "start": {
+      // If range’s root is not equal to node’s root, or if bp is after the range’s end,
+      if (
+        root(range) !== tree.root(node) ||
+        position(bp, $(range).end) === Position.After
+        // set range’s end to bp.
+      ) $(range).end = bp;
+
+      // 2. Set range’s start to bp.
+      $(range).start = bp;
+      break;
+    }
+
+    // If these steps were invoked as "set the end"
+    case "end": {
+      // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start,
+      if (
+        root(range) !== tree.root(node) ||
+        position(bp, $(range).start) === Position.Before
+        // set range’s start to bp.
+      ) $(range).start = bp;
+
+      // 2. Set range’s end to bp.
+      $(range).end = bp;
+    }
+  }
 }
 
 /**
