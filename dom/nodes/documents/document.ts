@@ -42,7 +42,6 @@ import { Document_SVG } from "../../../svg/document.ts";
 import { ReName } from "../../../xml/document.ts";
 import { getDocumentElement } from "../node_trees/node_tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
-import { adoptNode } from "../node_trees/mutation.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Range } from "../../ranges/range.ts";
 import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
@@ -58,7 +57,7 @@ import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
-import { isHTMLDocument } from "./document_utils.ts";
+import { adoptNode, isHTMLDocument } from "./document_utils.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
 
 export type Origin = OpaqueOrigin | TupleOrigin;

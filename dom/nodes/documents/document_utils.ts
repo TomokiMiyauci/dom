@@ -1,4 +1,54 @@
-import { $ } from "../../../internal.ts";
+import { isElement } from "../utils.ts";
+import { iter } from "../../../deps.ts";
+import { $, tree } from "../../../internal.ts";
+import { isCustom } from "../elements/element_utils.ts";
+import { enqueueCustomElementCallbackReaction } from "../../../html/elements/custom_elements/custom_element_reaction.ts";
+import { removeNode } from "../node_trees/mutation.ts";
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-node-adopt
+ */
+export function adoptNode(node: Node, document: Document): void {
+  // 1. Let oldDocument be node’s node document.
+  const oldDocument = $(node).nodeDocument;
+
+  // 2. If node’s parent is non-null, then remove node.
+  if (tree.parent(node)) removeNode(node);
+
+  // 3. If document is not oldDocument, then:
+  if (document !== oldDocument) {
+    // 1. For each inclusiveDescendant in node’s shadow-including inclusive descendants:
+    for (const inclusiveDescendant of tree.inclusiveDescendants(node)) { // TODO(miyauci): shadow-including
+      // 1. Set inclusiveDescendant’s node document to document.
+      $(inclusiveDescendant).nodeDocument = document;
+
+      // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
+      if (isElement(inclusiveDescendant)) {
+        const { attributeList } = $(inclusiveDescendant);
+        iter(attributeList).forEach((attr) => $(attr).nodeDocument = document);
+      }
+    }
+  }
+
+  const shadowIncludingInclusiveDescendants = tree
+    .shadowIncludingInclusiveDescendants(node);
+  // 2. For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom, enqueue a custom element callback reaction with inclusiveDescendant, callback name "adoptedCallback", and an argument list containing oldDocument and document.
+  for (
+    const inclusiveDescendant of iter(shadowIncludingInclusiveDescendants)
+      .filter(isElement).filter(isCustom)
+  ) {
+    enqueueCustomElementCallbackReaction(
+      inclusiveDescendant,
+      "adoptedCallback",
+      [oldDocument, document],
+    );
+  }
+
+  // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order, run the adopting steps with inclusiveDescendant and oldDocument.
+  for (const inclusiveDescendant of shadowIncludingInclusiveDescendants) {
+    $(node).adoptingSteps.run(inclusiveDescendant, oldDocument);
+  }
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#html-document
