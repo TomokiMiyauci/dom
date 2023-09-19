@@ -18,7 +18,7 @@ import { concatString } from "../../infra/string.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
 import { List } from "../../infra/data_structures/list.ts";
-import { replaceData } from "./character_data_algorithm.ts";
+import { replaceData } from "./character_data_utils.ts";
 import {
   type RegisteredObserver,
   type TransientRegisteredObserver,

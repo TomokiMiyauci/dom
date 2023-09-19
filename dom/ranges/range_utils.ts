@@ -16,7 +16,7 @@ import {
   preInsertNode,
   removeNode,
 } from "../nodes/node_trees/mutation.ts";
-import { replaceData } from "../nodes/character_data_algorithm.ts";
+import { replaceData } from "../nodes/character_data_utils.ts";
 import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
 import { Position, position } from "./boundary_point.ts";

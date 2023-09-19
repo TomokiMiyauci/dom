@@ -25,7 +25,7 @@ import {
   select,
 } from "./range_utils.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
-import { replaceData } from "../nodes/character_data_algorithm.ts";
+import { replaceData } from "../nodes/character_data_utils.ts";
 import { iter } from "../../deps.ts";
 import { removeNode } from "../nodes/node_trees/mutation.ts";
 
@@ -349,7 +349,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-extractcontents
    */
-  extractContents(): globalThis.DocumentFragment {
+  extractContents(): DocumentFragment {
     // return the result of extracting this.
     return extract(this);
   }
@@ -357,7 +357,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-clonecontents
    */
-  cloneContents(): globalThis.DocumentFragment {
+  cloneContents(): DocumentFragment {
     // return the result of cloning the contents of this.
     return cloneContents(this);
   }

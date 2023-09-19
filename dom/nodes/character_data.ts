@@ -6,7 +6,7 @@ import { nodeLength } from "./node_trees/node_tree.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
 import { convert, unsignedLong } from "../../webidl/types.ts";
-import { replaceData } from "./character_data_algorithm.ts";
+import { replaceData } from "./character_data_utils.ts";
 import { $, internalSlots } from "../../internal.ts";
 
 export interface CharacterDataStates {
