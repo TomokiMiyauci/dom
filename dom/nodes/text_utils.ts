@@ -3,25 +3,12 @@ import { isText } from "./utils.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import { composeIs, Constructor, iter } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
-import { $, tree } from "../../internal.ts";
+import { $ } from "../../internal.ts";
 import { Get } from "../../utils.ts";
 import { Tree } from "../infra/tree.ts";
 
 export function isExclusiveTextNode(text: Text): text is Text {
   return true;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-child-text-content
- */
-export function getChildTextContent(node: Node): string {
-  // concatenation of the data of all the Text node children of node, in tree order.
-  return iter(tree.children(node))
-    .filter(isText)
-    .map<CharacterDataInternals>($)
-    .map(Get.data)
-    .toArray()
-    .join("");
 }
 
 const isNodeExclusiveTextNode = composeIs(isText, isExclusiveTextNode);
@@ -36,6 +23,17 @@ export function TextTree<T extends Constructor<Tree<Node>>>(
 
     contiguousExclusiveTextNodes(node: Node): IterableIterator<Text> {
       return contiguousNodes(node, isNodeExclusiveTextNode, this);
+    }
+
+    childTextContent(node: Node): string {
+      // node is the concatenation of the data of all the Text node children of node, in tree order.
+      const children = this.children(node);
+      const datalist = iter(children)
+        .filter(isText)
+        .map<CharacterDataInternals>($)
+        .map(Get.data);
+
+      return concatString(new List(datalist));
     }
 
     descendantTextContent(node: Node): string {
@@ -63,6 +61,11 @@ export interface TextTree {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#contiguous-exclusive-text-nodes)
    */
   contiguousExclusiveTextNodes(node: Node): IterableIterator<Text>;
+
+  /** Return the concatenation of the data of all the {@linkcode Text} node children of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-descendant-text-content)
+   */
+  childTextContent(node: Node): string;
 
   /** Return the concatenation of the data of all the {@linkcode Text} node descendants of {@linkcode node}.
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-descendant-text-content)

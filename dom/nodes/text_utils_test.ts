@@ -39,6 +39,21 @@ describe("TextTree", () => {
     });
   });
 
+  it("childTextContent", () => {
+    const table: [Node, string][] = [
+      [A, "B"],
+      [B, ""],
+      [C, "EF"],
+      [D, ""],
+      [E, ""],
+      [F, ""],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals(tree.childTextContent(node), expected);
+    });
+  });
+
   it("descendantTextContent", () => {
     const table: [Node, string][] = [
       [A, "BEF"],

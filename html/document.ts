@@ -3,7 +3,6 @@ import { Constructor, iter } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
 import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
-import { getChildTextContent } from "../dom/nodes/text_utils.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $, internalSlots, tree } from "../internal.ts";
@@ -123,7 +122,7 @@ export function Document_HTML<T extends Constructor<Node>>(
           .find(isSVGTitle)
         // 2. Otherwise, let value be the child text content of the title element, or the empty string if the title element is null.
         : getTitleElement(this);
-      const value = maybeTitle ? getChildTextContent(maybeTitle) : "";
+      const value = maybeTitle ? tree.childTextContent(maybeTitle) : "";
 
       // 3. Strip and collapse ASCII whitespace in value. 4. Return value.
       return stripAndCollapseASCIIWhitespace(value);
