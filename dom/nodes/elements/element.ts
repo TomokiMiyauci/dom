@@ -19,7 +19,6 @@ import {
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 import { Text } from "../text.ts";
-import { descendantTextContent } from "../text_utils.ts";
 import { find, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
@@ -41,7 +40,7 @@ import { convert, DOMString } from "../../../webidl/types.ts";
 import { createElement } from "../utils/create_element.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { Steps } from "../../infra/applicable.ts";
-import { $, internalSlots } from "../../../internal.ts";
+import { $, internalSlots, tree } from "../../../internal.ts";
 import { ShadowRoot } from "../shadow_root.ts";
 import {
   appendAttribute,
@@ -148,7 +147,7 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return descendantTextContent(this);
+    return tree.descendantTextContent(this);
   }
 
   /**

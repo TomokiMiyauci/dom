@@ -5,9 +5,8 @@ import { List } from "../../infra/data_structures/list.ts";
 import type { IText } from "../../interface.d.ts";
 import { iter } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
-import { $ } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
 import { Get } from "../../utils.ts";
-import { contiguousTextNodes } from "./text_utils.ts";
 import { splitText } from "./utils/split_text.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
@@ -43,8 +42,8 @@ export class Text extends CharacterData implements IText {
    * @see https://dom.spec.whatwg.org/#dom-text-wholetext
    */
   get wholeText(): string {
-    const textNodes = contiguousTextNodes(this);
-    const dataList = iter(textNodes)
+    const contiguousTextNodes = tree.contiguousTextNodes(this);
+    const dataList = iter(contiguousTextNodes)
       .map<CharacterDataInternals>($)
       .map(Get.data);
     // to return the concatenation of the data of the contiguous Text nodes of this, in tree order.

@@ -38,4 +38,19 @@ describe("TextTree", () => {
       assertEquals([...tree.contiguousTextNodes(node)], expected);
     });
   });
+
+  it("descendantTextContent", () => {
+    const table: [Node, string][] = [
+      [A, "BEF"],
+      [B, ""],
+      [C, "EF"],
+      [D, ""],
+      [E, ""],
+      [F, ""],
+    ];
+
+    table.forEach(([node, expected]) => {
+      assertEquals(tree.descendantTextContent(node), expected);
+    });
+  });
 });

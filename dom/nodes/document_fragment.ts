@@ -2,9 +2,8 @@ import { Node, NodeType } from "./node.ts";
 import { ParentNode } from "./node_trees/parent_node.ts";
 import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
-import { descendantTextContent } from "./text_utils.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
-import { $, internalSlots } from "../../internal.ts";
+import { $, internalSlots, tree } from "../../internal.ts";
 
 @ParentNode
 @NonElementParentNode
@@ -57,7 +56,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return descendantTextContent(this);
+    return tree.descendantTextContent(this);
   }
 
   /**
