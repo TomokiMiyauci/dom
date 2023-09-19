@@ -393,8 +393,12 @@ export function equalsProcessingInstruction(
  */
 export function* contiguousTextNodesExclusive(
   node: Node,
-): Iterable<Text> {
+): IterableIterator<Text> {
+  const previousSibling = tree.previousSibling(node);
+
+  if (previousSibling && isText(previousSibling)) yield previousSibling;
   const preceding = tree.precedeSiblings(node);
+
   const precedingTexts = takewhile(preceding, isText);
   const following = tree.followSiblings(node);
   const followingTexts = takewhile(following, isText);

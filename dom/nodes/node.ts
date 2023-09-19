@@ -9,7 +9,7 @@ import {
   removeNode,
   replaceChild,
 } from "./node_trees/mutation.ts";
-import { ifilter, iter } from "../../deps.ts";
+import { ifilter } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
@@ -25,7 +25,6 @@ import { $, internalSlots, tree } from "../../internal.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { Get } from "../../utils.ts";
 import {
-  contiguousTextNodesExclusive,
   equals,
   getInterface,
   getParentElement,
@@ -34,6 +33,7 @@ import {
 } from "./node_utils.ts";
 import { documentBaseURL } from "../../html/infra/url.ts";
 import { URLSerializer } from "../../url/serializer.ts";
+import { isExclusiveTextNode } from "./text_utils.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 
@@ -251,8 +251,14 @@ export abstract class Node extends EventTarget implements INode {
         continue;
       }
 
-      const contiguousExclusiveTextNodes = contiguousTextNodesExclusive(node);
-      const dataList = iter(contiguousExclusiveTextNodes).map((v) => $(v)).map(
+      const contiguousExclusiveTextNodes = [
+        ...tree.contiguousExclusiveTextNodes(node),
+      ];
+      const contiguousExclusiveTextNodesExcludingNode =
+        contiguousExclusiveTextNodes.filter((v) => v !== node);
+      const dataList = contiguousExclusiveTextNodesExcludingNode.map((v) =>
+        $(v)
+      ).map(
         Get.data,
       );
 
@@ -265,8 +271,10 @@ export abstract class Node extends EventTarget implements INode {
       // 5. Let currentNode be node’s next sibling.
       let currentNode = tree.nextSibling(node);
 
-      // 6. While currentNode is an exclusive Text node:
-      while (currentNode && isText(currentNode)) {
+      // 6. While currentNode is an exclusinve Text node:
+      while (
+        currentNode && isText(currentNode) && isExclusiveTextNode(currentNode)
+      ) {
         // 1. For each live range whose start node is currentNode, add length to its start offset and set its start node to node.
 
         // 2. For each live range whose end node is currentNode, add length to its end offset and set its end node to node.
@@ -276,14 +284,14 @@ export abstract class Node extends EventTarget implements INode {
         // 4. For each live range whose end node is currentNode’s parent and end offset is currentNode’s index, set its end node to node and its end offset to length.
 
         // 5. Add currentNode’s length to length.
-        length = nodeLength(currentNode);
+        length += nodeLength(currentNode);
 
         // 6. Set currentNode to its next sibling.
         currentNode = tree.nextSibling(currentNode);
       }
 
       // 7. Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order.
-      [...contiguousTextNodesExclusive(node)].forEach((node) =>
+      [...contiguousExclusiveTextNodesExcludingNode].forEach((node) =>
         removeNode(node)
       );
     }

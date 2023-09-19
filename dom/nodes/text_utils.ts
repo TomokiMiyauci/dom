@@ -1,10 +1,15 @@
 import { type CharacterDataInternals } from "./character_data.ts";
 import { isText } from "./utils.ts";
 import { List } from "../../infra/data_structures/list.ts";
-import { iter, takewhile } from "../../deps.ts";
+import { composeIs, Constructor, iter, takewhile } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
 import { $, tree } from "../../internal.ts";
 import { Get } from "../../utils.ts";
+import { Tree } from "../infra/tree.ts";
+
+export function isExclusiveTextNode(text: Text): text is Text {
+  return true;
+}
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-child-text-content
@@ -17,6 +22,39 @@ export function getChildTextContent(node: Node): string {
     .map(Get.data)
     .toArray()
     .join("");
+}
+
+const isNodeExclusiveTextNode = composeIs(isText, isExclusiveTextNode);
+
+export function TextTree<T extends Constructor<Tree<Node>>>(
+  Ctor: T,
+): T & Constructor<TextTree> {
+  abstract class Mixin extends Ctor implements TextTree {
+    contiguousTextNodes(node: Node): IterableIterator<Text> {
+      return contiguousNodes(node, isText, {
+        nextSibling: this.nextSibling.bind(this),
+        previousSibling: this.previousSibling.bind(this),
+      });
+    }
+
+    contiguousExclusiveTextNodes(node: Node): IterableIterator<Text> {
+      return contiguousNodes(node, isNodeExclusiveTextNode, this);
+    }
+  }
+
+  return Mixin;
+}
+
+export interface TextTree {
+  /** Yield contiguous {@linkcode Text} nodes of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#contiguous-text-nodes)
+   */
+  contiguousTextNodes(node: Node): IterableIterator<Text>;
+
+  /** Yield contiguous inclusive {@linkcode Text} nodes of {@linkcode node}.
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#contiguous-exclusive-text-nodes)
+   */
+  contiguousExclusiveTextNodes(node: Node): IterableIterator<Text>;
 }
 
 /**
@@ -46,4 +84,38 @@ export function descendantTextContent(node: Node): string {
     .map(Get.data);
 
   return concatString(new List(dataList));
+}
+
+type TreeAccessor = Pick<Tree<Node>, "previousSibling" | "nextSibling">;
+
+export function contiguousNodes<T extends Node>(
+  node: Node,
+  predicate: (node: Node) => node is T,
+  accessor: TreeAccessor,
+): IterableIterator<T>;
+export function contiguousNodes(
+  node: Node,
+  predicate: (node: Node) => boolean,
+  accessor: TreeAccessor,
+): IterableIterator<Node>;
+export function* contiguousNodes(
+  node: Node,
+  predicate: (node: Node) => boolean,
+  accessor: TreeAccessor,
+): IterableIterator<Node> {
+  do {
+    const previousSibling = accessor.previousSibling(node);
+
+    if (previousSibling && predicate(previousSibling)) {
+      node = previousSibling;
+    } else break;
+  } while (true);
+
+  while (predicate(node)) {
+    yield node;
+    const nextSibling = accessor.nextSibling(node);
+
+    if (nextSibling) node = nextSibling;
+    else break;
+  }
 }
