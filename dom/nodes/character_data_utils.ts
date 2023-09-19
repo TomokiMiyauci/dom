@@ -6,7 +6,14 @@ import { queueMutationRecord } from "./mutation_observers/queue.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
-import { $ } from "../../internal.ts";
+import { $, tree } from "../../internal.ts";
+import { iter } from "../../deps.ts";
+import {
+  compareRangeOffset,
+  equalsNodeEndNode,
+  equalsNodeStartNode,
+  Operator,
+} from "./node_trees/mutation.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace
@@ -51,13 +58,85 @@ export function replaceData(
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 
-  // 8 For each live range whose start node is node and start offset is greater than offset but less than or equal to offset plus count, set its start offset to offset.
+  const { nodeDocument } = $(node);
+  const { ranges: _ranges } = $(nodeDocument);
+  const ranges = iter(_ranges);
 
-  // 9 For each live range whose end node is node and end offset is greater than offset but less than or equal to offset plus count, set its end offset to offset.
+  const startNodeIsNode = equalsNodeStartNode.bind(null, node);
+  const startOffsetIsGtOffset = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    offset,
+    true,
+  );
+  const offsetPlusCount = offset + count;
+  const startOffsetLteOffsetPlusCount = compareRangeOffset.bind(
+    null,
+    Operator.Lte,
+    offsetPlusCount,
+    true,
+  );
+  const startNodeIsNodeRanges = ranges.filter(startNodeIsNode);
 
-  // 10 For each live range whose start node is node and start offset is greater than offset plus count, increase its start offset by data’s length and decrease it by count.
+  // 8 For each live range whose start node is node and start offset is greater than offset but less than or equal to offset plus count,
+  for (
+    const range of startNodeIsNodeRanges.filter(startOffsetIsGtOffset)
+      .filter(startOffsetLteOffsetPlusCount)
+    // set its start offset to offset.
+  ) $(range).start[1] = offset;
 
-  // 11 For each live range whose end node is node and end offset is greater than offset plus count, increase its end offset by data’s length and decrease it by count.
+  const endNodeIsNode = equalsNodeEndNode.bind(null, node);
+  const endOffsetIsGtOffset = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    offset,
+    false,
+  );
+  const endOffsetLteOffsetPlusCount = compareRangeOffset.bind(
+    null,
+    Operator.Lte,
+    offsetPlusCount,
+    false,
+  );
 
+  const endNodeIsNodeRanges = ranges.filter(endNodeIsNode);
+
+  // 9 For each live range whose end node is node and end offset is greater than offset but less than or equal to offset plus count,
+  for (
+    const range of endNodeIsNodeRanges.filter(endOffsetIsGtOffset).filter(
+      endOffsetLteOffsetPlusCount,
+    )
+    // set its end offset to offset.
+  ) $(range).end[1] = offset;
+
+  const diff = data.length - count;
+  const startOffsetIsGtOffsetPlusCount = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    offsetPlusCount,
+    true,
+  );
+
+  // 10 For each live range whose start node is node and start offset is greater than offset plus count,
+  for (
+    const range of startNodeIsNodeRanges.filter(startOffsetIsGtOffsetPlusCount)
+    // increase its start offset by data’s length and decrease it by count.
+  ) $(range).start[1] += diff;
+
+  const endOffsetIsGtOffsetPlusCount = compareRangeOffset.bind(
+    null,
+    Operator.Gt,
+    offsetPlusCount,
+    false,
+  );
+
+  // 11 For each live range whose end node is node and end offset is greater than offset plus count,
+  for (
+    const range of endNodeIsNodeRanges.filter(endOffsetIsGtOffsetPlusCount)
+    // increase its end offset by data’s length and decrease it by count.
+  ) $(range).end[1] += diff;
+
+  const parent = tree.parent(node);
   // 12 If node’s parent is non-null, then run the children changed steps for node’s parent.
+  if (parent) $(parent).childrenChangedSteps.run();
 }
