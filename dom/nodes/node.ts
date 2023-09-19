@@ -4,12 +4,16 @@ import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
 import type { INode } from "../../interface.d.ts";
 import {
   appendNode,
+  compareRangeOffset,
+  equalsNodeEndNode,
+  equalsNodeStartNode,
+  Operator,
   preInsertNode,
   preRemoveChild,
   removeNode,
   replaceChild,
 } from "./node_trees/mutation.ts";
-import { ifilter } from "../../deps.ts";
+import { ifilter, iter } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
 import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { type Const, constant } from "../../webidl/idl.ts";
@@ -271,17 +275,75 @@ export abstract class Node extends EventTarget implements INode {
       // 5. Let currentNode be node’s next sibling.
       let currentNode = tree.nextSibling(node);
 
+      const { nodeDocument } = $(node);
+      const { ranges: _ranges } = $(nodeDocument);
+      const ranges = iter(_ranges);
       // 6. While currentNode is an exclusinve Text node:
       while (
         currentNode && isText(currentNode) && isExclusiveTextNode(currentNode)
       ) {
-        // 1. For each live range whose start node is currentNode, add length to its start offset and set its start node to node.
+        const startNodeIsCurrentNode = equalsNodeStartNode.bind(
+          null,
+          currentNode,
+        );
+        // 1. For each live range whose start node is currentNode,
+        for (
+          const range of ranges.filter(startNodeIsCurrentNode)
+          // add length to its start offset and set its start node to node.
+        ) length += $(range).startOffset, $(range).start[0] = node;
 
-        // 2. For each live range whose end node is currentNode, add length to its end offset and set its end node to node.
+        const endNodeIsCurrentNode = equalsNodeEndNode.bind(
+          null,
+          currentNode,
+        );
+        // 2. For each live range whose end node is currentNode,
+        for (const range of ranges.filter(endNodeIsCurrentNode)) {
+          // add length to its end offset and set its end node to node.
+          length += $(range).endOffset, $(range).end[0] = node;
+        }
 
-        // 3. For each live range whose start node is currentNode’s parent and start offset is currentNode’s index, set its start node to node and its start offset to length.
+        const parent = tree.parent(currentNode);
 
-        // 4. For each live range whose end node is currentNode’s parent and end offset is currentNode’s index, set its end node to node and its end offset to length.
+        if (parent) {
+          const startNodeIsCurrentParent = equalsNodeStartNode.bind(
+            null,
+            parent,
+          );
+          const currentNodeIndex = tree.index(currentNode);
+          const startOffsetIsCurrentNodeIndex = compareRangeOffset.bind(
+            null,
+            Operator.Eq,
+            currentNodeIndex,
+            true,
+          );
+
+          // 3. For each live range whose start node is currentNode’s parent and start offset is currentNode’s index,
+          for (
+            const range of ranges.filter(startNodeIsCurrentParent).filter(
+              startOffsetIsCurrentNodeIndex,
+            )
+            // set its start node to node and its start offset to length.
+          ) $(range).start[0] = node, $(range).start[1] = length;
+
+          const endNodeIsCurrentParent = equalsNodeEndNode.bind(
+            null,
+            parent,
+          );
+          const endOffsetIsCurrentNodeIndex = compareRangeOffset.bind(
+            null,
+            Operator.Eq,
+            currentNodeIndex,
+            false,
+          );
+
+          // 4. For each live range whose end node is currentNode’s parent and end offset is currentNode’s index,
+          for (
+            const range of ranges.filter(endNodeIsCurrentParent).filter(
+              endOffsetIsCurrentNodeIndex,
+            )
+            // set its end node to node and its end offset to length.
+          ) $(range).end[0] = node, $(range).end[1] = length;
+        }
 
         // 5. Add currentNode’s length to length.
         length += nodeLength(currentNode);
@@ -291,7 +353,7 @@ export abstract class Node extends EventTarget implements INode {
       }
 
       // 7. Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order.
-      [...contiguousExclusiveTextNodesExcludingNode].forEach((node) =>
+      contiguousExclusiveTextNodesExcludingNode.forEach((node) =>
         removeNode(node)
       );
     }
