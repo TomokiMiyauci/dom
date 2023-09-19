@@ -3,18 +3,10 @@ import { ChildNode } from "./node_trees/child_node.ts";
 import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
-import { convert, unsignedLong } from "../../webidl/types.ts";
-import { replaceData } from "./character_data_utils.ts";
-import { $, internalSlots } from "../../internal.ts";
-
-export interface CharacterDataStates {
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-cd-data
-   */
-  data: string;
-}
+import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
+import { replaceData, substringData } from "./character_data_utils.ts";
+import { internalSlots } from "../../internal.ts";
 
 @ChildNode
 @NonDocumentTypeChildNode
@@ -88,7 +80,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-characterdata-data
    */
   @LegacyNullToEmptyString
-  set data(value: string) {
+  @convert
+  set data(@DOMString value: string) {
     // replace data with node this, offset 0, count this’s length, and data new value.
     replaceData(this, 0, nodeLength(this), value);
   }
@@ -96,7 +89,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
   /**
    * @see https://dom.spec.whatwg.org/#dom-characterdata-appenddata
    */
-  appendData(data: string): void {
+  @convert
+  appendData(@DOMString data: string): void {
     // replace data with node this, offset this’s length, count 0, and data data
     replaceData(this, nodeLength(this), 0, data);
   }
@@ -114,7 +108,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-characterdata-insertdata
    */
   @convert
-  insertData(@unsignedLong offset: number, data: string): void {
+  insertData(@unsignedLong offset: number, @DOMString data: string): void {
     // replace data with node this, offset offset, count 0, and data data.
     replaceData(this, offset, 0, data);
   }
@@ -169,28 +163,4 @@ export class CharacterDataInternals extends NodeInternals {
 
     this.data = data;
   }
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-cd-substring
- * @throws {DOMException}
- */
-export function substringData(
-  node: globalThis.CharacterData,
-  offset: number,
-  count: number,
-): string {
-  // 1. Let length be node’s length.
-  const length = nodeLength(node);
-
-  // 2. If offset is greater than length, then throw an "IndexSizeError" DOMException.
-  if (offset < 0 || offset > length) { // offset < 0 is test requirement
-    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
-  }
-
-  // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
-  if (offset + count > length) return $(node).data.slice(offset);
-
-  // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
-  return $(node).data.slice(offset, offset + count);
 }

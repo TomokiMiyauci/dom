@@ -140,3 +140,27 @@ export function replaceData(
   // 12 If node’s parent is non-null, then run the children changed steps for node’s parent.
   if (parent) $(parent).childrenChangedSteps.run();
 }
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-cd-substring
+ * @throws {DOMException}
+ */
+export function substringData(
+  node: CharacterData,
+  offset: number,
+  count: number,
+): string {
+  // 1. Let length be node’s length.
+  const length = nodeLength(node);
+
+  // 2. If offset is greater than length, then throw an "IndexSizeError" DOMException.
+  if (offset < 0 || offset > length) { // offset < 0 is test requirement
+    throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+  }
+
+  // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
+  if (offset + count > length) return $(node).data.slice(offset);
+
+  // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
+  return $(node).data.slice(offset, offset + count);
+}

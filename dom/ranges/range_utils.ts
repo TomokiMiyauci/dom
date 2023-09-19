@@ -9,14 +9,13 @@ import {
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
-import { substringData } from "../nodes/character_data.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
   preInsertNode,
   removeNode,
 } from "../nodes/node_trees/mutation.ts";
-import { replaceData } from "../nodes/character_data_utils.ts";
+import { replaceData, substringData } from "../nodes/character_data_utils.ts";
 import { $, tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
 import { Position, position } from "./boundary_point.ts";
