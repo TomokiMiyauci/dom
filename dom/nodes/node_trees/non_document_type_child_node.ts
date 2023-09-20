@@ -1,11 +1,11 @@
+// deno-lint-ignore-file no-empty-interface
 import { type INonDocumentTypeChildNode } from "../../../interface.d.ts";
 import { isElement } from "../utils.ts";
-import { type Constructor, iter } from "../../../deps.ts";
+import { iter } from "../../../deps.ts";
 import { tree } from "../../../internal.ts";
 
-export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
-  abstract class NonDocumentTypeChildNode extends Ctor
-    implements INonDocumentTypeChildNode {
+export function NonDocumentTypeChildNode() {
+  class NonDocumentTypeChildNode implements INonDocumentTypeChildNode {
     /**
      * @see https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-previouselementsibling
      */
@@ -27,8 +27,9 @@ export function NonDocumentTypeChildNode<T extends Constructor<Node>>(Ctor: T) {
     }
   }
 
+  interface NonDocumentTypeChildNode extends Node {}
+
   return NonDocumentTypeChildNode;
 }
 
-// deno-lint-ignore no-empty-interface
 export interface NonDocumentTypeChildNode extends INonDocumentTypeChildNode {}

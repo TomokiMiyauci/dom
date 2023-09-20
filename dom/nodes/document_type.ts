@@ -3,10 +3,10 @@ import { ChildNode } from "./node_trees/child_node.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import type { PartialBy } from "../../deps.ts";
 import { internalSlots } from "../../internal.ts";
+import { includes } from "../../utils.ts";
 
 type Optional = "publicId" | "systemId";
 
-@ChildNode
 export class DocumentType extends Node implements IDocumentType {
   constructor(
     { name, publicId = "", systemId = "", nodeDocument }:
@@ -100,6 +100,8 @@ export class DocumentType extends Node implements IDocumentType {
 
   declare protected _: DocumentTypeInternals & Node["_"];
 }
+
+includes(DocumentType, ChildNode());
 
 // deno-lint-ignore no-empty-interface
 export interface DocumentType extends ChildNode {}
