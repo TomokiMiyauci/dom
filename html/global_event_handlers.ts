@@ -414,6 +414,10 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
       throw new Error();
     }
 
+    get onscrollend(): ((this: GlobalEventHandlers, ev: Event) => any) | null {
+      throw new Error();
+    }
+
     set onabort(
       value: ((this: GlobalEventHandlers, ev: UIEvent) => any) | null,
     ) {
@@ -879,6 +883,12 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
     }
     set onwheel(
       value: ((this: GlobalEventHandlers, ev: WheelEvent) => any) | null,
+    ) {
+      throw new Error();
+    }
+
+    set onscrollend(
+      value: ((this: GlobalEventHandlers, ev: Event) => any) | null,
     ) {
       throw new Error();
     }

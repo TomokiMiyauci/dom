@@ -23,10 +23,10 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("alt#setter");
   }
 
-  get autocomplete(): string {
+  get autocomplete(): AutoFill {
     throw new Error("autocomplete#getter");
   }
-  set autocomplete(value: string) {
+  set autocomplete(value: AutoFill) {
     throw new Error("autocomplete#setter");
   }
   get capture(): string {

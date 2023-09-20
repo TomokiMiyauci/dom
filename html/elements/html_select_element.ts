@@ -5,10 +5,10 @@ export class HTMLSelectElement extends HTMLElement
   implements IHTMLSelectElement {
   [name: number]: HTMLOptionElement | HTMLOptGroupElement;
 
-  get autocomplete(): string {
+  get autocomplete(): AutoFill {
     throw new Error("autocomplete#getter");
   }
-  set autocomplete(value: string) {
+  set autocomplete(value: AutoFill) {
     throw new Error("autocomplete#setter");
   }
 

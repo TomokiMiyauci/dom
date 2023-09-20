@@ -3,10 +3,10 @@ import { HTMLElement } from "../dom/html_element.ts";
 
 export class HTMLTextAreaElement extends HTMLElement
   implements IHTMLTextAreaElement {
-  get autocomplete(): string {
+  get autocomplete(): AutoFillBase {
     throw new Error("autocomplete#getter");
   }
-  set autocomplete(value: string) {
+  set autocomplete(value: AutoFillBase) {
     throw new Error("autocomplete#setter");
   }
 

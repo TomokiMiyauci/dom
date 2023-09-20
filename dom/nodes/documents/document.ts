@@ -469,7 +469,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "ClipboardEvent"): ClipboardEvent;
   createEvent(eventInterface: "CloseEvent"): CloseEvent;
   createEvent(eventInterface: "CompositionEvent"): CompositionEvent;
-  createEvent(eventInterface: "CustomEvent"): CustomEvent<any>;
+  createEvent(eventInterface: "CustomEvent"): CustomEvent;
   createEvent(eventInterface: "DeviceMotionEvent"): DeviceMotionEvent;
   createEvent(eventInterface: "DeviceOrientationEvent"): DeviceOrientationEvent;
   createEvent(eventInterface: "DragEvent"): DragEvent;
@@ -490,7 +490,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "MediaKeyMessageEvent"): MediaKeyMessageEvent;
   createEvent(eventInterface: "MediaQueryListEvent"): MediaQueryListEvent;
   createEvent(eventInterface: "MediaStreamTrackEvent"): MediaStreamTrackEvent;
-  createEvent(eventInterface: "MessageEvent"): MessageEvent<any>;
+  createEvent(eventInterface: "MessageEvent"): MessageEvent;
   createEvent(eventInterface: "MouseEvent"): MouseEvent;
   createEvent(eventInterface: "MouseEvents"): MouseEvent;
   createEvent(eventInterface: "MutationEvent"): MutationEvent;
@@ -508,7 +508,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "PictureInPictureEvent"): PictureInPictureEvent;
   createEvent(eventInterface: "PointerEvent"): PointerEvent;
   createEvent(eventInterface: "PopStateEvent"): PopStateEvent;
-  createEvent(eventInterface: "ProgressEvent"): ProgressEvent<EventTarget>;
+  createEvent(eventInterface: "ProgressEvent"): ProgressEvent;
   createEvent(eventInterface: "PromiseRejectionEvent"): PromiseRejectionEvent;
   createEvent(eventInterface: "RTCDTMFToneChangeEvent"): RTCDTMFToneChangeEvent;
   createEvent(eventInterface: "RTCDataChannelEvent"): RTCDataChannelEvent;
@@ -529,6 +529,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "SpeechSynthesisEvent"): SpeechSynthesisEvent;
   createEvent(eventInterface: "StorageEvent"): StorageEvent;
   createEvent(eventInterface: "SubmitEvent"): SubmitEvent;
+  createEvent(eventInterface: "ToggleEvent"): ToggleEvent;
   createEvent(eventInterface: "TouchEvent"): TouchEvent;
   createEvent(eventInterface: "TrackEvent"): TrackEvent;
   createEvent(eventInterface: "TransitionEvent"): TransitionEvent;
@@ -536,7 +537,7 @@ export class Document extends Node implements IDocument {
   createEvent(eventInterface: "UIEvents"): UIEvent;
   createEvent(eventInterface: "WebGLContextEvent"): WebGLContextEvent;
   createEvent(eventInterface: "WheelEvent"): WheelEvent;
-  createEvent(eventInterface: string): Event;
+  createEvent(eventInterface: string): globalThis.Event;
   createEvent(eventInterface: string): globalThis.Event {
     // 1. Let constructor be null.
     let constructor: typeof globalThis.Event | null = null;

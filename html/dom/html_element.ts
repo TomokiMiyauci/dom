@@ -120,6 +120,42 @@ export class HTMLElement extends Element implements IHTMLElement {
   attachInternals(): ElementInternals {
     throw new Error("attachInternals");
   }
+
+  get popover(): string | null {
+    throw new Error("popover#getter");
+  }
+
+  set popover(value: string | null) {
+    throw new Error("popover#setter");
+  }
+
+  hidePopover(): void {
+    throw new Error("hidePopover");
+  }
+
+  showPopover(): void {
+    throw new Error("showPopover");
+  }
+
+  togglePopover(force?: boolean): void {
+    throw new Error("togglePopover");
+  }
+
+  get popoverTargetAction(): string {
+    throw new Error("popoverTargetAction#getter");
+  }
+
+  set popoverTargetAction(value: string) {
+    throw new Error("popoverTargetAction#setter");
+  }
+
+  get popoverTargetElement(): Element | null {
+    throw new Error("popoverTargetElement#getter");
+  }
+
+  set popoverTargetElement(value: Element | null) {
+    throw new Error("popoverTargetElement#setter");
+  }
 }
 
 export interface HTMLElement

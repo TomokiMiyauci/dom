@@ -3336,5 +3336,13 @@ export class CSSStyleDeclaration implements ICSSStyleDeclaration {
     throw new Error("setProperty");
   }
 
+  get forcedColorAdjust(): string {
+    throw new Error("forcedColorAdjust#getter");
+  }
+
+  set forcedColorAdjust(value: string) {
+    throw new Error("forcedColorAdjust#setter");
+  }
+
   *[Symbol.iterator]() {}
 }

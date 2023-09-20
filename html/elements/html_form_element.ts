@@ -19,10 +19,10 @@ export class HTMLFormElement extends HTMLElement implements IHTMLFormElement {
     throw new Error("action#setter");
   }
 
-  get autocomplete(): string {
+  get autocomplete(): AutoFillBase {
     throw new Error("autocomplete#getter");
   }
-  set autocomplete(value: string) {
+  set autocomplete(value: AutoFillBase) {
     throw new Error("autocomplete#setter");
   }
 
