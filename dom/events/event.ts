@@ -26,14 +26,12 @@ export class Event implements IEvent {
     _.bubbles = bubbles;
     _.cancelable = cancelable;
 
-    internalSlots.set(this, _);
-
-    this._ = _;
+    internalSlots.extends<Event>(this, _);
   }
 
   get type(): string {
     // return the value it was initialized to
-    return this._.type;
+    return this.#_.type;
   }
 
   /**
@@ -41,7 +39,7 @@ export class Event implements IEvent {
    */
   get target(): EventTarget | null {
     // return this’s target.
-    return this._.target;
+    return this.#_.target;
   }
 
   /**
@@ -49,7 +47,7 @@ export class Event implements IEvent {
    */
   get srcElement(): EventTarget | null {
     // return this’s target.
-    return this._.target;
+    return this.#_.target;
   }
 
   /**
@@ -57,7 +55,7 @@ export class Event implements IEvent {
    */
   get currentTarget(): EventTarget | null {
     // return the value it was initialized to
-    return this._.currentTarget;
+    return this.#_.currentTarget;
   }
 
   /**
@@ -68,7 +66,7 @@ export class Event implements IEvent {
     const composedPath = new List<EventTarget>();
 
     // 2. Let path be this’s path.
-    const path = this._.path;
+    const path = this.#_.path;
 
     // 3. If path is empty, then return composedPath.
     if (path.isEmpty) return [...composedPath];
@@ -194,7 +192,7 @@ export class Event implements IEvent {
    */
   get eventPhase(): number {
     // return the value it was initialized to
-    return this._.eventPhase;
+    return this.#_.eventPhase;
   }
 
   /**
@@ -202,7 +200,7 @@ export class Event implements IEvent {
    */
   stopPropagation(): void {
     // set this’s stop propagation flag.
-    this._.stopPropagation = true;
+    this.#_.stopPropagation = true;
   }
 
   /**
@@ -210,7 +208,7 @@ export class Event implements IEvent {
    */
   get cancelBubble(): boolean {
     // return true if this’s stop propagation flag is set; otherwise false.
-    return this._.stopPropagation;
+    return this.#_.stopPropagation;
   }
 
   /**
@@ -218,7 +216,7 @@ export class Event implements IEvent {
    */
   private set cancelBubble(value: boolean) {
     // set this’s stop propagation flag if the given value is true; otherwise do nothing.
-    if (value) this._.stopPropagation = true;
+    if (value) this.#_.stopPropagation = true;
   }
 
   /**
@@ -226,21 +224,21 @@ export class Event implements IEvent {
    */
   stopImmediatePropagation(): void {
     // set this’s stop propagation flag and this’s stop immediate propagation flag.
-    this._.stopPropagation = true, this._.stopImmediatePropagation = true;
+    this.#_.stopPropagation = true, this.#_.stopImmediatePropagation = true;
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-bubbles)
    */
   get bubbles(): boolean {
-    return this._.bubbles;
+    return this.#_.bubbles;
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-cancelable)
    */
   get cancelable(): boolean {
-    return this._.cancelable;
+    return this.#_.cancelable;
   }
 
   /**
@@ -248,7 +246,7 @@ export class Event implements IEvent {
    */
   get returnValue(): boolean {
     // return false if this’s canceled flag is set; otherwise true.
-    return !this._.canceled;
+    return !this.#_.canceled;
   }
 
   /**
@@ -272,7 +270,7 @@ export class Event implements IEvent {
    */
   get defaultPrevented(): boolean {
     // return true if this’s canceled flag is set; otherwise false.
-    return this._.canceled;
+    return this.#_.canceled;
   }
 
   /**
@@ -280,7 +278,7 @@ export class Event implements IEvent {
    */
   get composed(): boolean {
     // return true if this’s composed flag is set; otherwise false.
-    return this._.composed;
+    return this.#_.composed;
   }
 
   /**
@@ -288,7 +286,7 @@ export class Event implements IEvent {
    */
   get isTrusted(): boolean {
     // return the value it was initialized to
-    return this._.isTrusted;
+    return this.#_.isTrusted;
   }
 
   #timestamp: number;
@@ -314,13 +312,15 @@ export class Event implements IEvent {
     cancelable = false,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
-    if (this._.dispatch) return;
+    if (this.#_.dispatch) return;
 
     // 2. Initialize this with type, bubbles, and cancelable.
     initialize(this, type, bubbles, cancelable);
   }
 
-  protected _: EventInternals;
+  get #_() {
+    return $<Event>(this);
+  }
 }
 
 export interface Event

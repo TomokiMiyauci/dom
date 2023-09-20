@@ -1,5 +1,5 @@
 import type { IProcessingInstruction } from "../../interface.d.ts";
-import { CharacterData, CharacterDataInternals } from "./character_data.ts";
+import { CharacterData } from "./character_data.ts";
 import { LinkStyle } from "../../cssom/link_style.ts";
 import { NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
@@ -9,20 +9,17 @@ import { internalSlots } from "../../internal.ts";
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
   constructor(
-    { data, nodeDocument, target }: Pick<
-      ProcessingInstructionInternals,
-      "data" | "nodeDocument" | "target"
-    >,
+    { data, target, nodeDocument }: {
+      data: string;
+      target: string;
+      nodeDocument: Document;
+    },
   ) {
     super(data, nodeDocument);
 
-    internalSlots.set(
+    internalSlots.extends<ProcessingInstruction>(
       this,
-      new ProcessingInstructionInternals({
-        data,
-        nodeDocument,
-        target,
-      }),
+      new ProcessingInstructionInternals(target),
     );
   }
 
@@ -45,28 +42,21 @@ export class ProcessingInstruction extends CharacterData
     });
   }
 
-  get #_(): ProcessingInstructionInternals {
-    return internalSlots.get(this);
+  get #_() {
+    return internalSlots.get<ProcessingInstruction>(this);
   }
 }
 
 // deno-lint-ignore no-empty-interface
 export interface ProcessingInstruction extends LinkStyle {}
 
-export class ProcessingInstructionInternals extends CharacterDataInternals {
+export class ProcessingInstructionInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-pi-target)
    */
   target: string;
 
-  constructor(
-    { target, nodeDocument, data }: Pick<
-      ProcessingInstructionInternals,
-      "target" | "data" | "nodeDocument"
-    >,
-  ) {
-    super({ data, nodeDocument });
-
+  constructor(target: string) {
     this.target = target;
   }
 }

@@ -2,7 +2,7 @@ import { Node, NodeType } from "./node.ts";
 import { ChildNode } from "./node_trees/child_node.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import type { PartialBy } from "../../deps.ts";
-import { internalSlots } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 import { includes } from "../../utils.ts";
 
 type Optional = "publicId" | "systemId";
@@ -21,13 +21,9 @@ export class DocumentType extends Node implements IDocumentType {
   ) {
     super(nodeDocument);
 
-    const _ = Object.assign(
-      this._,
-      new DocumentTypeInternals({ name }),
-      { publicId, systemId },
-    );
-    this._ = _;
-    internalSlots.set(this, _);
+    const internal = new DocumentTypeInternals({ name });
+    internal.publicId = publicId, internal.systemId = systemId;
+    internalSlots.extends<DocumentType>(this, internal);
   }
 
   override get nodeType(): NodeType.DOCUMENT_TYPE_NODE {
@@ -35,7 +31,7 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   override get nodeName(): string {
-    return this._.name;
+    return this.#_.name;
   }
 
   /**
@@ -72,33 +68,35 @@ export class DocumentType extends Node implements IDocumentType {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this._.nodeDocument;
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): DocumentType {
     return new DocumentType(
       {
-        name: this._.name,
-        publicId: this._.publicId,
-        systemId: this._.systemId,
+        name: this.#_.name,
+        publicId: this.#_.publicId,
+        systemId: this.#_.systemId,
         nodeDocument: document,
       },
     );
   }
 
   get name(): string {
-    return this._.name;
+    return this.#_.name;
   }
 
   get publicId(): string {
-    return this._.publicId;
+    return this.#_.publicId;
   }
 
   get systemId(): string {
-    return this._.systemId;
+    return this.#_.systemId;
   }
 
-  declare protected _: DocumentTypeInternals & Node["_"];
+  get #_() {
+    return $<DocumentType>(this);
+  }
 }
 
 includes(DocumentType, ChildNode());

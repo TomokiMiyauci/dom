@@ -13,7 +13,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
   constructor(data: string, document: Document) {
     super(document);
 
-    internalSlots.set(
+    internalSlots.extends<CharacterData>(
       this,
       new CharacterDataInternals({ data, nodeDocument: document }),
     );
@@ -140,8 +140,8 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return substringData(this, offset, count);
   }
 
-  get #_(): CharacterDataInternals {
-    return internalSlots.get(this);
+  get #_() {
+    return internalSlots.get<CharacterData>(this);
   }
 }
 

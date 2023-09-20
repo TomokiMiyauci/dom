@@ -30,7 +30,7 @@ export class DOMImplementation implements IDOMImplementation {
       name: qualifiedName,
       publicId,
       systemId,
-      nodeDocument: $(this).document,
+      nodeDocument: $<DOMImplementation>(this).document,
     });
   }
 
@@ -63,7 +63,7 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    $(document).origin = $($(this).document).origin;
+    $(document).origin = $(this.#_.document).origin;
 
     // 7. document’s content type is determined by namespace:
     $(document).contentType = namespaceToContentType(namespace);
@@ -114,7 +114,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    $(doc).origin = $($(this).document).origin;
+    $(doc).origin = $(this.#_.document).origin;
 
     // 9. Return doc.
     return doc;
@@ -132,9 +132,13 @@ export class DOMImplementation implements IDOMImplementation {
     const instance = new DOMImplementation();
 
     const _: DOMImplementationInternals = { document };
-    internalSlots.set(instance, _);
+    internalSlots.extends<DOMImplementation>(instance, _);
 
     return instance;
+  }
+
+  get #_() {
+    return $<DOMImplementation>(this);
   }
 }
 

@@ -99,7 +99,7 @@ export class Element extends Node implements IElement {
       // 1. If localName is id, namespace is null, and value is null or the empty string, then unset element’s ID.
       if (localName === "id" && namespace === null) {
         // 2. Otherwise, if localName is id, namespace is null, then set element’s ID to value.
-        this._.ID = value ? value : null;
+        this.#_.ID = value ? value : null;
       }
     };
 
@@ -111,12 +111,8 @@ export class Element extends Node implements IElement {
       customElementDefinition,
       isValue,
     });
-    const _ = Object.assign(this._, internal);
-
-    _.attributeChangeSteps.define(changeAttribute);
-    this._ = _;
-
-    internalSlots.set(this, _);
+    internal.attributeChangeSteps.define(changeAttribute);
+    internalSlots.extends<Element>(this, internal);
   }
 
   override get nodeType(): NodeType.ELEMENT_NODE {
@@ -165,21 +161,21 @@ export class Element extends Node implements IElement {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return $(this).nodeDocument;
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): Element {
     // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
     const copy = createElement(
       document,
-      this._.localName,
-      this._.namespace,
-      this._.namespacePrefix,
-      this._.isValue,
+      this.#_.localName,
+      this.#_.namespace,
+      this.#_.namespacePrefix,
+      this.#_.isValue,
     );
 
     // 2. For each attribute in node’s attribute list:
-    for (const attribute of this._.attributeList) {
+    for (const attribute of this.#_.attributeList) {
       // 1. Let copyAttribute be a clone of attribute.
       const copyAttribute = cloneAttr(attribute, document);
 
@@ -231,7 +227,7 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-localname
    */
   get localName(): string {
-    return this._.localName;
+    return this.#_.localName;
   }
 
   /**
@@ -239,7 +235,7 @@ export class Element extends Node implements IElement {
    */
   get namespaceURI(): string | null {
     // return this’s namespace.
-    return this._.namespace;
+    return this.#_.namespace;
   }
 
   /**
@@ -254,7 +250,7 @@ export class Element extends Node implements IElement {
    */
   get prefix(): string | null {
     // return this’s namespace prefix.
-    return this._.namespacePrefix;
+    return this.#_.namespacePrefix;
   }
 
   /**
@@ -262,7 +258,7 @@ export class Element extends Node implements IElement {
    */
   get shadowRoot(): globalThis.ShadowRoot | null {
     // 1. Let shadow be this’s shadow root.
-    const shadow = this._.shadowRoot;
+    const shadow = this.#_.shadowRoot;
 
     // 2. If shadow is null or its mode is "closed", then return null.
     if (!shadow || $(shadow).mode === "closed") return null;
@@ -284,23 +280,25 @@ export class Element extends Node implements IElement {
     init.delegatesFocus ??= false;
 
     // 1. If this’s namespace is not the HTML namespace, then throw a "NotSupportedError" DOMException.
-    if (this._.namespace !== Namespace.HTML) {
+    if (this.#_.namespace !== Namespace.HTML) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
     // 2. If this’s local name is not a valid shadow host name, then throw a "NotSupportedError" DOMException.
-    if (!isValidShadowHostName(this._.localName)) {
+    if (!isValidShadowHostName(this.#_.localName)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
     // 3. If this’s local name is a valid custom element name, or this’s is value is not null, then:
-    if (isValidCustomElementName(this._.localName) || this._.isValue !== null) {
+    if (
+      isValidCustomElementName(this.#_.localName) || this.#_.isValue !== null
+    ) {
       // 1. Let definition be the result of looking up a custom element definition given this’s node document, its namespace, its local name, and its is value.
       const definition = lookUpCustomElementDefinition(
-        this._.nodeDocument,
-        this._.namespace,
-        this._.localName,
-        this._.isValue,
+        this.#_.nodeDocument,
+        this.#_.namespace,
+        this.#_.localName,
+        this.#_.isValue,
       );
 
       // 2. If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException.
@@ -317,12 +315,12 @@ export class Element extends Node implements IElement {
     // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
     const shadow = new ShadowRoot({ host: this }) as globalThis.ShadowRoot;
     $(shadow).mode = init.mode;
-    $(shadow).nodeDocument = this._.nodeDocument;
+    $(shadow).nodeDocument = this.#_.nodeDocument;
 
     // 6. Set shadow’s delegates focus to init["delegatesFocus"].
     $(shadow).delegatesFocus = init.delegatesFocus ?? false;
 
-    const { customElementState } = this._;
+    const { customElementState } = this.#_;
     // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
     if (
       customElementState === CustomElementState.Precustomized ||
@@ -333,7 +331,7 @@ export class Element extends Node implements IElement {
     $(shadow).slotAssignment = init.slotAssignment;
 
     // 9. Set this’s shadow root to shadow.
-    this._.shadowRoot = shadow;
+    this.#_.shadowRoot = shadow;
 
     // 10 .Return shadow.
     return shadow;
@@ -395,7 +393,7 @@ export class Element extends Node implements IElement {
   getAttributeNames(): string[] {
     // return the qualified names of the attributes in this’s attribute list, in order; otherwise a new list.
     const qualifiedNames = map(
-      this._.attributeList,
+      this.#_.attributeList,
       (attr) => getQualifiedName($(attr).localName, $(attr).namespacePrefix),
     );
 
@@ -485,8 +483,8 @@ export class Element extends Node implements IElement {
   hasAttribute(qualifiedName: string): boolean {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this._.namespace === Namespace.HTML &&
-      isHTMLDocument($(this).nodeDocument)
+      this.#_.namespace === Namespace.HTML &&
+      isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
@@ -499,7 +497,7 @@ export class Element extends Node implements IElement {
   @SameObject
   get attributes(): NamedNodeMap {
     return new NamedNodeMap({
-      attributeList: this._.attributeList,
+      attributeList: this.#_.attributeList,
       element: this,
     });
   }
@@ -513,7 +511,7 @@ export class Element extends Node implements IElement {
 
     // 2. Return true if this has an attribute whose namespace is namespace and local name is localName; otherwise false.
     return some(
-      this._.attributeList,
+      this.#_.attributeList,
       (attr) =>
         $(attr).namespace === namespace && $(attr).localName === localName,
     );
@@ -524,7 +522,7 @@ export class Element extends Node implements IElement {
    */
   hasAttributes(): boolean {
     // return false if this’s attribute list is empty; otherwise true.
-    return !this._.attributeList.isEmpty;
+    return !this.#_.attributeList.isEmpty;
   }
 
   /**
@@ -544,7 +542,7 @@ export class Element extends Node implements IElement {
   insertAdjacentText(where: InsertPosition, data: string): void {
     const text = new Text();
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    $(text).data = data, $(text).nodeDocument = $(this).nodeDocument;
+    $(text).data = data, $(text).nodeDocument = this.#_.nodeDocument;
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);
@@ -575,7 +573,7 @@ export class Element extends Node implements IElement {
    */
   removeAttributeNode(attr: Attr): Attr {
     // 1. If this’s attribute list does not contain attr, then throw a "NotFoundError" DOMException.
-    if (!this._.attributeList.contains(attr)) {
+    if (!this.#_.attributeList.contains(attr)) {
       throw new DOMException("<message>", DOMExceptionName.NotFoundError);
     }
 
@@ -600,13 +598,13 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this._.namespace === Namespace.HTML &&
-      isHTMLDocument($(this).nodeDocument)
+      this.#_.namespace === Namespace.HTML &&
+      isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
-      this._.attributeList,
+      this.#_.attributeList,
       (attr) => $(attr).qualifiedName === qualifiedName,
     ) ?? null;
 
@@ -615,7 +613,7 @@ export class Element extends Node implements IElement {
       const attribute = new Attr({
         localName: qualifiedName,
         value,
-        nodeDocument: $(this).nodeDocument,
+        nodeDocument: this.#_.nodeDocument,
       });
 
       appendAttribute(attribute, this);
@@ -674,13 +672,13 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this._.namespace === Namespace.HTML &&
-      isHTMLDocument($(this).nodeDocument)
+      this.#_.namespace === Namespace.HTML &&
+      isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
-      this._.attributeList,
+      this.#_.attributeList,
       (attr) => $(attr).qualifiedName === qualifiedName,
     ) ?? null;
 
@@ -692,7 +690,7 @@ export class Element extends Node implements IElement {
         const attr = new Attr({
           localName: qualifiedName,
           value: "",
-          nodeDocument: $(this).nodeDocument,
+          nodeDocument: this.#_.nodeDocument,
         });
 
         // then append this attribute to this,
@@ -720,19 +718,21 @@ export class Element extends Node implements IElement {
     throw new UnImplemented("webkitMatchesSelector");
   }
 
-  declare protected _: ElementInternals & Node["_"];
+  get #_() {
+    return $<Element>(this);
+  }
 
   /**
    * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name
    */
   get #upperQualifiedName(): string {
     // 1. Let qualifiedName be this’s qualified name.
-    let qualifiedName = this._.qualifiedName;
+    let qualifiedName = this.#_.qualifiedName;
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this._.namespace === Namespace.HTML &&
-      $($(this).nodeDocument).type !== "xml"
+      this.#_.namespace === Namespace.HTML &&
+      $(this.#_.nodeDocument).type !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }

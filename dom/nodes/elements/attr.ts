@@ -35,10 +35,7 @@ export class Attr extends Node implements IAttr {
       localName,
       element,
     });
-    const _ = Object.assign(this._, internal);
-
-    this._ = _;
-    internalSlots.set(this, _);
+    internalSlots.extends<Attr>(this, internal);
   }
 
   /**
@@ -49,7 +46,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return this._.qualifiedName;
+    return this.#_.qualifiedName;
   }
 
   /**
@@ -57,7 +54,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this._.value;
+    return this.#_.value;
   }
 
   /**
@@ -73,7 +70,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this._.value;
+    return this.#_.value;
   }
 
   /**
@@ -90,7 +87,7 @@ export class Attr extends Node implements IAttr {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this._.nodeDocument;
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): Attr {
@@ -102,7 +99,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this._.namespace;
+    return this.#_.namespace;
   }
 
   /**
@@ -110,7 +107,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this._.namespacePrefix;
+    return this.#_.namespacePrefix;
   }
 
   /**
@@ -118,7 +115,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this._.localName;
+    return this.#_.localName;
   }
 
   /**
@@ -126,7 +123,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return this._.qualifiedName;
+    return this.#_.qualifiedName;
   }
 
   /**
@@ -134,7 +131,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this._.value;
+    return this.#_.value;
   }
 
   /**
@@ -150,7 +147,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this._.element;
+    return this.#_.element;
   }
 
   /**
@@ -161,7 +158,9 @@ export class Attr extends Node implements IAttr {
     return true;
   }
 
-  declare protected _: AttrInternals & Node["_"];
+  get #_() {
+    return $<Attr>(this);
+  }
 }
 
 export class AttrInternals {

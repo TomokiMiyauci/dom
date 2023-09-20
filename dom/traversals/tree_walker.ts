@@ -228,8 +228,8 @@ export class TreeWalker implements ITreeWalker {
 
   [Symbol.toStringTag] = "TreeWalker";
 
-  get #_(): TreeWalkerInternals {
-    return $(this);
+  get #_() {
+    return $<TreeWalker>(this);
   }
 }
 

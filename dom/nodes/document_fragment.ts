@@ -18,10 +18,9 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     // set this’s node document to current global object’s associated Document.
     super(globalThis.document);
 
-    const _ = Object.assign(this._, new DocumentFragmentInternals());
-    this._ = _;
+    const internal = new DocumentFragmentInternals();
 
-    internalSlots.set(this, _);
+    internalSlots.extends<DocumentFragment>(this, internal);
   }
 
   /**
@@ -76,7 +75,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this._.nodeDocument;
+    return this.#_.nodeDocument;
   }
 
   protected override clone(document: Document): globalThis.DocumentFragment {
@@ -86,7 +85,9 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     return fragment;
   }
 
-  declare protected _: DocumentFragmentInternals & Node["_"];
+  get #_() {
+    return $<DocumentFragment>(this);
+  }
 }
 
 export interface DocumentFragment extends ParentNode, NonElementParentNode {

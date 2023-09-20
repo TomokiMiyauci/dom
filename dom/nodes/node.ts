@@ -142,20 +142,14 @@ export abstract class Node extends EventTarget implements INode {
   constructor(nodeDocument: Document) {
     super();
 
-    const _ = Object.assign(
-      this._ as EventTarget["_"],
-      new NodeInternals(nodeDocument),
-    );
-
-    this._ = _;
-    internalSlots.set(this, _);
+    internalSlots.extends<Node>(this, new NodeInternals(nodeDocument));
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-baseuri)
    */
   get baseURI(): string {
-    const url = documentBaseURL(this._.nodeDocument);
+    const url = documentBaseURL(this.#_.nodeDocument);
     // return this’s node document’s document base URL, serialized.
     return URLSerializer.serialize(url);
   }
@@ -360,7 +354,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   cloneNode(deep?: boolean | undefined): globalThis.Node {
-    let document = this._.nodeDocument;
+    let document = this.#_.nodeDocument;
     const copy = this.clone(document);
 
     if (isDocument(copy)) document = copy;
@@ -555,7 +549,9 @@ export abstract class Node extends EventTarget implements INode {
   ${[...tree.children(this)].map((node) => this[inspect].call(node)).join("")}`;
   }
 
-  declare protected _: NodeInternals & EventTarget["_"];
+  get #_() {
+    return $<Node>(this);
+  }
 }
 
 export interface Node

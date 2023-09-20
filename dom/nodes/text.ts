@@ -33,7 +33,7 @@ export class Text extends CharacterData implements IText {
 
   protected override clone(document: Document): globalThis.Text {
     const text = new Text();
-    $(text).data = $(this).data, $(text).nodeDocument = document;
+    $(text).data = $<Text>(this).data, $(text).nodeDocument = document;
     return text;
   }
 

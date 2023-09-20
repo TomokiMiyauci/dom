@@ -17,9 +17,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
   constructor({ host }: { host: Element }) {
     super();
 
-    const _ = Object.assign(this._, new ShadowRootInternals(host));
-    this._ = _;
-    internalSlots.set(this, _);
+    internalSlots.extends<ShadowRoot>(this, new ShadowRootInternals(host));
   }
 
   /**
@@ -27,7 +25,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get mode(): ShadowRootMode {
     // return this’s mode.
-    return this._.mode;
+    return this.#_.mode;
   }
 
   /**
@@ -43,7 +41,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get slotAssignment(): SlotAssignmentMode {
     // return this’s delegates focus.
-    return this._.slotAssignment;
+    return this.#_.slotAssignment;
   }
 
   /**
@@ -51,7 +49,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get host(): Element {
     // return this’s host.
-    throw this._.host;
+    throw this.#_.host;
   }
 
   /**
@@ -70,7 +68,9 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
     setEventHandlerIDLAttribute(this, "onslotchange", value);
   }
 
-  declare protected _: ShadowRootInternals & DocumentFragment["_"];
+  get #_() {
+    return internalSlots.get<ShadowRoot>(this);
+  }
 }
 
 export interface ShadowRoot extends DocumentOrShadowRoot, InnerHTML {}

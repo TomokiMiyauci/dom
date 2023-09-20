@@ -23,10 +23,9 @@ export class MutationObserver implements IMutationObserver {
     callback: MutationCallback,
   ) {
     // set this’s callback to callback.
-    const _ = new MutationObserverInternals(callback);
+    const internal = new MutationObserverInternals(callback);
 
-    internalSlots.set(this, _);
-    this.#_ = _;
+    internalSlots.extends<MutationObserver>(this, internal);
   }
 
   /**
@@ -126,7 +125,9 @@ export class MutationObserver implements IMutationObserver {
     return observer === this;
   }
 
-  #_: MutationObserverInternals;
+  get #_() {
+    return $<MutationObserver>(this);
+  }
 }
 
 export class MutationObserverInternals {

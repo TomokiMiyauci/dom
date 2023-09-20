@@ -74,8 +74,8 @@ export class NodeIterator implements INodeIterator {
   // It does not seem to be defined in the specification. For test pass.
   [Symbol.toStringTag] = "NodeIterator";
 
-  get #_(): NodeIteratorInternals {
-    return $(this);
+  get #_() {
+    return $<NodeIterator>(this);
   }
 }
 

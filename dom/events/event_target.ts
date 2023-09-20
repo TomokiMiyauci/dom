@@ -9,10 +9,8 @@ import { $, internalSlots } from "../../internal.ts";
 @Exposed("*")
 export class EventTarget implements IEventTarget {
   constructor() {
-    const _ = new EventTargetInternals();
-
-    this._ = _;
-    internalSlots.set(this, _);
+    const internal = new EventTargetInternals();
+    internalSlots.extends<EventTarget>(this, internal);
   }
 
   addEventListener(
@@ -47,7 +45,7 @@ export class EventTarget implements IEventTarget {
     const capture = flatten(options);
 
     const eventListener = find(
-      this._.eventListenerList,
+      this.#_.eventListenerList,
       (listener) =>
         type === listener.type && callback === listener.callback &&
         capture === listener.capture,
@@ -69,7 +67,9 @@ export class EventTarget implements IEventTarget {
     return dispatch(event, this);
   }
 
-  protected _: EventTargetInternals;
+  get #_() {
+    return $<EventTarget>(this);
+  }
 }
 
 export class EventTargetInternals {

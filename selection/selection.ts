@@ -15,9 +15,9 @@ import { Range } from "../dom/ranges/range.ts";
 @Exposed(Window)
 export class Selection implements ISelection {
   constructor() {
-    const _ = new SelectionInternals();
+    const internal = new SelectionInternals();
 
-    internalSlots.set(this, _);
+    internalSlots.extends<Selection>(this, internal);
   }
 
   /**
@@ -364,7 +364,7 @@ export class Selection implements ISelection {
   }
 
   get #_(): SelectionInternals {
-    return $(this);
+    return $<Selection>(this);
   }
 }
 

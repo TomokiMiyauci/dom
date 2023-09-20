@@ -22,7 +22,7 @@ export class Comment extends CharacterData implements IComment {
   }
 
   protected override clone(document: Document): Comment {
-    const comment = new Comment($(this).data);
+    const comment = new Comment($<Comment>(this).data);
     $(comment).nodeDocument = document;
 
     return comment;

@@ -59,20 +59,14 @@ import { CustomEvent } from "../../events/custom_event.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
 import { adoptNode, isHTMLDocument } from "./document_utils.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
-
-export type Origin = OpaqueOrigin | TupleOrigin;
-
-export interface OpaqueOrigin {
-  type: "opaque";
-}
+import {
+  OpaqueOrigin,
+  Origin,
+} from "../../../html/loading_web_pages/supporting_concepts.ts";
 
 const opaqueOrigin: OpaqueOrigin = {
   type: "opaque",
 };
-
-export interface TupleOrigin {
-  type: "tuple";
-}
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
@@ -96,19 +90,17 @@ export class Document extends Node implements IDocument {
     // @ts-ignore
     super();
 
-    const _ = Object.assign(
-      this._,
-      new DocumentInternals({
-        implementation: DOMImplementation["create"](this),
-      }),
-      { nodeDocument: this },
-    );
+    const internal = new DocumentInternals({
+      implementation: DOMImplementation["create"](this),
+    });
 
-    this._ = _;
-    internalSlots.set(this, _);
+    internalSlots.extends<Document>(this, internal);
+    $<Document>(this).nodeDocument = this;
   }
 
-  declare protected _: DocumentInternals & Node["_"];
+  get #_() {
+    return $<Document>(this);
+  }
 
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
@@ -160,7 +152,7 @@ export class Document extends Node implements IDocument {
    */
   get URL(): string {
     // return this’s URL, serialized.
-    return this._.URL.href;
+    return this.#_.URL.href;
   }
 
   /**
@@ -168,7 +160,7 @@ export class Document extends Node implements IDocument {
    */
   get characterSet(): string {
     // return this’s encoding’s name.
-    return this._.encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -176,7 +168,7 @@ export class Document extends Node implements IDocument {
    */
   get charset(): string {
     // return this’s encoding’s name.
-    return this._.encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -184,7 +176,7 @@ export class Document extends Node implements IDocument {
    */
   get compatMode(): CompatMode {
     // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
-    switch (this._.mode) {
+    switch (this.#_.mode) {
       case html.DOCUMENT_MODE.QUIRKS:
         return "BackCompat";
       default:
@@ -193,7 +185,7 @@ export class Document extends Node implements IDocument {
   }
 
   get contentType(): string {
-    return this._.contentType;
+    return this.#_.contentType;
   }
 
   /**
@@ -219,7 +211,7 @@ export class Document extends Node implements IDocument {
    */
   get documentURI(): string {
     // return this’s URL, serialized.
-    return this._.URL.href;
+    return this.#_.URL.href;
   }
 
   /**
@@ -227,7 +219,7 @@ export class Document extends Node implements IDocument {
    */
   get implementation(): DOMImplementation {
     // return the DOMImplementation object that is associated with this.
-    return this._.implementation;
+    return this.#_.implementation;
   }
 
   /**
@@ -235,7 +227,7 @@ export class Document extends Node implements IDocument {
    */
   get inputEncoding(): string {
     // return this’s encoding’s name.
-    return this._.encoding.name;
+    return this.#_.encoding.name;
   }
 
   /**
@@ -264,7 +256,9 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. If node is a DocumentFragment node whose host is non-null, then return.
-    if (isDocumentFragment(node) && $(node).host) return node; // TODO(miyauci): Check return null or not.
+    if (
+      isDocumentFragment(node) && $<globalThis.DocumentFragment>(node).host
+    ) return node; // TODO(miyauci): Check return null or not.
 
     // 4. Adopt node into this.
     adoptNode(node, this);
@@ -404,7 +398,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (isHTMLDocument(this) || this._.contentType === "application/xhtml+xml")
+      (isHTMLDocument(this) || this.#_.contentType === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -581,7 +575,7 @@ export class Document extends Node implements IDocument {
   ): NodeIterator {
     // 1. Let iterator be a new NodeIterator object.
     const iterator = new NodeIterator();
-    const _ = new NodeIteratorInternals({
+    const internal = new NodeIteratorInternals({
       // 2. Set iterator’s root and iterator’s reference to root.
       root,
       reference: root,
@@ -592,10 +586,10 @@ export class Document extends Node implements IDocument {
       // 5. Set iterator’s filter to filter.
       filter,
     });
-    internalSlots.set(iterator, _);
+    internalSlots.extends(iterator as globalThis.NodeIterator, internal);
 
     // Non-standard process
-    this._.iterators.add(iterator);
+    this.#_.iterators.add(iterator);
 
     // 6. Return iterator.
     return iterator;
@@ -634,7 +628,7 @@ export class Document extends Node implements IDocument {
     const range = new Range();
     $(range).start = [this, 0], $(range).end = [this, 0];
 
-    this._.ranges.add(range);
+    this.#_.ranges.add(range);
 
     return range;
   }
@@ -660,7 +654,7 @@ export class Document extends Node implements IDocument {
   ): TreeWalker {
     // 1. Let walker be a new TreeWalker object.
     const walker = new TreeWalker();
-    const _ = new TreeWalkerInternals({
+    const internal = new TreeWalkerInternals({
       // 2. Set walker’s root and walker’s current to root.
       root,
       current: root,
@@ -669,7 +663,7 @@ export class Document extends Node implements IDocument {
       // 4. Set walker’s filter to filter.
       filter,
     });
-    internalSlots.set(walker, _);
+    internalSlots.extends(walker as globalThis.TreeWalker, internal);
 
     // 5. Return walker.
     return walker;
@@ -736,18 +730,18 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-importnode
    */
-  importNode<T>(node: T & Node, deep = false): T {
+  importNode<T extends globalThis.Node>(node: T, deep = false): T {
     // 1. If node is a document or shadow root, then throw a "NotSupportedError" DOMException.
     if (isDocument(node) || isShadowRoot(node)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
     // TODO(miyauci): improve dirty re-assignment
-    const document = $(node).nodeDocument;
-    $(node).nodeDocument = this;
+    const document = $(node as globalThis.Node).nodeDocument;
+    $(node as globalThis.Node).nodeDocument = this;
     // 2. Return a clone of node, with this and the clone children flag set if deep is true.
     const copy = node.cloneNode(deep) as T;
-    $(node).nodeDocument = document;
+    $(node as globalThis.Node).nodeDocument = document;
 
     return copy;
   }

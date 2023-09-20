@@ -34,18 +34,18 @@ import { removeNode } from "../nodes/node_trees/mutation.ts";
 @Exposed(Window)
 export class Range extends AbstractRange implements IRange {
   protected override get _(): AbstractRangeInternals {
-    return $(this);
+    return $<Range>(this);
   }
 
   constructor() {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    const _ = new AbstractRangeInternals([globalThis.document, 0], [
+    const internal = new AbstractRangeInternals([globalThis.document, 0], [
       globalThis.document,
       0,
     ]);
-    internalSlots.set(this, _);
+    internalSlots.extends<Range>(this, internal);
   }
 
   /**
@@ -194,7 +194,6 @@ export class Range extends AbstractRange implements IRange {
     const length = nodeLength(node);
 
     // 3. Set start to the boundary point (node, 0).
-    $(this).start = [node, 0];
     this._.start = [node, 0];
 
     // 4. Set end to the boundary point (node, length).
@@ -343,7 +342,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 10. Set start and end to (new node, new offset).
-    $(this).start = [newNode, newOffset], $(this).end = [newNode, newOffset];
+    this._.start = [newNode, newOffset], this._.end = [newNode, newOffset];
   }
 
   /**

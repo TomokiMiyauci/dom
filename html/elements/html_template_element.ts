@@ -12,7 +12,7 @@ export class HTMLTemplateElement extends HTMLElement
     super(...args);
 
     // 1. Let doc be the template element's node document's appropriate template contents owner document.
-    const doc = appropriateTemplateContentsOwnerDocument(this._.nodeDocument);
+    const doc = appropriateTemplateContentsOwnerDocument(this.#_.nodeDocument);
 
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = new DocumentFragment();
@@ -20,10 +20,9 @@ export class HTMLTemplateElement extends HTMLElement
     $(fragment).host = this;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
-    const _ = Object.assign(this._, { templateContents: fragment });
-
-    this._ = _;
-    internalSlots.set(this, _);
+    internalSlots.extends<HTMLTemplateElement>(this, {
+      templateContents: fragment,
+    });
   }
 
   /**
@@ -31,10 +30,12 @@ export class HTMLTemplateElement extends HTMLElement
    */
   get content(): DocumentFragment {
     // return the template element's template contents.
-    return this._.templateContents;
+    return this.#_.templateContents;
   }
 
-  declare protected _: HTMLTemplateElementInternals & HTMLElement["_"];
+  get #_() {
+    return $<HTMLTemplateElement>(this);
+  }
 }
 
 export interface HTMLTemplateElementInternals {

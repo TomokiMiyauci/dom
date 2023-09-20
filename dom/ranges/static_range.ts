@@ -28,7 +28,7 @@ export class StaticRange extends AbstractRange implements IStaticRange {
       endContainer,
       init.endOffset,
     ]);
-    internalSlots.set(this, this._);
+    internalSlots.extends<StaticRange>(this, this._);
   }
 
   protected override _: AbstractRangeInternals;

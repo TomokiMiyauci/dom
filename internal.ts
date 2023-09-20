@@ -13,6 +13,8 @@ import { type ShadowRootInternals } from "./dom/nodes/shadow_root.ts";
 import { type SlottableInternals } from "./dom/nodes/node_trees/slottable.ts";
 import { type MutationObserverInternals } from "./dom/nodes/mutation_observers/mutation_observer.ts";
 
+import { SelectionInternals } from "./selection/selection.ts";
+
 import type * as HTML from "./html/document.ts";
 
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
@@ -24,86 +26,59 @@ import { TreeWalkerInternals } from "./dom/traversals/tree_walker.ts";
 import { OrderedSet } from "./infra/data_structures/set.ts";
 import { List } from "./infra/data_structures/list.ts";
 import { TextTree } from "./dom/nodes/text_utils.ts";
+import { emplace, UnionToIntersection } from "./deps.ts";
 
-export interface InternalSlots {
-  set(key: HTMLTemplateElement, value: HTMLTemplateElementInternals): void;
-  set(key: ShadowRoot, value: ShadowRootInternals): void;
-  set(
-    key: Element,
-    value: ElementInternals & NodeInternals & EventTargetInternals,
-  ): void;
-  set(key: Attr, value: AttrInternals): void;
-  set(key: DocumentType, value: DocumentTypeInternals): void;
-  set(key: ProcessingInstruction, value: ProcessingInstructionInternals): void;
-  set(key: CharacterData, value: CharacterDataInternals): void;
-  set(key: DocumentFragment, value: DocumentFragmentInternals): void;
-  set(key: Document, value: DocumentInternals): void;
-  set(key: DOMImplementation, value: DOMImplementationInternals): void;
-  set(key: Node, value: NodeInternals & EventTargetInternals): void;
-  set(key: Event, value: EventInternals): void;
-  set(key: EventTarget, value: EventTargetInternals): void;
-  set(key: AbstractRange, value: AbstractRangeInternals): void;
-  set(key: NodeIterator, value: NodeIteratorInternals): void;
-  set(key: TreeWalker, value: TreeWalkerInternals): void;
-  set(key: Slottable, value: SlottableInternals): void;
-  set(key: MutationObserver, value: MutationObserverInternals): void;
+type InternalSlotEntries = [
+  [Event, EventInternals],
+  [EventTarget, EventTargetInternals],
+  [Node, NodeInternals],
+  [Attr, AttrInternals],
+  [DocumentType, DocumentTypeInternals],
+  [DocumentFragment, DocumentFragmentInternals],
+  [Element, ElementInternals],
+  [CharacterData, CharacterDataInternals],
+  [Document, DocumentInternals],
+  [DOMImplementation, DOMImplementationInternals],
+  [AbstractRange, AbstractRangeInternals],
+  [ShadowRoot, ShadowRootInternals],
+  [NodeIterator, NodeIteratorInternals],
+  [TreeWalker, TreeWalkerInternals],
+  [ProcessingInstruction, ProcessingInstructionInternals],
+  [Selection, SelectionInternals],
+  [MutationObserver, MutationObserverInternals],
+  [Slottable, SlottableInternals],
+  [HTMLTemplateElement, HTMLTemplateElementInternals],
+  [Document, HTML.DocumentInternals],
+  [HTMLSlotElement, {
+    manuallyAssignedNodes: OrderedSet<Element | Text>;
+    assignedNodes: List<Element | Text>;
+  }],
+];
+
+interface InternalSlots<T extends [unknown, unknown]> {
+  get<U extends T[0]>(
+    key: U,
+  ): UnionToIntersection<T extends any ? U extends T[0] ? T[1] : never : never>;
 
   has(key: object): boolean;
 
-  get(
-    key: HTMLSlotElement,
-  ):
-    & {
-      manuallyAssignedNodes: OrderedSet<Element | Text>;
-      assignedNodes: List<Element | Text>;
-    }
-    & ElementInternals
-    & NodeInternals
-    & EventTargetInternals;
-  get(
-    key: HTMLTemplateElement,
-  ):
-    & HTMLTemplateElementInternals
-    & ElementInternals
-    & NodeInternals
-    & EventTargetInternals;
-  get(key: ShadowRoot): ShadowRootInternals & NodeInternals;
-  get(
-    key: Element,
-  ):
-    & ElementInternals
-    & SlottableInternals
-    & NodeInternals
-    & EventTargetInternals;
-  get(key: Attr): AttrInternals & NodeInternals & EventTargetInternals;
-  get(key: DocumentType): DocumentTypeInternals;
-  get(key: ProcessingInstruction): ProcessingInstructionInternals;
-  get(
-    key: CharacterData,
-  ): CharacterDataInternals & NodeInternals & EventTargetInternals;
-  get(key: DocumentFragment): DocumentFragmentInternals & NodeInternals;
-  get(key: Document): DocumentInternals & HTML.DocumentInternals;
-  get(key: DOMImplementation): DOMImplementationInternals;
-
-  get(key: AbstractRange): AbstractRangeInternals;
-  get(key: NodeIterator): NodeIteratorInternals;
-  get(key: TreeWalker): TreeWalkerInternals;
-  get(
-    key: TreeWalker | NodeIterator,
-  ): TreeWalkerInternals | NodeIteratorInternals;
-  get(
-    key: Slottable,
-  ): SlottableInternals & NodeInternals & EventTargetInternals;
-  get(key: Node): NodeInternals & EventTargetInternals;
-  get(key: Event): EventInternals;
-  get(key: EventTarget): EventTargetInternals;
-  get(key: MutationObserver): MutationObserverInternals;
+  extends<U extends T[0]>(
+    key: U,
+    value: T extends any ? U extends T[0] ? T[1] : never : never,
+  ): void;
 }
 
 export class InternalSlotsMap {
   #map = new WeakMap();
-  set(key: object, value: object): void {
-    this.#map.set(key, value);
+  extends(key: object, value: object): void {
+    emplace(this.#map, key, {
+      insert: () => {
+        return value;
+      },
+      update: (existing) => {
+        return { ...existing, ...value };
+      },
+    });
   }
 
   has(key: object): boolean {
@@ -116,8 +91,9 @@ export class InternalSlotsMap {
     throw new Error(`internal slot does not exist. ${key}`);
   }
 }
-
-export const internalSlots = new InternalSlotsMap() as InternalSlots;
+export const internalSlots = new InternalSlotsMap() as any as InternalSlots<
+  InternalSlotEntries[number]
+>;
 
 export const $ = internalSlots.get.bind(internalSlots);
 

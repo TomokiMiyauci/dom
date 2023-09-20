@@ -69,7 +69,7 @@ export function ParentNode<T extends Constructor<Node>>(
     @convert
     prepend(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, $(this).nodeDocument);
+      const node = convertNodesToNode(nodes, this.#_.nodeDocument);
 
       // 2. Pre-insert node into this before this’s first child.
       preInsertNode(node, this, tree.firstChild(this));
@@ -81,7 +81,7 @@ export function ParentNode<T extends Constructor<Node>>(
     @convert
     append(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
       // Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, $(this).nodeDocument);
+      const node = convertNodesToNode(nodes, this.#_.nodeDocument);
 
       // Append node to this.
       appendNode(node, this);
@@ -95,7 +95,7 @@ export function ParentNode<T extends Constructor<Node>>(
       @DOMString.exclude(isObject) ...nodes: (string | Node)[]
     ): void {
       // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-      const node = convertNodesToNode(nodes, $(this).nodeDocument);
+      const node = convertNodesToNode(nodes, this.#_.nodeDocument);
 
       // 2. Ensure pre-insertion validity of node into this before null.
       ensurePreInsertionValidity(node, this, null);
@@ -150,6 +150,10 @@ export function ParentNode<T extends Constructor<Node>>(
       return new StaticNodeList(
         matchScopedSelectorsString(selectors, this),
       ) as never as NodeListOf<Element>;
+    }
+
+    get #_() {
+      return $<ParentNode>(this);
     }
   }
 

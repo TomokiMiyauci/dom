@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import type { ICustomEvent } from "../../interface.d.ts";
+import { $ } from "../../internal.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Event, initialize } from "./event.ts";
 
@@ -42,7 +43,7 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     detail?: T,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
-    if (this._.dispatch) return;
+    if ($<CustomEvent>(this).dispatch) return;
 
     // 2. Initialize this with type, bubbles, and cancelable.
     initialize(this, type, bubbles, cancelable);
