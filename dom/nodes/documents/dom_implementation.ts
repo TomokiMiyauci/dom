@@ -10,7 +10,9 @@ import { isUndefined } from "../../../deps.ts";
 import { $, internalSlots } from "../../../internal.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
 import { createElement } from "../utils/create_element.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
+@Exposed(Window)
 export class DOMImplementation implements IDOMImplementation {
   /**
    * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocumenttype

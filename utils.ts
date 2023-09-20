@@ -85,3 +85,15 @@ export function debug(node: Node, depth = 0): string[] {
 export class Get {
   static data = prop("data");
 }
+
+// deno-lint-ignore ban-types
+export function includes(derived: Function, constructor: Function): void {
+  Object.getOwnPropertyNames(constructor.prototype).forEach((name) => {
+    Object.defineProperty(
+      derived.prototype,
+      name,
+      Object.getOwnPropertyDescriptor(constructor.prototype, name) ||
+        Object.create(null),
+    );
+  });
+}
