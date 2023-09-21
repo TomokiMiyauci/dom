@@ -23,7 +23,7 @@ export function parseHTMLFragment(
   input: string,
 ): List<Node> {
   // 1. Create a new Document node, and mark it as being an HTML document.
-  const document = new Document() as globalThis.Document;
+  const document = new Document();
   $(document).type = "html";
 
   // 2. If the node document of the context element is in quirks mode, then let the Document be in quirks mode. Otherwise, the node document of the context element is in limited-quirks mode, then let the Document be in limited-quirks mode. Otherwise, leave the Document in no-quirks mode.

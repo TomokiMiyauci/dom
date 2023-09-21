@@ -8,7 +8,7 @@ export class DOMParser implements IDOMParser {
     string: string,
     type: DOMParserSupportedType,
   ): globalThis.Document {
-    const document = new Document() as globalThis.Document;
+    const document = new Document();
     $(document).contentType = type;
     // document[$URL] = globalThis.window.document.URL;
 

@@ -1,7 +1,6 @@
 import { type Constructor } from "../deps.ts";
 import type { IInnerHTML } from "../interface.d.ts";
 import { replaceAllNode } from "../dom/nodes/node_trees/mutation.ts";
-import { type Element } from "../dom/nodes/elements/element.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { parseFragment, serializeFragment } from "./fragment.ts";
 

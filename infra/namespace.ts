@@ -43,7 +43,7 @@ export enum Namespace {
  * @throws {DOMException}
  * @see https://dom.spec.whatwg.org/#validate
  */
-export function validate(qualifiedName: string) {
+export function validate(qualifiedName: string): void {
   // throw an "InvalidCharacterError" DOMException if qualifiedName does not match the QName production.
   if (!xmlValidator.qname(qualifiedName)) {
     throw new DOMException(
