@@ -291,19 +291,11 @@
     ],
     "dom/nodes/Document-createElement.html": [
       {
-        "name": "createElement(undefined) in HTML document",
-        "reason": "HTMLIFrameElement contentDocument getter is not supported"
-      },
-      {
         "name": "createElement(undefined) in XML document",
         "reason": "HTMLIFrameElement contentDocument getter is not supported"
       },
       {
         "name": "createElement(undefined) in XHTML document",
-        "reason": "HTMLIFrameElement contentDocument getter is not supported"
-      },
-      {
-        "name": "createElement(null) in HTML document",
         "reason": "HTMLIFrameElement contentDocument getter is not supported"
       },
       {

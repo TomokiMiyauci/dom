@@ -64,10 +64,6 @@ import {
   Origin,
 } from "../../../html/loading_web_pages/supporting_concepts.ts";
 
-const opaqueOrigin: OpaqueOrigin = {
-  type: "opaque",
-};
-
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
 @Document_HTML
@@ -375,9 +371,10 @@ export class Document extends Node implements IDocument {
     tagName: string,
     options?: ElementCreationOptions,
   ): HTMLElement;
+  @convert
   createElement(
-    tagName: string,
-    options?: ElementCreationOptions,
+    @DOMString tagName: string,
+    options: ElementCreationOptions = {},
   ): HTMLElement {
     // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
     if (!ReName.test(tagName)) {
@@ -394,7 +391,7 @@ export class Document extends Node implements IDocument {
     let is: string | null = null;
 
     // 4. If options is a dictionary and options["is"] exists, then set is to it.
-    if (options && typeof options.is === "string") is = options.is;
+    if (typeof options.is === "string") is = options.is;
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
@@ -810,7 +807,7 @@ export class DocumentInternals {
    * @default OpaqueOrigin
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-origin)
    */
-  origin: Origin = opaqueOrigin;
+  origin: Origin = new OpaqueOrigin();
 
   /**
    * @default "xml"
