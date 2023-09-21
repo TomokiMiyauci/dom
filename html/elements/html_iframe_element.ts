@@ -6,16 +6,27 @@ import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
 import { reflectSet } from "../../dom/nodes/utils/set_attribute_value.ts";
 
-import { $ } from "../../internal.ts";
+import * as DOM from "../../internal.ts";
+import { internalSlots } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
+import {
+  contentDocument,
+  Navigable,
+} from "../loading_web_pages/infrastructure_for_sequences_of_documents.ts";
+import { createNewChildNavigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
   constructor(args: any) {
     super(args);
 
-    $(this).insertionSteps.define((element: any) => {
+    internalSlots.extends<HTMLIFrameElement>(
+      this,
+      new ContentNavigableInternals(),
+    );
+    this.#_.insertionSteps.define((element: any) => {
       // 1. Create a new child navigable for element.
+      createNewChildNavigable(element);
 
       // 2. If element has a sandbox attribute, then parse the sandboxing directive given the attribute's value and element's iframe sandboxing flag set.
 
@@ -44,7 +55,7 @@ export class HTMLIFrameElement extends HTMLElement
   }
 
   get contentDocument(): Document | null {
-    throw new Error("contentDocument");
+    return contentDocument(this);
   }
 
   get contentWindow(): WindowProxy | null {
@@ -145,6 +156,10 @@ export class HTMLIFrameElement extends HTMLElement
   }
   getSVGDocument(): Document | null {
     throw new Error("getSVGDocument");
+  }
+
+  get #_() {
+    return DOM.$(this as HTMLIFrameElement);
   }
 }
 
@@ -248,4 +263,8 @@ export function iframeLoadEventSteps(element: Element) {
   fireEvent("load", element);
 
   // 7. Unset childDocument's iframe load in progress flag.
+}
+
+export class ContentNavigableInternals {
+  contentNavigable: Navigable | null = null;
 }
