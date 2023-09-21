@@ -5,7 +5,8 @@ import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $, internalSlots, tree } from "../internal.ts";
+import { internalSlots } from "./internal.ts";
+import { $, tree } from "../internal.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -51,7 +52,7 @@ type PartialDocument =
 
 interface IDocument_HTML extends Pick<Document, PartialDocument> {}
 
-export function Document_HTML<T extends Constructor<Node>>(
+export function Document_HTML<T extends Constructor<Document>>(
   Ctor: T,
 ) {
   @Document_Obsolete
@@ -64,45 +65,45 @@ export function Document_HTML<T extends Constructor<Node>>(
     constructor(...args: any) {
       super(...args);
 
-      const _ = Object.assign(internalSlots.get(this), new DocumentInternals());
-      internalSlots.set(this, _);
+      const internal = new DocumentInternals();
+      internalSlots.extends<Document>(this, internal);
     }
 
-    get location(): Location {
+    override get location(): Location {
       throw new Error("location#getter");
     }
-    set location(href: Location) {
+    override set location(href: Location) {
       throw new Error("location#setter");
     }
 
-    get domain(): string {
+    override get domain(): string {
       throw new Error("domain#getter");
     }
 
-    set domain(value: string) {
+    override set domain(value: string) {
       throw new Error("domain#setter");
     }
 
-    get referrer(): string {
+    override get referrer(): string {
       throw new Error("referrer");
     }
 
-    get cookie(): string {
+    override get cookie(): string {
       throw new Error("cookie#getter");
     }
 
-    set cookie(value: string) {
+    override set cookie(value: string) {
       throw new Error("cookie#setter");
     }
 
-    get lastModified(): string {
+    override get lastModified(): string {
       throw new Error("lastModified");
     }
 
     /**
      * @see https://momdo.github.io/html/dom.html#dom-document-readystate
      */
-    get readyState(): DocumentReadyState {
+    override get readyState(): DocumentReadyState {
       // to return this's current document readiness.
       return this._currentDocumentReadiness;
     }
@@ -110,7 +111,7 @@ export function Document_HTML<T extends Constructor<Node>>(
     /**
      * @see https://html.spec.whatwg.org/multipage/dom.html#document.title
      */
-    get title(): string {
+    override get title(): string {
       const documentElement = getDocumentElement(this);
 
       if (!documentElement) return "";
@@ -128,19 +129,19 @@ export function Document_HTML<T extends Constructor<Node>>(
       return stripAndCollapseASCIIWhitespace(value);
     }
 
-    set title(value: string) {
+    override set title(value: string) {
       throw new Error("title#setter");
     }
 
-    get dir(): string {
+    override get dir(): string {
       throw new Error("dir#getter");
     }
 
-    set dir(value: string) {
+    override set dir(value: string) {
       throw new Error("dir#setter");
     }
 
-    get body(): HTMLElement {
+    override get body(): HTMLElement {
       const children = tree.children(this);
       // The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element.
       const documentElement = iter(children).find(isElement);
@@ -156,7 +157,7 @@ export function Document_HTML<T extends Constructor<Node>>(
       return (bodyOrFrameSet ?? null) as any as HTMLElement;
     }
 
-    set body(value: HTMLElement) {
+    override set body(value: HTMLElement) {
       throw new Error("body#setter");
     }
 
@@ -164,7 +165,7 @@ export function Document_HTML<T extends Constructor<Node>>(
      * @see https://html.spec.whatwg.org/multipage/dom.html#dom-document-head
      * @note The specification also allows null to be returned.
      */
-    get head(): HTMLHeadElement {
+    override get head(): HTMLHeadElement {
       const children = tree.children(this);
       // return the head element of the document (a head element or null).
       const head =
@@ -175,44 +176,50 @@ export function Document_HTML<T extends Constructor<Node>>(
       return head as HTMLHeadElement;
     }
 
-    get images(): HTMLCollectionOf<HTMLImageElement> {
+    override get images(): HTMLCollectionOf<HTMLImageElement> {
       throw new Error("images");
     }
 
-    get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
+    override get embeds(): HTMLCollectionOf<HTMLEmbedElement> {
       throw new Error();
     }
 
-    get plugins(): HTMLCollectionOf<HTMLEmbedElement> {
+    override get plugins(): HTMLCollectionOf<HTMLEmbedElement> {
       throw new Error();
     }
 
-    get links(): HTMLCollectionOf<HTMLAnchorElement | HTMLAreaElement> {
+    override get links(): HTMLCollectionOf<
+      HTMLAnchorElement | HTMLAreaElement
+    > {
       throw new Error();
     }
 
-    get forms(): HTMLCollectionOf<HTMLFormElement> {
+    override get forms(): HTMLCollectionOf<HTMLFormElement> {
       throw new Error();
     }
 
-    get scripts(): HTMLCollectionOf<HTMLScriptElement> {
+    override get scripts(): HTMLCollectionOf<HTMLScriptElement> {
       throw new Error();
     }
 
-    getElementsByName(elementName: string): NodeListOf<HTMLElement> {
+    override getElementsByName(elementName: string): NodeListOf<HTMLElement> {
       throw new Error("getElementsByName");
     }
 
-    get currentScript(): HTMLOrSVGScriptElement | null {
+    override get currentScript(): HTMLOrSVGScriptElement | null {
       throw new Error("currentScript");
     }
 
-    open(
+    override open(
       unused1?: string | undefined,
       unused2?: string | undefined,
     ): globalThis.Document;
-    open(url: string | URL, name: string, features: string): Window | null;
-    open(
+    override open(
+      url: string | URL,
+      name: string,
+      features: string,
+    ): Window | null;
+    override open(
       url?: unknown,
       name?: unknown,
       features?: unknown,
@@ -220,22 +227,22 @@ export function Document_HTML<T extends Constructor<Node>>(
       throw new Error();
     }
 
-    close(): void {
+    override close(): void {
       throw new Error();
     }
 
-    write(...text: string[]): void {
+    override write(...text: string[]): void {
       throw new Error();
     }
 
-    writeln(...text: string[]): void {
+    override writeln(...text: string[]): void {
       throw new Error();
     }
 
     /**
      * @see https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-defaultview
      */
-    get defaultView(): (WindowProxy & typeof globalThis) | null {
+    override get defaultView(): (WindowProxy & typeof globalThis) | null {
       // TODO
       return globalThis as any;
       // 1. If this's browsing context is null, then return null.
@@ -243,19 +250,19 @@ export function Document_HTML<T extends Constructor<Node>>(
       // 2. Return this's browsing context's WindowProxy object.
     }
 
-    hasFocus(): boolean {
+    override hasFocus(): boolean {
       throw new Error("hasFocus");
     }
 
-    get designMode(): string {
+    override get designMode(): string {
       throw new Error("designMode#getter");
     }
 
-    set designMode(value: string) {
+    override set designMode(value: string) {
       throw new Error("designMode#setter");
     }
 
-    execCommand(
+    override execCommand(
       commandId: string,
       showUI?: boolean | undefined,
       value?: string | undefined,
@@ -263,37 +270,39 @@ export function Document_HTML<T extends Constructor<Node>>(
       throw new Error("execCommand");
     }
 
-    queryCommandEnabled(commandId: string): boolean {
+    override queryCommandEnabled(commandId: string): boolean {
       throw new Error();
     }
 
-    queryCommandIndeterm(commandId: string): boolean {
+    override queryCommandIndeterm(commandId: string): boolean {
       throw new Error();
     }
 
-    queryCommandState(commandId: string): boolean {
+    override queryCommandState(commandId: string): boolean {
       throw new Error();
     }
 
-    queryCommandSupported(commandId: string): boolean {
+    override queryCommandSupported(commandId: string): boolean {
       throw new Error();
     }
 
-    queryCommandValue(commandId: string): string {
+    override queryCommandValue(commandId: string): string {
       throw new Error();
     }
 
-    get hidden(): boolean {
+    override get hidden(): boolean {
       throw new Error();
     }
 
-    get visibilityState(): DocumentVisibilityState {
+    override get visibilityState(): DocumentVisibilityState {
       throw new Error();
     }
 
-    onreadystatechange: ((this: Document, ev: Event) => any) | null = null;
+    override onreadystatechange: ((this: Document, ev: Event) => any) | null =
+      null;
 
-    onvisibilitychange: ((this: Document, ev: Event) => any) | null = null;
+    override onvisibilitychange: ((this: Document, ev: Event) => any) | null =
+      null;
   }
 
   return Mixin;
