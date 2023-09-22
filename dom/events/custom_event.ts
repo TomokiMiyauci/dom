@@ -16,20 +16,20 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     super(type, eventInitDict);
     const { detail = null } = eventInitDict;
 
-    this.#detail = detail;
+    this.#detail = detail as T;
   }
 
-  #detail: T | null;
+  #detail: T;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-customevent-detail)
    */
-  get detail(): T | null {
+  get detail(): T {
     // return the value it was initialized to.
     return this.#detail;
   }
 
-  private set detail(value: T | null) {
+  private set detail(value: T) {
     this.#detail = value;
   }
 
@@ -40,7 +40,7 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     type: string,
     bubbles = false,
     cancelable = false,
-    detail?: T,
+    detail: T = null as T,
   ): void {
     // 1. If this’s dispatch flag is set, then return.
     if ($<CustomEvent>(this).dispatch) return;
@@ -49,6 +49,6 @@ export class CustomEvent<T = any> extends Event implements ICustomEvent {
     initialize(this, type, bubbles, cancelable);
 
     // 3. Set this’s detail attribute to detail.
-    this.detail = detail ?? null;
+    this.detail = detail;
   }
 }
