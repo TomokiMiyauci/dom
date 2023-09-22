@@ -3,7 +3,7 @@ import {
   join,
   toFileUrl,
 } from "https://deno.land/std@0.190.0/path/mod.ts";
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import * as denoDom from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 import { insert } from "https://deno.land/x/upsert@1.2.0/mod.ts";
 import * as DOM from "../mod.ts";
 import { Statuses, TestReport, Tests, TestsStatus } from "./types.ts";
@@ -15,7 +15,7 @@ for (const item of Object.keys(DOM)) {
   });
 }
 
-const parser = new DOMParser();
+const parser = new denoDom.DOMParser();
 
 export async function extractMetadata(
   path: URL,
