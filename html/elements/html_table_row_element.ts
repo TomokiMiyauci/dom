@@ -1,5 +1,8 @@
 import type { IHTMLTableRowElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
+import { SameObject } from "../../webidl/extended_attribute.ts";
+import { tree } from "../../internal.ts";
 
 export class HTMLTableRowElement extends HTMLElement
   implements IHTMLTableRowElement {
@@ -17,8 +20,14 @@ export class HTMLTableRowElement extends HTMLElement
     throw new Error("bgColor#setter");
   }
 
+  @SameObject
   get cells(): HTMLCollectionOf<HTMLTableCellElement> {
-    throw new Error("cells#getter");
+    return new HTMLCollection({
+      root: this,
+      filter: (element) => {
+        return (isTd(element) || isTh(element)) && tree.isChild(element, this);
+      },
+    }) as any as HTMLCollectionOf<HTMLTableCellElement>;
   }
 
   get ch(): string {
@@ -57,4 +66,12 @@ export class HTMLTableRowElement extends HTMLElement
   insertCell(index?: number): HTMLTableCellElement {
     throw new Error("insertCell");
   }
+}
+
+function isTd(element: Element): boolean {
+  return element.tagName.toLowerCase() === "td";
+}
+
+function isTh(element: Element): boolean {
+  return element.tagName.toLowerCase() === "th";
 }

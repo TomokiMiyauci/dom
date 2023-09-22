@@ -22,6 +22,8 @@ export function parseHTMLFragment(
   context: Element,
   input: string,
 ): List<Node> {
+  console.warn("parseHTMLFragment is not standard behavior");
+
   // 1. Create a new Document node, and mark it as being an HTML document.
   const document = new Document();
   $(document).type = "html";
@@ -74,5 +76,8 @@ export function parseHTMLFragment(
   // 13. Start the parser and let it run until it has consumed all the characters just inserted into the input stream.
 
   // 14. Return the child nodes of root, in tree order.
-  throw new Error("parseHTMLFragment");
+
+  const text = document.createTextNode(input);
+
+  return new List([text]);
 }

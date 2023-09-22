@@ -1,5 +1,8 @@
 import type { IHTMLTableElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
+import { tree } from "../../internal.ts";
+import { SameObject } from "../../webidl/extended_attribute.ts";
 
 export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
   get align(): string {
@@ -69,8 +72,15 @@ export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
     throw new Error("summary#setter");
   }
 
+  @SameObject
   get tBodies(): HTMLCollectionOf<HTMLTableSectionElement> {
-    throw new Error("tBodies#getter");
+    // return an HTMLCollection rooted at the table node, whose filter matches only tbody elements that are children of the table element.
+    return new HTMLCollection({
+      root: this,
+      filter: (element) => {
+        return isTBody(element) && tree.isChild(element, this);
+      },
+    }) as any as HTMLCollectionOf<HTMLTableSectionElement>;
   }
 
   get tFoot(): HTMLTableSectionElement | null {
@@ -129,4 +139,8 @@ export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
   insertRow(index?: number): HTMLTableRowElement {
     throw new Error("insertRow");
   }
+}
+
+function isTBody(element: Element): boolean {
+  return element.tagName.toLowerCase() === "tbody";
 }

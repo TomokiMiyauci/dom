@@ -1,5 +1,8 @@
 import type { IHTMLTableSectionElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
+import { tree } from "../../internal.ts";
+import { SameObject } from "../../webidl/extended_attribute.ts";
 
 export class HTMLTableSectionElement extends HTMLElement
   implements IHTMLTableSectionElement {
@@ -24,8 +27,14 @@ export class HTMLTableSectionElement extends HTMLElement
     throw new Error("chOff#setter");
   }
 
+  @SameObject
   get rows(): HTMLCollectionOf<HTMLTableRowElement> {
-    throw new Error("rows#getter");
+    return new HTMLCollection({
+      root: this,
+      filter: (element) => {
+        return isTr(element) && tree.isChild(element, this);
+      },
+    }) as any as HTMLCollectionOf<HTMLTableRowElement>;
   }
 
   get vAlign(): string {
@@ -42,4 +51,8 @@ export class HTMLTableSectionElement extends HTMLElement
   insertRow(index?: number): HTMLTableRowElement {
     throw new Error("insertRow");
   }
+}
+
+function isTr(element: Element): boolean {
+  return element.tagName.toLowerCase() === "tr";
 }
