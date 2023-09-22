@@ -7,8 +7,9 @@ import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes
 import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
 import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
-import { includes } from "../../utils.ts";
 
+@NonDocumentTypeChildNode
+@ChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
   constructor(data: string, document: Document) {
     super(document);
@@ -144,11 +145,6 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return internalSlots.get<CharacterData>(this);
   }
 }
-
-/** https://dom.spec.whatwg.org/#nondocumenttypechildnode */
-includes(CharacterData, NonDocumentTypeChildNode());
-/** https://dom.spec.whatwg.org/#interface-childnode */
-includes(CharacterData, ChildNode());
 
 export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
 

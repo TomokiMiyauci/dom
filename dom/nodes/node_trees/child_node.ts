@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-empty-interface
 import type { IChildNode } from "../../../interface.d.ts";
-import { find, isObject } from "../../../deps.ts";
+import { Constructor, find, isObject } from "../../../deps.ts";
 import {
   preInsertNode,
   removeNode,
@@ -10,8 +10,8 @@ import { convertNodesToNode } from "../node_trees/parent_node.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
 import { $, tree } from "../../../internal.ts";
 
-export function ChildNode() {
-  class ChildNode implements IChildNode {
+export function ChildNode<T extends Constructor<Node>>(Ctor: T) {
+  abstract class ChildNode extends Ctor implements IChildNode {
     /**
      * @see https://dom.spec.whatwg.org/#dom-childnode-after
      */
@@ -107,8 +107,6 @@ export function ChildNode() {
       return $<ChildNode>(this);
     }
   }
-
-  interface ChildNode extends Node {}
 
   return ChildNode;
 }

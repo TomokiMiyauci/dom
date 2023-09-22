@@ -6,10 +6,11 @@ import type { IText } from "../../interface.d.ts";
 import { iter } from "../../deps.ts";
 import { concatString } from "../../infra/string.ts";
 import { $, tree } from "../../internal.ts";
-import { Get, includes } from "../../utils.ts";
+import { Get } from "../../utils.ts";
 import { splitText } from "./utils/split_text.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Slottable
 @Exposed(Window)
 export class Text extends CharacterData implements IText {
   /**
@@ -59,9 +60,6 @@ export class Text extends CharacterData implements IText {
     return splitText(this, offset);
   }
 }
-
-/** https://dom.spec.whatwg.org/#slotable */
-includes(Text, Slottable());
 
 // deno-lint-ignore no-empty-interface
 export interface Text extends Slottable {}

@@ -59,7 +59,6 @@ import {
 } from "./element_utils.ts";
 import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
 import { replaceAllString } from "../utils/replace_all_string.ts";
-import { includes } from "../../../utils.ts";
 
 export interface ElementInits {
   namespace: string | null;
@@ -74,6 +73,9 @@ export interface ElementInits {
 @Animatable
 @InnerHTML
 @ParentNode
+@NonDocumentTypeChildNode
+@ChildNode
+@Slottable
 @Element_CSSOMView
 @Element_CSSTypedOM
 @Element_DomParsing
@@ -741,13 +743,6 @@ export class Element extends Node implements IElement {
     return qualifiedName;
   }
 }
-
-/** https://dom.spec.whatwg.org/#nondocumenttypechildnode */
-includes(Element, NonDocumentTypeChildNode());
-/** https://dom.spec.whatwg.org/#childnode */
-includes(Element, ChildNode());
-/** https://dom.spec.whatwg.org/#slotable */
-includes(Element, Slottable());
 
 export interface Element
   extends
