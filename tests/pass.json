@@ -2376,6 +2376,535 @@
         "name": "invalid object argument insertAdjacentElement",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/Document-createElement-namespace.html": [
+      {
+        "name": "Created element's namespace in created XML document by DOMParser ('text/xml')",
+        "reason": "DOMParser is not supported that content-type"
+      },
+      {
+        "name": "Created element's namespace in created XML document by DOMParser ('application/xml')",
+        "reason": "DOMParser is not supported that content-type"
+      },
+      {
+        "name": "Created element's namespace in created XHTML document by DOMParser ('application/xhtml+xml')",
+        "reason": "DOMParser is not supported that content-type"
+      },
+      {
+        "name": "Created element's namespace in created SVG document by DOMParser ('image/svg+xml')",
+        "reason": "DOMParser is not supported that content-type"
+      },
+      {
+        "name": "Created element's namespace in empty.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in empty.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in empty.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in minimal_html.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in minimal_html.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in minimal_html.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml.svg",
+        "reason": "iframe loading is not supported"
+      },
+
+      {
+        "name": "Created element's namespace in svg.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in svg.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in svg.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in mathml.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in mathml.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in mathml.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_xhtml.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_xhtml.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_xhtml.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_svg.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_svg.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_svg.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_mathml.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_mathml.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in bare_mathml.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_removed.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_removed.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_removed.svg",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_changed.xhtml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_changed.xml",
+        "reason": "iframe loading is not supported"
+      },
+      {
+        "name": "Created element's namespace in xhtml_ns_changed.svg",
+        "reason": "iframe loading is not supported"
+      }
+    ],
+    "dom/nodes/DOMImplementation-createDocument.html": [
+      {
+        "name": "createDocument test: metadata for null,null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,undefined,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"ெfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: undefined,undefined,null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,undefined,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"f:oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"a:_\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"a:ெ\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"ெ:a\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"a:aெ\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"aெ:a\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"test:xmlns\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"_:_\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"_:h0\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"_:test\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"l_:_\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"ns:_0\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"ns:a0\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"ns0:test\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"a.b:c\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"a-b:c\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"XMLNS\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"XML:foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"XMLNS:foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"xmlfoo:bar\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"f:oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"xmlfoo:bar\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"f:oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"xml:foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"xmlfoo:bar\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/2000/xmlns/\",\"xmlns\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/2000/xmlns/\",\"xmlns:foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"foo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"f1oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"foo1\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"f:oo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"xml\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"xmlfoo\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"xmlfoo:bar\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,null,undefined",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: undefined,undefined,undefined,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,undefined,undefined",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for undefined,\"\",undefined",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://example.com/\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"/\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/XML/1998/namespace\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/2000/xmlns/\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/2000/xmlns/\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",null,null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo:\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,null,DocumentType node <!DOCTYPE foo>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,null,DocumentType node <!DOCTYPE html>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,null,DocumentType node <!DOCTYPE bar>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,null,DocumentType node <!DOCTYPE baz>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,null,DocumentType node <!DOCTYPE quz>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"foo\",DocumentType node <!DOCTYPE foo>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo\",null,DocumentType node <!DOCTYPE foo>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo\",null,DocumentType node <!DOCTYPE foo>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"foo\",\"bar\",DocumentType node <!DOCTYPE foo>",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/2000/svg\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/1999/xhtml\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for \"http://www.w3.org/1998/Math/MathML\",\"\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"html\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"svg\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument test: metadata for null,\"math\",null",
+        "reason": "location is not supported"
+      },
+      {
+        "name": "createDocument with missing arguments",
+        "reason": "compiler error"
+      }
     ]
   }
 }

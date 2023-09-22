@@ -43,7 +43,9 @@ export class DOMImplementation implements IDOMImplementation {
     doctype: globalThis.DocumentType | null = null,
   ): globalThis.XMLDocument {
     // LegacyNullToEmptyString
-    qualifiedName ??= "";
+    // TODO
+    if (qualifiedName === null) qualifiedName = "";
+    qualifiedName = String(qualifiedName);
 
     // 1. Let document be a new XMLDocument.
     const document = new XMLDocument() as globalThis.XMLDocument;
