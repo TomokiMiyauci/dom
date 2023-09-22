@@ -126,3 +126,17 @@ export type ICustomEvent = CustomEvent;
 export type IEventTarget = EventTarget;
 export type IAbortController = AbortController;
 export type IAbortSignal = AbortSignal;
+export type ISelection = Selection;
+export type IWindow = Omit<
+  Window,
+  | keyof WindowOrWorkerGlobalScope
+  | keyof AnimationFrameProvider
+  | keyof GlobalEventHandlers
+  | keyof WindowEventHandlers
+  | "Deno"
+  | "Navigator"
+  | "Location"
+  | "localStorage"
+  | "sessionStorage"
+  | "add_completion_callback"
+>;
