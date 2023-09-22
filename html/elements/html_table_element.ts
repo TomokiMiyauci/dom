@@ -3,6 +3,9 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
 import { tree } from "../../internal.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";
+import { DOMExceptionName } from "../../webidl/exception.ts";
+import { removeNode } from "../../dom/nodes/node_trees/mutation.ts";
+import { isElement } from "../../dom/nodes/utils.ts";
 
 export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
   get align(): string {
@@ -55,7 +58,19 @@ export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
   }
 
   get rows(): HTMLCollectionOf<HTMLTableRowElement> {
-    throw new Error("rows#getter");
+    return new HTMLCollection({
+      root: this,
+      filter: (element) => {
+        if (!isTr(element)) return false;
+        if (tree.isChild(element, this)) return true;
+
+        const parent = tree.parent(element);
+
+        if (!parent || !isElement(parent)) return false;
+
+        return isTHead(parent) || isTBody(parent) || isTFoot(parent);
+      },
+    }) as any as HTMLCollectionOf<HTMLTableRowElement>;
   }
 
   get rules(): string {
@@ -124,8 +139,31 @@ export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
     throw new Error("deleteCaption");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow)
+   */
   deleteRow(index: number): void {
-    throw new Error("deleteRow");
+    const rows = this.rows;
+    const length = rows.length;
+    // 1. If index is less than −1 or greater than or equal to the number of elements in the rows collection,
+    if (index < -1 || index >= length) {
+      // then throw an "IndexSizeError" DOMException.
+      throw new DOMException("<message>", DOMExceptionName.IndexSizeError);
+    }
+
+    // 2. If index is −1,
+    if (index === -1) {
+      // then remove the last element in the rows collection from its parent, or do nothing if the rows collection is empty.
+      const lastElement = rows[length];
+      if (!rows.length || !lastElement) return;
+
+      removeNode(lastElement);
+    } // 3. Otherwise,
+    else {
+      // remove the indexth element in the rows collection from its parent.
+      const node = rows[index];
+      if (node) removeNode(node);
+    }
   }
 
   deleteTFoot(): void {
@@ -143,4 +181,16 @@ export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
 
 function isTBody(element: Element): boolean {
   return element.tagName.toLowerCase() === "tbody";
+}
+
+function isTHead(element: Element): boolean {
+  return element.tagName.toLowerCase() === "thead";
+}
+
+function isTFoot(element: Element): boolean {
+  return element.tagName.toLowerCase() === "tfoot";
+}
+
+function isTr(element: Element): boolean {
+  return element.tagName.toLowerCase() === "tr";
 }
