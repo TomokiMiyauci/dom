@@ -7,13 +7,20 @@ import { fireEvent } from "../../dom/events/fire.ts";
 import { reflectSet } from "../../dom/nodes/utils/set_attribute_value.ts";
 
 import * as DOM from "../../internal.ts";
-import { internalSlots } from "../internal.ts";
+import { $, internalSlots } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 import {
+  activeDocument,
   contentDocument,
-  Navigable,
-} from "../loading_web_pages/infrastructure_for_sequences_of_documents.ts";
-import { createNewChildNavigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents.ts";
+  createNewChildNavigable,
+} from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
+import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
+import { willLoadElementSteps } from "../infra/fetching_resource.ts";
+import {
+  navigate,
+  NavigationHistoryBehavior,
+} from "../loading_web_pages/navigation_and_session_history.ts";
+import { completelyLoaded } from "../loading_web_pages/document_lifecycle.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
@@ -171,33 +178,7 @@ export function processIframeAttributes(
   initialInsertion = false,
 ) {
   // 1. If element's srcdoc attribute is specified, then:
-  if (element.hasAttribute("srcdoc")) {}
-  // 2. Otherwise:
-  else {
-    // 1. Let url be the result of running the shared attribute processing steps for iframe and frame elements given element and initialInsertion.
-    const url = sharedAttributeProcessingSteps(
-      element,
-      initialInsertion,
-    );
-
-    // 2. If url is null, then return.
-    if (!url) return;
-
-    // 3. If url matches about:blank and initialInsertion is true, then:
-    if (matchAboutBlank(url) && initialInsertion) {
-      // 1. Run the iframe load event steps given element.
-      iframeLoadEventSteps(element);
-
-      // 2. Return.
-      return;
-    }
-
-    // 4. Let referrerPolicy be the current state of element's referrerpolicy content attribute.
-
-    // 5. Set element's current navigation was lazy loaded boolean to false.
-
-    // 6. If the will lazy load element steps given element return true, then:
-
+  if (element.hasAttribute("srcdoc")) {
     // 1. Set element's lazy load resumption steps to the rest of this algorithm starting with the step labeled navigate.
 
     // 2. Set element's current navigation was lazy loaded boolean to true.
@@ -205,9 +186,49 @@ export function processIframeAttributes(
     // 3. Start intersection-observing a lazy loading element for element.
 
     // 4. Return.
-
-    // 7. Navigate: navigate an iframe or frame given element, url, and referrerPolicy.
+    return;
   }
+
+  // 2. Otherwise:
+  // 1. Let url be the result of running the shared attribute processing steps for iframe and frame elements given element and initialInsertion.
+  const url = sharedAttributeProcessingSteps(
+    element,
+    initialInsertion,
+  );
+
+  // 2. If url is null, then return.
+  if (!url) return;
+
+  // 3. If url matches about:blank and initialInsertion is true, then:
+  if (matchAboutBlank(url) && initialInsertion) {
+    // 1. Run the iframe load event steps given element.
+    iframeLoadEventSteps(element);
+
+    // 2. Return.
+    return;
+  }
+
+  // 4. Let referrerPolicy be the current state of element's referrerpolicy content attribute.
+  const referrerPolicy: ReferrerPolicy =
+    element.getAttribute("referrerpolicy") as ReferrerPolicy ?? "";
+
+  // 5. Set element's current navigation was lazy loaded boolean to false.
+  $(element).currentNavigationWasLazyLoaded = false;
+
+  // 6. If the will lazy load element steps given element return true, then:
+  if (willLoadElementSteps(element)) {
+    // 1. Set element's lazy load resumption steps to the rest of this algorithm starting with the step labeled navigate.
+
+    // 2. Set element's current navigation was lazy loaded boolean to true.
+
+    // 3. Start intersection-observing a lazy loading element for element.
+
+    // 4. Return.
+    return;
+  }
+
+  // 7. Navigate: navigate an iframe or frame given element, url, and referrerPolicy.
+  navigateIframeOrFrame(element, url, referrerPolicy);
 }
 
 /**
@@ -235,6 +256,48 @@ export function sharedAttributeProcessingSteps(
 
   // 5. Return url.
   return url;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#navigate-an-iframe-or-frame)
+ */
+export function navigateIframeOrFrame(
+  element: Element,
+  url: URL,
+  referrerPolicy: ReferrerPolicy,
+  srcdocString: string | null = null,
+) {
+  // 1. Let historyHandling be "auto".
+  let historyHandling = NavigationHistoryBehavior.Auto;
+
+  const { contentNavigable } = $(element);
+  // 2. If element's content navigable's active document is not completely loaded, then set historyHandling to "replace".
+  if (contentNavigable) {
+    const contentNavigableActiveDocument = activeDocument(contentNavigable);
+    if (
+      contentNavigableActiveDocument &&
+      completelyLoaded(contentNavigableActiveDocument)
+    ) historyHandling = NavigationHistoryBehavior.Replace;
+  }
+
+  // 3. If element is an iframe, then set element's pending resource-timing start time to the current high resolution time given element's node document's relevant global object.
+  if (isIframe(element)) {
+  }
+
+  // 4. Navigate element's content navigable to url using element's node document, with historyHandling set to historyHandling, referrerPolicy set to referrerPolicy, and documentResource set to scrdocString.
+  contentNavigable && navigate(
+    contentNavigable,
+    url,
+    DOM.$(element).nodeDocument,
+    undefined,
+    srcdocString,
+    undefined,
+    undefined,
+    historyHandling,
+    undefined,
+    undefined,
+    referrerPolicy,
+  );
 }
 
 /**
@@ -267,4 +330,18 @@ export function iframeLoadEventSteps(element: Element) {
 
 export class ContentNavigableInternals {
   contentNavigable: Navigable | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#current-navigation-was-lazy-loaded)
+   */
+  currentNavigationWasLazyLoaded = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#iframe-pending-resource-timing-start-time)
+   */
+  pendingResourceTimingStartTime = null;
+}
+
+export function isIframe(element: Element): element is HTMLIFrameElement {
+  return element.localName.toLowerCase() === "iframe";
 }
