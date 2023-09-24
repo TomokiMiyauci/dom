@@ -297,7 +297,7 @@
   "dom/nodes/getElementsByClassName-empty-set.html",
   "dom/nodes/getElementsByClassName-whitespace-class-names.html",
   "dom/nodes/getElementsByClassNameFrame.htm",
-  // "dom/nodes/insert-adjacent.html",
+  "dom/nodes/insert-adjacent.html",
   "dom/nodes/MutationObserver-attributes.html",
   "dom/nodes/MutationObserver-callback-arguments.html",
   // "dom/nodes/MutationObserver-characterData.html",
