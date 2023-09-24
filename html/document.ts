@@ -7,6 +7,11 @@ import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { internalSlots } from "./internal.ts";
 import { $, tree } from "../internal.ts";
+import { type BrowsingContext } from "./loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
+import {
+  CrossOriginOpenerPolicy,
+  PolicyContainer,
+} from "./loading_web_pages/supporting_concepts.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -312,9 +317,60 @@ export interface Document_HTML extends IDocument_HTML, Document_Obsolete {}
 
 export class DocumentInternals {
   /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-policy-container)
+   */
+  policyContainer: PolicyContainer = new PolicyContainer();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-permissions-policy)
+   */
+  permissionsPolicy: unknown;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-coop)
+   */
+  crossOriginOpenerPolicy: CrossOriginOpenerPolicy =
+    new CrossOriginOpenerPolicy();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#is-initial-about:blank)
+   */
+  isInitialAboutBlank = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-navigation-id)
+   */
+  duringLoadingNavigationIDForWebDriverBiDi: string | null = null;
+
+  /**
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#concept-document-about-base-url)
    */
   aboutBaseURL: URL | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#completely-loaded-time)
+   */
+  completelyLoadedTime: unknown | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#concept-document-bc)
+   */
+  browsingContext: BrowsingContext | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#iframe-load-in-progress)
+   */
+  iframeLoadInProgress = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#mute-iframe-load)
+   */
+  muteIframeLoad = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#concept-document-salvageable)
+   */
+  salvageable = true;
 }
 
 /**

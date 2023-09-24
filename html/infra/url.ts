@@ -59,3 +59,18 @@ export function matchAboutBlank(url: URL): boolean {
   return url.protocol === "about:" && url.pathname === "blank" &&
     url.username === "" && url.password === "" && url.host === "";
 }
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#encoding-parsing-a-url)
+ */
+export function encodingParseURL(
+  url: string,
+  environment: Document,
+): URL | false {
+  // 4. Let baseURL be environment's base URL, if environment is a Document object; otherwise environment's API base URL.
+  // TODO
+  const baseURL = documentBaseURL(environment);
+
+  // 5. Return the result of applying the URL parser to url, with baseURL and encoding.
+  return new URL(url, baseURL);
+}

@@ -11,9 +11,12 @@ import {
 import {
   activeBrowsingContext,
   activeDocument,
+  activeWindow,
   container,
   containerDocument,
   Navigable,
+  TraversableNavigable,
+  traversableNavigable,
 } from "./infrastructure_for_sequences_of_documents/navigable.ts";
 import { StructuredSerializeForStorage } from "../infra/safe_passing_of_structured_data.ts";
 import * as DOM from "../../internal.ts";
@@ -24,12 +27,16 @@ import {
   loadHTMLDocument,
 } from "./document_lifecycle.ts";
 import { $ } from "../internal.ts";
-import { determineOrigin } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
+import {
+  determineOrigin,
+} from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
 import {
   isFetchScheme,
   isHTTPScheme,
   locationURL as getLocationURL,
 } from "../../fetch/infrastructure.ts";
+import { queueGlobalTask } from "../web_application_apis/scripting.ts";
+import { OrderedSet } from "../../infra/data_structures/set.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#session-history-entry)
@@ -147,6 +154,49 @@ export class NestedHistory {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#nested-history-entries)
    */
   entries: List<SessionHistoryEntry> = new List();
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#session-history-traversal-parallel-queue)
+ */
+export interface SessionHistoryTraversalParallelQueue {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#session-history-traversal-parallel-queue-algorithm-set)
+   */
+  algorithmSet: OrderedSet<unknown>;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#tn-append-session-history-traversal-steps)
+ */
+export function appendSessionHistoryTraversalSteps(
+  traversable: TraversableNavigable,
+  steps: Function,
+): void {
+  // append steps to traversable's session history traversal queue's algorithm set.
+  traversable.sessionHistoryTraversalQueue.algorithmSet.append(steps);
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#starting-a-new-session-history-traversal-parallel-queue)
+ */
+export function startNewSessionHistoryTraversalParallelQueue(): SessionHistoryTraversalParallelQueue {
+  // 1. Let sessionHistoryTraversalQueue be a new session history traversal parallel queue.
+  const sessionHistoryTraversalQueue: SessionHistoryTraversalParallelQueue = {
+    algorithmSet: new OrderedSet(),
+  };
+
+  // 2. Run the following steps in parallel:
+
+  // 1. While true:
+  // 1. If sessionHistoryTraversalQueue's algorithm set is empty, then continue.
+
+  // 2. Let steps be the result of dequeuing from sessionHistoryTraversalQueue's algorithm set.
+
+  // 3. Run steps.
+
+  // 3. Return sessionHistoryTraversalQueue.
+  return sessionHistoryTraversalQueue;
 }
 
 export function getSessionHistoryEntryDocument(
@@ -509,10 +559,68 @@ export function navigate(
     navigationParams,
     cspNavigationType,
     true,
-    [],
+    () => {
+      // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
+      appendSessionHistoryTraversalSteps(
+        traversableNavigable(navigable),
+        () =>
+          finalizeCrossDocumentNavigation(
+            navigable,
+            historyHandling,
+            historyEntry,
+          ),
+      );
+    },
   );
+}
 
-  // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
+export function finalizeCrossDocumentNavigation(
+  navigable: Navigable,
+  historyHandling: NavigationHistoryBehavior,
+  historyEntry: SessionHistoryEntry,
+): void {
+  // 1. Assert: this is running on navigable's traversable navigable's session history traversal queue.
+
+  // 2. Set navigable's is delaying load events to false.
+
+  // 3. If historyEntry's document is null, then return.
+
+  // 4. If all of the following are true:
+  // - navigable's parent is null;
+  // - historyEntry's document's browsing context is not an auxiliary browsing context whose opener browsing context is non-null; and
+  // - historyEntry's document's origin is not navigable's active document's origin,
+
+  // then set historyEntry's document state's navigable target name to the empty string.
+
+  // 5. Let entryToReplace be navigable's active session history entry if historyHandling is "replace", otherwise null.
+
+  // 6. Let traversable be navigable's traversable navigable.
+
+  // 7. Let targetStep be null.
+
+  // 8. Let targetEntries be the result of getting session history entries for navigable.
+
+  // 9. If entryToReplace is null, then:
+
+  // 1. Clear the forward session history of traversable.
+
+  // 2. Set targetStep to traversable's current session history step + 1.
+
+  // 3. Set historyEntry's step to targetStep.
+
+  // 4. Append historyEntry to targetEntries.
+
+  // Otherwise:
+
+  // 1. Replace entryToReplace with historyEntry in targetEntries.
+
+  // 2. Set historyEntry's step to entryToReplace's step.
+
+  // 3. If historyEntry's document state's origin is same origin with entryToReplace's document state's origin, then set historyEntry's navigation API key to entryToReplace's navigation API key.
+
+  // 4. Set targetStep to traversable's current session history step.
+
+  // 10. Apply the push/replace history step targetStep to traversable.
 }
 
 /**
@@ -607,7 +715,7 @@ export function attemptToCreateNonFetchSchemeDocument(
 }
 
 /**
- * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#populating-a-session-history-entry)
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#attempt-to-populate-the-history-entry's-document)
  */
 export function attemptPopulateHistoryEntryDocument(
   entry: SessionHistoryEntry,
@@ -620,7 +728,7 @@ export function attemptPopulateHistoryEntryDocument(
     null,
   cspNavigationType = "other",
   allowPOST = false,
-  completionSteps = [],
+  completionSteps: Function = () => {},
 ): void {
   // 1. Assert: this is running in parallel.
 
@@ -686,108 +794,129 @@ export function attemptPopulateHistoryEntryDocument(
     }
   }
 
+  const navigableActiveWindow = activeWindow(navigable);
+  // TODO
+  if (!navigableActiveWindow) return;
   // 6. Queue a global task on the navigation and traversal task source, given navigable's active window, to run these steps:
-
-  // 1. If navigable's ongoing navigation no longer equals navigationId, then run completionSteps and return.
-
-  // 2. Let failure be false.
-  let failure = false;
-
-  // 3. If navigationParams is a non-fetch scheme navigation params,
-  if (navigationParams && "URL" in navigationParams) {
-    // then set entry's document state's document to the result of running attempt to create a non-fetch scheme document given navigationParams.
-    entry.documentState.document = attemptToCreateNonFetchSchemeDocument(
-      navigationParams,
-    );
-    // 4. Otherwise, if navigationParams is null, then set failure to true.
-  } else if (navigationParams === null) failure = true;
-
-  // 5. Otherwise, if the result of should navigation response to navigation request of type in target be blocked by Content Security Policy? given navigationParams's request, navigationParams's response, navigationParams's policy container's CSP list, cspNavigationType, and navigable is "Blocked", then set failure to true. [CSP]
-
-  // 6. Otherwise, if navigationParams's reserved environment is non-null and the result of checking a navigation response's adherence to its embedder policy given navigationParams's response, navigable, and navigationParams's policy container's embedder policy is false, then set failure to true.
-
-  // 7. Otherwise, if the result of checking a navigation response's adherence to `X-Frame-Options` given navigationParams's response, navigable, navigationParams's policy container's CSP list, and navigationParams's origin is false, then set failure to true.
-
-  // 8. If failure is true, then:
-  if (failure) {
-    // 1. Set entry's document state's document to the result of creating a document for inline content that doesn't have a DOM, given navigable, null, and navTimingType. The inline content should indicate to the user the sort of error that occurred.
-
-    // 2. Set entry's document state's document's salvageable to false.
-
-    // 3. If navigationParams is not null, then:
-    if (navigationParams) {
-      // 1. Run the environment discarding steps for navigationParams's reserved environment.
-
-      // 2. Invoke WebDriver BiDi navigation failed with currentBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "canceled", and url is navigationParams's response's URL.
-    }
-
-    // 9. Otherwise, if navigationParams's response's status is 204 or 205, then:
-  } else if (
-    navigationParams &&
-    "response" in navigationParams &&
-    new Set<number>([204, 205]).has(navigationParams.response.status)
-  ) {
-    // 1. Run completionSteps.
-
-    // 2. Return.
-    return;
-    // 10. Otherwise, if navigationParams's response has a `Content-Disposition` header specifying the attachment disposition type, then:
-  } else if (
-    navigationParams &&
-    "response" in navigationParams &&
-    navigationParams.response.headers.has("Content-Disposition")
-  ) {
-    // 1. Let sourceAllowsDownloading be sourceSnapshotParams's allows downloading.
-    const sourceAllowsDownloading = sourceSnapshotParams.allowsDownloading;
-
-    // 2. Let targetAllowsDownloading be false if navigationParams's final sandboxing flag set has the sandboxed downloads browsing context flag set; otherwise true.
-
-    // 3. Let uaAllowsDownloading be true.
-
-    // 4. Optionally, the user agent may set uaAllowsDownloading to false, if it believes doing so would safeguard the user from a potentially hostile download.
-
-    // 5. If sourceAllowsDownloading, targetAllowsDownloading, and uaAllowsDownloading are true, then:
-
-    // 1. Handle navigationParams's response as a download.
-
-    // 2. Invoke WebDriver BiDi download started with currentBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "complete", and url is navigationParams's response's URL.
-
-    // 6. Run completionSteps.
-
-    // 7. Return.
-    return;
-  } else {
-    // 11. Otherwise:
-
-    // 1. Let document be the result of loading a document given navigationParams, sourceSnapshotParams, and entry's document state's initiator origin.
-    const document = loadDocument(
-      navigationParams as any,
-      sourceSnapshotParams,
-      entry.documentState.initiatorOrigin!,
-    );
-
-    // 2. If document is null,
-    if (!document) {
+  queueGlobalTask({}, navigableActiveWindow, () => {
+    // 1. If navigable's ongoing navigation no longer equals navigationId,
+    if (navigable.ongoingNavigation !== navigationId) {
       // then run completionSteps and return.
-      // TODO
+      completionSteps();
       return;
     }
 
-    // 3. Set entry's document state's document to document.
-    entry.documentState.document = document;
+    // 2. Let failure be false.
+    let failure = false;
 
-    // 4. Set entry's document state's origin to document's origin.
-    entry.documentState.origin = DOM.$(document).origin;
+    // 3. If navigationParams is a non-fetch scheme navigation params,
+    if (navigationParams && "URL" in navigationParams) {
+      // then set entry's document state's document to the result of running attempt to create a non-fetch scheme document given navigationParams.
+      entry.documentState.document = attemptToCreateNonFetchSchemeDocument(
+        navigationParams,
+      );
+      // 4. Otherwise, if navigationParams is null, then set failure to true.
+    } else if (navigationParams === null) failure = true;
 
-    // 5. If document's URL requires storing the policy container in history, then set entry's document state's history policy container to navigationParams's policy container.
-  }
+    // 5. Otherwise, if the result of should navigation response to navigation request of type in target be blocked by Content Security Policy? given navigationParams's request, navigationParams's response, navigationParams's policy container's CSP list, cspNavigationType, and navigable is "Blocked", then set failure to true. [CSP]
 
-  // 12. If entry's document state's request referrer is "client", then set it to request's referrer.
+    // 6. Otherwise, if navigationParams's reserved environment is non-null and the result of checking a navigation response's adherence to its embedder policy given navigationParams's response, navigable, and navigationParams's policy container's embedder policy is false, then set failure to true.
 
-  // 13. If entry's document state's document is not null, then set entry's document state's ever populated to true.
-  if (entry.documentState.document) entry.documentState.everPopulated = true;
+    // 7. Otherwise, if the result of checking a navigation response's adherence to `X-Frame-Options` given navigationParams's response, navigable, navigationParams's policy container's CSP list, and navigationParams's origin is false, then set failure to true.
 
-  // 14. Run completionSteps.
+    // 8. If failure is true, then:
+    if (failure) {
+      // 1. Set entry's document state's document to the result of creating a document for inline content that doesn't have a DOM, given navigable, null, and navTimingType. The inline content should indicate to the user the sort of error that occurred.
+      entry.documentState.document = displayInlineContent(
+        navigable,
+        null,
+        navTimingType,
+      );
+
+      // 2. Set entry's document state's document's salvageable to false.
+      $(entry.documentState.document).salvageable = false;
+
+      // 3. If navigationParams is not null, then:
+      if (navigationParams) {
+        // 1. Run the environment discarding steps for navigationParams's reserved environment.
+
+        // 2. Invoke WebDriver BiDi navigation failed with currentBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "canceled", and url is navigationParams's response's URL.
+      }
+
+      // 9. Otherwise, if navigationParams's response's status is 204 or 205, then:
+    } else if (
+      navigationParams &&
+      "response" in navigationParams &&
+      new Set<number>([204, 205]).has(navigationParams.response.status)
+    ) {
+      // 1. Run completionSteps.
+      completionSteps();
+
+      // 2. Return.
+      return;
+      // 10. Otherwise, if navigationParams's response has a `Content-Disposition` header specifying the attachment disposition type, then:
+    } else if (
+      navigationParams &&
+      "response" in navigationParams &&
+      navigationParams.response.headers.has("Content-Disposition")
+    ) {
+      // 1. Let sourceAllowsDownloading be sourceSnapshotParams's allows downloading.
+      const sourceAllowsDownloading = sourceSnapshotParams.allowsDownloading;
+
+      // 2. Let targetAllowsDownloading be false if navigationParams's final sandboxing flag set has the sandboxed downloads browsing context flag set; otherwise true.
+
+      // 3. Let uaAllowsDownloading be true.
+      let uaAllowsDownloading = true;
+
+      // 4. Optionally, the user agent may set uaAllowsDownloading to false, if it believes doing so would safeguard the user from a potentially hostile download.
+
+      // 5. If sourceAllowsDownloading, targetAllowsDownloading, and uaAllowsDownloading are true, then:
+      // TODO
+      if (sourceAllowsDownloading && uaAllowsDownloading) {
+        // 1. Handle navigationParams's response as a download.
+
+        // 2. Invoke WebDriver BiDi download started with currentBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "complete", and url is navigationParams's response's URL.
+      }
+
+      // 6. Run completionSteps.
+      completionSteps();
+
+      // 7. Return.
+      return;
+    } else {
+      // 11. Otherwise:
+
+      // 1. Let document be the result of loading a document given navigationParams, sourceSnapshotParams, and entry's document state's initiator origin.
+      const document = loadDocument(
+        navigationParams as any,
+        sourceSnapshotParams,
+        entry.documentState.initiatorOrigin!,
+      );
+
+      // 2. If document is null,
+      if (!document) {
+        // then run completionSteps and return.
+        completionSteps();
+        return;
+      }
+
+      // 3. Set entry's document state's document to document.
+      entry.documentState.document = document;
+
+      // 4. Set entry's document state's origin to document's origin.
+      entry.documentState.origin = DOM.$(document).origin;
+
+      // 5. If document's URL requires storing the policy container in history, then set entry's document state's history policy container to navigationParams's policy container.
+    }
+
+    // 12. If entry's document state's request referrer is "client", then set it to request's referrer.
+
+    // 13. If entry's document state's document is not null, then set entry's document state's ever populated to true.
+    if (entry.documentState.document) entry.documentState.everPopulated = true;
+
+    // 14. Run completionSteps.
+    completionSteps();
+  });
 }
 
 /**

@@ -14,7 +14,7 @@ import { createPermissionPolicyForNavigable } from "../../../permissions_policy/
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#browsing-context)
  */
 export class BrowsingContext {
-  WindowProxy!: WindowProxy;
+  WindowProxy: WindowProxy = window;
 
   /**
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#opener-browsing-context)

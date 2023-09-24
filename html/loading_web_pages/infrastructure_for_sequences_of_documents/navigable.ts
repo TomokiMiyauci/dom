@@ -2,6 +2,8 @@ import {
   DocumentState,
   getSessionHistoryEntryDocument,
   SessionHistoryEntry,
+  SessionHistoryTraversalParallelQueue,
+  startNewSessionHistoryTraversalParallelQueue,
 } from "../navigation_and_session_history.ts";
 import { newUniqueIntervalValue } from "../../infra/common_microsyntaxes.ts";
 import { sameOriginDomain } from "../supporting_concepts.ts";
@@ -11,6 +13,7 @@ import {
 } from "./browsing_context.ts";
 import { $ } from "../../internal.ts";
 import * as DOM from "../../../internal.ts";
+import { List } from "../../../infra/data_structures/list.ts";
 
 /** A navigable presents a Document to the user via its active session history entry.
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#navigable)
@@ -45,6 +48,11 @@ export class Navigable {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#delaying-load-events-mode)
    */
   isDelayingLoadEvents = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#ongoing-navigation)
+   */
+  ongoingNavigation: string | "traversal" | null = null;
 }
 
 /**
@@ -72,6 +80,22 @@ export function activeBrowsingContext(
   return navigableActiveDocument && $(navigableActiveDocument).browsingContext;
 }
 
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-wp)
+ */
+export function activeWindowProxy(navigable: Navigable): WindowProxy | null {
+  // its active browsing context's associated WindowProxy.
+  return activeBrowsingContext(navigable)?.WindowProxy ?? null;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-window)
+ */
+export function activeWindow(navigable: Navigable): Window | null {
+  // its active WindowProxy's [[Window]].
+  return activeWindowProxy(navigable)?.window ?? null;
+}
+
 export function nodeNavigable(node: NavigableContainer) {
   const { nodeDocument } = DOM.$(node);
 }
@@ -92,6 +116,55 @@ export function initializeNavigable(
   navigable.currentSessionHistoryEntry = entry;
   navigable.activeSessionHistoryEntry = entry;
   navigable.parent = parent;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#traversable-navigable)
+ */
+export class TraversableNavigable extends Navigable {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#tn-current-session-history-step)
+   */
+  currentSessionHistoryStep = 0;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#tn-session-history-entries)
+   */
+  sessionHistoryEntries: List<SessionHistoryEntry> = new List();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#tn-session-history-traversal-queue)
+   */
+  sessionHistoryTraversalQueue: SessionHistoryTraversalParallelQueue =
+    startNewSessionHistoryTraversalParallelQueue();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#tn-running-nested-apply-history-step)
+   */
+  runningNestedApplyHistoryStep = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#system-visibility-state)
+   */
+  systemVisibilityState: "hidden" | "visible" = "visible";
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-traversable)
+ */
+export function traversableNavigable(
+  inputNavigable: Navigable,
+): TraversableNavigable {
+  // 1. Let navigable be inputNavigable.
+  let navigable = inputNavigable;
+
+  // 2. While navigable is not a traversable navigable, set navigable to navigable's parent.
+  while (!(navigable instanceof TraversableNavigable)) {
+    navigable = navigable.parent!; // TODO
+  }
+
+  // 3. Return navigable.
+  return navigable;
 }
 
 /**
