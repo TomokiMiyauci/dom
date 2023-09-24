@@ -355,7 +355,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
   let commonAncestor = originalStartNode;
 
   // 6. While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent.
-  while (tree.isInclusiveAncestor(commonAncestor, originalEndNode)) {
+  while (!tree.isInclusiveAncestor(commonAncestor, originalEndNode)) {
     const parent = tree.parent(commonAncestor);
 
     if (!parent) break;

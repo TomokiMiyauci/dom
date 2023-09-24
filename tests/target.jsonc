@@ -300,7 +300,7 @@
   "dom/nodes/insert-adjacent.html",
   "dom/nodes/MutationObserver-attributes.html",
   "dom/nodes/MutationObserver-callback-arguments.html",
-  // "dom/nodes/MutationObserver-characterData.html",
+  "dom/nodes/MutationObserver-characterData.html",
   // "dom/nodes/MutationObserver-childList.html",
   // "dom/nodes/MutationObserver-cross-realm-callback-report-exception.html",
   "dom/nodes/MutationObserver-disconnect.html",

@@ -139,7 +139,7 @@ export function replaceChild<T extends Node>(
 
   // 12. Let nodes be node’s children if node is a DocumentFragment node; otherwise « node ».
   const nodes = isDocumentFragment(node)
-    ? tree.children(node)
+    ? new OrderedSet(tree.children(node))
     : new OrderedSet([node]);
 
   // 13. Insert node into parent before referenceChild with the suppress observers flag set.
@@ -167,9 +167,10 @@ export function insertNode(
   child: Node | null,
   suppressObservers: boolean | null = null,
 ): void {
+  const nodeIsDocumentFragment = isDocumentFragment(node);
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
-  const nodes = isDocumentFragment(node)
-    ? tree.children(node).clone()
+  const nodes = nodeIsDocumentFragment
+    ? new OrderedSet(tree.children(node))
     : new OrderedSet<Node>([node]);
 
   // 2. Let count be nodes’s size.
@@ -179,11 +180,9 @@ export function insertNode(
   if (!count) return;
 
   // 4. If node is a DocumentFragment node, then:
-  if (isDocumentFragment(node)) {
+  if (nodeIsDocumentFragment) {
     // 1. Remove its children with the suppress observers flag set.
-    for (const child of [...tree.children(node)]) {
-      removeNode(child, suppressObservers);
-    }
+    for (const child of [...tree.children(node)]) removeNode(child, true);
 
     // 2. Queue a tree mutation record for node with « », nodes, null, and null.
     queueTreeMutationRecord(node, new OrderedSet(), nodes, null, null);
@@ -285,7 +284,7 @@ export function insertNode(
   }
 
   // 8. If suppress observers flag is unset, then queue a tree mutation record for parent with nodes, « », previousSibling, and child.
-  if (suppressObservers === null) {
+  if (!suppressObservers) {
     queueTreeMutationRecord(
       parent,
       nodes,
@@ -434,7 +433,7 @@ export function replaceAllNode(
   parent: Node,
 ): void {
   // 1. Let removedNodes be parent’s children.
-  const removeNodes = tree.children(parent);
+  const removeNodes = new OrderedSet(tree.children(parent)); // No lazy generation due to the possibility of being referenced in subsequent processing.
 
   // 2. Let addedNodes be the empty set.
   const addNodes = !node
@@ -480,7 +479,7 @@ export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
 export function removeNode(
   node: Node,
   suppressObservers: boolean | null = null,
-) {
+): void {
   // 1. Let parent be node’s parent.
   const parent = tree.parent(node);
   // 2. Assert: parent is non-null.
@@ -593,14 +592,19 @@ export function removeNode(
     }
   }
 
-  // 19. For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, if registered’s options["subtree"] is true, then append a new transient registered observer whose observer is registered’s observer, options is registered’s options, and source is registered to node’s registered observer list.
+  // 19. For each inclusive ancestor inclusiveAncestor of parent,
   for (const inclusiveAncestor of tree.inclusiveAncestors(parent)) {
     const { registeredObserverList } = $(inclusiveAncestor);
+    // and then for each registered of inclusiveAncestor’s registered observer list,
     for (const registered of [...registeredObserverList]) {
+      // if registered’s options["subtree"] is true,
       if (registered.options.subtree) {
+        // then append a new transient registered observer whose observer is registered’s observer,
         registeredObserverList.append({
           observer: registered.observer,
+          // options is registered’s options,
           options: registered.options,
+          // and source is registered to node’s registered observer list.
           source: registered,
         });
       }
@@ -608,7 +612,7 @@ export function removeNode(
   }
 
   // 20. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
-  if (suppressObservers === null) {
+  if (!suppressObservers) {
     queueTreeMutationRecord(
       parent,
       new OrderedSet(),

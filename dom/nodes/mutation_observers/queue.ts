@@ -185,16 +185,24 @@ export function queueMutationRecord(
 
   // 4. For each observer → mappedOldValue of interestedObservers:
   for (const [observer, mappedOldValue] of interestedObservers) {
-    // 1. Let record be a new MutationRecord object with its type set to type, target set to target, attributeName set to name, attributeNamespace set to namespace, oldValue set to mappedOldValue, addedNodes set to addedNodes, removedNodes set to removedNodes, previousSibling set to previousSibling, and nextSibling set to nextSibling.
+    // 1. Let record be a new MutationRecord object with its type set to type,
     const record = new MutationRecord(
       type,
+      // target set to target,
       target,
+      // attributeName set to name,
       name,
+      // attributeNamespace set to namespace,
       namespace,
+      // oldValue set to mappedOldValue,
       mappedOldValue,
+      // addedNodes set to addedNodes,
       new StaticNodeList(addedNodes),
+      //  removedNodes set to removedNodes,
       new StaticNodeList(removedNodes),
+      // previousSibling set to previousSibling,
       previousSibling,
+      // and nextSibling set to nextSibling.
       nextSibling,
     );
 
