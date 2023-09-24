@@ -1,10 +1,16 @@
 import { Constructor } from "../../deps.ts";
 import { $, tree } from "../../internal.ts";
 import { Tree } from "../infra/tree.ts";
-import { isNodeLike } from "./utils.ts";
+import { isDocumentFragment, isNodeLike } from "./utils.ts";
 
-export function isShadowRoot(input: unknown): input is ShadowRoot {
-  return input instanceof ShadowRoot;
+export function isShadowRoot(
+  fragment: DocumentFragment,
+): fragment is ShadowRoot {
+  return !!$(fragment).host;
+}
+
+export function isShadowRootNode(node: Node): node is ShadowRoot {
+  return isDocumentFragment(node) && isShadowRoot(node);
 }
 
 export function ShadowTree<T extends Constructor<Tree<Node>>>(
@@ -15,12 +21,49 @@ export function ShadowTree<T extends Constructor<Tree<Node>>>(
       const root = this.root(node);
 
       // its root’s host’s shadow-including root, if the object’s root is a shadow root; otherwise its root.
-      if (isShadowRoot(root)) {
+      if (isShadowRootNode(root)) {
         const { host } = $(root);
         return this.shadowIncludingRoot(host);
       }
 
       return root;
+    }
+
+    *shadowIncludingDescendants(node: Node): IterableIterator<Node> {
+      for (const descendant of this.descendants(node)) {
+        const root = this.root(descendant);
+
+        if (isShadowRootNode(root)) {
+          const { host } = $(root);
+          yield* this.shadowIncludingInclusiveDescendants(host);
+        } else yield descendant;
+      }
+    }
+
+    *shadowIncludingInclusiveDescendants(node: Node): IterableIterator<Node> {
+      yield node;
+      yield* this.shadowIncludingDescendants(node);
+    }
+
+    isShadowIncludingDescendant(A: Node, B: Node): boolean {
+      if (this.isDescendant(A, B)) return true;
+
+      const root = this.root(A);
+
+      return isShadowRootNode(root) &&
+        this.isShadowIncludingInclusiveDescendant($(root).host, B);
+    }
+
+    isShadowIncludingInclusiveDescendant(A: Node, B: Node): boolean {
+      return A === B || this.isShadowIncludingDescendant(A, B);
+    }
+
+    isShadowIncludingAncestor(A: Node, B: Node): boolean {
+      return this.isShadowIncludingDescendant(B, A);
+    }
+
+    isShadowIncludingInclusiveAncestor(A: Node, B: Node): boolean {
+      return A === B || this.isShadowIncludingAncestor(A, B);
     }
   }
 
@@ -32,6 +75,24 @@ export interface ShadowTree {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-shadow-including-root)
    */
   shadowIncludingRoot(node: Node): Node;
+
+  shadowIncludingDescendants(node: Node): IterableIterator<Node>;
+
+  shadowIncludingInclusiveDescendants(node: Node): IterableIterator<Node>;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-shadow-including-descendant)
+   */
+  isShadowIncludingDescendant(A: Node, B: Node): boolean;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-shadow-including-inclusive-descendant)
+   */
+  isShadowIncludingInclusiveDescendant(A: Node, B: Node): boolean;
+
+  isShadowIncludingAncestor(A: object, B: object): boolean;
+
+  isShadowIncludingInclusiveAncestor(A: object, B: object): boolean;
 }
 
 /**
@@ -49,7 +110,7 @@ export function isShadowIncludingDescendant(A: Node, B: unknown): boolean {
 
   const root = tree.root(A);
 
-  return isNodeLike(root) && isShadowRoot(root) &&
+  return isNodeLike(root) && isShadowRootNode(root) &&
     isShadowInclusiveAncestor($(root).host, B);
 }
 
@@ -66,7 +127,7 @@ export function retarget<T extends object | null>(
     const root = tree.root(A as Node);
 
     if (
-      !isShadowRoot(root) ||
+      !isShadowRootNode(root) ||
       (isNodeLike(B) && isShadowInclusiveAncestor(root, B))
     ) return A;
 

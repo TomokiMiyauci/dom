@@ -10,7 +10,7 @@ import { $, tree } from "../../../internal.ts";
 import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
 import { iter } from "../../../deps.ts";
 import { List } from "../../../infra/data_structures/list.ts";
-import { isShadowRoot } from "../shadow_root_utils.ts";
+import { isShadowRootNode } from "../shadow_root_utils.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -111,7 +111,7 @@ export function findSlottables(slot: HTMLSlotElement): List<Slottable> {
   const root = tree.root(slot);
 
   // 3. If root is not a shadow root, then return result.
-  if (!isShadowRoot(root)) return result;
+  if (!isShadowRootNode(root)) return result;
 
   // 4. Let host be root’s host.
   const { host } = $(root);
