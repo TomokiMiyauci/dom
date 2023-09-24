@@ -18,12 +18,17 @@ export function adoptNode(node: Node, document: Document): void {
   // 3. If document is not oldDocument, then:
   if (document !== oldDocument) {
     // 1. For each inclusiveDescendant in node’s shadow-including inclusive descendants:
-    for (const inclusiveDescendant of tree.inclusiveDescendants(node)) { // TODO(miyauci): shadow-including
+    for (
+      const inclusiveDescendant of tree.shadowIncludingInclusiveDescendants(
+        node,
+      )
+    ) {
       // 1. Set inclusiveDescendant’s node document to document.
       $(inclusiveDescendant).nodeDocument = document;
 
-      // 2. If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
+      // 2. If inclusiveDescendant is an element,
       if (isElement(inclusiveDescendant)) {
+        // then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
         const { attributeList } = $(inclusiveDescendant);
         iter(attributeList).forEach((attr) => $(attr).nodeDocument = document);
       }
@@ -32,20 +37,24 @@ export function adoptNode(node: Node, document: Document): void {
 
   const shadowIncludingInclusiveDescendants = tree
     .shadowIncludingInclusiveDescendants(node);
-  // 2. For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom, enqueue a custom element callback reaction with inclusiveDescendant, callback name "adoptedCallback", and an argument list containing oldDocument and document.
+  // 2. For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom,
   for (
     const inclusiveDescendant of iter(shadowIncludingInclusiveDescendants)
       .filter(isElement).filter(isCustom)
   ) {
+    // enqueue a custom element callback reaction with inclusiveDescendant,
     enqueueCustomElementCallbackReaction(
       inclusiveDescendant,
+      // callback name "adoptedCallback",
       "adoptedCallback",
+      //  and an argument list containing oldDocument and document.
       [oldDocument, document],
     );
   }
 
-  // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order, run the adopting steps with inclusiveDescendant and oldDocument.
+  // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order,
   for (const inclusiveDescendant of shadowIncludingInclusiveDescendants) {
+    // run the adopting steps with inclusiveDescendant and oldDocument.
     $(node).adoptingSteps.run(inclusiveDescendant, oldDocument);
   }
 }

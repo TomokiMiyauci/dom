@@ -193,9 +193,9 @@ export function insertNode(
     const { nodeDocument } = $(node);
     const { ranges: _ranges } = $(nodeDocument);
     const ranges = iter(_ranges);
-    const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
+    const startNodeIsParent = equalsNodeStartNode.bind(null, parent);
     const childIndex = tree.index(child);
-    const isStartOffsetGtChildIndex = compareRangeOffset.bind(
+    const startOffsetIsGtChildIndex = compareRangeOffset.bind(
       null,
       Operator.Gt,
       childIndex,
@@ -204,13 +204,13 @@ export function insertNode(
 
     // 1. For each live range whose start node is parent and start offset is greater than child’s index, increase its start offset by count.
     for (
-      const range of ranges.filter(isStartNodeParent).filter(
-        isStartOffsetGtChildIndex,
+      const range of ranges.filter(startNodeIsParent).filter(
+        startOffsetIsGtChildIndex,
       )
     ) $(range).start[1] += count;
 
-    const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
-    const isEndOffsetGtChildIndex = compareRangeOffset.bind(
+    const endNodeIsParent = equalsNodeEndNode.bind(null, parent);
+    const endOffsetIsGtChildIndex = compareRangeOffset.bind(
       null,
       Operator.Gt,
       childIndex,
@@ -219,8 +219,8 @@ export function insertNode(
 
     // 2. For each live range whose end node is parent and end offset is greater than child’s index, increase its end offset by count.
     for (
-      const range of ranges.filter(isEndNodeParent).filter(
-        isEndOffsetGtChildIndex,
+      const range of ranges.filter(endNodeIsParent).filter(
+        endOffsetIsGtChildIndex,
       )
     ) $(range).end[1] += count;
   }
@@ -231,16 +231,14 @@ export function insertNode(
     : tree.lastChild(parent);
 
   // 7. For each node in nodes, in tree order:
-  for (const node of nodes) { // The iteration order of nodes is tree order
+  for (const node of nodes) {
     // 1. Adopt node into parent’s node document.
     adoptNode(node, $(parent).nodeDocument);
 
     // 2. If child is null, then append node to parent’s children.
     if (child === null) tree.children(parent).append(node as ChildNode);
     // 3. Otherwise, insert node into parent’s children before child’s index.
-    else {
-      tree.children(parent).insert(tree.index(child), node as ChildNode);
-    }
+    else tree.children(parent).insert(tree.index(child), node as ChildNode);
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -252,9 +250,13 @@ export function insertNode(
       isSlottable(node)
     ) assignSlot(node);
 
-    // 5. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
-    // TODO
-    if (isShadowRoot(tree.root(parent))) signalSlotChange(parent as any);
+    // 5. If parent’s root is a shadow root,
+    if (
+      isShadowRoot(tree.root(parent)) &&
+      // and parent is a slot whose assigned nodes is the empty list,
+      isElement(parent) && isSlot(parent) && $(parent).assignedNodes.isEmpty
+      // then run signal a slot change for parent.
+    ) signalSlotChange(parent);
 
     // 6. Run assign slottables for a tree with node’s root.
     assignSlottablesForTree(tree.root(node));
@@ -270,8 +272,9 @@ export function insertNode(
 
       // 2. If inclusiveDescendant is connected, then:
       if (isConnected(inclusiveDescendant)) {
-        // 1. If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list.
+        // 1. If inclusiveDescendant is custom,
         if (isCustom(inclusiveDescendant)) {
+          // then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list.
           enqueueCustomElementCallbackReaction(
             inclusiveDescendant,
             "connectedCallback",
@@ -503,7 +506,6 @@ export function removeNode(
   }
 
   const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
-  const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
   const startOffsetIsGtIndex = compareRangeOffset.bind(
     null,
     Operator.Gt,
@@ -522,20 +524,24 @@ export function removeNode(
     index,
     false,
   );
+  const isEndNodeParent = equalsNodeEndNode.bind(null, parent);
 
   // 7. For each live range whose end node is parent and end offset is greater than index, decrease its end offset by 1.
   for (
     const range of ranges.filter(isEndNodeParent).filter(endOffsetIsGtIndex)
   ) $(range).end[1]--;
 
-  // 8. For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator.
-  for (const iterator of iterators) {
-    const { root, preRemovingSteps } = $(iterator);
+  function rootNodeDocumentIsNodeNodeDocument(iterator: NodeIterator): boolean {
+    const { root } = $(iterator);
 
-    if ($(root).nodeDocument === nodeDocument) {
-      preRemovingSteps.run(iterator, node);
-    }
+    return $(root).nodeDocument === nodeDocument;
   }
+
+  // 8. For each NodeIterator object iterator whose root’s node document is node’s node document,
+  for (
+    const iterator of iter(iterators).filter(rootNodeDocumentIsNodeNodeDocument)
+    // run the NodeIterator pre-removing steps given node and iterator.
+  ) $(iterator).preRemovingSteps.run(iterator, node);
 
   // 9. Let oldPreviousSibling be node’s previous sibling.
   const oldPreviousSibling = tree.previousSibling(node);
@@ -546,15 +552,19 @@ export function removeNode(
   // 11. Remove node from its parent’s children.
   tree.children(parent).remove((child) => child === node);
 
-  // 12. If node is assigned, then run assign slottables for node’s assigned slot.
+  // 12. If node is assigned,
   if (isSlottable(node) && isAssigned(node)) {
+    // then run assign slottables for node’s assigned slot.
     const { assignedSlot } = $(node);
     assignSlottables(assignedSlot!);
   }
 
   const root = tree.root(parent);
-  // 13. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent.
-  if (isShadowRoot(root) && isElement(parent) && isSlot(parent)) {}
+  // 13. If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list,
+  if (isShadowRoot(root) && isElement(parent) && isSlot(parent)) {
+    // then run signal a slot change for parent.
+    signalSlotChange(parent);
+  }
 
   const inclusiveDescendants = tree.inclusiveDescendants(node);
   // 14. If node has an inclusive descendant that is a slot, then:
@@ -572,8 +582,9 @@ export function removeNode(
   // 16. Let isParentConnected be parent’s connected.
   const isParentConnected = isConnected(parent);
 
-  // 17. If node is custom and isParentConnected is true, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list.
+  // 17. If node is custom and isParentConnected is true,
   if (isElement(node) && isCustom(node) && isParentConnected) {
+    // then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list.
     enqueueCustomElementCallbackReaction(node, "disconnectedCallback", []);
   }
 
@@ -582,8 +593,9 @@ export function removeNode(
     // 1. Run the removing steps with descendant and null.
     $(node).removingSteps.run(descendant, null);
 
-    // 2. If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
+    // 2. If descendant is custom and isParentConnected is true,
     if (isElement(descendant) && isCustom(descendant) && isParentConnected) {
+      // then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list.
       enqueueCustomElementCallbackReaction(
         descendant,
         "disconnectedCallback",
@@ -611,8 +623,9 @@ export function removeNode(
     }
   }
 
-  // 20. If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
+  // 20. If suppress observers flag is unset,
   if (!suppressObservers) {
+    // then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling.
     queueTreeMutationRecord(
       parent,
       new OrderedSet(),

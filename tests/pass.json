@@ -2905,6 +2905,22 @@
         "name": "createDocument with missing arguments",
         "reason": "compiler error"
       }
+    ],
+    "dom/nodes/rootNode.html": [
+      {
+        "name": "getRootNode() must return context object's shadow-including root if options's composed is true, and context object's root otherwise",
+        "reason": "innerHTML setter is not supported"
+      }
+    ],
+    "dom/ranges/Range-adopt-test.html": [
+      {
+        "name": "Range container's parentless container moved to another document with appendChild: Removing the only element in the range must collapse the range",
+        "reason": "TODO: associated document rages is wrong"
+      },
+      {
+        "name": "Parentless range container moved to another document with appendChild: Removing the only element in the range must collapse the range",
+        "reason": "TODO: associated document rages is wrong"
+      }
     ]
   }
 }

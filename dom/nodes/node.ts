@@ -521,7 +521,11 @@ export abstract class Node extends EventTarget implements INode {
     return preInsertNode(node, this, child);
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-appendchild)
+   */
   appendChild<T extends globalThis.Node>(node: T): T {
+    // return the result of appending node to this.
     return appendNode(node, this);
   }
 

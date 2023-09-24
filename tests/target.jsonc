@@ -371,7 +371,7 @@
   "dom/nodes/Text-splitText.html",
   "dom/nodes/Text-wholeText.html",
   // "dom/parts/basic-dom-part-objects.tentative.html",
-  // "dom/ranges/Range-adopt-test.html",
+  "dom/ranges/Range-adopt-test.html",
   "dom/ranges/Range-attributes.html",
   // "dom/ranges/Range-cloneContents.html",
   "dom/ranges/Range-cloneRange.html",

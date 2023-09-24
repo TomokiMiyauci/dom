@@ -83,9 +83,9 @@ export class MutationObserver implements IMutationObserver {
     }
 
     // 8. Otherwise:
-    if ($(target).registeredObserverList.isEmpty) {
+    if (registeredObserverList.isEmpty) {
       // 1. Append a new registered observer whose observer is this and options is options to target’s registered observer list.
-      $(target).registeredObserverList.append({ observer: this, options });
+      registeredObserverList.append({ observer: this, options });
 
       // 2. Append a weak reference to target to this’s node list.
       this.#_.nodeList.append(target);
@@ -118,7 +118,7 @@ export class MutationObserver implements IMutationObserver {
     this.#_.recordQueue.empty();
 
     // 3. Return records.
-    return Array.from(records);
+    return [...records];
   }
 
   #isRegisteredObserverThis({ observer }: RegisteredObserver): boolean {
