@@ -140,3 +140,4 @@ export type IWindow = Omit<
   | "sessionStorage"
   | "add_completion_callback"
 >;
+export type ILocation = Location;
