@@ -552,23 +552,6 @@ export class Element extends Node implements IElement {
   }
 
   /**
-   * @see [HTML Living Standard](https://dom.spec.whatwg.org/#dom-element-matches)
-   */
-  @convert
-  matches(@DOMString selectors: string): boolean {
-    // 1. Let s be the result of parse a selector from selectors. [SELECTORS4]
-    const s = parseSelector(selectors);
-
-    // 2. If s is failure, then throw a "SyntaxError" DOMException.
-    if (typeof s === "string") {
-      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
-    }
-
-    // 3. If the result of match a selector against an element, using s, this, and scoping root this, returns success, then return true; otherwise, return false. [SELECTORS4]
-    return matchSelector(s, this, [this]);
-  }
-
-  /**
    * @see https://dom.spec.whatwg.org/#dom-element-removeattribute
    */
   removeAttribute(qualifiedName: string): void {
@@ -730,9 +713,27 @@ export class Element extends Node implements IElement {
     return true;
   }
 
-  webkitMatchesSelector(selectors: string): boolean {
-    throw new UnImplemented("webkitMatchesSelector");
+  /**
+   * @see [HTML Living Standard](https://dom.spec.whatwg.org/#dom-element-matches)
+   */
+  @convert
+  matches(@DOMString selectors: string): boolean {
+    // 1. Let s be the result of parse a selector from selectors. [SELECTORS4]
+    const s = parseSelector(selectors);
+
+    // 2. If s is failure, then throw a "SyntaxError" DOMException.
+    if (typeof s === "string") {
+      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
+    }
+
+    // 3. If the result of match a selector against an element, using s, this, and scoping root this, returns success, then return true; otherwise, return false. [SELECTORS4]
+    return matchSelector(s, this, [this]);
   }
+
+  /**
+   * @see [HTML Living Standard](https://dom.spec.whatwg.org/#dom-element-webkitmatchesselector)
+   */
+  webkitMatchesSelector = this.matches;
 
   get #_() {
     return $<Element>(this);
