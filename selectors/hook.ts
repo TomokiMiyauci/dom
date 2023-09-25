@@ -58,14 +58,16 @@ function resolveMessage(e: unknown): string | undefined {
 export function matchSelector(
   selector: SelectorList,
   element: Element,
+  scopingRoots?: [Node, ...Node[]],
 ): boolean {
-  // If any simple selectors in the rightmost compound selector does not match the element, return failure.
+  // For each complex selector in the given selector (which is taken to be a list of complex selectors),
   for (const complexSelector of selector) {
-    // Otherwise, if there is only one compound selector in the complex selector, return success.
+    // match the complex selector against element, as described in the following paragraph.
+    // If the matching returns success for any complex selector, then the algorithm return success;
     if (matchComplexSelector(complexSelector, element)) return true;
   }
 
-  // Otherwise, consider all possible elements that could be related to this element by the rightmost combinator. If the operation of matching the selector consisting of this selector with the rightmost compound selector and rightmost combinator removed against any one of these elements returns success, then return success. Otherwise, return failure.
+  // otherwise it returns failure.
   return false;
 }
 
@@ -214,27 +216,28 @@ function matchIdSelector(idSelector: IDSelector, element: Element): boolean {
  */
 export function matchSelectorToTree(
   selector: SelectorList,
-  rootElements: OrderedSet<Node>,
+  rootElement: Node,
   scopingRoots: OrderedSet<Node> = new OrderedSet(),
+  condition?: Function,
 ): Element[] {
   // 1. Start with a list of candidate elements, which are the root elements and all of their descendant elements, sorted in shadow-including tree order, unless otherwise specified.
   const candidateElements = ifilter(
-    tree.descendants(scopingRoots[0]!),
+    tree.shadowIncludingDescendants(scopingRoots[0]!),
     isElement,
   );
 
   // 2. If scoping root were provided, then remove from the candidate elements any elements that are not descendants of at least one scoping root.
   // 3. Initialize the selector match list to empty.
-  const list: Element[] = [];
+  const selectorMatchList: Element[] = [];
 
   // 4. For each element in the set of candidate elements:
   for (const element of candidateElements) {
     // 1. If the result of match a selector against an element for element and selector is success, add element to the selector match list.
-    if (matchSelector(selector, element)) list.push(element);
+    if (matchSelector(selector, element)) selectorMatchList.push(element);
 
     // 2. For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list.
   }
 
   // This algorithm returns a (possibly empty) list of elements.
-  return list;
+  return selectorMatchList;
 }
