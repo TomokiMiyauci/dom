@@ -37,6 +37,7 @@ import {
 } from "../../fetch/infrastructure.ts";
 import { queueGlobalTask } from "../web_application_apis/scripting.ts";
 import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { informNavigationAPIAboutAbortingNavigation } from "./navigation_history_entry_utils.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#session-history-entry)
@@ -1307,4 +1308,21 @@ export function createNavigationParamsByFetching(
     // about base URL: entry's document state's about base URL
     aboutBaseURL: entry.documentState.aboutBaseURL,
   };
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#set-the-ongoing-navigation)
+ */
+export function setOngoingNavigation(
+  navigable: Navigable,
+  newValue: string | null,
+): void {
+  // 1. If navigable's ongoing navigation is equal to newValue, then return.
+  if (navigable.ongoingNavigation === newValue) return;
+
+  // 2. Inform the navigation API about aborting navigation given navigable.
+  informNavigationAPIAboutAbortingNavigation(navigable);
+
+  // 3. Set navigable's ongoing navigation to newValue.
+  navigable.ongoingNavigation = newValue;
 }

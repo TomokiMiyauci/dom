@@ -2,67 +2,130 @@ import type { IWindow } from "../../interface.d.ts";
 import { EventTarget } from "../../dom/events/event_target.ts";
 import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import { WindowEventHandlers } from "../window_event_handlers.ts";
+import { Document } from "../../dom/nodes/documents/document.ts";
+import { $, internalSlots } from "../internal.ts";
+import {
+  activeWindow,
+  Navigable,
+  targetName,
+} from "./infrastructure_for_sequences_of_documents/navigable.ts";
+import { BrowsingContext } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
+import { stopLoading } from "./document_lifecycle.ts";
+import { PutForwards } from "../../webidl/extended_attribute.ts";
+import { Location } from "./location.ts";
 
 @GlobalEventHandlers
 @WindowEventHandlers
 export class Window extends EventTarget implements IWindow {
+  constructor() {
+    super();
+
+    const location = new Location();
+    const document = new Document();
+    internalSlots.extends<globalThis.Window>(this as any, {
+      location,
+      document,
+    });
+  }
+
   get clientInformation(): Navigator {
     throw new Error();
   }
+
   get closed(): boolean {
+    const browsingContext = this.#browsingContext;
+    // return true if this's browsing context is null or its is closing is true; otherwise false.
     throw new Error();
   }
+
   get customElements(): CustomElementRegistry {
     throw new Error();
   }
+
   get devicePixelRatio(): number {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-2)
+   */
   get document(): Document {
-    throw new Error();
+    // return this's associated Document.
+    return this.#_.document;
   }
+
   get event(): Event | undefined {
     throw new Error();
   }
+
   get external(): External {
     throw new Error();
   }
+
   get frameElement(): Element | null {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-frames)
+   */
   get frames(): WindowProxy {
-    throw new Error();
+    // return this's relevant realm.[[GlobalEnv]].[[GlobalThisValue]].
+    return this as any;
   }
+
   get history(): History {
     throw new Error();
   }
+
   get innerHeight(): number {
     throw new Error();
   }
+
   get innerWidth(): number {
     throw new Error();
   }
+
   get length(): number {
     throw new Error();
   }
-  get location(): Location {
-    throw new Error();
+
+  @PutForwards("href")
+  get location(): globalThis.Location {
+    // return this's Location object.
+    return this.#_.location;
   }
-  set location(href: string | Location) {
-    throw new Error();
-  }
+
   get locationbar(): BarProp {
     throw new Error();
   }
   get menubar(): BarProp {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-name)
+   */
   get name(): string {
-    throw new Error();
+    // 1. If this's navigable is null, then return the empty string.
+    if (!this.#navigable) return "";
+
+    // 2. Return this's navigable's target name.
+    return targetName(this.#navigable);
   }
-  set name(value: unknown) {
-    throw new Error();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-name)
+   */
+  set name(value: string) {
+    // 1. If this's navigable is null, then return.
+    if (!this.#navigable) return;
+
+    // 2. Set this's navigable's active session history entry's document state's navigable target name to the given value.
+    this.#navigable.activeSessionHistoryEntry.documentState
+      .navigableTargetName = value;
   }
+
   get navigator(): Navigator {
     throw new Error();
   }
@@ -107,7 +170,7 @@ export class Window extends EventTarget implements IWindow {
   }
 
   get opener(): any {
-    throw new Error();
+    return;
   }
   set opener(value: any) {
     throw new Error();
@@ -127,9 +190,24 @@ export class Window extends EventTarget implements IWindow {
   get pageYOffset(): number {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-parent)
+   */
   get parent(): WindowProxy {
-    throw new Error();
+    // 1. Let navigable be this's navigable.
+    const navigable = this.#navigable;
+
+    // 2. If navigable is null, then return null.
+    if (!navigable) return null!;
+
+    // 3. If navigable's parent is not null, then set navigable to navigable's parent.
+    if (!navigable.parent) navigable.parent = navigable;
+
+    // 4. Return navigable's active WindowProxy.
+    return activeWindow(navigable)!;
   }
+
   get personalbar(): BarProp {
     throw new Error();
   }
@@ -157,9 +235,14 @@ export class Window extends EventTarget implements IWindow {
   get scrollbars(): BarProp {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-self)
+   */
   get self(): globalThis.Window & typeof globalThis {
-    throw new Error();
+    return this as any;
   }
+
   get speechSynthesis(): SpeechSynthesis {
     throw new Error();
   }
@@ -181,9 +264,14 @@ export class Window extends EventTarget implements IWindow {
   get visualViewport(): VisualViewport | null {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window)
+   */
   get window(): globalThis.Window & typeof globalThis {
-    throw new Error();
+    return this as any;
   }
+
   alert(message?: any): void {
     throw new Error();
   }
@@ -275,11 +363,37 @@ export class Window extends EventTarget implements IWindow {
   scrollTo(x?: number | ScrollToOptions, y?: number): void {
     throw new Error();
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-window-stop)
+   */
   stop(): void {
-    throw new Error();
+    const navigable = this.#navigable;
+    // 1. If this's navigable is null, then return.
+    if (!navigable) return;
+
+    // 2. Stop loading this's navigable.
+    stopLoading(navigable);
   }
 
   [index: number]: globalThis.Window;
+
+  get #_() {
+    return $<globalThis.Window>(this as any);
+  }
+
+  get #navigable(): Navigable | null {
+    return null;
+  }
+
+  get #browsingContext(): BrowsingContext | null {
+    return browsingContext(this as any);
+  }
+}
+
+export interface WindowInternals {
+  document: Document;
+  location: Location;
 }
 
 export interface Window extends GlobalEventHandlers, WindowEventHandlers {
@@ -303,4 +417,14 @@ export interface Window extends GlobalEventHandlers, WindowEventHandlers {
     listener: EventListenerOrEventListenerObject,
     options?: boolean | EventListenerOptions,
   ): void;
+}
+
+export function browsingContext(
+  window: globalThis.Window,
+): BrowsingContext | null {
+  return $($(window).document).browsingContext;
+}
+
+export function navigable(window: globalThis.Window) {
+  $(window);
 }

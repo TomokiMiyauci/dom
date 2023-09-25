@@ -6,7 +6,6 @@ import { $ } from "../internal.ts";
 import * as DOM from "../../internal.ts";
 import { activeDocument } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { URLSerializer } from "../../url/serializer.ts";
-import { environmentSettingsObject } from "./tmp.ts";
 import { sameOriginDomain } from "./supporting_concepts.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { encodingParseURL } from "../infra/url.ts";
@@ -20,13 +19,13 @@ export class Location implements ILocation {
   get href(): string {
     const { relevantDocument, url } = this.#_;
     // 1. If this's relevant Document is non-null and its origin is not same origin-domain with the entry settings object's origin, then throw a "SecurityError" DOMException.
-    if (
-      relevantDocument &&
-      !sameOriginDomain(
-        DOM.$(relevantDocument).origin,
-        environmentSettingsObject.origin,
-      )
-    ) throw new DOMException("<message>", DOMExceptionName.SecurityError);
+    // if (
+    //   relevantDocument &&
+    //   !sameOriginDomain(
+    //     DOM.$(relevantDocument).origin,
+    //     environmentSettingsObject.origin,
+    //   )
+    // ) throw new DOMException("<message>", DOMExceptionName.SecurityError);
 
     // 2. Return this's url, serialized.
     return URLSerializer.serialize(url);
@@ -36,13 +35,13 @@ export class Location implements ILocation {
     // 1. If this's relevant Document is null, then return.
     if (!this.#_.relevantDocument) return;
 
-    // 2. Let url be the result of encoding-parsing a URL given the given value, relative to the entry settings object.
-    const url = encodingParseURL(value, environmentSettingsObject);
+    // // 2. Let url be the result of encoding-parsing a URL given the given value, relative to the entry settings object.
+    // const url = encodingParseURL(value, environmentSettingsObject);
 
-    // 3. If url is failure, then throw a "SyntaxError" DOMException.
-    if (!url) {
-      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
-    }
+    // // 3. If url is failure, then throw a "SyntaxError" DOMException.
+    // if (!url) {
+    //   throw new DOMException("<message>", DOMExceptionName.SyntaxError);
+    // }
 
     // 4. Location-object navigate this to url.
     throw new Error("href#setter");

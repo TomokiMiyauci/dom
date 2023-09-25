@@ -1,7 +1,10 @@
 import { appendNode } from "../../dom/nodes/node_trees/mutation.ts";
 import { createElement } from "../../dom/nodes/utils/create_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
-import { NavigationParams } from "./navigation_and_session_history.ts";
+import {
+  NavigationParams,
+  setOngoingNavigation,
+} from "./navigation_and_session_history.ts";
 import { $ } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 import * as DOM from "../../internal.ts";
@@ -11,6 +14,7 @@ import {
 } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
 import {
   activeBrowsingContext,
+  activeDocument as navigableActiveDocument,
   Navigable,
 } from "./infrastructure_for_sequences_of_documents/navigable.ts";
 import {
@@ -21,6 +25,7 @@ import {
   PolicyContainer,
   sameOriginDomain,
 } from "./supporting_concepts.ts";
+import { navigationID } from "../internal.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#populate-with-html/head/body)
@@ -290,4 +295,28 @@ export function displayInlineContent(
 
   // 7. Return document.
   return document;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#abort-a-document)
+ */
+export function abortDocument(document: Document) {}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#nav-stop)
+ */
+export function stopLoading(navigable: Navigable) {
+  // 1. Let document be navigable's active document.
+  const document = navigableActiveDocument(navigable);
+
+  if (!document) return;
+
+  // 2. If document's unload counter is 0, and navigable's ongoing navigation is a navigation ID,
+  if (
+    !$(document).unloadCounter && navigable.ongoingNavigation === navigationID
+    // then set the ongoing navigation for navigable to null.
+  ) setOngoingNavigation(navigable, null);
+
+  // 3. Abort document.
+  abortDocument(document);
 }

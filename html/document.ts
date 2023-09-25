@@ -5,8 +5,9 @@ import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { internalSlots } from "./internal.ts";
-import { $, tree } from "../internal.ts";
+import { $, internalSlots } from "./internal.ts";
+import * as DOM from "../internal.ts";
+import { tree } from "../internal.ts";
 import { type BrowsingContext } from "./loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
 import {
   CrossOriginOpenerPolicy,
@@ -121,7 +122,7 @@ export function Document_HTML<T extends Constructor<Document>>(
 
       if (!documentElement) return "";
 
-      const maybeTitle = $(documentElement).localName === "svg"
+      const maybeTitle = DOM.$(documentElement).localName === "svg"
         // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
         ? iter(tree.children(documentElement))
           .filter(isElement)
@@ -153,7 +154,7 @@ export function Document_HTML<T extends Constructor<Document>>(
 
       if (!documentElement) return null as any;
 
-      if ($(documentElement).localName !== "html") return null as any;
+      if (DOM.$(documentElement).localName !== "html") return null as any;
 
       const documentElementChildren = tree.children(documentElement);
       const bodyOrFrameSet = iter(documentElementChildren)
@@ -175,7 +176,7 @@ export function Document_HTML<T extends Constructor<Document>>(
       // return the head element of the document (a head element or null).
       const head =
         iter(children).filter(isElement).find((element) =>
-          $(element).localName === "html"
+          DOM.$(element).localName === "html"
         ) ?? null;
 
       return head as HTMLHeadElement;
@@ -247,12 +248,14 @@ export function Document_HTML<T extends Constructor<Document>>(
     /**
      * @see https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-defaultview
      */
-    override get defaultView(): (WindowProxy & typeof globalThis) | null {
-      // TODO
+    override get defaultView(): (Window & typeof globalThis) | null {
       return globalThis as any;
-      // 1. If this's browsing context is null, then return null.
+      // const { browsingContext } = this.#_;
+      // // 1. If this's browsing context is null, then return null.
+      // if (!browsingContext) return null;
 
-      // 2. Return this's browsing context's WindowProxy object.
+      // // 2. Return this's browsing context's WindowProxy object.
+      // return browsingContext.WindowProxy as Window & typeof globalThis;
     }
 
     override hasFocus(): boolean {
@@ -308,6 +311,10 @@ export function Document_HTML<T extends Constructor<Document>>(
 
     override onvisibilitychange: ((this: Document, ev: Event) => any) | null =
       null;
+
+    get #_() {
+      return $<Document>(this);
+    }
   }
 
   return Mixin;
@@ -371,6 +378,11 @@ export class DocumentInternals {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#concept-document-salvageable)
    */
   salvageable = true;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#unload-counter)
+   */
+  unloadCounter = 0;
 }
 
 /**
@@ -381,13 +393,13 @@ export function getTitleElement(node: Node): Element | null {
   // the first title element in the document (in tree order), if there is one, or null otherwise.
   return iter(descendant)
     .filter(isElement)
-    .find((element) => $(element).localName === "title") ??
+    .find((element) => DOM.$(element).localName === "title") ??
     null;
 }
 
 function isSVGTitle(element: Element): boolean {
-  return $(element).localName === "title" &&
-    $(element).namespace === Namespace.SVG;
+  return DOM.$(element).localName === "title" &&
+    DOM.$(element).namespace === Namespace.SVG;
 }
 
 const tags = new Set<string>(["body", "frameset"]);
@@ -395,5 +407,5 @@ const tags = new Set<string>(["body", "frameset"]);
 function isBodyOrFrameset(node: Node): boolean {
   if (!isElement(node)) return false;
 
-  return tags.has($(node).localName);
+  return tags.has(DOM.$(node).localName);
 }

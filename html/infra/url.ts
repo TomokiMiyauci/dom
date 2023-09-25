@@ -1,4 +1,5 @@
 import { $ } from "../../internal.ts";
+import { EnvironmentSettingsObject } from "../web_application_apis/scripting.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#fallback-base-url)
@@ -65,11 +66,12 @@ export function matchAboutBlank(url: URL): boolean {
  */
 export function encodingParseURL(
   url: string,
-  environment: Document,
+  environment: Document | EnvironmentSettingsObject,
 ): URL | false {
   // 4. Let baseURL be environment's base URL, if environment is a Document object; otherwise environment's API base URL.
-  // TODO
-  const baseURL = documentBaseURL(environment);
+  const baseURL = "URL" in environment
+    ? documentBaseURL(environment)
+    : environment.APIBaseURL;
 
   // 5. Return the result of applying the URL parser to url, with baseURL and encoding.
   return new URL(url, baseURL);

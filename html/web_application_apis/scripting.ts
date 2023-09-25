@@ -4,6 +4,12 @@ import {
   Agent,
   RealmRecord,
 } from "../../ecma/executable_coce_and_execution_context.ts";
+import {
+  Origin,
+  PolicyContainer,
+} from "../loading_web_pages/supporting_concepts.ts";
+import { BrowsingContext } from "../loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
+
 export function queueTask(
   source: unknown,
   steps: unknown,
@@ -86,3 +92,44 @@ internalSlots.extends(Object.prototype, { realm });
 
 const agent = realm["[[AgentSignifier]]"];
 internalSlots.extends(agent, { taskQueues: new OrderedSet() });
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#environment)
+ */
+export interface Environment {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-id)
+   */
+  id: string;
+
+  creationURL: URL;
+
+  topLevelCreationURL: URL | null;
+
+  topLevelOrigin: Origin | null;
+
+  targetBrowsingContext: BrowsingContext | null;
+
+  activeServiceWorker: unknown;
+
+  executionReadyFlag: boolean;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object)
+ */
+export interface EnvironmentSettingsObject extends Environment {
+  realmExecutionContext: unknown;
+
+  moduleMap: unknown;
+
+  APIBaseURL: URL;
+
+  origin: Origin;
+
+  policyContainer: PolicyContainer;
+
+  crossOriginIsolatedCability: boolean;
+
+  timeOrigin: number;
+}

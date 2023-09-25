@@ -96,6 +96,14 @@ export function activeWindow(navigable: Navigable): Window | null {
   return activeWindowProxy(navigable)?.window ?? null;
 }
 
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-target)
+ */
+export function targetName(navigable: Navigable): string {
+  // its active session history entry's document state's navigable target name.
+  return navigable.activeSessionHistoryEntry.documentState.navigableTargetName;
+}
+
 export function nodeNavigable(node: NavigableContainer) {
   const { nodeDocument } = DOM.$(node);
 }
