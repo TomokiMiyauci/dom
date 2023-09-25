@@ -2921,6 +2921,64 @@
         "name": "Parentless range container moved to another document with appendChild: Removing the only element in the range must collapse the range",
         "reason": "TODO: associated document rages is wrong"
       }
+    ],
+    "dom/nodes/Element-closest.html": [
+      {
+        "name": "Element.closest with context node 'test13' and selector 'div:not(.div1)'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test6' and selector 'div.div3'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test12' and selector '.div3 > .div2'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test12' and selector '.div3 > .div1'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test9' and selector 'form > input[required]'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test12' and selector 'fieldset > select[required]'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test11' and selector ':last-child'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test11' and selector ':last-child'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test12' and selector ':first-child'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test12' and selector ':first-child'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test11' and selector ':invalid'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test4' and selector 'select > :scope'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test4' and selector 'div > :scope'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test4' and selector ':has(> :scope)'",
+        "reason": "the selector is not supported"
+      }
     ]
   }
 }

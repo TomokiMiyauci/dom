@@ -240,7 +240,7 @@
   "dom/nodes/Element-childElementCount.html",
   "dom/nodes/Element-children.html",
   "dom/nodes/Element-classlist.html",
-  // "dom/nodes/Element-closest.html",
+  "dom/nodes/Element-closest.html",
   "dom/nodes/Element-firstElementChild-namespace.html",
   "dom/nodes/Element-firstElementChild.html",
   "dom/nodes/Element-getElementsByClassName.html",

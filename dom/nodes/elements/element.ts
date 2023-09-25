@@ -4,7 +4,7 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
 } from "../node_utils.ts";
-import { getQualifiedName, isShadowHost, UnImplemented } from "../utils.ts";
+import { getQualifiedName, isElement, isShadowHost } from "../utils.ts";
 import { Attr, cloneAttr } from "./attr.ts";
 import { changeAttributes } from "./attr_utils.ts";
 import { ParentNode } from "../node_trees/parent_node.ts";
@@ -19,7 +19,7 @@ import {
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 import { Text } from "../text.ts";
-import { find, map, some, xmlValidator } from "../../../deps.ts";
+import { find, iter, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
@@ -338,24 +338,6 @@ export class Element extends Node implements IElement {
 
     // 10 .Return shadow.
     return shadow;
-  }
-
-  closest<K extends keyof HTMLElementTagNameMap>(
-    selector: K,
-  ): HTMLElementTagNameMap[K] | null;
-  closest<K extends keyof SVGElementTagNameMap>(
-    selector: K,
-  ): SVGElementTagNameMap[K] | null;
-  closest<K extends keyof MathMLElementTagNameMap>(
-    selector: K,
-  ): MathMLElementTagNameMap[K] | null;
-  closest<E extends Element = Element>(
-    selectors: string,
-  ): E | null;
-  closest<E extends Element = Element>(
-    selectors: string,
-  ): E | null {
-    throw new UnImplemented("closest");
   }
 
   /**
@@ -711,6 +693,42 @@ export class Element extends Node implements IElement {
 
     // 6. Return true.
     return true;
+  }
+
+  closest<K extends keyof HTMLElementTagNameMap>(
+    selector: K,
+  ): HTMLElementTagNameMap[K] | null;
+  closest<K extends keyof SVGElementTagNameMap>(
+    selector: K,
+  ): SVGElementTagNameMap[K] | null;
+  closest<K extends keyof MathMLElementTagNameMap>(
+    selector: K,
+  ): MathMLElementTagNameMap[K] | null;
+  closest<E extends Element = Element>(selectors: string): E | null;
+  @convert
+  closest(
+    @DOMString selectors: string,
+  ): globalThis.Element | null {
+    // 1. Let s be the result of parse a selector from selectors. [SELECTORS4]
+    const s = parseSelector(selectors);
+
+    // 2. If s is failure, then throw a "SyntaxError" DOMException.
+    if (typeof s === "string") {
+      throw new DOMException("<message>", DOMExceptionName.SyntaxError);
+    }
+
+    const inclusiveAncestors = tree.inclusiveAncestors(this);
+    // 3. Let elements be this’s inclusive ancestors that are elements, in reverse tree order.
+    const elements = iter(inclusiveAncestors).filter(isElement);
+
+    // 4. For each element in elements,
+    for (const element of elements) {
+      // if match a selector against an element, using s, element, and scoping root this, returns success, return element. [SELECTORS4]
+      if (matchSelector(s, element, [this])) return element;
+    }
+
+    // 5. Return null.
+    return null;
   }
 
   /**
