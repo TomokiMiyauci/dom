@@ -1,6 +1,6 @@
 export interface TypeSelector {
   type: "type";
-  name: string;
+  value: string;
   namespacePrefix?: string;
 }
 
@@ -9,20 +9,24 @@ export interface UniversalSelector {
   namespacePrefix?: string;
 }
 
-export type AttributeSelector = {
-  type: "attr";
-} & (Presence | PresenceAndValue | PresenceAndValueCaseSensitivity);
+export type AttributeSelector =
+  & { type: "attr" }
+  & (
+    | Presence
+    | PresenceAndValue
+    | PresenceAndValueCaseSensitivity
+  );
 
-interface Presence {
+export interface Presence {
   name: string;
 }
 
-interface PresenceAndValue extends Presence {
+export interface PresenceAndValue extends Presence {
   value: string;
   operator: Operator;
 }
 
-interface PresenceAndValueCaseSensitivity extends PresenceAndValue {
+export interface PresenceAndValueCaseSensitivity extends PresenceAndValue {
   case: Case;
 }
 
@@ -36,20 +40,49 @@ export enum Operator {
   Unknown = "",
 }
 
+export namespace Operator {
+  export function from(input: string): Operator {
+    switch (input) {
+      case Operator.EndWith:
+        return Operator.EndWith;
+      case Operator.HyphenOf:
+        return Operator.HyphenOf;
+      case Operator.ExactEq:
+        return Operator.ExactEq;
+      case Operator.OneOf:
+        return Operator.OneOf;
+      case Operator.PartOf:
+        return Operator.PartOf;
+      case Operator.StartWith:
+        return Operator.StartWith;
+      default:
+        return Operator.Unknown;
+    }
+  }
+}
+
 export enum Case {
   i = "i",
   s = "s",
   Unknown = "",
 }
 
-export interface IDSelector {
-  type: "id";
-  id: string;
+export class IDSelector {
+  type: "id" = "id";
+  value: string;
+
+  constructor(id: string) {
+    this.value = id;
+  }
 }
 
-export interface ClassSelector {
-  type: "class";
+export class ClassSelector {
+  type: "class" = "class";
   value: string;
+
+  constructor(value: string) {
+    this.value = value;
+  }
 }
 
 export type SubclassSelector = IDSelector | ClassSelector | AttributeSelector;

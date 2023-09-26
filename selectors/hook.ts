@@ -16,7 +16,7 @@ import { OrderedSet } from "../infra/data_structures/set.ts";
 import { selectorToSelectorList } from "./utils.ts";
 import { createParser } from "npm:css-selector-parser@2.3.2";
 import { toASCIILowerCase } from "../infra/string.ts";
-import { $, tree } from "../internal.ts";
+import { tree } from "../internal.ts";
 
 type Failure = string;
 type Success = SelectorList;
@@ -122,7 +122,7 @@ export function matchComplexSelector(
   // - Otherwise, consider all possible elements that could be related to this element by the rightmost combinator. If the operation of matching the selector consisting of this selector with the rightmost compound selector and rightmost combinator removed against any one of these elements returns success, then return success. Otherwise, return failure.
 }
 
-function matchSimpleSelector(
+export function matchSimpleSelector(
   simpleSelector: SimpleSelector,
   element: Element,
 ): boolean {
@@ -144,7 +144,7 @@ function matchTypeSelector(
   typeSelector: TypeSelector,
   element: Element,
 ): boolean {
-  return $(element).localName === typeSelector.name;
+  return element.localName === typeSelector.value;
 }
 
 function matchAttributeSelector(
@@ -163,52 +163,71 @@ function matchAttributeSelector(
       }
       : { attrValue: value, selectorValue: selector.value };
 
-    for (const attr of element.attributes) {
-      attr.prefix;
-      attr.name;
-      attr.localName;
-      attr.value;
-      attr.namespaceURI;
-    }
-
     switch (selector.operator) {
       case Operator.ExactEq:
         return selectorValue === attrValue;
-
       case Operator.OneOf:
+        return matchOneOf(selectorValue, attrValue);
       case Operator.HyphenOf:
+        return matchHyphen(selectorValue, attrValue);
       case Operator.StartWith:
+        return matchStartWith(selectorValue, attrValue);
       case Operator.EndWith:
+        return matchEndWith(selectorValue, attrValue);
       case Operator.PartOf:
         return matchPartOf(selectorValue, attrValue);
 
       case Operator.Unknown:
       default: {
-        throw new Error("not supported yet");
+        throw new Error(`Unknown operator. ${selector.operator}`);
       }
     }
   }
 
-  if (selector.name) {
-    return !!element.getAttributeNodeNS(null, selector.name);
-  }
+  return !!element.getAttributeNodeNS(null, selector.name);
+}
 
-  throw Error("attribute selector is not supported");
+export function matchHyphen(selectorValue: string, attrValue: string): boolean {
+  if (selectorValue === attrValue) return true;
+
+  const pattern = new RegExp("^" + selectorValue + "-"); // TODO escape
+
+  return pattern.test(attrValue);
+}
+
+export function matchStartWith(
+  selectorValue: string,
+  attrValue: string,
+): boolean {
+  return attrValue.startsWith(selectorValue);
+}
+
+export function matchEndWith(
+  selectorValue: string,
+  attrValue: string,
+): boolean {
+  return attrValue.endsWith(selectorValue);
+}
+
+export function matchOneOf(selectorValue: string, attrValue: string): boolean {
+  const list = new Set(attrValue.split(" "));
+
+  return list.has(selectorValue);
 }
 
 export function matchPartOf(selectorValue: string, attrValue: string): boolean {
   return selectorValue.includes(attrValue);
 }
 
-function matchClassSelector(
-  typeSelector: ClassSelector,
+export function matchClassSelector(
+  selector: ClassSelector,
   element: Element,
 ): boolean {
-  throw new Error("class selector is not supported");
+  return element.classList.contains(selector.value);
 }
 
 function matchIdSelector(idSelector: IDSelector, element: Element): boolean {
-  return element.id === idSelector.id;
+  return element.id === idSelector.value;
 }
 
 /**
