@@ -2909,10 +2909,6 @@
     ],
     "dom/nodes/Element-closest.html": [
       {
-        "name": "Element.closest with context node 'test11' and selector ':last-child'",
-        "reason": "the selector is not supported"
-      },
-      {
         "name": "Element.closest with context node 'test11' and selector ':invalid'",
         "reason": "the selector is not supported"
       },

@@ -161,9 +161,11 @@ export function matchPseudoClass(
     case "empty":
       return !element.hasChildNodes();
 
-    case "first-child": {
+    case "first-child":
       return element.parentNode?.firstElementChild === element;
-    }
+
+    case "last-child":
+      return element.parentNode?.lastElementChild === element;
 
     default:
       throw new Error("");

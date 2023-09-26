@@ -116,10 +116,8 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "invalid":
           case "empty":
           case "first-child":
-            return {
-              type: "pseudo-class",
-              value: name,
-            };
+          case "last-child":
+            return { type: "pseudo-class", value: name };
 
           case "not": {
             const selectorList = selectorToSelectorList(
