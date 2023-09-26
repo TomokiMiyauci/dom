@@ -119,6 +119,12 @@ function resolveCombinator(
     case "child":
       return element.parentElement ? [element.parentElement] : [];
 
+    case "adjacent-sibling": {
+      const previousSibling = element.previousElementSibling;
+
+      return previousSibling ? [previousSibling] : [];
+    }
+
     default:
       throw new Error("");
   }

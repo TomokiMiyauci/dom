@@ -131,25 +131,21 @@ export type CompoundSelector = SubclassSelector[] | [
   ...SubclassSelector[],
 ];
 
-export interface DescendantCombinator {
-  type: "descendant";
-}
-
-export interface ChildCombinator {
-  type: "child";
-}
-
-export type Combinator = DescendantCombinator | ChildCombinator | {
-  type: "unknown";
+export type Combinator = {
+  type: "descendant" | "child" | "adjacent-sibling" | "unknown";
 };
 
 export namespace Combinator {
   export function from(input: string): Combinator {
-    console.log(input);
     switch (input) {
       case ">": {
         return { type: "child" };
       }
+      case "+":
+        return { type: "adjacent-sibling" };
+
+      case " ":
+        return { type: "descendant" };
 
       default:
         return { type: "unknown" };
