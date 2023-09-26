@@ -41,14 +41,20 @@ Deno.test("wpt", async (t) => {
 
         for await (const report of reports) {
           const ignore = shouldBeIgnore(name, report.name);
-
-          await t.step({
+          const markAsIgnoreButPass = ignore && !report.status;
+          const definition: Deno.TestStepDefinition = {
             name: report.name,
-            ignore,
-            fn: () => {
-              if (report.status) throw new Error(report.message);
-            },
-          });
+            fn: markAsIgnoreButPass
+              ? () => {
+                throw new Error(`test case is passed but it mark as ignore`);
+              }
+              : () => {
+                if (report.status) throw new Error(report.message);
+              },
+            ignore: !markAsIgnoreButPass && ignore,
+          };
+
+          await t.step(definition);
         }
       });
     });

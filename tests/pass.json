@@ -142,10 +142,6 @@
         "reason": "innerHTML setter is not supported"
       },
       {
-        "name": "remove id attribute via innerHTML",
-        "reason": "innerHTML setter is not supported"
-      },
-      {
         "name": "add id attribute via outerHTML",
         "reason": "outerHTML setter is not supported"
       },
@@ -169,9 +165,6 @@
         "name": "new Document(): URL parsing",
         "reason": "HTMLHyperlinkElementUtils href getter is not supported"
       }
-    ],
-    "dom/nodes/Node-isConnected.html": [
-      { "name": "Test with iframes", "reason": "frames is not supported" }
     ],
     "dom/nodes/CharacterData-appendData.html": [
       {
@@ -2558,10 +2551,6 @@
         "reason": "location is not supported"
       },
       {
-        "name": "createDocument test: undefined,undefined,null,null",
-        "reason": "location is not supported"
-      },
-      {
         "name": "createDocument test: metadata for undefined,undefined,null",
         "reason": "location is not supported"
       },
@@ -2790,10 +2779,6 @@
         "reason": "location is not supported"
       },
       {
-        "name": "createDocument test: undefined,undefined,undefined,null",
-        "reason": "location is not supported"
-      },
-      {
         "name": "createDocument test: metadata for undefined,undefined,undefined",
         "reason": "location is not supported"
       },
@@ -2925,10 +2910,6 @@
     "dom/nodes/Element-closest.html": [
       {
         "name": "Element.closest with context node 'test13' and selector 'div:not(.div1)'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test6' and selector 'div.div3'",
         "reason": "the selector is not supported"
       },
       {
