@@ -1,4 +1,5 @@
-import { matchSimpleSelector } from "./hook.ts";
+import { matchComplexSelector, matchSimpleSelector } from "./hook.ts";
+import { ComplexSelector } from "./types.ts";
 import {
   assert,
   assertFalse,
@@ -10,6 +11,26 @@ import { Document } from "../dom/nodes/documents/document.ts";
 import { Operator } from "./types.ts";
 
 const document = new Document();
+
+describe("matchComplexSelector", () => {
+  it("should", () => {
+    const parent = document.createElement("div");
+    const child = parent.appendChild(document.createElement("span"));
+
+    const selector: ComplexSelector = [
+      {
+        combinator: { type: "descendant" },
+        unit: [[{ type: "type", value: "div" }]],
+      },
+      [
+        [{ type: "type", value: "span" }],
+      ],
+    ];
+
+    assert(matchComplexSelector(selector, child));
+    assertFalse(matchComplexSelector(selector, parent));
+  });
+});
 
 describe("matchSimpleSelector", () => {
   it("should match with id selector", () => {
@@ -257,6 +278,34 @@ describe("matchSimpleSelector", () => {
           operator: Operator.Unknown,
         }, element)
       );
+    });
+  });
+
+  describe("pseudo selector", () => {
+    describe("not", () => {
+      it(":not(div) should match to not div element", () => {
+        const element = document.createElement("span");
+
+        assert(
+          matchSimpleSelector({
+            type: "pseudo-class",
+            value: "not",
+            argument: [{ type: "type", value: "div" }],
+          }, element),
+        );
+      });
+
+      it(":not(div) should match to not div element", () => {
+        const element = document.createElement("div");
+
+        assertFalse(
+          matchSimpleSelector({
+            type: "pseudo-class",
+            value: "not",
+            argument: [{ type: "type", value: "div" }],
+          }, element),
+        );
+      });
     });
   });
 });

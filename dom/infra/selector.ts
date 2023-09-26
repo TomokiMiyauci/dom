@@ -4,6 +4,7 @@ import { DOMExceptionName } from "../../webidl/exception.ts";
 import { tree } from "../../internal.ts";
 
 /**
+ * @throws {DOMException}
  * @see https://dom.spec.whatwg.org/#scope-match-a-selectors-string
  */
 export function matchScopedSelectorsString(
@@ -21,7 +22,7 @@ export function matchScopedSelectorsString(
   // 3. Return the result of match a selector against a tree with s and node’s root using scoping root node.
   return matchSelectorToTree(
     s,
-    new OrderedSet([tree.root(node)]),
+    tree.root(node),
     new OrderedSet([node]),
   );
 }

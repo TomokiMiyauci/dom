@@ -1,18 +1,18 @@
-import { ifilter, initLast } from "../deps.ts";
+import { ifilter, initLast, lastItem } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
 import {
   AttributeSelector,
   ClassSelector,
+  Combinator,
   ComplexSelector,
-  ComplexSelectorUnit,
   CompoundSelector,
   IDSelector,
   Operator,
+  PseudoClassSelector,
   SelectorList,
   SimpleSelector,
   TypeSelector,
 } from "./types.ts";
-import { OrderedSet } from "../infra/data_structures/set.ts";
 import { selectorToSelectorList } from "./utils.ts";
 import { createParser } from "npm:css-selector-parser@2.3.2";
 import { toASCIILowerCase } from "../infra/string.ts";
@@ -32,7 +32,7 @@ export function parseSelector(source: string): ParseResult {
   try {
     return selectorToSelectorList(parser(source));
   } catch (e: unknown) {
-    return resolveMessage(e) ?? "Fail to parse selector";
+    return resolveMessage(e);
   }
   // 1. Let selector be the result of parsing source as a <selector-list>. If this returns failure, it’s an invalid selector; return failure.
 
@@ -41,7 +41,7 @@ export function parseSelector(source: string): ParseResult {
   // 3. Otherwise, return selector.
 }
 
-function resolveMessage(e: unknown): string | undefined {
+function resolveMessage(e: unknown): string {
   if (
     e &&
     typeof e === "object" &&
@@ -49,7 +49,7 @@ function resolveMessage(e: unknown): string | undefined {
     typeof e.message === "string"
   ) return e.message;
 
-  return;
+  return String(e);
 }
 
 /**
@@ -80,13 +80,6 @@ function matchCompoundSelector(
   );
 }
 
-function matchComplexSelectorUnit(
-  complexSelectorUnit: ComplexSelectorUnit,
-  element: Element,
-): boolean {
-  return matchCompoundSelector(complexSelectorUnit[0], element);
-}
-
 /**
  * @see https://drafts.csswg.org/selectors-4/#match-a-complex-selector-against-an-element
  */
@@ -94,25 +87,21 @@ export function matchComplexSelector(
   complexSelector: ComplexSelector,
   element: Element,
 ): boolean {
-  const [init, last] = initLast(complexSelector);
+  const last = lastItem(complexSelector);
 
-  if (complexSelector.length === 1) {
-    return matchComplexSelectorUnit(complexSelector[0], element);
+  for (const simpleSelector of last[0]) {
+    if (!matchSimpleSelector(simpleSelector, element)) return false;
   }
 
-  throw new Error("combinator is not supported");
+  if (complexSelector.length === 1) return true;
 
-  // - If any simple selectors in the rightmost compound selector does not match the element, return failure.
-  for (const compoundSelector of last) {
-    if (!matchCompoundSelector(compoundSelector, element)) return false;
-  }
-
-  if (!init.length) return true;
-
-  const elements: Element[] = [];
+  const [init] = initLast(complexSelector);
+  const [rest, lastOf] = initLast(init);
+  const elements = resolveCombinator(lastOf!.combinator, element);
+  const restComplexSelector: ComplexSelector = [...rest, lastOf!.unit];
 
   for (const element of elements) {
-    if (matchComplexSelector(init as any, element)) return true;
+    if (matchComplexSelector(restComplexSelector, element)) return true;
   }
 
   return false;
@@ -120,6 +109,19 @@ export function matchComplexSelector(
   // process it compound selector at a time, in right-to-left order. This process is defined recursively as follows:
   // - Otherwise, if there is only one compound selector in the complex selector, return success.
   // - Otherwise, consider all possible elements that could be related to this element by the rightmost combinator. If the operation of matching the selector consisting of this selector with the rightmost compound selector and rightmost combinator removed against any one of these elements returns success, then return success. Otherwise, return failure.
+}
+
+function resolveCombinator(
+  combinator: Combinator,
+  element: Element,
+): Element[] {
+  switch (combinator.type) {
+    case "child":
+      return element.parentElement ? [element.parentElement] : [];
+
+    default:
+      throw new Error("");
+  }
 }
 
 export function matchSimpleSelector(
@@ -137,6 +139,24 @@ export function matchSimpleSelector(
       return true;
     case "attr":
       return matchAttributeSelector(simpleSelector, element);
+    case "pseudo-class":
+      return matchPseudoClass(simpleSelector, element);
+  }
+}
+
+export function matchPseudoClass(
+  selector: PseudoClassSelector,
+  element: Element,
+): boolean {
+  switch (selector.value) {
+    case "not":
+      return !matchCompoundSelector(selector.argument, element);
+
+    case "empty":
+      return !element.hasChildNodes();
+
+    default:
+      throw new Error("");
   }
 }
 
@@ -236,14 +256,24 @@ function matchIdSelector(idSelector: IDSelector, element: Element): boolean {
 export function matchSelectorToTree(
   selector: SelectorList,
   rootElement: Node,
-  scopingRoots: OrderedSet<Node> = new OrderedSet(),
+  scopingRoots?: Iterable<Node>,
   condition?: Function,
 ): Element[] {
   // 1. Start with a list of candidate elements, which are the root elements and all of their descendant elements, sorted in shadow-including tree order, unless otherwise specified.
-  const candidateElements = ifilter(
-    tree.shadowIncludingDescendants(scopingRoots[0]!),
+  const candidateElements = new Set(ifilter(
+    tree.shadowIncludingDescendants(rootElement),
     isElement,
-  );
+  ));
+
+  if (scopingRoots) {
+    candidateElements.forEach((element) => {
+      for (const scoped of scopingRoots) {
+        if (!tree.isDescendant(element, scoped)) {
+          candidateElements.delete(element);
+        }
+      }
+    });
+  }
 
   // 2. If scoping root were provided, then remove from the candidate elements any elements that are not descendants of at least one scoping root.
   // 3. Initialize the selector match list to empty.

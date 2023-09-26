@@ -85,7 +85,38 @@ export class ClassSelector {
   }
 }
 
-export type SubclassSelector = IDSelector | ClassSelector | AttributeSelector;
+export type PseudoClassSelector =
+  | NotPseudoClass
+  | ValidityPseudoClass
+  | EmptyPseudoClass;
+
+export interface RegularPseudoClass {
+  type: "pseudo-class";
+  value: string;
+}
+
+export interface ValidityPseudoClass extends RegularPseudoClass {
+  value: "valid" | "invalid";
+}
+
+export interface EmptyPseudoClass extends RegularPseudoClass {
+  value: "empty";
+}
+
+export interface NotPseudoClass extends RegularPseudoClass {
+  value: "not";
+  argument: CompoundSelector;
+}
+
+export interface FunctionalPseudoClass extends RegularPseudoClass {
+  arg: string;
+}
+
+export type SubclassSelector =
+  | IDSelector
+  | ClassSelector
+  | AttributeSelector
+  | PseudoClassSelector;
 
 export type SimpleSelector =
   | TypeSelector
@@ -100,19 +131,42 @@ export type CompoundSelector = SubclassSelector[] | [
   ...SubclassSelector[],
 ];
 
-interface BaseCombinator {
-  left: CompoundSelector;
-  right: CompoundSelector;
-}
-
-export interface DescendantCombinator extends BaseCombinator {
+export interface DescendantCombinator {
   type: "descendant";
 }
 
-export type Combinator = DescendantCombinator;
+export interface ChildCombinator {
+  type: "child";
+}
+
+export type Combinator = DescendantCombinator | ChildCombinator | {
+  type: "unknown";
+};
+
+export namespace Combinator {
+  export function from(input: string): Combinator {
+    console.log(input);
+    switch (input) {
+      case ">": {
+        return { type: "child" };
+      }
+
+      default:
+        return { type: "unknown" };
+    }
+  }
+}
 
 export type ComplexSelectorUnit = [CompoundSelector];
 
-export type ComplexSelector = [ComplexSelectorUnit];
+export interface ComplexSelectorUnitWithCombinator {
+  unit: ComplexSelectorUnit;
+  combinator: Combinator;
+}
+
+export type ComplexSelector = [
+  ...ComplexSelectorUnitWithCombinator[],
+  ComplexSelectorUnit,
+];
 
 export type SelectorList = [ComplexSelector, ...ComplexSelector[]];

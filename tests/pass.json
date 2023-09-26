@@ -2909,26 +2909,6 @@
     ],
     "dom/nodes/Element-closest.html": [
       {
-        "name": "Element.closest with context node 'test13' and selector 'div:not(.div1)'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test12' and selector '.div3 > .div2'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test12' and selector '.div3 > .div1'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test9' and selector 'form > input[required]'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test12' and selector 'fieldset > select[required]'",
-        "reason": "the selector is not supported"
-      },
-      {
         "name": "Element.closest with context node 'test11' and selector ':last-child'",
         "reason": "the selector is not supported"
       },
@@ -2958,6 +2938,10 @@
       },
       {
         "name": "Element.closest with context node 'test4' and selector ':has(> :scope)'",
+        "reason": "the selector is not supported"
+      },
+      {
+        "name": "Element.closest with context node 'test4' and selector ':scope'",
         "reason": "the selector is not supported"
       }
     ]

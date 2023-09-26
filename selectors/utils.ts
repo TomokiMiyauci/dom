@@ -10,21 +10,82 @@ import {
 import {
   AttributeSelector,
   Case,
+  ClassSelector,
+  Combinator,
   ComplexSelector,
-  ComplexSelectorUnit,
+  ComplexSelectorUnitWithCombinator,
   CompoundSelector,
   IDSelector,
+  NotPseudoClass,
   Operator,
+  PseudoClassSelector,
   SelectorList,
   TypeSelector,
   UniversalSelector,
 } from "./types.ts";
+import { initLast } from "../deps.ts";
 
 export function selectorToSelectorList(selector: AstSelector): SelectorList {
-  return selector.rules.map(astRuleToComplexSelector) as SelectorList;
+  return selector.rules.map(toComplexSelector) as SelectorList;
 }
 
-function astRuleToComplexSelector(rule: AstRule): ComplexSelector {
+export function toComplexSelector(rule: AstRule): ComplexSelector {
+  const flatted = flatten(rule);
+  const normalized = shiftCombinator(flatted);
+  const [inits, last] = initLast(normalized);
+
+  const withCombinator = inits.map(toComplexSelectorUnitWithCombinator);
+
+  return [...withCombinator, [toCompoundSelector(last)]];
+}
+
+export function toComplexSelectorUnitWithCombinator(
+  { combinator, ...rest }: AstRule & { combinator: string },
+): ComplexSelectorUnitWithCombinator {
+  return {
+    combinator: Combinator.from(combinator),
+    unit: [toCompoundSelector(rest)],
+  };
+}
+
+export type FlattenAstRule = [AstRule, ...(AstRule & { combinator: string })[]];
+export type NormalizedAstRules = [
+  ...(AstRule & { combinator: string })[],
+  AstRule,
+];
+
+export function flatten(rule: AstRule): FlattenAstRule {
+  const rules: FlattenAstRule = [rule];
+
+  while (rule.nestedRule) {
+    rules.push(rule.nestedRule);
+
+    rule = rule.nestedRule;
+  }
+
+  return rules;
+}
+
+export function shiftCombinator(rules: FlattenAstRule): NormalizedAstRules {
+  const shifted = rules.reduce((acc, cur, index, array) => {
+    const next = array[index + 1];
+
+    if (next) {
+      return acc.concat({
+        ...cur,
+        combinator: next.combinator!,
+      }) as NormalizedAstRules;
+    }
+
+    const { combinator: _, ...rest } = cur;
+
+    return acc.concat(rest) as NormalizedAstRules;
+  }, [] as unknown as NormalizedAstRules);
+
+  return shifted;
+}
+
+function toCompoundSelector(rule: AstRule): CompoundSelector {
   const compoundSelector: CompoundSelector = rule.tag ? [tag(rule.tag)] : [];
 
   if (rule.ids) {
@@ -38,14 +99,52 @@ function astRuleToComplexSelector(rule: AstRule): ComplexSelector {
     compoundSelector.push(...selectors);
   }
 
-  const xx: ComplexSelectorUnit = [compoundSelector];
-  const x: ComplexSelector = [xx];
+  if (rule.classNames) {
+    const selectors: ClassSelector[] = rule.classNames.map((value) => ({
+      type: "class",
+      value,
+    }));
 
-  return x;
+    compoundSelector.push(...selectors);
+  }
+
+  if (rule.pseudoClasses) {
+    const selectors: PseudoClassSelector[] = rule.pseudoClasses.map(
+      ({ name, argument }) => {
+        switch (name) {
+          case "valid":
+          case "invalid":
+          case "empty":
+            return {
+              type: "pseudo-class",
+              value: name,
+            };
+
+          case "not": {
+            const selectorList = selectorToSelectorList(
+              argument! as AstSelector,
+            );
+            const a = selectorList.flat(3);
+            return <NotPseudoClass> {
+              "value": name,
+              type: "pseudo-class",
+              argument: a,
+            };
+          }
+        }
+
+        throw new Error("");
+      },
+    );
+
+    compoundSelector.push(...selectors);
+  }
+
+  return compoundSelector;
 }
 
-function typeSelector(name: string): TypeSelector {
-  return { type: "type", name };
+function typeSelector(value: string): TypeSelector {
+  return { type: "type", value };
 }
 
 function tag(
@@ -59,33 +158,34 @@ function tag(
   }
 }
 
-function id(id: string): IDSelector {
-  return { type: "id", id };
+export function id(id: string): IDSelector {
+  return { type: "id", value: id };
 }
 
-function attr(ast: AstAttribute): AttributeSelector {
+export function attr(ast: AstAttribute): AttributeSelector {
   const { name, caseSensitivityModifier } = ast;
   const base = { type: "attr", name } as const;
 
-  if (ast.operator) {
-    if (!ast.value) throw new Error("invalid");
-
-    const value = valueToStr(ast.value);
-    const operator = operatorToSymbol(ast.operator);
-
-    const base_ = { ...base, operator, value };
-
-    if (caseSensitivityModifier) {
-      return {
-        ...base_,
-        case: caseSensitivityModifierToCase(caseSensitivityModifier),
-      };
-    }
-
-    return base_;
+  if (typeof ast.operator !== "string" && !ast.value) {
+    return base;
   }
 
-  return base;
+  if (typeof ast.operator !== "string" || !ast.value) {
+    throw new Error("unreachable");
+  }
+
+  const value = valueToStr(ast.value);
+  const operator = Operator.from(ast.operator);
+  const base_ = { ...base, operator, value };
+
+  if (caseSensitivityModifier) {
+    return {
+      ...base_,
+      case: caseSensitivityModifierToCase(caseSensitivityModifier),
+    };
+  }
+
+  return base_;
 }
 
 function valueToStr(ast: AstString | AstSubstitution): string {
@@ -94,25 +194,6 @@ function valueToStr(ast: AstString | AstSubstitution): string {
       return ast.value;
     case "Substitution":
       return ast.name;
-  }
-}
-
-function operatorToSymbol(operator: string): Operator {
-  switch (operator) {
-    case Operator.EndWith:
-      return Operator.EndWith;
-    case Operator.HyphenOf:
-      return Operator.HyphenOf;
-    case Operator.ExactEq:
-      return Operator.ExactEq;
-    case Operator.OneOf:
-      return Operator.OneOf;
-    case Operator.PartOf:
-      return Operator.PartOf;
-    case Operator.StartWith:
-      return Operator.StartWith;
-    default:
-      return Operator.Unknown;
   }
 }
 
