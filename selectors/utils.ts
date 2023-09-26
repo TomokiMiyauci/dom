@@ -115,6 +115,7 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "valid":
           case "invalid":
           case "empty":
+          case "first-child":
             return {
               type: "pseudo-class",
               value: name,

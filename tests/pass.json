@@ -2913,18 +2913,6 @@
         "reason": "the selector is not supported"
       },
       {
-        "name": "Element.closest with context node 'test11' and selector ':last-child'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test12' and selector ':first-child'",
-        "reason": "the selector is not supported"
-      },
-      {
-        "name": "Element.closest with context node 'test12' and selector ':first-child'",
-        "reason": "the selector is not supported"
-      },
-      {
         "name": "Element.closest with context node 'test11' and selector ':invalid'",
         "reason": "the selector is not supported"
       },

@@ -161,6 +161,10 @@ export function matchPseudoClass(
     case "empty":
       return !element.hasChildNodes();
 
+    case "first-child": {
+      return element.parentNode?.firstElementChild === element;
+    }
+
     default:
       throw new Error("");
   }
