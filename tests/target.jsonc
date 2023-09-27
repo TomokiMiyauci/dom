@@ -348,7 +348,7 @@
   "dom/nodes/ParentNode-append.html",
   "dom/nodes/ParentNode-children.html",
   "dom/nodes/ParentNode-prepend.html",
-  // "dom/nodes/ParentNode-querySelector-All-content.html",
+  "dom/nodes/ParentNode-querySelector-All-content.html",
   // "dom/nodes/ParentNode-querySelector-All.html",
   "dom/nodes/ParentNode-querySelector-case-insensitive.html",
   // "dom/nodes/ParentNode-querySelector-escapes.html",
