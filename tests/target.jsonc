@@ -417,7 +417,7 @@
   // "!dom/traversal/support/TreeWalker-acceptNode-filter-cross-realm-null-browsing-context-subframe.html",
   // "dom/traversal/TreeWalker-acceptNode-filter-cross-realm-null-browsing-context.html",
   // "dom/traversal/TreeWalker-acceptNode-filter-cross-realm.html",
-  // "dom/traversal/TreeWalker-acceptNode-filter.html",
+  "dom/traversal/TreeWalker-acceptNode-filter.html",
   "dom/traversal/TreeWalker-basic.html",
   "dom/traversal/TreeWalker-currentNode.html",
   "dom/traversal/TreeWalker-previousNodeLastChildReject.html",
