@@ -4,7 +4,7 @@ import {
   SessionHistoryEntry,
   SessionHistoryTraversalParallelQueue,
   startNewSessionHistoryTraversalParallelQueue,
-} from "../navigation_and_session_history.ts";
+} from "../navigation_and_session_histories/session_history.ts";
 import { newUniqueIntervalValue } from "../../infra/common_microsyntaxes.ts";
 import { sameOriginDomain } from "../supporting_concepts.ts";
 import {
@@ -176,6 +176,13 @@ export function traversableNavigable(
 }
 
 /**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#top-level-traversable)
+ */
+export function isTopLevelTraversable(navigable: Navigable): boolean {
+  return traversableNavigable(navigable).parent === null;
+}
+
+/**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-container-document)
  */
 export function contentDocument(
@@ -247,8 +254,10 @@ export function createNewChildNavigable(element: Element): void {
   $(element).contentNavigable = navigable;
 
   // 11. Let historyEntry be navigable's active session history entry.
+  const historyEntry = navigable.activeSessionHistoryEntry;
 
   // 12. Let traversable be parentNavigable's traversable navigable.
+  const traversable = parentNavigable;
 
   // 1. Append the following session history traversal steps to traversable:
 

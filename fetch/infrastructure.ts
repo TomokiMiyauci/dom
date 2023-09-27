@@ -69,18 +69,106 @@ export class FetchParams {
   }
 }
 
+export function processNextManualRedirect(
+  controller: FetchController & { nextManualRedirectSteps: Function }, // 1. Assert: controller’s report timing steps is non-null.
+): void {
+  // 2. Call controller’s report timing steps with global.
+  controller.nextManualRedirectSteps();
+}
+
 export class FetchController {
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-controller-state)
    */
   state: "ongoing" | "terminated" | "aborted" = "ongoing";
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-controller-full-timing-info)
+   */
+  fullTimingInfo: FetchTimingInfo | null = null;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-controller-report-timing-steps)
+   */
+
+  reportTimingSteps: Function | null = null;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-controller-serialized-abort-reason)
+   */
+
+  serializedAbortReason: unknown | null = null;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-controller-next-manual-redirect-steps)
+   */
+
+  nextManualRedirectSteps: Function | null = null;
 }
 
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info)
  */
 export class FetchTimingInfo {
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-start-time)
+   */
   startTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-redirect-start-time)
+   */
+  redirectStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-redirect-end-time)
+   */
+  redirectEndTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-post-redirect-start-time)
+   */
+  postRedirectStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-final-service-worker-start-time)
+   */
+  finalServiceWorkerStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-final-network-request-start-time)
+   */
+  finalNetworkRequestStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-first-interim-network-response-start-time)
+   */
+  firstInterimNetworkResponseStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-final-network-response-start-time)
+   */
+  finalNetworkResponseStartTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-end-time)
+   */
+  endTime = 0;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-final-connection-timing-info)
+   */
+  finalConnectionTimingInfo: ConnectionTimingInfo | null = null;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-server-timing-headers)
+   */
+  serverTimingHeaders: List<string> = new List();
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-timing-info-render-blocking)
+   */
+  renderBlocking = false;
 }
 
 const httpSchemes = new Set<string>(["http", "https"]);
@@ -177,3 +265,20 @@ type HeaderName = ByteSequence;
 type HeaderList = List<Header>;
 
 export type Header = [name: ByteSequence, value: ByteSequence];
+
+/**
+ * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#connection-timing-info)
+ */
+export class ConnectionTimingInfo {
+  domainLookupStartTime = 0;
+
+  domainLookupEndTime = 0;
+
+  connectionStartTime = 0;
+
+  connectionEndTime = 0;
+
+  secureConnectionStartTime = 0;
+
+  ALPNNegotiatedProtocol: unknown;
+}

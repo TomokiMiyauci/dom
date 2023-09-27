@@ -4,7 +4,7 @@ import { Namespace } from "../../infra/namespace.ts";
 import {
   NavigationParams,
   setOngoingNavigation,
-} from "./navigation_and_session_history.ts";
+} from "./navigation_and_session_histories/navigation.ts";
 import { $ } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 import * as DOM from "../../internal.ts";
@@ -26,6 +26,7 @@ import {
   sameOriginDomain,
 } from "./supporting_concepts.ts";
 import { navigationID } from "../internal.ts";
+import { HTMLParser } from "../html_parser.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#populate-with-html/head/body)
@@ -211,11 +212,15 @@ export function loadHTMLDocument(
     navigationParams,
   );
 
+  const { URL } = DOM.$(document);
+
   // 2. If document's URL is about:blank, then populate with html/head/body given document.
-  if (matchAboutBlank(DOM.$(document).URL)) populateHTMLHeadBody(document);
+  if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
   // 3. Otherwise,
   else {
     // create an HTML parser and associate it with the document. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
+    const parser = new HTMLParser(document);
+
     // The first task that the networking task source places on the task queue while fetching runs must process link headers given document, navigationParams's response, and "media", after the task has been processed by the HTML parser.
 
     // Before any script execution occurs, the user agent must wait for scripts may run for the newly-created document to be true for document.

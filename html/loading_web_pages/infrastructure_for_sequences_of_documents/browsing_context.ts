@@ -1,5 +1,6 @@
 import {
   determineCreationSandboxingFlags,
+  OpaqueOrigin,
   Origin,
 } from "../supporting_concepts.ts";
 import { $ } from "../../internal.ts";
@@ -95,7 +96,6 @@ export function createNewBrowsingContextAndDocument(
   // 10. Let realm execution context be the result of creating a new realm given agent and the following customizations:
 
   // - For the global object, create a new Window object.
-
   // - For the global this binding, use browsingContext's WindowProxy object.
 
   // 11. Let topLevelCreationURL be about:blank if embedder is null; otherwise embedder's relevant settings object's top-level creation URL.
@@ -158,13 +158,14 @@ export function createNewBrowsingContextAndDocument(
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#determining-the-origin)
  */
 export function determineOrigin(
-  url: URL,
+  url: URL | null,
   sandboxFlags: unknown,
   sourceOrigin: Origin | null,
 ): Origin {
   // 1. If sandboxFlags has its sandboxed origin browsing context flag set, then return a new opaque origin.
 
   // 2. If url is null, then return a new opaque origin.
+  if (!url) return new OpaqueOrigin();
 
   // 3. If url is about:srcdoc, then:
 
