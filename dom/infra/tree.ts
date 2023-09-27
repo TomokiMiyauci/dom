@@ -161,7 +161,7 @@ export class Tree<
 
     const parent = this.parent(node);
 
-    return parent ? this.#nextNodeDescendant(parent) : null;
+    return parent ? this.nextDescendant(parent) : null;
   }
 
   /** Yield following nodes of {@linkcode node}. */
@@ -243,14 +243,15 @@ export class Tree<
     }
   }
 
-  #nextNodeDescendant(node: T): T | null {
+  /** Return next {@linkcode node} descendant. */
+  nextDescendant(node: T): T | null {
     const nextSibling = this.nextSibling(node);
 
     if (nextSibling) return nextSibling;
 
     const parent = this.parent(node);
 
-    return parent ? this.#nextNodeDescendant(parent) : null;
+    return parent ? this.nextDescendant(parent) : null;
   }
 
   /** Yield siblings of {@linkcode node} in tree order. O(n) */
