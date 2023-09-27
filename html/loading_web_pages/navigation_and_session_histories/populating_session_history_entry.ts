@@ -483,7 +483,7 @@ export function createNavigationParamsByFetching(
         const parentEnvironment = activeDocument(navigable.parent!);
 
         // 2. Set topLevelCreationURL to parentEnvironment's top-level creation URL.
-        topLevelCreationURL = DOM.$(parentEnvironment!);
+        // topLevelCreationURL = DOM.$(parentEnvironment!);
 
         // 3. Set topLevelOrigin to parentEnvironment's top-level origin.
         topLevelOrigin = parentEnvironment;
@@ -535,7 +535,7 @@ export function createNavigationParamsByFetching(
     // 13. If response is not a network error, navigable is a child navigable, and the result of performing a cross-origin resource policy check with navigable's container document's origin, navigable's container document's relevant settings object, request's destination, response, and true is blocked, then set response to a network error and break.
 
     // 14. Set locationURL to response's location URL given currentURL's fragment.
-    locationURL = getLocationURL(response, currentURL.hash);
+    locationURL = getLocationURL(response!, currentURL.hash);
 
     // 15. If locationURL is failure or null, then break.
     if (!locationURL) break;

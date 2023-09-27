@@ -27,6 +27,7 @@ import { OrderedSet } from "./infra/data_structures/set.ts";
 import { List } from "./infra/data_structures/list.ts";
 import { TextTree } from "./dom/nodes/text_utils.ts";
 import { emplace, UnionToIntersection } from "./deps.ts";
+import { RequestInternals } from "./fetch/request.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],
@@ -53,9 +54,10 @@ type InternalSlotEntries = [
     manuallyAssignedNodes: OrderedSet<Element | Text>;
     assignedNodes: List<Element | Text>;
   }],
+  [Request, RequestInternals],
 ];
 
-interface InternalSlots<T extends [unknown, unknown]> {
+export interface InternalSlots<T extends [unknown, unknown]> {
   get<U extends T[0]>(
     key: U,
   ): UnionToIntersection<T extends any ? U extends T[0] ? T[1] : never : never>;

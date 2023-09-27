@@ -9,7 +9,7 @@ import { willLoadElementSteps } from "../infra/fetching_resource.ts";
 import {
   navigate,
   NavigationHistoryBehavior,
-} from "../loading_web_pages/navigation_and_session_history.ts";
+} from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
 import { completelyLoaded } from "../loading_web_pages/document_lifecycle.ts";
 
 /**

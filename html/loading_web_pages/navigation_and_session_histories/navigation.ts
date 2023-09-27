@@ -2,11 +2,13 @@ import { List } from "../../../infra/data_structures/list.ts";
 import {
   CrossOriginOpenerPolicy,
   CrossOriginOpenerPolicyEnforcementResult,
+  determineNavigationParamsPolicyContainer,
   Origin,
   PolicyContainer,
 } from "../supporting_concepts.ts";
 import {
   activeDocument,
+  containerDocument,
   Navigable,
   targetName,
 } from "../infrastructure_for_sequences_of_documents/navigable.ts";
@@ -314,17 +316,25 @@ export function navigate(
   const historyEntry = new SessionHistoryEntry({ URL: url, documentState });
 
   // 7. Let navigationParams be null.
-  let navigationParams = null;
+  let navigationParams: NavigationParams | null = null;
 
   // 8. If response is non-null:
   if (response) {
     // 1. Let policyContainer be the result of determining navigation params policy container given response's URL, null, a clone of the sourceDocument's policy container, navigable's container document's policy container, and null.
+    const policyContainer = determineNavigationParamsPolicyContainer(
+      $(response).url!,
+      null,
+      $(sourceDocument).policyContainer,
+      $(containerDocument(navigable)!).policyContainer,
+      null,
+    );
 
     // 2. Let finalSandboxFlags be the union of targetSnapshotParams's sandboxing flags and policyContainer's CSP list's CSP-derived sandboxing flags.
+    const finalSandboxFlags = {}; // TODO
 
     // 3. Let responseOrigin be the result of determining the origin given response's URL, finalSandboxFlags, and documentState's initiator origin.
     const responseOrigin = determineOrigin(
-      response.url,
+      $(response).url,
       finalSandboxFlags,
       documentState.initiatorOrigin,
     );
@@ -335,7 +345,7 @@ export function navigate(
     // 5. Let coopEnforcementResult be a new cross-origin opener policy enforcement result with
     const coopEnforcementResult = new CrossOriginOpenerPolicyEnforcementResult({
       // url: response's URL
-      url: response.url,
+      url: $(response).url!,
       // origin: responseOrigin
       origin: responseOrigin,
       // cross-origin opener policy: coop
