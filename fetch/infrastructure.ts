@@ -1,4 +1,5 @@
 import { List } from "../infra/data_structures/list.ts";
+import { extractSafely } from "./body_init_utils.ts";
 
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params)
@@ -281,4 +282,35 @@ export class ConnectionTimingInfo {
   secureConnectionStartTime = 0;
 
   ALPNNegotiatedProtocol: unknown;
+}
+
+/**
+ * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body)
+ */
+export class Body {
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body-source)
+   */
+  stream: ReadableStream;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body-source)
+   */
+  source: Int8Array | Blob | FormData | null = null;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body-total-bytes)
+   */
+  length: number | null = null;
+
+  constructor(stream: ReadableStream) {
+    this.stream = stream;
+  }
+}
+
+/**
+ * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#byte-sequence-as-a-body)
+ */
+export function asBody(bytes: Uint8Array): Body {
+  return extractSafely(bytes)[0];
 }
