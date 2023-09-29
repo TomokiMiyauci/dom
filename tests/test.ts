@@ -25,14 +25,12 @@ const entry = walk(wptRootURL, {
   match: [include],
 });
 
-const cache = new Map();
-
 Deno.test("wpt", async (t) => {
   for await (const { path, name } of entry) {
     const url = toFileUrl(path);
 
     await t.step(url.href, async (t) => {
-      const metadata = await extractMetadata(url, wptRootURL, cache);
+      const metadata = await extractMetadata(url);
 
       await t.step(metadata.title, async (t) => {
         const reports = runTest(metadata);

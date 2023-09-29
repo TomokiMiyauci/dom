@@ -195,25 +195,13 @@
     "dom/collections/HTMLCollection-supported-property-indices.html": [
       {
         "name": "Trying to delete an indexed property name should never work",
-        "reason": "strict mode"
+        "reason": "Bug"
       }
     ],
     "dom/collections/HTMLCollection-supported-property-names.html": [
       {
         "name": "Trying to set a non-configurable expando that shadows a named property that gets added later",
-        "reason": "strict mode"
-      }
-    ],
-    "dom/nodes/Document-getElementsByTagName.html": [
-      {
-        "name": "Shouldn't be able to set unsigned properties on a HTMLCollection (non-strict mode)",
-        "reason": "strict mode"
-      }
-    ],
-    "dom/nodes/Element-getElementsByTagName.html": [
-      {
-        "name": "Shouldn't be able to set unsigned properties on a HTMLCollection (non-strict mode)",
-        "reason": "strict mode"
+        "reason": "Bug"
       }
     ],
     "dom/nodes/Node-properties.html": [
@@ -2270,15 +2258,7 @@
     ],
     "dom/traversal/NodeIterator.html": [
       {
-        "name": "createNodeIterator() parameter defaults",
-        "reason": "assign to readonly"
-      },
-      {
         "name": "createNodeIterator() with null as arguments",
-        "reason": "assign to readonly"
-      },
-      {
-        "name": "createNodeIterator() with undefined as arguments",
         "reason": "assign to readonly"
       }
     ],
