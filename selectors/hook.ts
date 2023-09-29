@@ -58,13 +58,15 @@ function resolveMessage(e: unknown): string {
 export function matchSelector(
   selector: SelectorList,
   element: Element,
-  scopingRoots?: [Node, ...Node[]],
+  scopingRoots?: ScopingRoots,
 ): boolean {
   // For each complex selector in the given selector (which is taken to be a list of complex selectors),
   for (const complexSelector of selector) {
     // match the complex selector against element, as described in the following paragraph.
     // If the matching returns success for any complex selector, then the algorithm return success;
-    if (matchComplexSelector(complexSelector, element)) return true;
+    if (matchComplexSelector(complexSelector, element, scopingRoots)) {
+      return true;
+    }
   }
 
   // otherwise it returns failure.
@@ -86,11 +88,14 @@ function matchCompoundSelector(
 export function matchComplexSelector(
   complexSelector: ComplexSelector,
   element: Element,
+  scopingRoots?: ScopingRoots,
 ): boolean {
   const last = lastItem(complexSelector);
 
   for (const simpleSelector of last[0]) {
-    if (!matchSimpleSelector(simpleSelector, element)) return false;
+    if (!matchSimpleSelector(simpleSelector, element, scopingRoots)) {
+      return false;
+    }
   }
 
   if (complexSelector.length === 1) return true;
@@ -133,6 +138,7 @@ function resolveCombinator(
 export function matchSimpleSelector(
   simpleSelector: SimpleSelector,
   element: Element,
+  scopingRoots?: ScopingRoots,
 ): boolean {
   switch (simpleSelector.type) {
     case "type":
@@ -146,13 +152,14 @@ export function matchSimpleSelector(
     case "attr":
       return matchAttributeSelector(simpleSelector, element);
     case "pseudo-class":
-      return matchPseudoClass(simpleSelector, element);
+      return matchPseudoClass(simpleSelector, element, scopingRoots);
   }
 }
 
 export function matchPseudoClass(
   selector: PseudoClassSelector,
   element: Element,
+  scopingRoots?: ScopingRoots,
 ): boolean {
   switch (selector.value) {
     case "not":
@@ -166,6 +173,12 @@ export function matchPseudoClass(
 
     case "last-child":
       return element.parentNode?.lastElementChild === element;
+
+    case "scope": {
+      if (!scopingRoots) return false;
+
+      return scopingRoots.includes(element);
+    }
 
     default:
       throw new Error("");
@@ -262,13 +275,15 @@ function matchIdSelector(idSelector: IDSelector, element: Element): boolean {
   return element.id === idSelector.value;
 }
 
+type ScopingRoots = [Node, ...Node[]];
+
 /**
  * @see https://drafts.csswg.org/selectors-4/#match-against-tree
  */
 export function matchSelectorToTree(
   selector: SelectorList,
   rootElement: Node,
-  scopingRoots?: Iterable<Node>,
+  scopingRoots?: ScopingRoots,
   condition?: Function,
 ): Element[] {
   // 1. Start with a list of candidate elements, which are the root elements and all of their descendant elements, sorted in shadow-including tree order, unless otherwise specified.
@@ -294,7 +309,9 @@ export function matchSelectorToTree(
   // 4. For each element in the set of candidate elements:
   for (const element of candidateElements) {
     // 1. If the result of match a selector against an element for element and selector is success, add element to the selector match list.
-    if (matchSelector(selector, element)) selectorMatchList.push(element);
+    if (matchSelector(selector, element, scopingRoots)) {
+      selectorMatchList.push(element);
+    }
 
     // 2. For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list.
   }

@@ -117,17 +117,18 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "empty":
           case "first-child":
           case "last-child":
+          case "scope":
             return { type: "pseudo-class", value: name };
 
           case "not": {
             const selectorList = selectorToSelectorList(
               argument! as AstSelector,
             );
-            const a = selectorList.flat(3);
+            const arg = selectorList.flat(3);
             return <NotPseudoClass> {
               "value": name,
               type: "pseudo-class",
-              argument: a,
+              argument: arg,
             };
           }
         }

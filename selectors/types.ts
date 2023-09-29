@@ -90,7 +90,8 @@ export type PseudoClassSelector =
   | ValidityPseudoClass
   | EmptyPseudoClass
   | FirstChildPseudoClass
-  | LastChildPseudoClass;
+  | LastChildPseudoClass
+  | ScopePseudoClass;
 
 export interface RegularPseudoClass {
   type: "pseudo-class";
@@ -111,6 +112,10 @@ export interface FirstChildPseudoClass extends RegularPseudoClass {
 
 export interface LastChildPseudoClass extends RegularPseudoClass {
   value: "last-child";
+}
+
+export interface ScopePseudoClass extends RegularPseudoClass {
+  value: "scope";
 }
 
 export interface NotPseudoClass extends RegularPseudoClass {

@@ -23,6 +23,6 @@ export function matchScopedSelectorsString(
   return matchSelectorToTree(
     s,
     tree.root(node),
-    new OrderedSet([node]),
+    [node],
   );
 }
