@@ -1,11 +1,12 @@
-export class RealmRecord {
-  "[[AgentSignifier]]": Agent = new Agent();
+/**
+ * @see [ECMAScript Language Specification](https://tc39.es/ecma262/#table-realm-record-fields)
+ */
+export interface RealmRecord {
+  "[[AgentSignifier]]": Agent;
   "[[Intrinsics]]": unknown;
-  "[[GlobalObject]]": unknown;
-  "[[GlobalEnv]]": unknown;
-  "[[TemplateMap]]": unknown;
-  "[[LoadedModules]]": unknown;
+  "[[GlobalObject]]": object | undefined;
   "[[HostDefined]]": unknown;
 }
 
-export class Agent {}
+export interface Agent {
+}

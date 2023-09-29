@@ -13,6 +13,10 @@ import {
   CrossOriginOpenerPolicy,
   PolicyContainer,
 } from "./loading_web_pages/supporting_concepts.ts";
+import { OrderedSet } from "../infra/data_structures/set.ts";
+import { SameObject } from "../webidl/extended_attribute.ts";
+import { HTMLCollection } from "../dom/nodes/node_trees/html_collection.ts";
+import { isHTMLScriptElement } from "./elements/scripting/html_script_element_utils.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -204,8 +208,16 @@ export function Document_HTML<T extends Constructor<Document>>(
       throw new Error();
     }
 
+    /**
+     * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#dom-document-scripts)
+     */
+    @SameObject
     override get scripts(): HTMLCollectionOf<HTMLScriptElement> {
-      throw new Error();
+      // return an HTMLCollection rooted at the Document node, whose filter matches only script elements.
+      return new HTMLCollection({
+        root: this,
+        filter: isHTMLScriptElement,
+      }) as any as HTMLCollectionOf<HTMLScriptElement>;
     }
 
     override getElementsByName(elementName: string): NodeListOf<HTMLElement> {
@@ -383,6 +395,21 @@ export class DocumentInternals {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#unload-counter)
    */
   unloadCounter = 0;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#render-blocking-element-set)
+   */
+  renderBlockingElementSet: OrderedSet<Element> = new OrderedSet();
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#ignore-destructive-writes-counter)
+   */
+  ignoreDestructiveWritesCounter = 0;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#dom-document-currentscript)
+   */
+  currentScript: Element | null = null;
 }
 
 /**

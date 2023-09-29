@@ -454,7 +454,7 @@ export function createNavigationParamsByFetching(
 
   // 19. While true:
   while (true) {
-    const reservedClient = DOM.$(request).reservedClient;
+    const reservedClient = $(request).reservedClient;
     // 1. If request's reserved client is not null and currentURL's origin is not the same as request's reserved client's creation URL's origin, then:
     if (
       reservedClient &&
@@ -463,7 +463,7 @@ export function createNavigationParamsByFetching(
       // 1. Run the environment discarding steps for request's reserved client.
 
       // 2. Set request's reserved client to null.
-      DOM.$(request).reservedClient = null;
+      $(request).reservedClient = null;
 
       // 3. Set commitEarlyHints to null.
       commitEarlyHints = null;

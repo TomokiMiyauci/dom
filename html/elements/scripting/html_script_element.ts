@@ -3,10 +3,24 @@ import { HTMLElement } from "../../dom/html_element.ts";
 import { reflectSet } from "../../../dom/nodes/utils/set_attribute_value.ts";
 import { reflectGet } from "../../../dom/nodes/elements/element_utils.ts";
 import { Exposed } from "../../../webidl/extended_attribute.ts";
+import {
+  ImportMapParseResult,
+  Script,
+} from "../../web_application_apis/scripting.ts";
+import { internalSlots } from "../../internal.ts";
 
 @Exposed(Window)
 export class HTMLScriptElement extends HTMLElement
   implements IHTMLScriptElement {
+  constructor(...args: any[]) {
+    // @ts-ignore
+    super(...args);
+
+    internalSlots.extends<HTMLScriptElement>(
+      this,
+      new HTMLScriptElementInternals(),
+    );
+  }
   get async(): boolean {
     throw new Error("async#getter");
   }
@@ -94,4 +108,37 @@ export class HTMLScriptElement extends HTMLElement
   set type(value: string) {
     reflectSet(this, "src", value);
   }
+}
+
+export class HTMLScriptElementInternals {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#parser-document)
+   */
+  parserDocument: Document | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#concept-script-external)
+   */
+  fromExternalFile = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#preparation-time-document)
+   */
+  preparationTimeDocument: Document | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#already-started)
+   */
+  alreadyStarted = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#concept-script-type)
+   */
+  type: "classic" | "module" | "importmap" | null = null;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#concept-script-result)
+   */
+  result: "uninitialized" | Script | ImportMapParseResult | null =
+    "uninitialized";
 }

@@ -33,12 +33,14 @@ export class FetchParams {
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params-process-response-end-of-body)
    */
-  processResponseEndOfBody: Function | null = null;
+  processResponseEndOfBody: ((response: Response) => void) | null = null;
 
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params-process-response-consume-body)
    */
-  processResponseConsumeBody: Function | null = null;
+  processResponseConsumeBody:
+    | ((response: Response, body: false | null | Uint8Array) => void)
+    | null = null;
 
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params-task-destination)
@@ -296,7 +298,7 @@ export class Body {
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body-source)
    */
-  source: Int8Array | Blob | FormData | null = null;
+  source: Uint8Array | null = null;
 
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-body-total-bytes)
@@ -313,4 +315,15 @@ export class Body {
  */
 export function asBody(bytes: Uint8Array): Body {
   return extractSafely(bytes)[0];
+}
+
+/**
+ * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#body-fully-read)
+ */
+export function readFully(
+  body: Body,
+  processBody: (nullOrBytes: null | Uint8Array) => void,
+  processBodyError: Function,
+) {
+  processBody(body.source);
 }

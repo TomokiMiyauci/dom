@@ -1,14 +1,15 @@
 import { OrderedSet } from "../../infra/data_structures/set.ts";
-import { $, internalSlots } from "../internal.ts";
-import {
-  Agent,
-  RealmRecord,
-} from "../../ecma/executable_coce_and_execution_context.ts";
+import { $ } from "../internal.ts";
+import { Agent } from "../../ecma/executable_coce_and_execution_context.ts";
+
+import { ParseScript, ScriptRecord } from "../../ecma/scripts_and_modules.ts";
 import {
   Origin,
   PolicyContainer,
 } from "../loading_web_pages/supporting_concepts.ts";
 import { BrowsingContext } from "../loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
+import { fetch } from "../../fetch/fetching.ts";
+import { createPotentialCORSRequest } from "../infra/fetching_resource.ts";
 
 export function queueTask(
   source: unknown,
@@ -87,12 +88,6 @@ export function relevantAgent(platformObject: object): Agent {
   return $(platformObject).realm["[[AgentSignifier]]"];
 }
 
-const realm = new RealmRecord();
-internalSlots.extends(Object.prototype, { realm });
-
-const agent = realm["[[AgentSignifier]]"];
-internalSlots.extends(agent, { taskQueues: new OrderedSet() });
-
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#environment)
  */
@@ -132,4 +127,171 @@ export interface EnvironmentSettingsObject extends Environment {
   crossOriginIsolatedCability: boolean;
 
   timeOrigin: number;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#script-structs)
+ */
+export interface Script {
+  settingsObject: EnvironmentSettingsObject;
+
+  record: ScriptRecord | null;
+
+  parseError: unknown | null;
+
+  errorRethrow: unknown;
+
+  FetchOptions: ScriptFetchOptions;
+
+  baseURL: URL | null;
+}
+
+export interface ClassicScript extends Script {
+  mutedErrors: boolean;
+
+  record: ScriptRecord | null;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#script-fetch-options)
+ */
+export interface ScriptFetchOptions {
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-classic-script)
+ */
+export function fetchClassicScript(
+  url: URL,
+  settingsObject: EnvironmentSettingsObject,
+  options: ScriptFetchOptions,
+  corsSetting: unknown,
+  encoding: unknown,
+  onComplete: (script: ClassicScript | null) => void,
+) {
+  // 1. Let request be the result of creating a potential-CORS request given url, "script", and corsSetting.
+  const request = createPotentialCORSRequest(url, "script", corsSetting);
+
+  // 2. Set request's client to settingsObject.
+  $(request).client = settingsObject;
+
+  // 3. Set request's initiator type to "script".
+  $(request).initiatorType = "script";
+
+  // 4. Set up the classic script request given request and options.
+
+  // 5. Fetch request with the following processResponseConsumeBody steps given response response and null, failure, or a byte sequence bodyBytes:
+  // TODO
+  fetch(
+    request,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    (response, bodyBytes) => {
+      // 1. Set response to response's unsafe response.
+
+      // 2. If any of the following are true:
+      // - bodyBytes is null or failure; or
+      // - response's status is not an ok status,
+      if (!bodyBytes) {
+        // then run onComplete given null, and abort these steps.
+        onComplete(null);
+        return;
+      }
+
+      const sourceText = new TextDecoder().decode(bodyBytes);
+
+      // 7. Let script be the result of creating a classic script given sourceText, settingsObject, response's URL, options, and mutedErrors.
+      const script = createClassicScript(
+        sourceText,
+        {} as any,
+        $(response).url!,
+        {},
+        // TODO
+      );
+
+      // 8. Run onComplete given script.
+      onComplete(script);
+    },
+  );
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#import-map-parse-result)
+ */
+export interface ImportMapParseResult {
+  importMap: ImportMap;
+
+  errorToRethrow: unknown;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#run-a-classic-script)
+ */
+export function runClassicScript(
+  script: ClassicScript,
+  rethrowErrors = false,
+): void {
+  const sourceCode = script.record!["[[ECMAScriptCode]]"]!;
+  const sourceText = !script.baseURL
+    ? sourceCode.replace(new RegExp(`^"use strict";`), "")
+    : sourceCode;
+
+  eval?.(sourceText);
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#import-map)
+ */
+export interface ImportMap {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#impr-import-map)
+   */
+  imports: unknown;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#impr-error-to-rethrow)
+   */
+  scopes: unknown;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#creating-a-classic-script)
+ */
+export function createClassicScript(
+  source: string,
+  settings: EnvironmentSettingsObject,
+  baseURL: URL,
+  options: ScriptFetchOptions,
+  mutedErrors = false,
+) {
+  // 1. If mutedErrors is true, then set baseURL to about:blank.
+  if (mutedErrors) baseURL = new URL("about:blank");
+
+  // 2. If scripting is disabled for settings, then set source to the empty string.
+
+  // 3. Let script be a new classic script that this algorithm will subsequently initialize.
+  const script: ClassicScript = {
+    // 4. Set script's settings object to settings.
+    settingsObject: settings,
+    // 5. Set script's base URL to baseURL.
+    baseURL,
+    // 6. Set script's fetch options to options.
+    FetchOptions: options,
+    // 7. Set script's muted errors to mutedErrors.
+    mutedErrors,
+    // 8. Set script's parse error and error to rethrow to null.
+    parseError: null,
+    errorRethrow: null,
+    record: null,
+  };
+
+  // 9. Let result be ParseScript(source, settings's realm, script).
+  const result = ParseScript(source, settings as any, script);
+
+  script.record = result;
+
+  return script;
 }
