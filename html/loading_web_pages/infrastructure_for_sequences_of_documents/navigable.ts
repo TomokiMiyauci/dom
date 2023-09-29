@@ -179,7 +179,7 @@ export function traversableNavigable(
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#top-level-traversable)
  */
 export function isTopLevelTraversable(navigable: Navigable): boolean {
-  return traversableNavigable(navigable).parent === null;
+  return true;
 }
 
 /**

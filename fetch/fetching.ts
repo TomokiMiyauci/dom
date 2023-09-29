@@ -59,6 +59,7 @@ export function fetch(
   if (processResponseConsumeBody) {
     fetchParams.processResponseConsumeBody = processResponseConsumeBody;
   }
+  if (processResponse) fetchParams.processResponse = processResponse;
 
   const { body } = $(request);
   // 8. If request’s body is a byte sequence, then set request’s body to request’s body as a body.
@@ -185,6 +186,9 @@ export function mainFetch(
 
     // request’s mode is "same-origin"
     // Return a network error.
+
+    $(request).responseTainting = "cors";
+
     return networkError();
 
     // request’s mode is "no-cors"
@@ -343,7 +347,10 @@ export function fetchResponseHandover(
     queueMicrotask(processResponseEndOfBodyTask);
   };
 
+  const { processResponse } = fetchParams;
+
   // 4. If fetchParams’s process response is non-null, then queue a fetch task to run fetchParams’s process response given response, with fetchParams’s task destination.
+  if (processResponse) queueMicrotask(() => processResponse(response));
 
   // 5. Let internalResponse be response, if response is a network error; otherwise response’s internal response.
   const internalResponse = isNetworkError(response) ? response : response; // TODO

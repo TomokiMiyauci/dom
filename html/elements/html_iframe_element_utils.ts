@@ -33,12 +33,10 @@ export function processIframeAttributes(
 
   // 2. Otherwise:
   // 1. Let url be the result of running the shared attribute processing steps for iframe and frame elements given element and initialInsertion.
-  // TODO
-  const url: URL | null = new URL("about:blank");
-  // const url = sharedAttributeProcessingSteps(
-  //   element,
-  //   initialInsertion,
-  // );
+  const url = sharedAttributeProcessingSteps(
+    element,
+    initialInsertion,
+  );
 
   // 2. If url is null, then return.
   if (!url) return;

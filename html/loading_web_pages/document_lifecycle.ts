@@ -5,7 +5,7 @@ import {
   NavigationParams,
   setOngoingNavigation,
 } from "./navigation_and_session_histories/navigation.ts";
-import { $ } from "../internal.ts";
+import { $, internalSlots } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 import * as DOM from "../../internal.ts";
 import {
@@ -27,6 +27,7 @@ import {
 } from "./supporting_concepts.ts";
 import { navigationID } from "../internal.ts";
 import { HTMLParser } from "../html_parser.ts";
+import { ResponseInternals } from "../../fetch/response.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#populate-with-html/head/body)
@@ -78,7 +79,7 @@ export function createAndInitializeDocument(
   // 3. Let permissionsPolicy be the result of creating a permissions policy from a response given navigationParams's navigable's container, navigationParams's origin, and navigationParams's response. [PERMISSIONSPOLICY]
 
   // 4. Let creationURL be navigationParams's response's URL.
-  let creationURL = new URL(navigationParams.response.url); // TODO use internal URL
+  const creationURL = $(navigationParams.response).url;
 
   // 5. If navigationParams's request is non-null, then set creationURL to navigationParams's request's current URL.
   if (navigationParams.request) {}
@@ -153,7 +154,7 @@ export function createAndInitializeDocument(
   // during-loading navigation ID for WebDriver BiDi: navigationParams's id
   $(document).duringLoadingNavigationIDForWebDriverBiDi = navigationParams.id;
   // URL: creationURL
-  DOM.$(document).URL = creationURL;
+  DOM.$(document).URL = creationURL!;
   // current document readiness: "loading"
 
   // about base URL: navigationParams's about base URL
@@ -214,12 +215,18 @@ export function loadHTMLDocument(
 
   const { URL } = DOM.$(document);
 
+  console.log(URL);
+
   // 2. If document's URL is about:blank, then populate with html/head/body given document.
   if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
   // 3. Otherwise,
   else {
     // create an HTML parser and associate it with the document. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
     const parser = new HTMLParser(document);
+
+    queueMicrotask(async () => {
+      // parser.parse();
+    });
 
     // The first task that the networking task source places on the task queue while fetching runs must process link headers given document, navigationParams's response, and "media", after the task has been processed by the HTML parser.
 
@@ -256,6 +263,9 @@ export function displayInlineContent(
     crossOriginOpenerPolicy: coop,
   });
 
+  const response = new Response();
+  internalSlots.extends(response, new ResponseInternals());
+
   // 4. Let navigationParams be a new navigation params with
   const navigationParams: NavigationParams = {
     // id: navigationId
@@ -265,7 +275,7 @@ export function displayInlineContent(
     // request: null
     request: null,
     // response: a new response
-    response: new Response(),
+    response,
     // origin: origin
     origin,
     // fetch controller: null

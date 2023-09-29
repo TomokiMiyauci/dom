@@ -1,5 +1,6 @@
 import { List } from "../infra/data_structures/list.ts";
 import { extractSafely } from "./body_init_utils.ts";
+import { $ } from "../html/internal.ts";
 
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params)
@@ -195,7 +196,7 @@ export function locationURL(
   requestFragment: string | null,
 ): URL | null | Failure {
   // 1. If response’s status is not a redirect status, then return null.
-  if (isRedirectStatus(response.status)) return null;
+  if (isRedirectStatus($(response).status)) return null;
 
   const locationValue = response.headers.get("Location");
 

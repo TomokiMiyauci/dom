@@ -19,7 +19,7 @@ import {
 import { StructuredSerializeForStorage } from "../../infra/safe_passing_of_structured_data.ts";
 import * as DOM from "../../../internal.ts";
 import { displayInlineContent } from "../document_lifecycle.ts";
-import { $ } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 import {
   determineOrigin,
 } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
@@ -40,11 +40,15 @@ import {
   TargetSnapshotParams,
 } from "./navigation.ts";
 import { origin } from "../../../url/url.ts";
+import { RequestInternals } from "../../../fetch/request.ts";
+import { isNetworkError } from "../../../fetch/response.ts";
+import { fetch } from "../../../fetch/fetching.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#attempt-to-populate-the-history-entry's-document)
  */
-export function attemptPopulateHistoryEntryDocument(
+// 1. Assert: this is running in parallel.
+export async function attemptPopulateHistoryEntryDocument(
   entry: SessionHistoryEntry,
   navigable: Navigable,
   navTimingType: NavigationTimingType,
@@ -56,9 +60,7 @@ export function attemptPopulateHistoryEntryDocument(
   cspNavigationType = "other",
   allowPOST = false,
   completionSteps: Function = () => {},
-): void {
-  // 1. Assert: this is running in parallel.
-
+): Promise<void> {
   // 2. Assert: if navigationParams is non-null, then navigationParams's response is non-null.
 
   // 3. Let currentBrowsingContext be navigable's active browsing context.
@@ -90,7 +92,7 @@ export function attemptPopulateHistoryEntryDocument(
       (documentResource === null || (allowPOST && documentResource.requestBody))
     ) {
       // then set navigationParams to the result of creating navigation params by fetching given entry, navigable, sourceSnapshotParams, targetSnapshotParams, cspNavigationType, navigationId, and navTimingType.
-      navigationParams = createNavigationParamsByFetching(
+      navigationParams = await createNavigationParamsByFetching(
         entry,
         navigable,
         sourceSnapshotParams,
@@ -133,8 +135,6 @@ export function attemptPopulateHistoryEntryDocument(
   queueMicrotask(() => {
     // 1. If navigable's ongoing navigation no longer equals navigationId,
     // if (navigable.ongoingNavigation !== navigationId) {
-    //   console.log(1);
-
     //   // then run completionSteps and return.
     //   completionSteps();
     //   return;
@@ -347,7 +347,8 @@ export function createNavigationParamsFromSrcdocResource(
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-by-fetching)
  */
-export function createNavigationParamsByFetching(
+// 1. Assert: this is running in parallel.
+export async function createNavigationParamsByFetching(
   entry: SessionHistoryEntry,
   navigable: Navigable,
   sourceSnapshotParams: SourceSnapshotParams,
@@ -355,9 +356,7 @@ export function createNavigationParamsByFetching(
   cspNavigationType: string,
   navigationId: string | null,
   navTimingType: NavigationTimingType,
-): NavigationParams | NonFetchSchemeNavigationParams | null {
-  // 1. Assert: this is running in parallel.
-
+): Promise<NavigationParams | NonFetchSchemeNavigationParams | null> {
   // 2. Let documentResource be entry's document state's resource.
   const documentResource = entry.documentState.resource;
 
@@ -374,10 +373,17 @@ export function createNavigationParamsByFetching(
     // referrer policy: entry's document state's request referrer policy
     referrerPolicy: entry.documentState.requestReferrerPolicy,
   });
-  // client: sourceSnapshotParams's fetch client
-  // destination: "document"
+  const internals = new RequestInternals({
+    URL: entry.URL,
+    // client: sourceSnapshotParams's fetch client
+    client: sourceSnapshotParams.fetchClient as any,
+  });
   // use-URL-credentials flag: set
+  internals.useCORSPreflightFlag = true;
+
+  // destination: "document"
   // replaces client id: navigable's active document's relevant settings object's id
+  internalSlots.extends(request, internals);
 
   // 4. If documentResource is a POST resource, then:
   if (documentResource && typeof documentResource === "object") {
@@ -455,6 +461,7 @@ export function createNavigationParamsByFetching(
   // 19. While true:
   while (true) {
     const reservedClient = $(request).reservedClient;
+
     // 1. If request's reserved client is not null and currentURL's origin is not the same as request's reserved client's creation URL's origin, then:
     if (
       reservedClient &&
@@ -478,7 +485,7 @@ export function createNavigationParamsByFetching(
       let topLevelOrigin = null;
 
       // 3. If navigable is not a top-level traversable, then:
-      if (isTopLevelTraversable(navigable)) {
+      if (!isTopLevelTraversable(navigable)) {
         // 1. Let parentEnvironment be navigable's parent's active document's relevant settings object.
         const parentEnvironment = activeDocument(navigable.parent!);
 
@@ -497,20 +504,36 @@ export function createNavigationParamsByFetching(
     // 4. Set response to null.
     response = null;
 
-    // 5. If fetchController is null, then set fetchController to the result of fetching request, with processEarlyHintsResponse set to processEarlyHintsResponse as defined below, processResponse set to processResponse as defined below, and useParallelQueue set to true.
+    // 5. If fetchController is null,
     if (!fetchController) {
       // Let processEarlyHintsResponse be the following algorithm given a response earlyResponse:
-
-      // 1. If commitEarlyHints is null, then set commitEarlyHints to the result of processing early hint headers given earlyResponse and request's reserved client.
+      const processEarlyHintsResponse = (earlyResponse: Response) => {
+        // 1. If commitEarlyHints is null, then set commitEarlyHints to the result of processing early hint headers given earlyResponse and request's reserved client.
+      };
 
       // Let processResponse be the following algorithm given a response fetchedResponse:
+      const processResponse = (fetchedResponse: Response): void => {
+        // 1. Set response to fetchedResponse.
+        response = fetchedResponse;
+      };
 
-      // 1. Set response to fetchedResponse.
+      // then set fetchController to the result of fetching request, with processEarlyHintsResponse set to processEarlyHintsResponse as defined below, processResponse set to processResponse as defined below, and useParallelQueue set to true.
+      fetchController = fetch(
+        request,
+        undefined,
+        undefined,
+        processEarlyHintsResponse,
+        processResponse,
+        undefined,
+        undefined,
+        true,
+      );
 
       // 6. Otherwise, process the next manual redirect for fetchController.
-    } else processNextManualRedirect(fetchController);
+    } else processNextManualRedirect(fetchController as any);
 
     // 7. Wait until either response is non-null, or navigable's ongoing navigation changes to no longer equal navigationId.
+    await waitUntil(() => !!response);
 
     // If the latter condition occurs, then abort fetchController, and return.
 
@@ -593,8 +616,6 @@ export function createNavigationParamsByFetching(
   }
 
   // 20. If locationURL is a URL whose scheme is not a fetch scheme, then return a new non-fetch scheme navigation params, with
-  // const locationURL = new Non;
-
   // id: navigationId
   // navigable: navigable
   // URL: locationURL
@@ -604,17 +625,22 @@ export function createNavigationParamsByFetching(
   // navigation timing type: navTimingType
 
   // 21. If any of the following are true:
-  // - response is a network error;
-  // - locationURL is failure; or
-  // - locationURL is a URL whose scheme is a fetch scheme,
-
-  // then return null.
+  if (
+    // - response is a network error;
+    isNetworkError(response!)
+    // - locationURL is failure; or
+    // !locationURL
+    // - locationURL is a URL whose scheme is a fetch scheme,
+  ) {
+    // then return null.
+    return null;
+  }
 
   // 22. Assert: locationURL is null and response is not a network error.
 
   // 23. Let resultPolicyContainer be the result of determining navigation params policy container given response's URL, entry's document state's history policy container, sourceSnapshotParams's source policy container, null, and responsePolicyContainer.
   const resultPolicyContainer = determineNavigationParamsPolicyContainer(
-    new URL(response!.url),
+    $(response!).url!,
     entry.documentState.historyPolicyContainer,
     sourceSnapshotParams.sourcePolicyContainer,
     null,
@@ -654,4 +680,10 @@ export function createNavigationParamsByFetching(
     // about base URL: entry's document state's about base URL
     aboutBaseURL: entry.documentState.aboutBaseURL,
   };
+}
+
+async function waitUntil(condition: () => boolean) {
+  while (!condition()) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
 }

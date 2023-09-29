@@ -11,6 +11,7 @@ import {
   containerDocument,
   Navigable,
   targetName,
+  traversableNavigable,
 } from "../infrastructure_for_sequences_of_documents/navigable.ts";
 import * as DOM from "../../../internal.ts";
 import { documentBaseURL, matchAboutBlank } from "../../infra/url.ts";
@@ -29,6 +30,9 @@ import {
 } from "./session_history.ts";
 import { attemptPopulateHistoryEntryDocument } from "./populating_session_history_entry.ts";
 import { determineOrigin } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
+import { appendSessionHistoryTraversalSteps } from "./session_history.ts";
+import { DOMParser } from "../../dom_parser.ts";
+import { DOMExceptionName } from "../../../webidl/exception.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#source-snapshot-params)
@@ -195,10 +199,15 @@ export function navigate(
   const initiatorBaseURLSnapshot = documentBaseURL(sourceDocument);
 
   // 5. If sourceDocument's node navigable is not allowed by sandboxing to navigate navigable given and sourceSnapshotParams, then:
+  if (false) {
+    // 1. If exceptionsEnabled is true, then throw a "SecurityError" DOMException.
+    if (exceptionsEnabled) {
+      throw new DOMException("<message>", DOMExceptionName.SecurityError);
+    }
 
-  // 1. If exceptionsEnabled is true, then throw a "SecurityError" DOMException.
-
-  // 2. Return.
+    // 2. Return.
+    return;
+  }
 
   // 6. Let navigationId be the result of generating a random UUID. [WEBCRYPTO]
   const navigationId = crypto.randomUUID(); // TODO
@@ -249,15 +258,18 @@ export function navigate(
   // 15. Invoke WebDriver BiDi navigation started with targetBrowsingContext, and a new WebDriver BiDi navigation status whose id is navigationId, status is "pending", and url is url.
 
   // 16. If navigable's ongoing navigation is "traversal", then:
+  if (navigable.ongoingNavigation === "traversal") {
+    // 1. Invoke WebDriver BiDi navigation failed with targetBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "canceled", and url is url.
 
-  // 1. Invoke WebDriver BiDi navigation failed with targetBrowsingContext and a new WebDriver BiDi navigation status whose id is navigationId, status is "canceled", and url is url.
-
-  // 2. Return.
+    // 2. Return.
+    return;
+  }
 
   // 17. Set the ongoing navigation for navigable to navigationId.
+  navigable.ongoingNavigation = navigationId;
 
   // 18. If url's scheme is "javascript", then:
-  if (url.protocol === "javascript") { // TODO use internal scheme
+  if (url.protocol === "javascript:") { // TODO use internal scheme
     // 1. Queue a global task on the navigation and traversal task source given navigable's active window to navigate to a javascript: URL given navigable, url, historyHandling, initiatorOriginSnapshot, and cspNavigationType.
 
     // 2. Return.
@@ -265,22 +277,24 @@ export function navigate(
   }
 
   // 19. If all of the following are true:
-  // - userInvolvement is not "browser UI";
-  // - navigable's active document's origin is same origin-domain with sourceDocument's origin;
-  // - navigable's active document's is initial about:blank is false; and
-  // - url's scheme is a fetch scheme,
+  if (
+    // - userInvolvement is not "browser UI";
+    userInvolvement !== UserNavigationInvolvement.BrowserUI
+    // - navigable's active document's origin is same origin-domain with sourceDocument's origin;
+    // - navigable's active document's is initial about:blank is false; and
+    // - url's scheme is a fetch scheme,
+    // then:
+  ) {
+    // 1. Let navigation be navigable's active window's navigation API.
 
-  // then:
+    // 2. Let entryListForFiring be formDataEntryList if documentResource is a POST resource; otherwise, null.
 
-  // 1. Let navigation be navigable's active window's navigation API.
+    // 3. Let navigationAPIStateForFiring be navigationAPIState if navigationAPIState is not null; otherwise, StructuredSerializeForStorage(undefined).
 
-  // 2. Let entryListForFiring be formDataEntryList if documentResource is a POST resource; otherwise, null.
+    // 4. Let continue be the result of firing a push/replace/reload navigate event at navigation with navigationType set to historyHandling, isSameDocument set to false, userInvolvement set to userInvolvement, formDataEntryList set to entryListForFiring, destinationURL set to url, and navigationAPIState set to navigationAPIStateForFiring.
 
-  // 3. Let navigationAPIStateForFiring be navigationAPIState if navigationAPIState is not null; otherwise, StructuredSerializeForStorage(undefined).
-
-  // 4. Let continue be the result of firing a push/replace/reload navigate event at navigation with navigationType set to historyHandling, isSameDocument set to false, userInvolvement set to userInvolvement, formDataEntryList set to entryListForFiring, destinationURL set to url, and navigationAPIState set to navigationAPIStateForFiring.
-
-  // 5. If continue is false, then return.
+    // 5. If continue is false, then return.
+  }
 
   // 20. In parallel, run these steps:
 
@@ -300,16 +314,19 @@ export function navigate(
   // request referrer policy: referrerPolicy
   documentState.origin = referrerPolicy;
   // initiator origin: initiatorOriginSnapshot
-  documentState.resource = documentResource;
+  documentState.initiatorOrigin = initiatorOriginSnapshot;
   // resource: documentResource
-  documentState.navigableTargetName = targetName(navigable);
+  documentState.resource = documentResource;
   // navigable target name: navigable's target name
+  documentState.navigableTargetName = targetName(navigable);
 
   // 5. If url matches about:blank or is about:srcdoc, then:
   if (matchAboutBlank(url)) { // TODO
     // 1. Set documentState's origin to initiatorOriginSnapshot.
+    documentState.origin = initiatorOriginSnapshot;
 
     // 2. Set documentState's about base URL to initiatorBaseURLSnapshot.
+    documentState.aboutBaseURL = initiatorBaseURLSnapshot;
   }
 
   // 6. Let historyEntry be a new session history entry, with its URL set to url and its document state set to documentState.
@@ -386,29 +403,37 @@ export function navigate(
   }
 
   // 9. Attempt to populate the history entry's document for historyEntry, given navigable, "navigate", sourceSnapshotParams, targetSnapshotParams, navigationId, navigationParams, cspNavigationType, with allowPOST set to true and completionSteps set to the following step:
-  attemptPopulateHistoryEntryDocument(
-    historyEntry,
-    navigable,
-    "navigate",
-    sourceSnapshotParams,
-    targetSnapshotParams,
-    navigationId,
-    navigationParams,
-    cspNavigationType,
-    true,
-    () => {
-      // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
-      // appendSessionHistoryTraversalSteps(
-      //   traversableNavigable(navigable),
-      //   () =>
-      //     finalizeCrossDocumentNavigation(
-      //       navigable,
-      //       historyHandling,
-      //       historyEntry,
-      //     ),
-      // );
-    },
-  );
+  // attemptPopulateHistoryEntryDocument(
+  //   historyEntry,
+  //   navigable,
+  //   "navigate",
+  //   sourceSnapshotParams,
+  //   targetSnapshotParams,
+  //   navigationId,
+  //   navigationParams,
+  //   cspNavigationType,
+  //   true,
+  //   (a: any) => {
+  //     // console.log($((a as NavigationParams).response));
+
+  //     // const { body } = $((a as NavigationParams).response);
+  //     // const contents = new TextDecoder().decode(body?.source!);
+
+  //     // console.log(contents);
+
+  //     // new DOMParser().parseFromString(contents, "text/html");
+  //     // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
+  //     // appendSessionHistoryTraversalSteps(
+  //     //   traversableNavigable(navigable),
+  //     //   () =>
+  //     //     finalizeCrossDocumentNavigation(
+  //     //       navigable,
+  //     //       historyHandling,
+  //     //       historyEntry,
+  //     //     ),
+  //     // );
+  //   },
+  // );
 }
 
 export function finalizeCrossDocumentNavigation(
