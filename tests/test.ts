@@ -1,60 +1,54 @@
-import { walk } from "https://deno.land/std@0.190.0/fs/walk.ts";
-import { escape } from "https://deno.land/std@0.190.0/regexp/mod.ts";
-import { basename, toFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
 import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
-import { extractMetadata, runTest } from "./wpt-runner.ts";
+import { createHandler, Runner } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
+import * as DOM from "../mod.ts";
 
-const testList = await Deno.readTextFile(
-  new URL(import.meta.resolve("./target.jsonc")),
-).then(parse) as string[];
+const wptRootURL = new URL(import.meta.resolve("../wpt/"));
+const wptRoot = fromFileUrl(wptRootURL);
+const targetContent = await Deno.readTextFile(
+  fromFileUrl(import.meta.resolve("./target.jsonc")),
+);
+const testList = parse(targetContent) as string[];
+const targets = testList.map((name) => ({
+  name,
+  url: new URL(name, "http://localhost:8000"),
+}));
 
 const passMap = new Map(
   Object.entries(pass.passes).map(([path, passes]) => {
-    return [
-      basename(path),
-      new Set<string>(passes.map(({ name }) => name)),
-    ] as const;
+    return [path, new Set<string>(passes.map(({ name }) => name))] as const;
   }),
 );
-
-const wptRootURL = new URL(import.meta.resolve("../wpt/"));
-const include = new RegExp(testList.map(escape).join("|"));
-const entry = walk(wptRootURL, {
-  includeDirs: false,
-  match: [include],
-});
+const handler = createHandler({ baseDir: wptRoot });
+const server = Deno.serve(handler);
+server.unref();
 
 Deno.test("wpt", async (t) => {
-  for await (const { path, name } of entry) {
-    const url = toFileUrl(path);
+  for (const { url, name } of targets) {
+    await t.step(url.pathname, async (t) => {
+      const runner = new Runner(DOM);
+      const reports = await runner.run(url);
+      // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await t.step(url.href, async (t) => {
-      const metadata = await extractMetadata(url);
+      for await (const report of reports) {
+        const ignore = shouldBeIgnore(name, report.name);
+        const markAsIgnoreButPass = ignore && !report.status;
+        const definition: Deno.TestStepDefinition = {
+          name: report.name,
+          fn: markAsIgnoreButPass
+            ? () => {
+              throw new Error(`test case is passed but it mark as ignore`);
+            }
+            : () => {
+              if (report.status) throw new Error(report.message);
+            },
+          ignore: !markAsIgnoreButPass && ignore,
+        };
 
-      await t.step(metadata.title, async (t) => {
-        const reports = runTest(metadata);
-        // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        for await (const report of reports) {
-          const ignore = shouldBeIgnore(name, report.name);
-          const markAsIgnoreButPass = ignore && !report.status;
-          const definition: Deno.TestStepDefinition = {
-            name: report.name,
-            fn: markAsIgnoreButPass
-              ? () => {
-                throw new Error(`test case is passed but it mark as ignore`);
-              }
-              : () => {
-                if (report.status) throw new Error(report.message);
-              },
-            ignore: !markAsIgnoreButPass && ignore,
-          };
-
-          await t.step(definition);
-        }
-      });
+        await t.step(definition);
+      }
     });
   }
 });

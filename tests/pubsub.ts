@@ -17,7 +17,9 @@ export class PubSub<T> {
 
   publish(data: T) {
     this.#queue.push(data);
-    this.#target.dispatchEvent(new Event(this.#key));
+    this.#target.dispatchEvent(
+      new CustomEvent(this.#key, { detail: { success: true } }),
+    );
   }
 
   async *[Symbol.asyncIterator]() {

@@ -1,110 +1,86 @@
-import {
-  dirname,
-  fromFileUrl,
-  join,
-  resolve,
-  toFileUrl,
-} from "https://deno.land/std@0.190.0/path/mod.ts";
-import * as denoDom from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
-import * as DOM from "../mod.ts";
-import { Statuses, TestReport, Tests, TestsStatus } from "./types.ts";
+import { join, toFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
+import { DOMParser } from "../mod.ts";
+import { TestReport } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
 
-for (const item of Object.keys(DOM)) {
-  Object.defineProperty(self, item, {
-    value: (DOM as Record<string, unknown>)[item],
-  });
-}
+const injectCode = `add_result_callback((t) => {
+  pubsub.publish(t._structured_clone)
+});
+add_completion_callback((_, testStatus, __, tests) => {
+  clearTimeout(tests?.timeout_id ?? undefined);
 
-const parser = new denoDom.DOMParser();
-const baseDir = import.meta.resolve("../wpt/");
-
-export async function extractMetadata(
-  path: URL,
-  root: URL,
-  cache: Map<string, string>,
-): Promise<Metadata> {
-  const source = await Deno.readTextFile(path);
-  const document = parser.parseFromString(source, "text/html")!;
-  const title = document.title;
-  const metadata = { title, document: source, url: path };
-
-  return metadata;
-}
-
-export interface Metadata {
-  title: string;
-  document: string;
-  url: URL;
-}
-
-export function runTest(
-  { document: doc, url }: Metadata,
-): AsyncIterable<TestReport> {
-  const pubsub = new PubSub<TestReport>();
-
-  Object.defineProperty(globalThis, "pubsub", {
-    value: pubsub,
-    configurable: true,
-  });
-
-  const contents = doc.replace(
-    new RegExp(
-      `(<script src="?/resources/testharness.js"?></script>)`,
-    ),
-    `$1<script>add_result_callback((t) => {
-      pubsub.publish(t._structured_clone)
-    });</script>`,
-  );
-
-  new DOM.DOMParser().parseFromString(contents, "text/html", {
-    baseURL: url,
-    resolveURL: (src, baseURL) => {
-      if (src.startsWith("/")) {
-        const absolutePath = fromFileUrl(baseDir);
-        const path = join(absolutePath, src);
-
-        return toFileUrl(path);
-      }
-
-      const absolutePath = fromFileUrl(baseURL);
-      const dirPath = dirname(absolutePath);
-
-      return toFileUrl(resolve(dirPath, src));
-    },
-    fetch: Deno.readFileSync.bind(Deno),
-  });
-
-  window.add_completion_callback((_, testStatus, __, tests) => {
-    clearTimeout(tests?.timeout_id ?? undefined);
-
-    switch (testStatus.status) {
-      case Statuses.Ok:
-      case Statuses.Error:
-        pubsub.unsubscribe();
-        break;
-      case Statuses.Timeout:
-        pubsub.error(new Error("Timeout"));
-        break;
-      default: {
-        pubsub.error(new Error("Precondition fail"));
-      }
+  switch (testStatus.status) {
+    case 0:
+    case 1:
+      pubsub.unsubscribe();
+      break;
+    case 2:
+      pubsub.error(new Error("Timeout"));
+      break;
+    default: {
+      pubsub.error(new Error("Precondition fail"));
     }
-  });
+  }
+});
+`;
 
-  dispatchEvent(new Event("load"));
+export function createHandler(
+  { baseDir }: { baseDir: string },
+): (request: Request) => Promise<Response> {
+  return (request) => {
+    const url = new URL(request.url);
+    const path = join(baseDir, url.pathname);
+    const fileURL = toFileUrl(path);
+    const response = fetch(fileURL);
 
-  if (!document.scripts.length) {
-    pubsub.unsubscribe();
+    return response;
+  };
+}
+
+const pattern = new RegExp(
+  `(<script src=["']?/resources/testharness.js["']?></script>)`,
+);
+function injectScript(input: string): string {
+  return input.replace(pattern, `$1<script>${injectCode}</script>`);
+}
+
+export class Runner {
+  #pubsub: PubSub<TestReport> = new PubSub();
+  constructor(public window: { DOMParser: typeof DOMParser }) {
   }
 
-  return pubsub;
-}
+  async resolve(url: URL): Promise<string> {
+    const response = await fetch(url);
+    const content = await response.text();
 
-declare global {
-  interface Window {
-    add_completion_callback(
-      fn: (_: unknown, status: TestsStatus, __: unknown, tests?: Tests) => void,
-    ): void;
+    Object.defineProperty(globalThis, "pubsub", {
+      value: this.#pubsub,
+      configurable: true,
+      writable: true,
+    });
+    const injectedContent = injectScript(content);
+
+    return injectedContent;
+  }
+
+  async run(url: URL): Promise<AsyncIterable<TestReport>> {
+    const content = await this.resolve(url);
+
+    for (const item of Object.keys(this.window)) {
+      Object.defineProperty(self, item, {
+        value: (this.window as Record<string, unknown>)[item],
+      });
+    }
+
+    const parser = new this.window.DOMParser();
+    const document = parser.parseFromString(content, "text/html", {
+      baseURL: url,
+    });
+
+    if (!document.scripts.length) {
+      this.#pubsub.unsubscribe();
+    }
+
+    return this.#pubsub;
   }
 }
