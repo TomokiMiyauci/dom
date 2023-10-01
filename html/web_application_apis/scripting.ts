@@ -10,6 +10,7 @@ import {
 import { BrowsingContext } from "../loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { fetch } from "../../fetch/fetching.ts";
 import { createPotentialCORSRequest } from "../infra/fetching_resource.ts";
+import { FetchController } from "../../fetch/infrastructure.ts";
 
 export function queueTask(
   source: unknown,
@@ -84,7 +85,6 @@ export interface Task {
 }
 
 export function relevantAgent(platformObject: object): Agent {
-  console.log(platformObject);
   return $(platformObject).realm["[[AgentSignifier]]"];
 }
 
@@ -161,14 +161,14 @@ export interface ScriptFetchOptions {
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#fetch-a-classic-script)
  */
-export function fetchClassicScript(
+export async function fetchClassicScript(
   url: URL,
   settingsObject: EnvironmentSettingsObject,
   options: ScriptFetchOptions,
   corsSetting: unknown,
   encoding: unknown,
   onComplete: (script: ClassicScript | null) => void,
-) {
+): Promise<FetchController> {
   // 1. Let request be the result of creating a potential-CORS request given url, "script", and corsSetting.
   const request = createPotentialCORSRequest(url, "script", corsSetting);
 
@@ -181,8 +181,7 @@ export function fetchClassicScript(
   // 4. Set up the classic script request given request and options.
 
   // 5. Fetch request with the following processResponseConsumeBody steps given response response and null, failure, or a byte sequence bodyBytes:
-  // TODO
-  fetch(
+  return fetch(
     request,
     undefined,
     undefined,

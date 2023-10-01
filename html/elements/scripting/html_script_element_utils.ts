@@ -109,7 +109,9 @@ export function executeScriptElement(el: HTMLScriptElement): void {
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element)
  */
-export function prepareScriptElement(el: HTMLScriptElement): void {
+export async function prepareScriptElement(
+  el: HTMLScriptElement,
+): Promise<void> {
   // 1. If el's already started is true, then return.
   if ($(el).alreadyStarted) return;
 
@@ -254,8 +256,8 @@ export function prepareScriptElement(el: HTMLScriptElement): void {
     switch ($(el).type) {
       // "classic"
       case "classic": {
-        fetchClassicScript(url, {} as any, {}, {}, {}, onComplete);
         // Fetch a classic script given url, settings object, options, classic script CORS setting, encoding, and onComplete.
+        await fetchClassicScript(url, {} as any, {}, {}, {}, onComplete);
         break;
       }
     }

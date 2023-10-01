@@ -1,10 +1,11 @@
-import { $, internalSlots, resolver } from "../html/internal.ts";
+import { $, internalSlots } from "../html/internal.ts";
 import {
   asBody,
   Body,
   FetchController,
   FetchParams,
   FetchTimingInfo,
+  isHTTPScheme,
   readFully,
 } from "./infrastructure.ts";
 import { clone } from "./request.ts";
@@ -13,7 +14,7 @@ import { isNetworkError, networkError, ResponseInternals } from "./response.ts";
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-fetch)
  */
-export function fetch(
+export async function fetch(
   request: Request,
   processRequestBodyChunkLength: Function | null = null,
   processRequestRndOfBody?: Function,
@@ -25,7 +26,7 @@ export function fetch(
     body: false | null | Uint8Array,
   ) => void,
   useParallelQueue = false,
-): FetchController {
+): Promise<FetchController> {
   // 1. Assert: request’s mode is "navigate" or processEarlyHintsResponse is null.
 
   // 2. Let taskDestination be null.
@@ -122,7 +123,7 @@ export function fetch(
   // 2. Append record to request’s client’s fetch group list of fetch records.
 
   // 17. Run main fetch given fetchParams.
-  mainFetch(fetchParams);
+  await mainFetch(fetchParams);
 
   // 18. Return fetchParams’s controller.
   return fetchParams.controller;
@@ -131,10 +132,10 @@ export function fetch(
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-main-fetch)
  */
-export function mainFetch(
+export async function mainFetch(
   fetchParams: FetchParams,
   recursive = false,
-): any {
+): Promise<any> {
   // 1. Let request be fetchParams’s request.
   const request = fetchParams.request;
 
@@ -162,7 +163,7 @@ export function mainFetch(
 
   // 11. If recursive is false, then run the remaining steps in parallel.
 
-  const resolve = (): Response => {
+  const resolve = (): Promise<Response> | Response => {
     // fetchParams’s preloaded response candidate is non-null
     if (fetchParams.preloadedResponseCandidate) {
       // 1. Wait until fetchParams’s preloaded response candidate is not "pending".
@@ -218,7 +219,7 @@ export function mainFetch(
   };
 
   // 12. If response is null, then set response to the result of running the steps corresponding to the first matching statement:
-  if (!response) response = resolve();
+  if (!response) response = await resolve();
 
   // 13. If recursive is true, then return response.
   if (recursive) return response;
@@ -388,7 +389,9 @@ export function fetchResponseHandover(
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-scheme-fetch)
  */
-export function fetchScheme(fetchParams: FetchParams): Response {
+export function fetchScheme(
+  fetchParams: FetchParams,
+): Promise<Response> | Response {
   // 1. If fetchParams is canceled, then return the appropriate network error for fetchParams.
 
   // 2. Let request be fetchParams’s request.
@@ -399,26 +402,10 @@ export function fetchScheme(fetchParams: FetchParams): Response {
   );
 
   switch (scheme) {
-    case "file": {
-      // 1. For now, unfortunate as it is, file: URLs are left as an exercise for the reader.
-
-      const source = resolver.fetch($(request).URL);
-      const response = new Response(source);
-      const internals = new ResponseInternals();
-      const body: Body = {
-        source,
-        length: null,
-        stream: null as any as ReadableStream,
-      };
-      internals.body = body;
-      internalSlots.extends(response, internals);
-
-      // 2. When in doubt, return a network error.
-      return response;
-    }
     default: {
+      if (isHTTPScheme(scheme)) return fetchHTTP(fetchParams);
+
       return networkError();
-      // if (isHTTPScheme(scheme)) return fetchHTTP(fetchParams);
     }
   }
 }
@@ -426,108 +413,124 @@ export function fetchScheme(fetchParams: FetchParams): Response {
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-http-fetch)
  */
-export function fetchHTTP(
+export async function fetchHTTP(
   fetchParams: FetchParams,
   makeCORSPreflight = false,
-): Response {
+): Promise<Response> {
   // 1. Let request be fetchParams’s request.
   const { request } = fetchParams;
 
-  // 2. Let response and internalResponse be null.
-  let response: Response | null = null!, internalResponse = null;
+  // Non-standard process
+  const response = await globalThis.fetch(request);
 
-  // 3. If request’s service-workers mode is "all", then:
-  if ($(request).serviceWorkersMode === "all") {
-    // 1. Let requestForServiceWorker be a clone of request.
-    const requestForServiceWorker = clone(request);
+  const internals = new ResponseInternals();
 
-    // 2. If requestForServiceWorker’s body is non-null, then:
-    if ($(requestForServiceWorker).body) {
-      // 1. Let transformStream be a new TransformStream.
+  const buffer = await response.arrayBuffer();
+  const source = new Uint8Array(buffer);
+  const body: Body = {
+    source,
+    length: null,
+    stream: null as any as ReadableStream,
+  };
+  internals.body = body;
+  internalSlots.extends(response, internals);
 
-      // 2. Let transformAlgorithm given chunk be these steps:
-
-      // 1. If fetchParams is canceled, then abort these steps.
-
-      // 2. If chunk is not a Uint8Array object, then terminate fetchParams’s controller.
-
-      // 3. Otherwise, enqueue chunk in transformStream. The user agent may split the chunk into implementation-defined practical sizes and enqueue each of them. The user agent also may concatenate the chunks into an implementation-defined practical size and enqueue it.
-
-      // 3. Set up transformStream with transformAlgorithm set to transformAlgorithm.
-
-      // 4. Set requestForServiceWorker’s body’s stream to the result of requestForServiceWorker’s body’s stream piped through transformStream.
-    }
-
-    // 3. Let serviceWorkerStartTime be the coarsened shared current time given fetchParams’s cross-origin isolated capability.
-
-    // 4. Set response to the result of invoking handle fetch for requestForServiceWorker, with fetchParams’s controller and fetchParams’s cross-origin isolated capability. [HTML] [SW]
-    // response = handleFetch(
-    //   requestForServiceWorker,
-    //   fetchParams.controller,
-    //   fetchParams.crossOriginIsolatedCapability,
-    // );
-
-    // 5. If response is non-null, then:
-    if (response) {
-      // 1. Set fetchParams’s timing info’s final service worker start time to serviceWorkerStartTime.
-
-      // 2. If request’s body is non-null, then cancel request’s body with undefined.
-
-      // 3. Set internalResponse to response, if response is not a filtered response; otherwise to response’s internal response.
-
-      // 4. If one of the following is true
-      if ($(response as Response).type === "error") {
-        // - response’s type is "error"
-        // - request’s mode is "same-origin" and response’s type is "cors"
-        // - request’s mode is not "no-cors" and response’s type is "opaque"
-        // - request’s redirect mode is not "manual" and response’s type is "opaqueredirect"
-        // - request’s redirect mode is not "follow" and response’s URL list has more than one item.
-        // then return a network error.
-        return networkError();
-      }
-    }
-  }
-
-  // 4. If response is null, then:
-  if (!response) {
-    // 1. If makeCORSPreflight is true and one of these conditions is true:
-
-    // - There is no method cache entry match for request’s method using request, and either request’s method is not a CORS-safelisted method or request’s use-CORS-preflight flag is set.
-    // - There is at least one item in the CORS-unsafe request-header names with request’s header list for which there is no header-name cache entry match using request.
-    // Then:
-
-    // 1. Let preflightResponse be the result of running CORS-preflight fetch given request.
-
-    // 2. If preflightResponse is a network error, then return preflightResponse.
-
-    // 2. If request’s redirect mode is "follow", then set request’s service-workers mode to "none".
-
-    // 3. Set response and internalResponse to the result of running HTTP-network-or-cache fetch given fetchParams.
-
-    // 4. If request’s response tainting is "cors" and a CORS check for request and response returns failure, then return a network error.
-
-    // 5. If the TAO check for request and response returns failure, then set request’s timing allow failed flag.
-
-    // 5. If either request’s response tainting or response’s type is "opaque", and the cross-origin resource policy check with request’s origin, request’s client, request’s destination, and internalResponse returns blocked, then return a network error.
-  }
-
-  // 6. If internalResponse’s status is a redirect status:
-
-  // 1. If internalResponse’s status is not 303, request’s body is non-null, and the connection uses HTTP/2, then user agents may, and are even encouraged to, transmit an RST_STREAM frame.
-
-  // 2. Switch on request’s redirect mode:
-
-  // "error"
-  // 1. Set response to a network error.
-
-  // "manual"
-  // 1. If request’s mode is "navigate", then set fetchParams’s controller’s next manual redirect steps to run HTTP-redirect fetch given fetchParams and response.
-
-  // 2. Otherwise, set response to an opaque-redirect filtered response whose internal response is internalResponse.
-
-  // "follow"
-  // 1. Set response to the result of running HTTP-redirect fetch given fetchParams and response.
-
-  // 7. Return response.
   return response;
+  // // 2. Let response and internalResponse be null.
+  // let response: Response | null = null!, internalResponse = null;
+
+  // // 3. If request’s service-workers mode is "all", then:
+  // if ($(request).serviceWorkersMode === "all") {
+  //   // 1. Let requestForServiceWorker be a clone of request.
+  //   const requestForServiceWorker = clone(request);
+
+  //   // 2. If requestForServiceWorker’s body is non-null, then:
+  //   if ($(requestForServiceWorker).body) {
+  //     // 1. Let transformStream be a new TransformStream.
+
+  //     // 2. Let transformAlgorithm given chunk be these steps:
+
+  //     // 1. If fetchParams is canceled, then abort these steps.
+
+  //     // 2. If chunk is not a Uint8Array object, then terminate fetchParams’s controller.
+
+  //     // 3. Otherwise, enqueue chunk in transformStream. The user agent may split the chunk into implementation-defined practical sizes and enqueue each of them. The user agent also may concatenate the chunks into an implementation-defined practical size and enqueue it.
+
+  //     // 3. Set up transformStream with transformAlgorithm set to transformAlgorithm.
+
+  //     // 4. Set requestForServiceWorker’s body’s stream to the result of requestForServiceWorker’s body’s stream piped through transformStream.
+  //   }
+
+  //   // 3. Let serviceWorkerStartTime be the coarsened shared current time given fetchParams’s cross-origin isolated capability.
+
+  //   // 4. Set response to the result of invoking handle fetch for requestForServiceWorker, with fetchParams’s controller and fetchParams’s cross-origin isolated capability. [HTML] [SW]
+  //   // response = handleFetch(
+  //   //   requestForServiceWorker,
+  //   //   fetchParams.controller,
+  //   //   fetchParams.crossOriginIsolatedCapability,
+  //   // );
+
+  //   // 5. If response is non-null, then:
+  //   if (response) {
+  //     // 1. Set fetchParams’s timing info’s final service worker start time to serviceWorkerStartTime.
+
+  //     // 2. If request’s body is non-null, then cancel request’s body with undefined.
+
+  //     // 3. Set internalResponse to response, if response is not a filtered response; otherwise to response’s internal response.
+
+  //     // 4. If one of the following is true
+  //     if ($(response as Response).type === "error") {
+  //       // - response’s type is "error"
+  //       // - request’s mode is "same-origin" and response’s type is "cors"
+  //       // - request’s mode is not "no-cors" and response’s type is "opaque"
+  //       // - request’s redirect mode is not "manual" and response’s type is "opaqueredirect"
+  //       // - request’s redirect mode is not "follow" and response’s URL list has more than one item.
+  //       // then return a network error.
+  //       return networkError();
+  //     }
+  //   }
+  // }
+
+  // // 4. If response is null, then:
+  // if (!response) {
+  //   // 1. If makeCORSPreflight is true and one of these conditions is true:
+
+  //   // - There is no method cache entry match for request’s method using request, and either request’s method is not a CORS-safelisted method or request’s use-CORS-preflight flag is set.
+  //   // - There is at least one item in the CORS-unsafe request-header names with request’s header list for which there is no header-name cache entry match using request.
+  //   // Then:
+
+  //   // 1. Let preflightResponse be the result of running CORS-preflight fetch given request.
+
+  //   // 2. If preflightResponse is a network error, then return preflightResponse.
+
+  //   // 2. If request’s redirect mode is "follow", then set request’s service-workers mode to "none".
+
+  //   // 3. Set response and internalResponse to the result of running HTTP-network-or-cache fetch given fetchParams.
+
+  //   // 4. If request’s response tainting is "cors" and a CORS check for request and response returns failure, then return a network error.
+
+  //   // 5. If the TAO check for request and response returns failure, then set request’s timing allow failed flag.
+
+  //   // 5. If either request’s response tainting or response’s type is "opaque", and the cross-origin resource policy check with request’s origin, request’s client, request’s destination, and internalResponse returns blocked, then return a network error.
+  // }
+
+  // // 6. If internalResponse’s status is a redirect status:
+
+  // // 1. If internalResponse’s status is not 303, request’s body is non-null, and the connection uses HTTP/2, then user agents may, and are even encouraged to, transmit an RST_STREAM frame.
+
+  // // 2. Switch on request’s redirect mode:
+
+  // // "error"
+  // // 1. Set response to a network error.
+
+  // // "manual"
+  // // 1. If request’s mode is "navigate", then set fetchParams’s controller’s next manual redirect steps to run HTTP-redirect fetch given fetchParams and response.
+
+  // // 2. Otherwise, set response to an opaque-redirect filtered response whose internal response is internalResponse.
+
+  // // "follow"
+  // // 1. Set response to the result of running HTTP-redirect fetch given fetchParams and response.
+
+  // // 7. Return response.
+  // return response;
 }

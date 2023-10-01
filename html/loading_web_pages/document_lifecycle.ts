@@ -215,8 +215,6 @@ export function loadHTMLDocument(
 
   const { URL } = DOM.$(document);
 
-  console.log(URL);
-
   // 2. If document's URL is about:blank, then populate with html/head/body given document.
   if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
   // 3. Otherwise,

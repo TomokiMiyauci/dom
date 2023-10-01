@@ -6,27 +6,18 @@ import {
   executeScriptElement,
   prepareScriptElement,
 } from "./elements/scripting/html_script_element_utils.ts";
-import { resolver } from "./internal.ts";
 
 export class DOMParser implements IDOMParser {
   parseFromString(
     string: string,
     type: DOMParserSupportedType,
-    options?: {
-      baseURL: URL;
-      resolveURL: (src: string, baseURL: URL) => URL;
-      fetch: (url: URL) => Uint8Array;
-    },
+    options?: { baseURL: URL },
   ): globalThis.Document {
     const document = new Document();
 
     $(document).contentType = type;
 
-    if (options) {
-      $(document).URL = options.baseURL;
-      resolver.resolveURL = options.resolveURL.bind(options);
-      resolver.fetch = options.fetch.bind(options);
-    }
+    if (options) $(document).URL = options.baseURL;
 
     switch (type) {
       case "text/html": {
@@ -34,8 +25,6 @@ export class DOMParser implements IDOMParser {
 
         const parser = new HTMLParser(document);
         const result = parser.parse(string);
-
-        for (const script of result.scripts) prepareScriptElement(script);
 
         Object.defineProperty(globalThis, "parent", {
           value: globalThis,
@@ -47,7 +36,15 @@ export class DOMParser implements IDOMParser {
           configurable: true,
         });
 
-        for (const script of result.scripts) executeScriptElement(script);
+        queueMicrotask(async () => {
+          for (const script of result.scripts) {
+            await prepareScriptElement(script);
+          }
+
+          for (const script of result.scripts) executeScriptElement(script);
+
+          dispatchEvent(new Event("load"));
+        });
 
         return result;
       }

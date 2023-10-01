@@ -518,7 +518,7 @@ export async function createNavigationParamsByFetching(
       };
 
       // then set fetchController to the result of fetching request, with processEarlyHintsResponse set to processEarlyHintsResponse as defined below, processResponse set to processResponse as defined below, and useParallelQueue set to true.
-      fetchController = fetch(
+      fetchController = await fetch(
         request,
         undefined,
         undefined,

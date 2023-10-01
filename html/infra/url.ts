@@ -1,5 +1,4 @@
 import { $ } from "../../internal.ts";
-import { resolver } from "../internal.ts";
 import { EnvironmentSettingsObject } from "../web_application_apis/scripting.ts";
 
 /**
@@ -76,11 +75,5 @@ export function encodingParseURL(
 
   // 5. Return the result of applying the URL parser to url, with baseURL and encoding.
 
-  // NON-standard process
-  if (baseURL.protocol === "file:") {
-    const fileURL = resolver.resolveURL(url, baseURL);
-
-    return fileURL;
-  }
   return new URL(url, baseURL);
 }
