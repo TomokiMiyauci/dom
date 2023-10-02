@@ -355,7 +355,7 @@
   "dom/nodes/ParentNode-querySelector-scope.html",
   // "dom/nodes/ParentNode-querySelectorAll-removed-elements.html",
   "dom/nodes/ParentNode-querySelectors-exclusive.html",
-  // "dom/nodes/ParentNode-querySelectors-namespaces.html",
+  "dom/nodes/ParentNode-querySelectors-namespaces.html",
   "dom/nodes/ParentNode-querySelectors-space-and-dash-attribute-value.html",
   // "dom/nodes/ParentNode-replaceChildren.html",
   "dom/nodes/prepend-on-Document.html",

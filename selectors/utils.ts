@@ -150,11 +150,12 @@ function typeSelector(value: string): TypeSelector {
 function tag(
   tag: AstTagName | AstWildcardTag,
 ): UniversalSelector | TypeSelector {
+  const base = { namespace: tag.namespace };
   switch (tag.type) {
     case "TagName":
-      return typeSelector(tag.name);
+      return { ...typeSelector(tag.name), ...base };
     case "WildcardTag":
-      return { type: "universal" };
+      return { type: "universal", ...base };
   }
 }
 
@@ -163,8 +164,8 @@ export function id(id: string): IDSelector {
 }
 
 export function attr(ast: AstAttribute): AttributeSelector {
-  const { name, caseSensitivityModifier } = ast;
-  const base = { type: "attr", name } as const;
+  const { name, caseSensitivityModifier, namespace } = ast;
+  const base = { type: "attr", name, namespace } as const;
 
   if (typeof ast.operator !== "string" && !ast.value) {
     return base;

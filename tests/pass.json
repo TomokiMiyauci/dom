@@ -3048,10 +3048,6 @@
         "reason": "selector parser is not supported non-ASCII character"
       },
       {
-        "name": "In-document Element.matches: Attribute presence selector, matching title attribute, case insensitivity (with no refNodes): #attr-presence [*|TiTlE]",
-        "reason": "namespace is not supported"
-      },
-      {
         "name": "In-document Element.matches: :root pseudo-class selector, matching document root element (with no refNodes): :root",
         "reason": ":root pseudo class is not supported"
       },
@@ -3200,10 +3196,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Detached Element.matches: Attribute presence selector, matching title attribute, case insensitivity (with no refNodes): #attr-presence [*|TiTlE]",
-        "reason": "not supported"
-      },
-      {
         "name": "Detached Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
         "reason": "not supported"
       },
@@ -3328,10 +3320,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Fragment Element.matches: Attribute presence selector, matching title attribute, case insensitivity (with no refNodes): #attr-presence [*|TiTlE]",
-        "reason": "not supported"
-      },
-      {
         "name": "Fragment Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
         "reason": "not supported"
       },
@@ -3453,10 +3441,6 @@
       },
       {
         "name": "Fragment Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: Attribute presence selector, matching title attribute, case insensitivity (with refNode Element): [TiTlE]",
         "reason": "not supported"
       },
       {

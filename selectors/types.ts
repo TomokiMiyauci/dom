@@ -1,15 +1,29 @@
-export interface TypeSelector {
-  type: "type";
-  value: string;
-  namespacePrefix?: string;
+import type {
+  AstNamespaceName,
+  AstNoNamespace,
+  AstWildcardNamespace,
+} from "npm:css-selector-parser@2.3.2";
+
+export type Namespace =
+  | AstNamespaceName
+  | AstNoNamespace
+  | AstWildcardNamespace;
+
+export interface Namespaceable {
+  namespace?: Namespace;
 }
 
-export interface UniversalSelector {
+export interface TypeSelector extends Namespaceable {
+  type: "type";
+  value: string;
+}
+
+export interface UniversalSelector extends Namespaceable {
   type: "universal";
-  namespacePrefix?: string;
 }
 
 export type AttributeSelector =
+  & Namespaceable
   & { type: "attr" }
   & (
     | Presence

@@ -12,6 +12,7 @@ import {
   SelectorList,
   SimpleSelector,
   TypeSelector,
+  UniversalSelector,
 } from "./types.ts";
 import { selectorToSelectorList } from "./utils.ts";
 import { createParser } from "npm:css-selector-parser@2.3.2";
@@ -158,7 +159,7 @@ export function matchSimpleSelector(
     case "class":
       return matchClassSelector(simpleSelector, element);
     case "universal":
-      return true;
+      return matchUniversalSelector(simpleSelector, element);
     case "attr":
       return matchAttributeSelector(simpleSelector, element);
     case "pseudo-class":
@@ -196,10 +197,38 @@ export function matchPseudoClass(
 }
 
 function matchTypeSelector(
-  typeSelector: TypeSelector,
+  selector: TypeSelector,
   element: Element,
 ): boolean {
-  return element.localName === typeSelector.value;
+  const matchedName = element.localName === selector.value;
+
+  if (!matchedName) return false;
+  if (!selector.namespace) return true;
+
+  switch (selector.namespace.type) {
+    case "NamespaceName":
+      return element.namespaceURI === selector.namespace.name;
+    case "NoNamespace":
+      return element.namespaceURI === null;
+    case "WildcardNamespace":
+      return true;
+  }
+}
+
+function matchUniversalSelector(
+  selector: UniversalSelector,
+  element: Element,
+): boolean {
+  if (!selector.namespace) return true;
+
+  switch (selector.namespace.type) {
+    case "NamespaceName":
+      return element.namespaceURI === selector.namespace.name;
+    case "NoNamespace":
+      return element.namespaceURI === null;
+    case "WildcardNamespace":
+      return true;
+  }
 }
 
 function matchAttributeSelector(
@@ -239,7 +268,27 @@ function matchAttributeSelector(
     }
   }
 
-  return !!element.getAttributeNodeNS(null, selector.name);
+  if (selector.namespace) {
+    switch (selector.namespace.type) {
+      case "NamespaceName":
+        return element.hasAttributeNS(selector.namespace.name, selector.name);
+      case "NoNamespace":
+        return element.hasAttributeNS(null, selector.name);
+      case "WildcardNamespace": {
+        // challenge O(1) matching
+        // This matches if there is no prefix
+        if (element.hasAttribute(selector.name)) return true;
+
+        for (const attr of element.attributes) {
+          if (attr.localName === selector.name) return true;
+        }
+
+        return false;
+      }
+    }
+  }
+
+  return element.hasAttribute(selector.name);
 }
 
 export function matchHyphen(selectorValue: string, attrValue: string): boolean {
