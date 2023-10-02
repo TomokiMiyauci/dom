@@ -147,7 +147,12 @@ export type CompoundSelector = SubclassSelector[] | [
 ];
 
 export type Combinator = {
-  type: "descendant" | "child" | "adjacent-sibling" | "unknown";
+  type:
+    | "descendant"
+    | "child"
+    | "adjacent-sibling"
+    | "general-sibling"
+    | "unknown";
 };
 
 export namespace Combinator {
@@ -159,8 +164,12 @@ export namespace Combinator {
       case "+":
         return { type: "adjacent-sibling" };
 
-      case " ":
+      case "":
         return { type: "descendant" };
+
+      case "~": {
+        return { type: "general-sibling" };
+      }
 
       default:
         return { type: "unknown" };

@@ -130,8 +130,16 @@ function resolveCombinator(
       return previousSibling ? [previousSibling] : [];
     }
 
+    case "descendant": {
+      return [...tree.ancestors(element)].filter(isElement);
+    }
+
+    case "general-sibling": {
+      return [...tree.precedeSiblings(element)].filter(isElement);
+    }
+
     default:
-      throw new Error("");
+      throw new Error(`the combinator is not supported: ${combinator.type}`);
   }
 }
 
@@ -166,7 +174,7 @@ export function matchPseudoClass(
       return !matchCompoundSelector(selector.argument, element);
 
     case "empty":
-      return !element.hasChildNodes();
+      return !element.textContent;
 
     case "first-child":
       return element.parentNode?.firstElementChild === element;
@@ -261,7 +269,7 @@ export function matchOneOf(selectorValue: string, attrValue: string): boolean {
 }
 
 export function matchPartOf(selectorValue: string, attrValue: string): boolean {
-  return selectorValue.includes(attrValue);
+  return attrValue.includes(selectorValue);
 }
 
 export function matchClassSelector(

@@ -73,7 +73,7 @@ export function shiftCombinator(rules: FlattenAstRule): NormalizedAstRules {
     if (next) {
       return acc.concat({
         ...cur,
-        combinator: next.combinator!,
+        combinator: next.combinator ?? "",
       }) as NormalizedAstRules;
     }
 
