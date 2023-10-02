@@ -352,7 +352,7 @@
   // "dom/nodes/ParentNode-querySelector-All.html",
   "dom/nodes/ParentNode-querySelector-case-insensitive.html",
   // "dom/nodes/ParentNode-querySelector-escapes.html",
-  // "dom/nodes/ParentNode-querySelector-scope.html",
+  "dom/nodes/ParentNode-querySelector-scope.html",
   // "dom/nodes/ParentNode-querySelectorAll-removed-elements.html",
   "dom/nodes/ParentNode-querySelectors-exclusive.html",
   // "dom/nodes/ParentNode-querySelectors-namespaces.html",

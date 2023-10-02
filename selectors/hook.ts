@@ -106,7 +106,9 @@ export function matchComplexSelector(
   const restComplexSelector: ComplexSelector = [...rest, lastOf!.unit];
 
   for (const element of elements) {
-    if (matchComplexSelector(restComplexSelector, element)) return true;
+    if (matchComplexSelector(restComplexSelector, element, scopingRoots)) {
+      return true;
+    }
   }
 
   return false;
