@@ -107,11 +107,16 @@ export type PseudoClassSelector =
   | LastChildPseudoClass
   | ScopePseudoClass
   | EnabledPseudoClass
-  | DisabledPseudoClass;
+  | DisabledPseudoClass
+  | ChildIndexedPseudoClass;
 
 export interface RegularPseudoClass {
   type: "pseudo-class";
   value: string;
+}
+export interface ChildIndexedPseudoClass extends RegularPseudoClass {
+  value: "nth-child";
+  argument: { a: number; b: number };
 }
 
 export interface ValidityPseudoClass extends RegularPseudoClass {

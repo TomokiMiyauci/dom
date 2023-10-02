@@ -1,4 +1,4 @@
-import { ifilter, initLast, lastItem } from "../deps.ts";
+import { ifilter, initLast, iter, lastItem } from "../deps.ts";
 import { isElement } from "../dom/nodes/utils.ts";
 import {
   AttributeSelector,
@@ -19,6 +19,7 @@ import { createParser } from "npm:css-selector-parser@2.3.2";
 import { toASCIILowerCase } from "../infra/string.ts";
 import { tree } from "../internal.ts";
 import * as PseudoClass from "../html/elements/selectors/pseudo_class.ts";
+import { compile } from "npm:nth-check@2.1.1";
 
 type Failure = string;
 type Success = SelectorList;
@@ -198,9 +199,27 @@ export function matchPseudoClass(
     case "disabled":
       return PseudoClass.disabled(element);
 
+    case "nth-child": {
+      const index = [...elementSiblings(element)].findIndex((el) =>
+        element === el
+      );
+
+      if (index < 0) return false;
+
+      const check = compile([selector.argument.a, selector.argument.b]);
+
+      return check(index);
+    }
+
     default:
       throw new Error("");
   }
+}
+
+export function elementSiblings(element: Element): Iterable<Element> {
+  const inclusiveSiblings = tree.inclusiveSiblings(element);
+
+  return iter(inclusiveSiblings).filter(isElement);
 }
 
 function matchTypeSelector(

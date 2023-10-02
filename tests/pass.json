@@ -3052,34 +3052,6 @@
         "reason": ":root pseudo class is not supported"
       },
       {
-        "name": "In-document Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every third child element (with no refNodes): #pseudo-nth li:nth-child(3n)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: Element.matches: :nth-child selector, matching every third child element (with no refNodes): #pseudo-nth li:nth-child(3n)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every second child element, starting from the fourth (with no refNodes): #pseudo-nth li:nth-child(2n+4)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every fourth child element, starting from the third (with no refNodes): #pseudo-nth-p1 :nth-child(4n-1)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every fourth child element, starting from the third (with no refNodes): #pseudo-nth-p1 :nth-child(4n-1)",
-        "reason": ":nth-child pseudo class is not supported"
-      },
-      {
         "name": "In-document Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
         "reason": "not supported"
       },
@@ -3180,22 +3152,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Detached Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-child selector, matching every third child element (with no refNodes): #pseudo-nth li:nth-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-child selector, matching every second child element, starting from the fourth (with no refNodes): #pseudo-nth li:nth-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-child selector, matching every fourth child element, starting from the third (with no refNodes): #pseudo-nth-p1 :nth-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
         "name": "Detached Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
         "reason": "not supported"
       },
@@ -3288,22 +3244,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Fragment Element.matches: :nth-child selector, matching the third child element (with no refNodes): #pseudo-nth-table1 :nth-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-child selector, matching every third child element (with no refNodes): #pseudo-nth li:nth-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-child selector, matching every second child element, starting from the fourth (with no refNodes): #pseudo-nth li:nth-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-child selector, matching every fourth child element, starting from the third (with no refNodes): #pseudo-nth-p1 :nth-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
         "name": "Fragment Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
         "reason": "not supported"
       },
@@ -3393,34 +3333,6 @@
       },
       {
         "name": "Fragment Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching the third child element (with refNode Element): :nth-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every third child element (with refNode Element): li:nth-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every second child element, starting from the fourth (with refNode Element): li:nth-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every second child element, starting from the fourth, with whitespace (with refNode Element): li:nth-child(2n \t\r\n+ \t\r\n4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every fourth child element, starting from the third (with refNode Element): :nth-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector, matching every fourth child element, starting from the third, with whitespace (with refNode Element): :nth-child(4n \t\r\n- \t\r\n1)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-child selector used twice, matching  (with refNode Element): :nth-child(1) :nth-child(1)",
         "reason": "not supported"
       },
       {

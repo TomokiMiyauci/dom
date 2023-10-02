@@ -110,7 +110,8 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
 
   if (rule.pseudoClasses) {
     const selectors: PseudoClassSelector[] = rule.pseudoClasses.map(
-      ({ name, argument }) => {
+      (pseudo) => {
+        const { name, argument } = pseudo;
         switch (name) {
           case "valid":
           case "invalid":
@@ -131,6 +132,18 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
               "value": name,
               type: "pseudo-class",
               argument: arg,
+            };
+          }
+
+          case "nth-child": {
+            const selector = argument?.type === "Formula" ? argument : (() => {
+              throw new Error();
+            })();
+
+            return {
+              type: "pseudo-class",
+              value: "nth-child",
+              argument: selector,
             };
           }
         }
