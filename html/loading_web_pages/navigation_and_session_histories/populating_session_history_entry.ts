@@ -546,6 +546,11 @@ export async function createNavigationParamsByFetching(
     // 10. Set finalSandboxFlags to the union of targetSnapshotParams's sandboxing flags and responsePolicyContainer's CSP list's CSP-derived sandboxing flags.
 
     // 11. Set responseOrigin to the result of determining the origin given response's URL, finalSandboxFlags, and entry's document state's initiator origin.
+    responseOrigin = determineOrigin(
+      $(response!).url,
+      finalSandboxFlags,
+      entry.documentState.initiatorOrigin,
+    );
 
     // 12. If navigable is a top-level traversable, then:
 
@@ -668,7 +673,7 @@ export async function createNavigationParamsByFetching(
     // reserved environment: request's reserved client
     reservedEnvironment: {}, // TODO
     // origin: responseOrigin
-    origin: responseOrigin!,
+    origin: responseOrigin,
     // policy container: resultPolicyContainer
     policyContainer: resultPolicyContainer,
     // final sandboxing flag set: finalSandboxFlags

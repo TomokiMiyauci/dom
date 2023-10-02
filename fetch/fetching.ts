@@ -422,9 +422,9 @@ export async function fetchHTTP(
 
   // Non-standard process
   const response = await globalThis.fetch(request);
-
   const internals = new ResponseInternals();
 
+  internals.url = new URL(response.url);
   const buffer = await response.arrayBuffer();
   const source = new Uint8Array(buffer);
   const body: Body = {

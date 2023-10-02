@@ -325,11 +325,9 @@ export function invoke(
   // 5. Initialize event’s currentTarget attribute to struct’s invocation target.
   $(event).currentTarget = struct.invocationTarget;
 
-  const currentTarget = $(event).currentTarget;
+  const currentTarget = $(event).currentTarget!;
   // 6. Let listeners be a clone of event’s currentTarget attribute value’s event listener list.
-  const listeners = currentTarget
-    ? $(currentTarget).eventListenerList.clone()
-    : new List<EventListener>();
+  const listeners = $(currentTarget).eventListenerList.clone();
 
   // 7. Let invocationTargetInShadowTree be struct’s invocation-target-in-shadow-tree.
   const invocationTargetInShadowTree = struct.invocationTargetInShadowTree;

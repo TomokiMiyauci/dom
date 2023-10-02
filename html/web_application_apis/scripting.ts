@@ -234,9 +234,7 @@ export function runClassicScript(
   rethrowErrors = false,
 ): void {
   const sourceCode = script.record!["[[ECMAScriptCode]]"]!;
-  const sourceText = !script.baseURL
-    ? sourceCode.replace(new RegExp(`^"use strict";`), "")
-    : sourceCode;
+  const sourceText = sourceCode.replace(new RegExp(`^"use strict";`), "");
 
   eval?.(sourceText);
 }

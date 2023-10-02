@@ -13,6 +13,7 @@ import {
 } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { reflectGet } from "../../dom/nodes/elements/element_utils.ts";
+import { fireEvent } from "../../dom/events/fire.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
@@ -23,14 +24,18 @@ export class HTMLIFrameElement extends HTMLElement
       this,
       new ContentNavigableInternals(),
     );
-    this.#_.insertionSteps.define((element: any) => {
-      // 1. Create a new child navigable for element.
+    this.#_.insertionSteps.define(async (element: any) => {
+      // // 1. Create a new child navigable for element.
       createNewChildNavigable(element);
 
-      // 2. If element has a sandbox attribute, then parse the sandboxing directive given the attribute's value and element's iframe sandboxing flag set.
+      // // 2. If element has a sandbox attribute, then parse the sandboxing directive given the attribute's value and element's iframe sandboxing flag set.
 
-      // 3. Process the iframe attributes for element, with initialInsertion set to true.
-      processIframeAttributes(element, true);
+      // // 3. Process the iframe attributes for element, with initialInsertion set to true.
+      await processIframeAttributes(element, true);
+
+      // Non-standard
+      // TODO
+      fireEvent("load", element);
     });
   }
 

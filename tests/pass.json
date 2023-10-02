@@ -2325,10 +2325,6 @@
         "reason": "DOMParser is not supported that content-type"
       },
       {
-        "name": "Created element's namespace in empty.html",
-        "reason": "iframe loading is not supported"
-      },
-      {
         "name": "Created element's namespace in empty.xhtml",
         "reason": "iframe loading is not supported"
       },
@@ -2338,10 +2334,6 @@
       },
       {
         "name": "Created element's namespace in empty.svg",
-        "reason": "iframe loading is not supported"
-      },
-      {
-        "name": "Created element's namespace in minimal_html.html",
         "reason": "iframe loading is not supported"
       },
       {
@@ -2357,10 +2349,6 @@
         "reason": "iframe loading is not supported"
       },
       {
-        "name": "Created element's namespace in xhtml.html",
-        "reason": "iframe loading is not supported"
-      },
-      {
         "name": "Created element's namespace in xhtml.xhtml",
         "reason": "iframe loading is not supported"
       },
@@ -2370,10 +2358,6 @@
       },
       {
         "name": "Created element's namespace in xhtml.svg",
-        "reason": "iframe loading is not supported"
-      },
-      {
-        "name": "Created element's namespace in svg.html",
         "reason": "iframe loading is not supported"
       },
       {
@@ -2389,10 +2373,6 @@
         "reason": "iframe loading is not supported"
       },
       {
-        "name": "Created element's namespace in mathml.html",
-        "reason": "iframe loading is not supported"
-      },
-      {
         "name": "Created element's namespace in mathml.xhtml",
         "reason": "iframe loading is not supported"
       },
@@ -2402,10 +2382,6 @@
       },
       {
         "name": "Created element's namespace in mathml.svg",
-        "reason": "iframe loading is not supported"
-      },
-      {
-        "name": "Created element's namespace in bare_xhtml.html",
         "reason": "iframe loading is not supported"
       },
       {
@@ -2421,10 +2397,6 @@
         "reason": "iframe loading is not supported"
       },
       {
-        "name": "Created element's namespace in bare_svg.html",
-        "reason": "iframe loading is not supported"
-      },
-      {
         "name": "Created element's namespace in bare_svg.xhtml",
         "reason": "iframe loading is not supported"
       },
@@ -2434,10 +2406,6 @@
       },
       {
         "name": "Created element's namespace in bare_svg.svg",
-        "reason": "iframe loading is not supported"
-      },
-      {
-        "name": "Created element's namespace in bare_mathml.html",
         "reason": "iframe loading is not supported"
       },
       {
@@ -2453,10 +2421,6 @@
         "reason": "iframe loading is not supported"
       },
       {
-        "name": "Created element's namespace in xhtml_ns_removed.html",
-        "reason": "iframe loading is not supported"
-      },
-      {
         "name": "Created element's namespace in xhtml_ns_removed.xhtml",
         "reason": "iframe loading is not supported"
       },
@@ -2466,10 +2430,6 @@
       },
       {
         "name": "Created element's namespace in xhtml_ns_removed.svg",
-        "reason": "iframe loading is not supported"
-      },
-      {
-        "name": "Created element's namespace in xhtml_ns_changed.html",
         "reason": "iframe loading is not supported"
       },
       {

@@ -172,7 +172,7 @@ export enum UserNavigationInvolvement {
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate)
  */
-export function navigate(
+export async function navigate(
   navigable: Navigable,
   url: URL,
   sourceDocument: Document,
@@ -185,7 +185,7 @@ export function navigate(
   formDataEntryList: List<Entry> | null = null,
   referrerPolicy: ReferrerPolicy = "",
   userInvolvement: UserNavigationInvolvement = UserNavigationInvolvement.None,
-): void {
+): Promise<void> {
   // 1. Let cspNavigationType be "form-submission" if formDataEntryList is non-null; otherwise "other".
   const cspNavigationType = formDataEntryList ? "form-submission" : "other";
 
@@ -403,37 +403,31 @@ export function navigate(
   }
 
   // 9. Attempt to populate the history entry's document for historyEntry, given navigable, "navigate", sourceSnapshotParams, targetSnapshotParams, navigationId, navigationParams, cspNavigationType, with allowPOST set to true and completionSteps set to the following step:
-  // attemptPopulateHistoryEntryDocument(
-  //   historyEntry,
-  //   navigable,
-  //   "navigate",
-  //   sourceSnapshotParams,
-  //   targetSnapshotParams,
-  //   navigationId,
-  //   navigationParams,
-  //   cspNavigationType,
-  //   true,
-  //   (a: any) => {
-  //     // console.log($((a as NavigationParams).response));
-
-  //     // const { body } = $((a as NavigationParams).response);
-  //     // const contents = new TextDecoder().decode(body?.source!);
-
-  //     // console.log(contents);
-
-  //     // new DOMParser().parseFromString(contents, "text/html");
-  //     // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
-  //     // appendSessionHistoryTraversalSteps(
-  //     //   traversableNavigable(navigable),
-  //     //   () =>
-  //     //     finalizeCrossDocumentNavigation(
-  //     //       navigable,
-  //     //       historyHandling,
-  //     //       historyEntry,
-  //     //     ),
-  //     // );
-  //   },
-  // );
+  await attemptPopulateHistoryEntryDocument(
+    historyEntry,
+    navigable,
+    "navigate",
+    sourceSnapshotParams,
+    targetSnapshotParams,
+    navigationId,
+    navigationParams,
+    cspNavigationType,
+    true,
+    () => {
+      // Non-standard process
+      navigable.activeSessionHistoryEntry = historyEntry;
+      // 1. Append session history traversal steps to navigable's traversable to finalize a cross-document navigation given navigable, historyHandling, and historyEntry.
+      // appendSessionHistoryTraversalSteps(
+      //   traversableNavigable(navigable),
+      //   () =>
+      //     finalizeCrossDocumentNavigation(
+      //       navigable,
+      //       historyHandling,
+      //       historyEntry,
+      //     ),
+      // );
+    },
+  );
 }
 
 export function finalizeCrossDocumentNavigation(

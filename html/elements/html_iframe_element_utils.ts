@@ -15,10 +15,10 @@ import { completelyLoaded } from "../loading_web_pages/document_lifecycle.ts";
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#process-the-iframe-attributes)
  */
-export function processIframeAttributes(
+export async function processIframeAttributes(
   element: Element,
   initialInsertion = false,
-): void {
+): Promise<void> {
   // 1. If element's srcdoc attribute is specified, then:
   if (element.hasAttribute("srcdoc")) {
     // 1. Set element's lazy load resumption steps to the rest of this algorithm starting with the step labeled navigate.
@@ -70,7 +70,7 @@ export function processIframeAttributes(
   }
 
   // 7. Navigate: navigate an iframe or frame given element, url, and referrerPolicy.
-  navigateIframeOrFrame(element, url, referrerPolicy);
+  await navigateIframeOrFrame(element, url, referrerPolicy);
 }
 
 /**
@@ -104,12 +104,12 @@ export function sharedAttributeProcessingSteps(
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#navigate-an-iframe-or-frame)
  */
-export function navigateIframeOrFrame(
+export async function navigateIframeOrFrame(
   element: Element,
   url: URL,
   referrerPolicy: ReferrerPolicy,
   srcdocString: string | null = null,
-) {
+): Promise<void> {
   // 1. Let historyHandling be "auto".
   let historyHandling = NavigationHistoryBehavior.Auto;
 
@@ -128,7 +128,7 @@ export function navigateIframeOrFrame(
   }
 
   // 4. Navigate element's content navigable to url using element's node document, with historyHandling set to historyHandling, referrerPolicy set to referrerPolicy, and documentResource set to scrdocString.
-  contentNavigable && navigate(
+  contentNavigable && await navigate(
     contentNavigable,
     url,
     DOM.$(element).nodeDocument,

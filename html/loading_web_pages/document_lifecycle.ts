@@ -219,12 +219,17 @@ export function loadHTMLDocument(
   if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
   // 3. Otherwise,
   else {
+    // TODO
     // create an HTML parser and associate it with the document. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
+    // const parser = new DOMParser();
     const parser = new HTMLParser(document);
+    const body = $(navigationParams.response).body?.source;
 
-    queueMicrotask(async () => {
-      // parser.parse();
-    });
+    if (!body) return document;
+    const text = new TextDecoder().decode(body);
+    parser.parse(text);
+
+    return document;
 
     // The first task that the networking task source places on the task queue while fetching runs must process link headers given document, navigationParams's response, and "media", after the task has been processed by the HTML parser.
 
