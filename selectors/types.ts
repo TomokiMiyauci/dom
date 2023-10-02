@@ -106,6 +106,7 @@ export type PseudoClassSelector =
   | FirstChildPseudoClass
   | LastChildPseudoClass
   | ScopePseudoClass
+  | EnabledPseudoClass
   | DisabledPseudoClass;
 
 export interface RegularPseudoClass {
@@ -131,6 +132,10 @@ export interface LastChildPseudoClass extends RegularPseudoClass {
 
 export interface ScopePseudoClass extends RegularPseudoClass {
   value: "scope";
+}
+
+export interface EnabledPseudoClass extends RegularPseudoClass {
+  value: "enabled";
 }
 
 export interface DisabledPseudoClass extends RegularPseudoClass {
