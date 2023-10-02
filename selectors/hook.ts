@@ -211,6 +211,18 @@ export function matchPseudoClass(
       return check(index);
     }
 
+    case "nth-last-child": {
+      const index = [...elementSiblings(element)].reverse().findIndex((el) =>
+        element === el
+      );
+
+      if (index < 0) return false;
+
+      const check = compile([selector.argument.a, selector.argument.b]);
+
+      return check(index);
+    }
+
     default:
       throw new Error("");
   }

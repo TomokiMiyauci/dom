@@ -115,7 +115,7 @@ export interface RegularPseudoClass {
   value: string;
 }
 export interface ChildIndexedPseudoClass extends RegularPseudoClass {
-  value: "nth-child";
+  value: "nth-child" | "nth-last-child";
   argument: { a: number; b: number };
 }
 

@@ -129,8 +129,8 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
             );
             const arg = selectorList.flat(3);
             return <NotPseudoClass> {
-              "value": name,
               type: "pseudo-class",
+              value: name,
               argument: arg,
             };
           }
@@ -140,11 +140,15 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
               throw new Error();
             })();
 
-            return {
-              type: "pseudo-class",
-              value: "nth-child",
-              argument: selector,
-            };
+            return { type: "pseudo-class", value: name, argument: selector };
+          }
+
+          case "nth-last-child": {
+            const selector = argument?.type === "Formula" ? argument : (() => {
+              throw new Error();
+            })();
+
+            return { type: "pseudo-class", value: name, argument: selector };
           }
         }
 

@@ -3052,22 +3052,6 @@
         "reason": ":root pseudo class is not supported"
       },
       {
-        "name": "In-document Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every third child element from the end (with no refNodes): #pseudo-nth li:nth-last-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every second child element from the end, starting from the fourth last (with no refNodes): #pseudo-nth li:nth-last-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every fourth element from the end, starting from the third last (with no refNodes): #pseudo-nth-p1 :nth-last-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
         "name": "In-document Element.matches: :nth-of-type selector, matching the third em element (with no refNodes): #pseudo-nth-p1 em:nth-of-type(3)",
         "reason": "not supported"
       },
@@ -3152,22 +3136,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Detached Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-last-child selector, matching every third child element from the end (with no refNodes): #pseudo-nth li:nth-last-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-last-child selector, matching every second child element from the end, starting from the fourth last (with no refNodes): #pseudo-nth li:nth-last-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :nth-last-child selector, matching every fourth element from the end, starting from the third last (with no refNodes): #pseudo-nth-p1 :nth-last-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
         "name": "Detached Element.matches: :nth-of-type selector, matching the third em element (with no refNodes): #pseudo-nth-p1 em:nth-of-type(3)",
         "reason": "not supported"
       },
@@ -3244,22 +3212,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Fragment Element.matches: :nth-last-child selector, matching the third last child element (with no refNodes): #pseudo-nth-table1 :nth-last-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-last-child selector, matching every third child element from the end (with no refNodes): #pseudo-nth li:nth-last-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-last-child selector, matching every second child element from the end, starting from the fourth last (with no refNodes): #pseudo-nth li:nth-last-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :nth-last-child selector, matching every fourth element from the end, starting from the third last (with no refNodes): #pseudo-nth-p1 :nth-last-child(4n-1)",
-        "reason": "not supported"
-      },
-      {
         "name": "Fragment Element.matches: :nth-of-type selector, matching the third em element (with no refNodes): #pseudo-nth-p1 em:nth-of-type(3)",
         "reason": "not supported"
       },
@@ -3333,22 +3285,6 @@
       },
       {
         "name": "Fragment Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching the third last child element (with refNode Element): :nth-last-child(3)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every third child element from the end (with refNode Element): li:nth-last-child(3n)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every second child element from the end, starting from the fourth last (with refNode Element): li:nth-last-child(2n+4)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :nth-last-child selector, matching every fourth element from the end, starting from the third last (with refNode Element): :nth-last-child(4n-1)",
         "reason": "not supported"
       },
       {
