@@ -3,7 +3,7 @@ import { parseHTMLFragment } from "../html/html_parser.ts";
 import { appendNode } from "../dom/nodes/node_trees/mutation.ts";
 import { isHTMLDocument } from "../dom/nodes/documents/document_utils.ts";
 import { serialize } from "npm:parse5@7.1.2";
-import { DOMTreeAdapter, DOMTreeAdapterMap } from "../html/utils.ts";
+import { DOMTreeAdapter, DOMTreeAdapterMap } from "../html/_adapter.ts";
 import { $ } from "../internal.ts";
 
 /**

@@ -1,5 +1,5 @@
 import { Document } from "../dom/nodes/documents/document.ts";
-import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./utils.ts";
+import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./_adapter.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
 import { $ } from "../internal.ts";
