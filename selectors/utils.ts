@@ -118,6 +118,7 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "first-child":
           case "last-child":
           case "scope":
+          case "disabled":
             return { type: "pseudo-class", value: name };
 
           case "not": {

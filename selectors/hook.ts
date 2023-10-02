@@ -18,6 +18,7 @@ import { selectorToSelectorList } from "./utils.ts";
 import { createParser } from "npm:css-selector-parser@2.3.2";
 import { toASCIILowerCase } from "../infra/string.ts";
 import { tree } from "../internal.ts";
+import { isActuallyDisabled } from "../html/elements/disabled_element.ts";
 
 type Failure = string;
 type Success = SelectorList;
@@ -190,6 +191,9 @@ export function matchPseudoClass(
 
       return scopingRoots.includes(element);
     }
+
+    case "disabled":
+      return isActuallyDisabled(element);
 
     default:
       throw new Error("");
