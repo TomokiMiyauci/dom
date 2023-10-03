@@ -121,6 +121,7 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "scope":
           case "disabled":
           case "enabled":
+          case "only-child":
             return { type: "pseudo-class", value: name };
 
           case "not": {
@@ -135,14 +136,7 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
             };
           }
 
-          case "nth-child": {
-            const selector = argument?.type === "Formula" ? argument : (() => {
-              throw new Error();
-            })();
-
-            return { type: "pseudo-class", value: name, argument: selector };
-          }
-
+          case "nth-child":
           case "nth-last-child": {
             const selector = argument?.type === "Formula" ? argument : (() => {
               throw new Error();

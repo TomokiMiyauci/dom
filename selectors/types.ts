@@ -108,14 +108,15 @@ export type PseudoClassSelector =
   | ScopePseudoClass
   | EnabledPseudoClass
   | DisabledPseudoClass
-  | ChildIndexedPseudoClass;
+  | ChildIndexedPseudoClass
+  | OnlyChildPseudoClass;
 
 export interface RegularPseudoClass {
   type: "pseudo-class";
   value: string;
 }
 export interface ChildIndexedPseudoClass extends RegularPseudoClass {
-  value: "nth-child" | "nth-last-child";
+  value: "nth-child" | "nth-last-child" | "nth-of-type";
   argument: { a: number; b: number };
 }
 
@@ -129,6 +130,10 @@ export interface EmptyPseudoClass extends RegularPseudoClass {
 
 export interface FirstChildPseudoClass extends RegularPseudoClass {
   value: "first-child";
+}
+
+export interface OnlyChildPseudoClass extends RegularPseudoClass {
+  value: "only-child";
 }
 
 export interface LastChildPseudoClass extends RegularPseudoClass {

@@ -3100,10 +3100,6 @@
         "reason": "not supported"
       },
       {
-        "name": "In-document Element.matches: :pseudo-only-child pseudo-class selector, matching all only-child elements (with no refNodes): #pseudo-only :only-child",
-        "reason": "not supported"
-      },
-      {
         "name": "In-document Element.matches: :pseudo-only-of-type pseudo-class selector, matching all elements with no siblings of the same type (with no refNodes): #pseudo-only :only-of-type",
         "reason": "not supported"
       },
@@ -3184,18 +3180,6 @@
         "reason": "not supported"
       },
       {
-        "name": "Detached Element.matches: :pseudo-only-child pseudo-class selector, matching all only-child elements (with no refNodes): #pseudo-only :only-child",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :pseudo-only-of-type pseudo-class selector, matching all elements with no siblings of the same type (with no refNodes): #pseudo-only :only-of-type",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :pseudo-only-of-type pseudo-class selector, matching em elements with no siblings of the same type (with no refNodes): #pseudo-only em:only-of-type",
-        "reason": "not supported"
-      },
-      {
         "name": "Detached Element.matches: :link and :visited pseudo-class selectors, matching a and area elements with href attributes (with no refNodes): #pseudo-link :link, #pseudo-link :visited",
         "reason": "not supported"
       },
@@ -3257,10 +3241,6 @@
       },
       {
         "name": "Fragment Element.matches: :last-of-type selector, matching the last td element in each table row (with no refNodes): #pseudo-nth-table1 tr :last-of-type",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :pseudo-only-child pseudo-class selector, matching all only-child elements (with no refNodes): #pseudo-only :only-child",
         "reason": "not supported"
       },
       {
@@ -3336,10 +3316,6 @@
         "reason": "not supported"
       },
       {
-        "name": "In-document Element.matches: :pseudo-only-child pseudo-class selector, matching all only-child elements (with refNode Element): :only-child",
-        "reason": "not supported"
-      },
-      {
         "name": "In-document Element.matches: :pseudo-only-of-type pseudo-class selector, matching all elements with no siblings of the same type (with refNode Element):  :only-of-type",
         "reason": "not supported"
       },
@@ -3365,6 +3341,14 @@
       },
       {
         "name": "In-document Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (1) (with no refNodes): #pseudo-ui :checked",
+        "reason": "not supported"
+      },
+      {
+        "name": "Detached Element.matches: :pseudo-only-of-type pseudo-class selector, matching all elements with no siblings of the same type (with no refNodes): #pseudo-only :only-of-type",
+        "reason": "not supported"
+      },
+      {
+        "name": "Detached Element.matches: :pseudo-only-of-type pseudo-class selector, matching em elements with no siblings of the same type (with no refNodes): #pseudo-only em:only-of-type",
         "reason": "not supported"
       }
     ]

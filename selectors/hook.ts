@@ -223,6 +223,10 @@ export function matchPseudoClass(
       return check(index);
     }
 
+    case "only-child": {
+      return [...elementSiblings(element)].length === 1;
+    }
+
     default:
       throw new Error("");
   }
