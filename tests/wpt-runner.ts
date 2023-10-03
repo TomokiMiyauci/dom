@@ -7,6 +7,7 @@ import { typeByExtension } from "https://deno.land/std@0.190.0/media_types/mod.t
 import { DOMParser } from "../mod.ts";
 import { TestReport } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
+import { EncodingHandler, Handler } from "./handlers/encoding.ts";
 
 const injectCode = `add_result_callback((t) => {
   pubsub.publish(t._structured_clone)
@@ -36,6 +37,8 @@ export function createHandler(
     const url = new URL(request.url);
     const path = join(baseDir, url.pathname);
     const ext = extname(path);
+
+    if (ext === ".py") return handlePython(request, [new EncodingHandler()]);
     const fileURL = toFileUrl(path);
     const stream = Deno.readFileSync(fileURL);
 
@@ -50,6 +53,19 @@ export function createHandler(
 
     return proxyResponse;
   };
+}
+
+export function handlePython(
+  request: Request,
+  handlers: Iterable<Handler>,
+): Response {
+  const url = new URL(request.url);
+
+  for (const handler of handlers) {
+    if (handler.pattern.test(url)) return handler.handle(request);
+  }
+
+  return new Response(null, { status: 404 });
 }
 
 const pattern = new RegExp(

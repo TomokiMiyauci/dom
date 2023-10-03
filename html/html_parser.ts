@@ -3,6 +3,7 @@ import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./_adapter.ts";
 import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
 import { $ } from "../internal.ts";
+import { getEncoding, windows_1252 } from "../encoding/encoding.ts";
 
 export class HTMLParser {
   #adaptor: DOMTreeAdapter;
@@ -11,7 +12,23 @@ export class HTMLParser {
   }
 
   parse(input: string): globalThis.Document {
-    return parse<DOMTreeAdapterMap>(input, { treeAdapter: this.#adaptor });
+    const document = parse<DOMTreeAdapterMap>(input, {
+      treeAdapter: this.#adaptor,
+    });
+
+    const meta = document.head.querySelector("meta[charset]");
+
+    if (meta) {
+      const charsetValue = meta.getAttribute("charset") ?? "";
+      let charset = getEncoding(charsetValue);
+
+      // 15. If charset is x-user-defined, then set charset to windows-1252.
+      if (charsetValue === "x-user-defined") charset = windows_1252;
+
+      if (charset) $(document).encoding = charset;
+    }
+
+    return document;
   }
 }
 
