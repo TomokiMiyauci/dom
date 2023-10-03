@@ -11,7 +11,6 @@ import {
   containerDocument,
   Navigable,
   targetName,
-  traversableNavigable,
 } from "../infrastructure_for_sequences_of_documents/navigable.ts";
 import * as DOM from "../../../internal.ts";
 import { documentBaseURL, matchAboutBlank } from "../../infra/url.ts";
@@ -19,6 +18,7 @@ import { equalsURL } from "../../../url/url.ts";
 import {
   displayInlineContent,
   loadHTMLDocument,
+  loadXMLDocument,
 } from "../document_lifecycle.ts";
 import { $ } from "../../internal.ts";
 import { FetchController } from "../../../fetch/infrastructure.ts";
@@ -30,9 +30,8 @@ import {
 } from "./session_history.ts";
 import { attemptPopulateHistoryEntryDocument } from "./populating_session_history_entry.ts";
 import { determineOrigin } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
-import { appendSessionHistoryTraversalSteps } from "./session_history.ts";
-import { DOMParser } from "../../dom_parser.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { parseMediaType } from "../../../deps.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#source-snapshot-params)
@@ -490,12 +489,12 @@ export function loadDocument(
   const contentType = navigationParams.response.headers.get("content-type") ??
     "";
   // 1. Let type be the computed type of navigationParams's response.
-  const type = contentType;
+  const [type] = parseMediaType(contentType);
 
   // 2. If the user agent has been configured to process resources of the given type using some mechanism other than rendering the content in a navigable, then skip this step. Otherwise, if the type is one of the following types:
-  switch (type) {
-    case "text/html":
-      return loadHTMLDocument(navigationParams);
+  if (type === "text/html") return loadHTMLDocument(navigationParams);
+  if (type.endsWith("+xml") || type === "application/xml") {
+    return loadXMLDocument(navigationParams, type);
   }
 
   return null;

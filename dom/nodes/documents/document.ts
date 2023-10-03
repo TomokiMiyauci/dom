@@ -443,10 +443,11 @@ export class Document extends Node implements IDocument {
     qualifiedName: string,
     options?: string | ElementCreationOptions,
   ): Element;
+  @convert
   createElementNS(
     namespace: string | null,
-    qualifiedName: string,
-    options?: string | ElementCreationOptions,
+    @DOMString qualifiedName: string,
+    options: string | ElementCreationOptions = {},
   ): globalThis.Element {
     // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
     return internalCreateElement(this, namespace, qualifiedName, options);

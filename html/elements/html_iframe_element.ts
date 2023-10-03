@@ -9,6 +9,7 @@ import { internalSlots } from "../internal.ts";
 import { processIframeAttributes } from "./html_iframe_element_utils.ts";
 import {
   contentDocument,
+  contentWindow,
   createNewChildNavigable,
 } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
@@ -62,8 +63,12 @@ export class HTMLIFrameElement extends HTMLElement
     return contentDocument(this);
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#dom-iframe-contentwindow)
+   */
   get contentWindow(): WindowProxy | null {
-    throw new Error("contentWindow");
+    // return this's content window.
+    return contentWindow(this);
   }
 
   get frameBorder(): string {

@@ -6,18 +6,20 @@ import {
   executeScriptElement,
   prepareScriptElement,
 } from "./elements/scripting/html_script_element_utils.ts";
+import { fireEvent } from "../dom/events/fire.ts";
 
 export class DOMParser implements IDOMParser {
   parseFromString(
     string: string,
     type: DOMParserSupportedType,
-    options?: { baseURL: URL },
   ): globalThis.Document {
     const document = new Document();
 
     $(document).contentType = type;
 
-    if (options) $(document).URL = options.baseURL;
+    if (globalThis.location) {
+      $(document).URL = new URL(globalThis.location.href);
+    }
 
     switch (type) {
       case "text/html": {
@@ -41,7 +43,10 @@ export class DOMParser implements IDOMParser {
             await prepareScriptElement(script);
           }
 
-          for (const script of result.scripts) executeScriptElement(script);
+          for (const script of result.scripts) {
+            executeScriptElement(script);
+            fireEvent("load", script);
+          }
 
           dispatchEvent(new Event("load"));
         });

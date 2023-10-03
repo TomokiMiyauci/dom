@@ -242,6 +242,33 @@ export function loadHTMLDocument(
   return document;
 }
 
+export function loadXMLDocument(
+  navigationParams: NavigationParams,
+  type: string,
+): Document {
+  const document = createAndInitializeDocument(
+    "xml",
+    type,
+    navigationParams,
+  );
+  const { URL } = DOM.$(document);
+
+  if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
+  else {
+    const parser = new HTMLParser(document);
+    const body = $(navigationParams.response).body?.source;
+
+    if (!body) return document;
+    const text = new TextDecoder().decode(body);
+    parser.parse(text.replace(/\n$/, ""));
+
+    return document;
+  }
+
+  // 4. Return document.
+  return document;
+}
+
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#read-ua-inline)
  */

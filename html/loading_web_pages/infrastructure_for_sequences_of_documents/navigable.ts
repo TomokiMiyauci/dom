@@ -211,6 +211,27 @@ export function contentDocument(
 }
 
 /**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#content-window)
+ */
+export function contentWindow(
+  container: NavigableContainer,
+): WindowProxy | null {
+  const { contentNavigable } = $(container);
+  if (!contentNavigable) return null;
+
+  return new Proxy({} as Window, {
+    get: (_, prop) => {
+      if (prop === "document") {
+        return contentNavigable.activeSessionHistoryEntry.documentState
+          .document!;
+      }
+
+      return Reflect.get(window, prop);
+    },
+  });
+}
+
+/**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#create-a-new-child-navigable)
  */
 export function createNewChildNavigable(element: Element): void {
