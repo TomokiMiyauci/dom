@@ -123,6 +123,7 @@ function toCompoundSelector(rule: AstRule): CompoundSelector {
           case "enabled":
           case "only-child":
           case "root":
+          case "checked":
             return { type: "pseudo-class", value: name };
 
           case "not": {

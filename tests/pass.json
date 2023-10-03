@@ -3124,10 +3124,6 @@
         "reason": "not supported"
       },
       {
-        "name": "In-document Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
-        "reason": "not supported"
-      },
-      {
         "name": "Detached Element.matches: :nth-of-type selector, matching the third em element (with no refNodes): #pseudo-nth-p1 em:nth-of-type(3)",
         "reason": "not supported"
       },
@@ -3185,10 +3181,6 @@
       },
       {
         "name": "Detached Element.matches: :lang pseudo-class selector, matching specified language with partial value (with no refNodes): #pseudo-lang-div3:lang(en)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Detached Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
         "reason": "not supported"
       },
       {
@@ -3257,10 +3249,6 @@
       },
       {
         "name": "Fragment Element.matches: :lang pseudo-class selector, matching specified language with partial value (with no refNodes): #pseudo-lang-div3:lang(en)",
-        "reason": "not supported"
-      },
-      {
-        "name": "Fragment Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (with no refNodes): #pseudo-ui :checked",
         "reason": "not supported"
       },
       {
@@ -3333,10 +3321,6 @@
       },
       {
         "name": "In-document Element.matches: :lang pseudo-class selector, matching specified language with partial value (1) (with no refNodes): #pseudo-lang-div3:lang(en)",
-        "reason": "not supported"
-      },
-      {
-        "name": "In-document Element.matches: :checked pseudo-class selector, matching checked radio buttons and checkboxes (1) (with no refNodes): #pseudo-ui :checked",
         "reason": "not supported"
       },
       {

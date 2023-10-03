@@ -199,6 +199,9 @@ export function matchPseudoClass(
     case "disabled":
       return PseudoClass.disabled(element);
 
+    case "checked":
+      return PseudoClass.checked(element);
+
     case "root":
       return rootElement(element) === element;
 

@@ -27,3 +27,24 @@ export function disabled(element: Element): boolean {
   // match any element that is actually disabled.
   return isActuallyDisabled(element);
 }
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/semantics-other.html#selector-checked)
+ */
+export function checked(element: Element): boolean {
+  // match any element falling into one of the following categories:
+  return (
+    // - input elements whose type attribute is in the Checkbox state and whose checkedness state is true
+    (isHTMLElementOf("input", element) &&
+      element.getAttribute("type") === "checkbox" &&
+      element.hasAttribute("checked")) ||
+    // - input elements whose type attribute is in the Radio Button state and whose checkedness state is true
+    (
+      isHTMLElementOf("input", element) &&
+      element.getAttribute("type") === "radio" &&
+      element.hasAttribute("checked")
+    ) ||
+    // - option elements whose selectedness is true
+    (isHTMLElementOf("option", element) && element.hasAttribute("selected"))
+  );
+}
