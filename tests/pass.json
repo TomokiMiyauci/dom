@@ -204,16 +204,6 @@
         "reason": "Bug"
       }
     ],
-    "dom/nodes/Node-properties.html": [
-      {
-        "name": "document.URL",
-        "reason": "location is not supported"
-      },
-      {
-        "name": "document.documentURI",
-        "reason": "location is not supported"
-      }
-    ],
     "dom/nodes/Element-insertAdjacentElement.html": [
       {
         "name": "Adding more than one child to document should cause a HierarchyRequestError exception",

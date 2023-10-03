@@ -9,10 +9,11 @@ const wptRoot = fromFileUrl(wptRootURL);
 const targetContent = await Deno.readTextFile(
   fromFileUrl(import.meta.resolve("./target.jsonc")),
 );
+const baseURL = new URL("http://localhost:8000");
 const testList = parse(targetContent) as string[];
 const targets = testList.map((name) => ({
   name,
-  url: new URL(name, "http://localhost:8000"),
+  url: new URL(name, baseURL),
 }));
 
 const passMap = new Map(
@@ -21,13 +22,22 @@ const passMap = new Map(
   }),
 );
 const handler = createHandler({ baseDir: wptRoot });
-const server = Deno.serve(handler);
+const server = Deno.serve({ hostname: "localhost", port: 8000 }, handler);
 server.unref();
 
 Deno.test("wpt", async (t) => {
   for (const { url, name } of targets) {
     await t.step(url.pathname, async (t) => {
-      const runner = new Runner(DOM);
+      const runner = new Runner({
+        ...DOM,
+        location: {
+          href: url.href,
+          toString() {
+            return url.href;
+          },
+        },
+      });
+
       const reports = await runner.run(url);
       // Workaround leading async ops. This is Deno's bug. @see https://github.com/denoland/deno/issues/15425
       await new Promise((resolve) => setTimeout(resolve, 0));

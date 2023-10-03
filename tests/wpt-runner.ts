@@ -1,4 +1,9 @@
-import { join, toFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
+import {
+  extname,
+  join,
+  toFileUrl,
+} from "https://deno.land/std@0.190.0/path/mod.ts";
+import { typeByExtension } from "https://deno.land/std@0.190.0/media_types/mod.ts";
 import { DOMParser } from "../mod.ts";
 import { TestReport } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
@@ -26,14 +31,24 @@ add_completion_callback((_, testStatus, __, tests) => {
 
 export function createHandler(
   { baseDir }: { baseDir: string },
-): (request: Request) => Promise<Response> {
+): (request: Request) => Response {
   return (request) => {
     const url = new URL(request.url);
     const path = join(baseDir, url.pathname);
+    const ext = extname(path);
     const fileURL = toFileUrl(path);
-    const response = fetch(fileURL);
+    const stream = Deno.readFileSync(fileURL);
 
-    return response;
+    const maybeContentType = typeByExtension(ext);
+    const headers = maybeContentType
+      ? new Headers({ "content-type": maybeContentType })
+      : undefined;
+    const proxyResponse = new Response(stream, { headers });
+    Object.defineProperty(proxyResponse, "url", {
+      value: url,
+    });
+
+    return proxyResponse;
   };
 }
 
@@ -46,7 +61,9 @@ function injectScript(input: string): string {
 
 export class Runner {
   #pubsub: PubSub<TestReport> = new PubSub();
-  constructor(public window: { DOMParser: typeof DOMParser }) {
+  constructor(
+    public window: { DOMParser: typeof DOMParser } & Record<string, unknown>,
+  ) {
   }
 
   async resolve(url: URL): Promise<string> {
@@ -73,9 +90,7 @@ export class Runner {
     }
 
     const parser = new this.window.DOMParser();
-    const document = parser.parseFromString(content, "text/html", {
-      baseURL: url,
-    });
+    const document = parser.parseFromString(content, "text/html");
 
     if (!document.scripts.length) {
       this.#pubsub.unsubscribe();
