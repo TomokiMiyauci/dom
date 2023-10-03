@@ -3048,10 +3048,6 @@
         "reason": "selector parser is not supported non-ASCII character"
       },
       {
-        "name": "In-document Element.matches: :root pseudo-class selector, matching document root element (with no refNodes): :root",
-        "reason": ":root pseudo class is not supported"
-      },
-      {
         "name": "In-document Element.matches: :nth-of-type selector, matching the third em element (with no refNodes): #pseudo-nth-p1 em:nth-of-type(3)",
         "reason": "not supported"
       },

@@ -109,7 +109,8 @@ export type PseudoClassSelector =
   | EnabledPseudoClass
   | DisabledPseudoClass
   | ChildIndexedPseudoClass
-  | OnlyChildPseudoClass;
+  | OnlyChildPseudoClass
+  | RootPseudoClass;
 
 export interface RegularPseudoClass {
   type: "pseudo-class";
@@ -150,6 +151,10 @@ export interface EnabledPseudoClass extends RegularPseudoClass {
 
 export interface DisabledPseudoClass extends RegularPseudoClass {
   value: "disabled";
+}
+
+export interface RootPseudoClass extends RegularPseudoClass {
+  value: "root";
 }
 
 export interface NotPseudoClass extends RegularPseudoClass {

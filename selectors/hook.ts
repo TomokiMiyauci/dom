@@ -199,6 +199,9 @@ export function matchPseudoClass(
     case "disabled":
       return PseudoClass.disabled(element);
 
+    case "root":
+      return rootElement(element) === element;
+
     case "nth-child": {
       const index = [...elementSiblings(element)].findIndex((el) =>
         element === el
@@ -236,6 +239,12 @@ export function elementSiblings(element: Element): Iterable<Element> {
   const inclusiveSiblings = tree.inclusiveSiblings(element);
 
   return iter(inclusiveSiblings).filter(isElement);
+}
+
+export function rootElement(element: Element): Element {
+  const parent = element.parentElement;
+
+  return parent ? rootElement(parent) : element;
 }
 
 function matchTypeSelector(
