@@ -79,11 +79,13 @@ export function Document_HTML<T extends Constructor<Document>>(
       internalSlots.extends<Document>(this, internal);
     }
 
+    /**
+     * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-location)
+     */
     override get location(): Location {
-      throw new Error("location#getter");
-    }
-    override set location(href: Location) {
-      throw new Error("location#setter");
+      // return this's relevant global object's Location object, if this is fully active, and null otherwise.
+      // TODO
+      return null!;
     }
 
     override get domain(): string {
