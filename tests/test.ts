@@ -56,6 +56,10 @@ Deno.test("wpt", async (t) => {
 
             return [...iframes].map((iframe) => iframe.contentWindow);
           },
+
+          getSelection() {
+            return (globalThis.document as Document).getSelection();
+          },
         });
 
         const reports = await runner.run(url);
