@@ -16,10 +16,7 @@ export class DOMParser implements IDOMParser {
     const document = new Document();
 
     $(document).contentType = type;
-
-    if (globalThis.location) {
-      $(document).URL = new URL(globalThis.location.href);
-    }
+    if (globalThis.document) $(document).URL = $(globalThis.document).URL;
 
     switch (type) {
       case "text/html": {
@@ -27,16 +24,6 @@ export class DOMParser implements IDOMParser {
 
         const parser = new HTMLParser(document);
         const result = parser.parse(string);
-
-        Object.defineProperty(globalThis, "parent", {
-          value: globalThis,
-          configurable: true,
-        });
-
-        Object.defineProperty(globalThis, "document", {
-          value: result,
-          configurable: true,
-        });
 
         queueMicrotask(async () => {
           for (const script of result.scripts) {

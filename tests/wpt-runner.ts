@@ -100,13 +100,26 @@ export class Runner {
     const content = await this.resolve(url);
 
     for (const item of Object.keys(this.window)) {
-      Object.defineProperty(self, item, {
-        value: (this.window as Record<string, unknown>)[item],
-      });
+      try {
+        Object.defineProperty(self, item, {
+          value: (this.window as Record<string, unknown>)[item],
+          configurable: true,
+          writable: true,
+        });
+      } catch {
+        // for location
+        (globalThis as any)[item] = this.window[item];
+      }
     }
 
     const parser = new this.window.DOMParser();
     const document = parser.parseFromString(content, "text/html");
+
+    Object.defineProperty(globalThis, "document", {
+      value: document,
+      configurable: true,
+      writable: true,
+    });
 
     if (!document.scripts.length) {
       this.#pubsub.unsubscribe();

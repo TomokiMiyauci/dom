@@ -3,6 +3,7 @@ import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
 import { createHandler, Runner } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
 import * as DOM from "../mod.ts";
+import { $ } from "../internal.ts";
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));
 const wptRoot = fromFileUrl(wptRootURL);
@@ -30,6 +31,9 @@ Deno.test("wpt", async (t) => {
     await t.step({
       name: url.pathname,
       fn: async (t) => {
+        const document = new DOM.Document();
+        $(document).URL = url;
+
         const runner = new Runner({
           ...DOM,
           location: {
@@ -37,6 +41,13 @@ Deno.test("wpt", async (t) => {
             toString() {
               return url.href;
             },
+          },
+          document,
+          get parent() {
+            return globalThis;
+          },
+          get frames() {
+            return (this.document as Document).querySelectorAll("iframe");
           },
         });
 
