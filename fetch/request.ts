@@ -5,6 +5,7 @@ import {
 } from "../html/web_application_apis/scripting.ts";
 import { $, internalSlots } from "../html/internal.ts";
 import { Body } from "./infrastructure.ts";
+import { List } from "../infra/data_structures/list.ts";
 
 export class RequestInternals {
   /**
@@ -12,7 +13,20 @@ export class RequestInternals {
    */
   method = "GET";
 
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-url)
+   */
   URL: URL;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-url-list)
+   */
+  URLList: List<URL>;
+
+  /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-current-url)
+   */
+  currentURL!: URL;
 
   /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-reserved-client)
@@ -117,6 +131,11 @@ export class RequestInternals {
   redirectCount = 0;
 
   /**
+   * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-redirect-mode)
+   */
+  redirectMode: RequestRedirect = "follow";
+
+  /**
    * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#concept-request-response-tainting)
    */
   responseTainting: "basic" | "cors" | "opaque" = "basic";
@@ -124,6 +143,11 @@ export class RequestInternals {
   constructor({ URL, client }: Pick<RequestInternals, "URL" | "client">) {
     this.URL = URL;
     this.client = client;
+    this.URLList = new List([this.URL]);
+
+    Object.defineProperty(this, "currentURL", {
+      get: () => this.URLList[this.URLList.size - 1],
+    });
   }
 }
 

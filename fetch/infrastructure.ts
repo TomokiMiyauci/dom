@@ -196,7 +196,7 @@ export function locationURL(
   requestFragment: string | null,
 ): URL | null | Failure {
   // 1. If response’s status is not a redirect status, then return null.
-  if (isRedirectStatus($(response).status)) return null;
+  if (!isRedirectStatus($(response).status)) return null;
 
   const locationValue = response.headers.get("Location");
 
