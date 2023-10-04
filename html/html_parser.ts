@@ -1,6 +1,5 @@
 import { Document } from "../dom/nodes/documents/document.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./_adapter.ts";
-import { List } from "../infra/data_structures/list.ts";
 import { parse } from "../deps.ts";
 import { $ } from "../internal.ts";
 import { getEncoding, windows_1252 } from "../encoding/encoding.ts";
@@ -38,7 +37,7 @@ export class HTMLParser {
 export function parseHTMLFragment(
   context: Element,
   input: string,
-): List<Node> {
+): Iterable<Node> {
   console.warn("parseHTMLFragment is not standard behavior");
 
   // 1. Create a new Document node, and mark it as being an HTML document.
@@ -94,7 +93,7 @@ export function parseHTMLFragment(
 
   // 14. Return the child nodes of root, in tree order.
 
-  const text = document.createTextNode(input);
+  parser.parse(input);
 
-  return new List([text]);
+  return document.body.childNodes;
 }

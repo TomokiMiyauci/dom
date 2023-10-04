@@ -134,10 +134,6 @@
     ],
     "dom/nodes/Document-getElementById.html": [
       {
-        "name": "add id attribute via innerHTML",
-        "reason": "innerHTML setter is not supported"
-      },
-      {
         "name": "add id attribute via outerHTML",
         "reason": "outerHTML setter is not supported"
       },
