@@ -47,7 +47,11 @@ Deno.test("wpt", async (t) => {
             return globalThis;
           },
           get frames() {
-            return (this.document as Document).querySelectorAll("iframe");
+            const iframes = (this.document as Document).querySelectorAll(
+              "iframe",
+            );
+
+            return [...iframes].map((iframe) => iframe.contentWindow);
           },
         });
 

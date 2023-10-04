@@ -42,59 +42,11 @@
         "reason": "compiler error"
       },
       {
-        "name": "Appending a document",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Adopting an orphan",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Adopting a non-orphan",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
         "name": "WebIDL tests",
         "reason": "compiler error"
       }
     ],
     "dom/nodes/Node-removeChild.html": [
-      {
-        "name": "Passing a detached element from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Passing a non-detached element from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Calling removeChild on a element from a frame document with no children should throw NOT_FOUND_ERR.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Passing a detached text from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Passing a non-detached text from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Calling removeChild on a text from a frame document with no children should throw NOT_FOUND_ERR.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Passing a detached comment from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Passing a non-detached comment from a frame document to removeChild should not affect it.",
-        "reason": "globalThis#frames is not supported"
-      },
-      {
-        "name": "Calling removeChild on a comment from a frame document with no children should throw NOT_FOUND_ERR.",
-        "reason": "globalThis#frames is not supported"
-      },
       {
         "name": "Passing a value that is not a Node reference to removeChild should throw TypeError.",
         "reason": "compiler error"
@@ -311,7 +263,7 @@
     "dom/nodes/rootNode.html": [
       {
         "name": "getRootNode() must return context object's shadow-including root if options's composed is true, and context object's root otherwise",
-        "reason": "innerHTML setter is not supported"
+        "reason": "Bug: Shadow root querySelector is wrong"
       }
     ],
     "dom/ranges/Range-adopt-test.html": [

@@ -98,18 +98,11 @@ export class Runner {
 
   async run(url: URL): Promise<AsyncIterable<TestReport>> {
     const content = await this.resolve(url);
+    const { location, ...rest } = Object.getOwnPropertyDescriptors(this.window);
 
-    for (const item of Object.keys(this.window)) {
-      try {
-        Object.defineProperty(self, item, {
-          value: (this.window as Record<string, unknown>)[item],
-          configurable: true,
-          writable: true,
-        });
-      } catch {
-        // for location
-        (globalThis as any)[item] = this.window[item];
-      }
+    Object.defineProperties(globalThis, rest);
+    if (location) {
+      (globalThis as any)["location"] = this.window["location"];
     }
 
     const parser = new this.window.DOMParser();
