@@ -41,6 +41,9 @@ Deno.test("wpt", async (t) => {
             toString() {
               return url.href;
             },
+            get origin() {
+              return url.origin;
+            },
           },
           document,
           get parent() {
