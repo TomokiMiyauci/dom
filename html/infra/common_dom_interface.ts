@@ -25,9 +25,8 @@ export function reflectSet(
   const target = new ElementTarget(element, name);
   // 1. If the given value is false, then run this's delete the content attribute.
   if (!value) target.deleteContentAttribute();
-
   // 2. If the given value is true, then run this's set the content attribute with the empty string.
-  target.setContentAttribute("");
+  else target.setContentAttribute("");
 }
 
 /**

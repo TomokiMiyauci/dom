@@ -1,11 +1,14 @@
 // deno-lint-ignore-file no-explicit-any
 import { Element } from "../../dom/nodes/elements/element.ts";
 import { GlobalEventHandlers } from "../global_event_handlers.ts";
+import { fireSyntheticPointerEvent } from "../global_event_handlers_utils.ts";
 import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";
 import { HTMLElement_CSSOMView } from "../../cssom/html_element.ts";
 import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";
 import type { IHTMLElement } from "../../interface.d.ts";
+import { $ } from "../../internal.ts";
+import { isDisabled } from "../elements/forms/attributes_common_to_form_control.ts";
 
 @GlobalEventHandlers
 @ElementContentEditable
@@ -61,8 +64,24 @@ export class HTMLElement extends Element implements IHTMLElement {
     throw new Error("inert#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/interaction.html#dom-click)
+   */
   click(): void {
-    throw new Error("click");
+    // 1. If this element is a form control that is disabled, then return.
+    if (isDisabled(this)) return;
+
+    // 2. If this element's click in progress flag is set, then return.
+    if ($<Element>(this).clickInProgress) return;
+
+    // 3. Set this element's click in progress flag.
+    $<Element>(this).clickInProgress = true;
+
+    // 4. Fire a synthetic pointer event named click at this element, with the not trusted flag set.
+    fireSyntheticPointerEvent("click", this, true);
+
+    // 5. Unset this element's click in progress flag.
+    $<Element>(this).clickInProgress = false;
   }
 
   get accessKey(): string {

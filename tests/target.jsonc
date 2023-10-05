@@ -19,7 +19,7 @@
   "dom/events/Event-constants.html",
   "dom/events/Event-defaultPrevented-after-dispatch.html",
   "dom/events/Event-defaultPrevented.html",
-  // "dom/events/event-disabled-dynamic.html",
+  "dom/events/event-disabled-dynamic.html",
   "dom/events/Event-dispatch-bubble-canceled.html",
   // "dom/events/Event-dispatch-bubbles-false.html",
   // "dom/events/Event-dispatch-bubbles-true.html",

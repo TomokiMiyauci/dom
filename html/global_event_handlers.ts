@@ -481,7 +481,7 @@ export function GlobalEventHandlers<T extends Constructor<EventTarget>>(
     set onclick(
       value: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null,
     ) {
-      throw new Error();
+      setEventHandlerIDLAttribute(this, "onclick", value);
     }
     set onclose(value: ((this: GlobalEventHandlers, ev: Event) => any) | null) {
       throw new Error();
