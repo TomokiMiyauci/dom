@@ -209,9 +209,6 @@
       }
     ],
 
-    "dom/events/Event-type-empty.html": [
-      { "name": "Constructor", "reason": "globalThis Event is not supported" }
-    ],
     "dom/events/CustomEvent.html": [
       {
         "name": "First parameter to initCustomEvent should be mandatory.",

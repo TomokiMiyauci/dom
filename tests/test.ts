@@ -33,10 +33,14 @@ Deno.test("wpt", async (t) => {
     await t.step({
       name: url.pathname,
       fn: async (t) => {
+        const window = new DOM.Window();
         const document = new DOM.Document();
         $(document).URL = url;
 
         const runner = new Runner({
+          dispatchEvent: window.dispatchEvent.bind(window),
+          addEventListener: window.addEventListener.bind(window),
+          removeEventListener: window.removeEventListener.bind(window),
           ...DOM,
           location: {
             href: url.href,
