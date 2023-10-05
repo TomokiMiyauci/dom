@@ -72,7 +72,8 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setstart
    */
-  setStart(node: Node, offset: number): void {
+  @convert
+  setStart(node: Node, @unsignedLong offset: number): void {
     // set the start of this to boundary point (node, offset).
     setStartOrEnd("start", this, [node, offset]);
   }
@@ -80,7 +81,8 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setend
    */
-  setEnd(node: Node, offset: number): void {
+  @convert
+  setEnd(node: Node, @unsignedLong offset: number): void {
     // set the end of this to boundary point (node, offset).
     setStartOrEnd("end", this, [node, offset]);
   }

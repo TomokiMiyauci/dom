@@ -122,8 +122,9 @@ export function ParentNode<T extends Constructor<Node>>(
     querySelector<E extends Element = Element>(
       selectors: string,
     ): E | null;
+    @convert
     querySelector(
-      selectors: string,
+      @DOMString selectors: string,
     ): Element | null {
       // return the first result of running scope-match a selectors string selectors against this, if the result is not an empty list;
       return matchScopedSelectorsString(selectors, this)[0] ?? null;
@@ -144,8 +145,9 @@ export function ParentNode<T extends Constructor<Node>>(
     querySelectorAll<E extends Element = Element>(
       selectors: string,
     ): NodeListOf<E>;
+    @convert
     querySelectorAll(
-      selectors: string,
+      @DOMString selectors: string,
     ): NodeListOf<Element> {
       return new StaticNodeList(
         matchScopedSelectorsString(selectors, this),
