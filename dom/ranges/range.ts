@@ -3,7 +3,13 @@ import { Exposed } from "../../webidl/extended_attribute.ts";
 import { Const, constant } from "../../webidl/idl.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 import { BoundaryPoint, Position, position } from "./boundary_point.ts";
-import { isCharacterData, isDocumentType, isText } from "../nodes/utils.ts";
+import {
+  isCharacterData,
+  isDocument,
+  isDocumentFragment,
+  isDocumentType,
+  isText,
+} from "../nodes/utils.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import {
@@ -27,7 +33,11 @@ import {
 import { isCollapsed } from "./abstract_range_utils.ts";
 import { replaceData } from "../nodes/character_data_utils.ts";
 import { iter } from "../../deps.ts";
-import { removeNode } from "../nodes/node_trees/mutation.ts";
+import {
+  appendNode,
+  removeNode,
+  replaceAllNode,
+} from "../nodes/node_trees/mutation.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
@@ -166,7 +176,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-collapse
    */
-  collapse(toStart?: boolean): void {
+  collapse(toStart = false): void {
     // if toStart is true, set end to start; otherwise set start to end.
     if (toStart) this._.end = this._.start;
     else this._.start = this._.end;
@@ -202,23 +212,39 @@ export class Range extends AbstractRange implements IRange {
     this._.end = [node, length];
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-start_to_start)
+   */
   @constant
   static readonly START_TO_START: 0;
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-start_to_end)
+   */
   @constant
   static readonly START_TO_END: 1;
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-end_to_end)
+   */
   @constant
   static readonly END_TO_END: 2;
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-end_to_start)
+   */
   @constant
   static readonly END_TO_START: 3;
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-compareboundarypoints)
+   */
   @convert
   compareBoundaryPoints(
     @unsignedShort how: number,
     sourceRange: Range,
   ): number {
+    // 1. If how is not one of
     switch (how) {
       case Range.START_TO_START:
       case Range.START_TO_END:
@@ -231,10 +257,12 @@ export class Range extends AbstractRange implements IRange {
         throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
+    // 2. If this’s root is not the same as sourceRange’s root, then throw a "WrongDocumentError" DOMException.
     if (this.#root !== sourceRange.#root) {
       throw new DOMException("<message>", DOMExceptionName.WrongDocumentError);
     }
 
+    // 3. If how is:
     const { point, otherPoint } = how === Range.START_TO_START
       ? { point: this._.start, otherPoint: sourceRange._.start }
       : how === Range.START_TO_END
@@ -243,9 +271,8 @@ export class Range extends AbstractRange implements IRange {
       ? { point: this._.end, otherPoint: sourceRange._.end }
       : { point: this._.start, otherPoint: sourceRange._.end };
 
-    const pos = position(point, otherPoint);
-
-    switch (pos) {
+    // 4. If the position of this point relative to other point is
+    switch (position(point, otherPoint)) {
       case Position.Before:
         return -1;
       case Position.Equal:
@@ -371,8 +398,38 @@ export class Range extends AbstractRange implements IRange {
     insert(node, this);
   }
 
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-surroundcontents)
+   */
   surroundContents(newParent: Node): void {
-    throw new Error("surroundContents");
+    // 1. If a non-Text node is partially contained in this, then throw an "InvalidStateError" DOMException.
+
+    // 2. If newParent is a Document, DocumentType, or DocumentFragment node, then throw an "InvalidNodeTypeError" DOMException.
+    if (
+      isDocument(newParent) ||
+      isDocumentType(newParent) ||
+      isDocumentFragment(newParent)
+    ) {
+      throw new DOMException(
+        "<message>",
+        DOMExceptionName.InvalidNodeTypeError,
+      );
+    }
+
+    // 3. Let fragment be the result of extracting this.
+    const fragment = extract(this);
+
+    // 4. If newParent has children, then replace all with null within newParent.
+    if (fragment.hasChildNodes()) replaceAllNode(null, newParent);
+
+    // 5. Insert newParent into this.
+    insert(newParent, this);
+
+    // 6. Append fragment to newParent.
+    appendNode(fragment, newParent);
+
+    // 7. Select newParent within this.
+    select(newParent, this);
   }
 
   /**
