@@ -126,9 +126,9 @@ export function createNewBrowsingContextAndDocument(
   DOM.$(document).contentType = "text/html";
   DOM.$(document).mode = html.DOCUMENT_MODE.QUIRKS;
   DOM.$(document).origin = origin;
-  $(document).browsingContext = browsingContext;
-  $(document).isInitialAboutBlank = true;
-  $(document).aboutBaseURL = creatorBaseURL;
+  DOM.$(document).browsingContext = browsingContext;
+  DOM.$(document).isInitialAboutBlank = true;
+  DOM.$(document).aboutBaseURL = creatorBaseURL;
 
   // 16. If creator is non-null, then:
   if (creator) {

@@ -168,7 +168,7 @@ export async function attemptPopulateHistoryEntryDocument(
       );
 
       // 2. Set entry's document state's document's salvageable to false.
-      $(entry.documentState.document).salvageable = false;
+      DOM.$(entry.documentState.document).salvageable = false;
 
       // 3. If navigationParams is not null, then:
       if (navigationParams) {
@@ -307,7 +307,8 @@ export function createNavigationParamsFromSrcdocResource(
     new URL(response.url),
     entry.documentState.historyPolicyContainer,
     null,
-    navigableContainerDocument && $(navigableContainerDocument).policyContainer,
+    navigableContainerDocument &&
+      DOM.$(navigableContainerDocument).policyContainer,
     null,
   );
 
@@ -431,7 +432,7 @@ export async function createNavigationParamsByFetching(
       origin: navigableActiveDocumentOrigin,
       // cross-origin opener policy: navigable's active document's cross-origin opener policy
       crossOriginOpenerPolicy:
-        $(navigableActiveDocument).crossOriginOpenerPolicy,
+        DOM.$(navigableActiveDocument).crossOriginOpenerPolicy,
     },
   );
   // current context is navigation source: true if navigable's active document's origin is same origin with entry's document state's initiator origin otherwise false

@@ -57,7 +57,7 @@ export function populateHTMLHeadBody(document: Document): void {
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#completely-loaded)
  */
 export function completelyLoaded(document: Document): boolean {
-  return $(document).completelyLoadedTime !== null;
+  return DOM.$(document).completelyLoadedTime !== null;
 }
 
 export function createAndInitializeDocument(
@@ -91,7 +91,7 @@ export function createAndInitializeDocument(
   const browsingContextActiveDocument = activeDocument(browsingContext!);
   // 7. If browsingContext's active document's is initial about:blank is true, and browsingContext's active document's origin is same origin-domain with navigationParams's origin,
   if (
-    $(browsingContextActiveDocument).isInitialAboutBlank &&
+    DOM.$(browsingContextActiveDocument).isInitialAboutBlank &&
     sameOriginDomain(
       DOM.$(browsingContextActiveDocument).origin,
       navigationParams.origin,
@@ -142,24 +142,25 @@ export function createAndInitializeDocument(
   // origin: navigationParams's origin
   DOM.$(document).origin = navigationParams.origin;
   // browsing context: browsingContext
-  $(document).browsingContext = browsingContext;
+  DOM.$(document).browsingContext = browsingContext;
   // policy container: navigationParams's policy container
-  $(document).policyContainer = navigationParams.policyContainer;
+  DOM.$(document).policyContainer = navigationParams.policyContainer;
   // permissions policy: permissionsPolicy
   // active sandboxing flag set: navigationParams's final sandboxing flag set
   // cross-origin opener policy: navigationParams's cross-origin opener policy
-  $(document).crossOriginOpenerPolicy =
+  DOM.$(document).crossOriginOpenerPolicy =
     navigationParams.crossOriginOpenerPolicy;
   // load timing info: loadTimingInfo
   // was created via cross-origin redirects: navigationParams's response's has cross-origin redirects
   // during-loading navigation ID for WebDriver BiDi: navigationParams's id
-  $(document).duringLoadingNavigationIDForWebDriverBiDi = navigationParams.id;
+  DOM.$(document).duringLoadingNavigationIDForWebDriverBiDi =
+    navigationParams.id;
   // URL: creationURL
   DOM.$(document).URL = creationURL!;
   // current document readiness: "loading"
 
   // about base URL: navigationParams's about base URL
-  $(document).aboutBaseURL = navigationParams.aboutBaseURL;
+  DOM.$(document).aboutBaseURL = navigationParams.aboutBaseURL;
 
   // 11. Set window's associated Document to document.
 
@@ -411,7 +412,8 @@ export function stopLoading(navigable: Navigable) {
 
   // 2. If document's unload counter is 0, and navigable's ongoing navigation is a navigation ID,
   if (
-    !$(document).unloadCounter && navigable.ongoingNavigation === navigationID
+    !DOM.$(document).unloadCounter &&
+    navigable.ongoingNavigation === navigationID
     // then set the ongoing navigation for navigable to null.
   ) setOngoingNavigation(navigable, null);
 

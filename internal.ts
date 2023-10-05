@@ -15,8 +15,6 @@ import { type MutationObserverInternals } from "./dom/nodes/mutation_observers/m
 
 import { SelectionInternals } from "./selection/selection.ts";
 
-import type * as HTML from "./html/document.ts";
-
 import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
 import { Tree } from "./dom/infra/tree.ts";
 import { ShadowTree } from "./dom/nodes/shadow_root_utils.ts";
@@ -27,7 +25,7 @@ import { OrderedSet } from "./infra/data_structures/set.ts";
 import { List } from "./infra/data_structures/list.ts";
 import { TextTree } from "./dom/nodes/text_utils.ts";
 import { emplace, UnionToIntersection } from "./deps.ts";
-import { RequestInternals } from "./fetch/request.ts";
+import { extend } from "./utils.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],
@@ -49,12 +47,10 @@ type InternalSlotEntries = [
   [MutationObserver, MutationObserverInternals],
   [Slottable, SlottableInternals],
   [HTMLTemplateElement, HTMLTemplateElementInternals],
-  [Document, HTML.DocumentInternals],
   [HTMLSlotElement, {
     manuallyAssignedNodes: OrderedSet<Element | Text>;
     assignedNodes: List<Element | Text>;
   }],
-  [Request, RequestInternals],
 ];
 
 export interface InternalSlots<T extends [unknown, unknown]> {
@@ -72,13 +68,13 @@ export interface InternalSlots<T extends [unknown, unknown]> {
 
 export class InternalSlotsMap {
   #map = new WeakMap();
-  extends(key: object, value: object): void {
+  extends(key: object, value: Record<PropertyKey, unknown>): void {
     emplace(this.#map, key, {
       insert: () => {
         return value;
       },
       update: (existing) => {
-        return { ...existing, ...value };
+        return extend(existing, value, { prototype: true });
       },
     });
   }

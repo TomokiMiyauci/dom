@@ -77,7 +77,8 @@ export function activeBrowsingContext(
   // its active document's browsing context.
   const navigableActiveDocument = activeDocument(navigable);
 
-  return navigableActiveDocument && $(navigableActiveDocument).browsingContext;
+  return navigableActiveDocument &&
+    DOM.$(navigableActiveDocument).browsingContext;
 }
 
 /**
@@ -264,7 +265,7 @@ export function createNewChildNavigable(element: Element): void {
   // navigable target name targetName
   documentState.navigableTargetName = targetName;
   // about base URL        document's about base URL
-  documentState.aboutBaseURL = $(document).aboutBaseURL;
+  documentState.aboutBaseURL = DOM.$(document).aboutBaseURL;
   // 8. Let navigable be a new navigable.
   const navigable = new Navigable();
 

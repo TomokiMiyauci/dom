@@ -78,7 +78,7 @@ export function snapshotSourceSnapshotParams(
     hasTransientActivation: false,
     sandboxingFlags: {},
     allowsDownloading: false,
-    sourcePolicyContainer: $(sourceDocument).policyContainer,
+    sourcePolicyContainer: DOM.$(sourceDocument).policyContainer,
     fetchClient: {},
   };
 }
@@ -342,8 +342,8 @@ export async function navigate(
     const policyContainer = determineNavigationParamsPolicyContainer(
       $(response).url!,
       null,
-      $(sourceDocument).policyContainer,
-      $(containerDocument(navigable)!).policyContainer,
+      DOM.$(sourceDocument).policyContainer,
+      DOM.$(containerDocument(navigable)!).policyContainer,
       null,
     );
 

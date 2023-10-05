@@ -4,6 +4,7 @@ import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import { WindowEventHandlers } from "../window_event_handlers.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
 import { $, internalSlots } from "../internal.ts";
+import * as DOM from "../../internal.ts";
 import {
   activeWindow,
   Navigable,
@@ -13,19 +14,21 @@ import { BrowsingContext } from "./infrastructure_for_sequences_of_documents/bro
 import { stopLoading } from "./document_lifecycle.ts";
 import { PutForwards } from "../../webidl/extended_attribute.ts";
 import { Location } from "./location.ts";
+import { Window_Selection } from "../../selection/window.ts";
+import { LegacyUnenumerableNamedProperties } from "../../webidl/legacy_extended_attributes.ts";
 
 @GlobalEventHandlers
 @WindowEventHandlers
+@Window_Selection
+@LegacyUnenumerableNamedProperties
 export class Window extends EventTarget implements IWindow {
   constructor() {
     super();
 
-    const location = new Location();
-    const document = new Document();
-    internalSlots.extends<globalThis.Window>(this as any, {
-      location,
-      document,
-    });
+    internalSlots.extends<globalThis.Window>(
+      this as any,
+      new WindowInternals(),
+    );
   }
 
   get clientInformation(): Navigator {
@@ -299,9 +302,6 @@ export class Window extends EventTarget implements IWindow {
   ): CSSStyleDeclaration {
     throw new Error();
   }
-  getSelection(): Selection | null {
-    throw new Error();
-  }
   matchMedia(query: string): MediaQueryList {
     throw new Error();
   }
@@ -391,12 +391,8 @@ export class Window extends EventTarget implements IWindow {
   }
 }
 
-export interface WindowInternals {
-  document: Document;
-  location: Location;
-}
-
-export interface Window extends GlobalEventHandlers, WindowEventHandlers {
+export interface Window
+  extends GlobalEventHandlers, WindowEventHandlers, Window_Selection {
   addEventListener<K extends keyof WindowEventMap>(
     type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => any,
@@ -419,10 +415,15 @@ export interface Window extends GlobalEventHandlers, WindowEventHandlers {
   ): void;
 }
 
+export class WindowInternals {
+  document: Document = new Document();
+  location: Location = new Location();
+}
+
 export function browsingContext(
   window: globalThis.Window,
 ): BrowsingContext | null {
-  return $($(window).document).browsingContext;
+  return DOM.$($(window).document).browsingContext;
 }
 
 export function navigable(window: globalThis.Window) {

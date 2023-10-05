@@ -1,5 +1,4 @@
 import * as DOM from "../../internal.ts";
-import { $ } from "../internal.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/dom.html#unblock-rendering)
@@ -9,5 +8,5 @@ export function unblockRendering(el: Element) {
   const document = DOM.$(el).nodeDocument;
 
   // 2. Remove el from document's render-blocking element set.
-  $(document).renderBlockingElementSet.remove((item) => item === el);
+  DOM.$(document).renderBlockingElementSet.remove((item) => item === el);
 }

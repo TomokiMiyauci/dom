@@ -1,6 +1,7 @@
 import { $ } from "../internal.ts";
+import * as DOM from "../../internal.ts";
 
 export function browsingContext(window: Window) {
   // its associated Document's browsing context.
-  return $($(window).document).browsingContext;
+  return DOM.$($(window).document).browsingContext;
 }

@@ -63,19 +63,20 @@ export function executeScriptElement(el: HTMLScriptElement): void {
   // 5. If el's from an external file is true, or el's type is "module", then increment document's ignore-destructive-writes counter.
   if ($(el).fromExternalFile || $(el).type === "module") {
     incremented = true;
-    $(document).ignoreDestructiveWritesCounter++;
+    DOM.$(document).ignoreDestructiveWritesCounter++;
   }
 
   // 6. Switch on el's type:
   switch ($(el).type) {
     case "classic": {
       // 1. Let oldCurrentScript be the value to which document's currentScript object was most recently set.
-      const oldCurrentScript = $(document).currentScript;
+      const oldCurrentScript = DOM.$(document).currentScript;
 
       // 2. If el's root is not a shadow root, then set document's currentScript attribute to el.
-      if (!isShadowRootNode(DOM.tree.root(el))) $(document).currentScript = el;
-      // Otherwise, set it to null.
-      else $(document).currentScript = null;
+      if (!isShadowRootNode(DOM.tree.root(el))) {
+        DOM.$(document).currentScript = el;
+      } // Otherwise, set it to null.
+      else DOM.$(document).currentScript = null;
 
       const { result } = $(el);
       // 3. Run the classic script given by el's result.
@@ -84,7 +85,7 @@ export function executeScriptElement(el: HTMLScriptElement): void {
       }
 
       // 4. Set document's currentScript attribute to oldCurrentScript.
-      $(document).currentScript = oldCurrentScript;
+      DOM.$(document).currentScript = oldCurrentScript;
       break;
     }
     case "module": {
@@ -100,7 +101,7 @@ export function executeScriptElement(el: HTMLScriptElement): void {
   }
 
   // 7. Decrement the ignore-destructive-writes counter of document, if it was incremented in the earlier step.
-  if (incremented) $(document).ignoreDestructiveWritesCounter--;
+  if (incremented) DOM.$(document).ignoreDestructiveWritesCounter--;
 
   // 8. If el's from an external file is true, then fire an event named load at el.
   if ($(el).fromExternalFile) fireEvent("load", el);

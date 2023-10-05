@@ -5,7 +5,7 @@ import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $, internalSlots } from "./internal.ts";
+import { $ } from "./internal.ts";
 import * as DOM from "../internal.ts";
 import { tree } from "../internal.ts";
 import { type BrowsingContext } from "./loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
@@ -71,13 +71,6 @@ export function Document_HTML<T extends Constructor<Document>>(
      * @see https://momdo.github.io/html/dom.html#current-document-readiness
      */
     _currentDocumentReadiness: DocumentReadyState = "complete";
-
-    constructor(...args: any) {
-      super(...args);
-
-      const internal = new DocumentInternals();
-      internalSlots.extends<Document>(this, internal);
-    }
 
     /**
      * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-document-location)

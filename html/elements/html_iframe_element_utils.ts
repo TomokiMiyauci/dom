@@ -152,7 +152,7 @@ export function iframeLoadEventSteps(element: Element): void {
   const childDocument = activeDocument($(element).contentNavigable!);
 
   // 3. If childDocument has its mute iframe load flag set, then return.
-  if (childDocument && $(childDocument).muteIframeLoad) return;
+  if (childDocument && DOM.$(childDocument).muteIframeLoad) return;
 
   // 4. If element's pending resource-timing start time is not null, then:
   if ($(element).pendingResourceTimingStartTime) {
@@ -167,13 +167,13 @@ export function iframeLoadEventSteps(element: Element): void {
   }
 
   // 5. Set childDocument's iframe load in progress flag.
-  if (childDocument) $(childDocument).iframeLoadInProgress = true;
+  if (childDocument) DOM.$(childDocument).iframeLoadInProgress = true;
 
   // 6. Fire an event named load at element.
   fireEvent("load", element);
 
   // 7. Unset childDocument's iframe load in progress flag.
-  if (childDocument) $(childDocument).iframeLoadInProgress = false;
+  if (childDocument) DOM.$(childDocument).iframeLoadInProgress = false;
 }
 
 export function isIframe(element: Element): element is HTMLIFrameElement {
