@@ -73,9 +73,8 @@ export class Selection implements ISelection {
     else return "Range";
   }
 
-  // https://w3c.github.io/selection-api/#dom-selection-getrangeat
   /**
-   * @see [Selection API]()
+   * @see [Selection API](https://w3c.github.io/selection-api/#dom-selection-getrangeat)
    */
   @convert
   getRangeAt(@unsignedLong index: number): globalThis.Range {

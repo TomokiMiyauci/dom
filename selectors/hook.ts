@@ -405,6 +405,7 @@ export function matchSelectorToTree(
     isElement,
   ));
 
+  // 2. If scoping root were provided, then remove from the candidate elements any elements that are not descendants of at least one scoping root.
   if (scopingRoots) {
     candidateElements.forEach((element) => {
       for (const scoped of scopingRoots) {
@@ -415,7 +416,6 @@ export function matchSelectorToTree(
     });
   }
 
-  // 2. If scoping root were provided, then remove from the candidate elements any elements that are not descendants of at least one scoping root.
   // 3. Initialize the selector match list to empty.
   const selectorMatchList: Element[] = [];
 

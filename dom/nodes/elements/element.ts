@@ -316,7 +316,7 @@ export class Element extends Node implements IElement {
     }
 
     // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
-    const shadow = new ShadowRoot({ host: this }) as globalThis.ShadowRoot;
+    const shadow = new ShadowRoot({ host: this });
     $(shadow).mode = init.mode;
     $(shadow).nodeDocument = this.#_.nodeDocument;
 

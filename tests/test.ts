@@ -3,6 +3,8 @@ import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
 import { createHandler, Runner } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
 import * as DOM from "../mod.ts";
+import "../html/loading_web_pages/events/event_target_internals.ts";
+
 import { $ } from "../internal.ts";
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));

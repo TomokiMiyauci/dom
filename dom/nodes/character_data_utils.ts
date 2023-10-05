@@ -54,14 +54,13 @@ export function replaceData(
     $(node).data.substring(offset + count);
 
   // 6 Let delete offset be offset + data’s length.
-  const deleteOffset = offset + $(node).data.length;
+  // const deleteOffset = offset + $(node).data.length;
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 
   const { nodeDocument } = $(node);
   const { ranges: _ranges } = $(nodeDocument);
   const ranges = iter(_ranges);
-
   const startNodeIsNode = equalsNodeStartNode.bind(null, node);
   const startOffsetIsGtOffset = compareRangeOffset.bind(
     null,
@@ -98,7 +97,6 @@ export function replaceData(
     offsetPlusCount,
     false,
   );
-
   const endNodeIsNodeRanges = ranges.filter(endNodeIsNode);
 
   // 9 For each live range whose end node is node and end offset is greater than offset but less than or equal to offset plus count,

@@ -9,6 +9,8 @@ export interface Fail<T = unknown> {
   error: T;
 }
 
+const { EventTarget, CustomEvent } = window;
+
 export class PubSub<T> {
   #target = new EventTarget();
   #done = false;
