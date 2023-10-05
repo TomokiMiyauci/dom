@@ -5,8 +5,7 @@ import { Document_Obsolete } from "./obsolete.ts";
 import { getDocumentElement } from "../dom/nodes/node_trees/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
-import { $ } from "./internal.ts";
-import * as DOM from "../internal.ts";
+import { $ } from "../internal.ts";
 import { tree } from "../internal.ts";
 import { type BrowsingContext } from "./loading_web_pages/infrastructure_for_sequences_of_documents/browsing_context.ts";
 import {
@@ -121,7 +120,7 @@ export function Document_HTML<T extends Constructor<Document>>(
 
       if (!documentElement) return "";
 
-      const maybeTitle = DOM.$(documentElement).localName === "svg"
+      const maybeTitle = $(documentElement).localName === "svg"
         // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
         ? iter(tree.children(documentElement))
           .filter(isElement)
@@ -153,7 +152,7 @@ export function Document_HTML<T extends Constructor<Document>>(
 
       if (!documentElement) return null as any;
 
-      if (DOM.$(documentElement).localName !== "html") return null as any;
+      if ($(documentElement).localName !== "html") return null as any;
 
       const documentElementChildren = tree.children(documentElement);
       const bodyOrFrameSet = iter(documentElementChildren)
@@ -175,7 +174,7 @@ export function Document_HTML<T extends Constructor<Document>>(
       // return the head element of the document (a head element or null).
       const head =
         iter(children).filter(isElement).find((element) =>
-          DOM.$(element).localName === "html"
+          $(element).localName === "html"
         ) ?? null;
 
       return head as HTMLHeadElement;
@@ -415,13 +414,13 @@ export function getTitleElement(node: Node): Element | null {
   // the first title element in the document (in tree order), if there is one, or null otherwise.
   return iter(descendant)
     .filter(isElement)
-    .find((element) => DOM.$(element).localName === "title") ??
+    .find((element) => $(element).localName === "title") ??
     null;
 }
 
 function isSVGTitle(element: Element): boolean {
-  return DOM.$(element).localName === "title" &&
-    DOM.$(element).namespace === Namespace.SVG;
+  return $(element).localName === "title" &&
+    $(element).namespace === Namespace.SVG;
 }
 
 const tags = new Set<string>(["body", "frameset"]);
@@ -429,5 +428,5 @@ const tags = new Set<string>(["body", "frameset"]);
 function isBodyOrFrameset(node: Node): boolean {
   if (!isElement(node)) return false;
 
-  return tags.has(DOM.$(node).localName);
+  return tags.has($(node).localName);
 }

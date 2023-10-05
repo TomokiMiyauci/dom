@@ -3,8 +3,7 @@ import { EventTarget } from "../../dom/events/event_target.ts";
 import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import { WindowEventHandlers } from "../window_event_handlers.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
-import { $, internalSlots } from "../internal.ts";
-import * as DOM from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 import {
   activeWindow,
   Navigable,
@@ -423,7 +422,7 @@ export class WindowInternals {
 export function browsingContext(
   window: globalThis.Window,
 ): BrowsingContext | null {
-  return DOM.$($(window).document).browsingContext;
+  return $($(window).document).browsingContext;
 }
 
 export function navigable(window: globalThis.Window) {

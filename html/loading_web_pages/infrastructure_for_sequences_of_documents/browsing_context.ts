@@ -3,8 +3,7 @@ import {
   OpaqueOrigin,
   Origin,
 } from "../supporting_concepts.ts";
-import { $ } from "../../internal.ts";
-import * as DOM from "../../../internal.ts";
+import { $ } from "../../../internal.ts";
 import { html } from "../../../deps.ts";
 import { documentBaseURL } from "../../infra/url.ts";
 import { origin } from "../../../url/url.ts";
@@ -67,7 +66,7 @@ export function createNewBrowsingContextAndDocument(
   // 5. If creator is non-null, then:
   if (creator) {
     // 1. Set creatorOrigin to creator's origin.
-    creatorOrigin = DOM.$(creator).origin;
+    creatorOrigin = $(creator).origin;
 
     // 2. Set creatorBaseURL to creator's document base URL.
     creatorBaseURL = documentBaseURL(creator);
@@ -122,13 +121,13 @@ export function createNewBrowsingContextAndDocument(
    * | is initial about:blank     | true              |
    * | about base URL             | creatorBaseURL    |
    */
-  DOM.$(document).type = "html";
-  DOM.$(document).contentType = "text/html";
-  DOM.$(document).mode = html.DOCUMENT_MODE.QUIRKS;
-  DOM.$(document).origin = origin;
-  DOM.$(document).browsingContext = browsingContext;
-  DOM.$(document).isInitialAboutBlank = true;
-  DOM.$(document).aboutBaseURL = creatorBaseURL;
+  $(document).type = "html";
+  $(document).contentType = "text/html";
+  $(document).mode = html.DOCUMENT_MODE.QUIRKS;
+  $(document).origin = origin;
+  $(document).browsingContext = browsingContext;
+  $(document).isInitialAboutBlank = true;
+  $(document).aboutBaseURL = creatorBaseURL;
 
   // 16. If creator is non-null, then:
   if (creator) {

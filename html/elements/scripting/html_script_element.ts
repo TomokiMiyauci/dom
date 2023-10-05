@@ -7,7 +7,7 @@ import {
   ImportMapParseResult,
   Script,
 } from "../../web_application_apis/scripting.ts";
-import { internalSlots } from "../../internal.ts";
+import { internalSlots } from "../../../internal.ts";
 
 @Exposed(Window)
 export class HTMLScriptElement extends HTMLElement

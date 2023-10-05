@@ -1,4 +1,4 @@
-import { $, internalSlots } from "../internal.ts";
+import { internalSlots } from "../../internal.ts";
 import { RequestInternals } from "../../fetch/request.ts";
 
 /**

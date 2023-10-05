@@ -1,5 +1,5 @@
 import { OrderedSet } from "../../infra/data_structures/set.ts";
-import { $ } from "../internal.ts";
+import { $ } from "../../internal.ts";
 import { Agent } from "../../ecma/executable_coce_and_execution_context.ts";
 
 import { ParseScript, ScriptRecord } from "../../ecma/scripts_and_modules.ts";

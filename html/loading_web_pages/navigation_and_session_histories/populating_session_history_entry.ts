@@ -19,7 +19,6 @@ import {
 import { StructuredSerializeForStorage } from "../../infra/safe_passing_of_structured_data.ts";
 import * as DOM from "../../../internal.ts";
 import { displayInlineContent } from "../document_lifecycle.ts";
-import { $, internalSlots } from "../../internal.ts";
 import {
   determineOrigin,
 } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
@@ -384,7 +383,7 @@ export async function createNavigationParamsByFetching(
 
   // destination: "document"
   // replaces client id: navigable's active document's relevant settings object's id
-  internalSlots.extends(request, internals);
+  DOM.internalSlots.extends(request, internals);
 
   // 4. If documentResource is a POST resource, then:
   if (documentResource && typeof documentResource === "object") {
@@ -461,7 +460,7 @@ export async function createNavigationParamsByFetching(
 
   // 19. While true:
   while (true) {
-    const reservedClient = $(request).reservedClient;
+    const reservedClient = DOM.$(request).reservedClient;
 
     // 1. If request's reserved client is not null and currentURL's origin is not the same as request's reserved client's creation URL's origin, then:
     if (
@@ -471,7 +470,7 @@ export async function createNavigationParamsByFetching(
       // 1. Run the environment discarding steps for request's reserved client.
 
       // 2. Set request's reserved client to null.
-      $(request).reservedClient = null;
+      DOM.$(request).reservedClient = null;
 
       // 3. Set commitEarlyHints to null.
       commitEarlyHints = null;
@@ -548,7 +547,7 @@ export async function createNavigationParamsByFetching(
 
     // 11. Set responseOrigin to the result of determining the origin given response's URL, finalSandboxFlags, and entry's document state's initiator origin.
     responseOrigin = determineOrigin(
-      $(response!).url,
+      DOM.$(response!).url,
       finalSandboxFlags,
       entry.documentState.initiatorOrigin,
     );
@@ -646,7 +645,7 @@ export async function createNavigationParamsByFetching(
 
   // 23. Let resultPolicyContainer be the result of determining navigation params policy container given response's URL, entry's document state's history policy container, sourceSnapshotParams's source policy container, null, and responsePolicyContainer.
   const resultPolicyContainer = determineNavigationParamsPolicyContainer(
-    $(response!).url!,
+    DOM.$(response!).url!,
     entry.documentState.historyPolicyContainer,
     sourceSnapshotParams.sourcePolicyContainer,
     null,

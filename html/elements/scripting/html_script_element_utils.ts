@@ -1,7 +1,6 @@
 import { fireEvent } from "../../../dom/events/fire.ts";
 import { isShadowRootNode } from "../../../dom/nodes/shadow_root_utils.ts";
-import * as DOM from "../../../internal.ts";
-import { $ } from "../../internal.ts";
+import { $, tree } from "../../../internal.ts";
 import { unblockRendering } from "../../semantics/document_utils.ts";
 import {
   createClassicScript,
@@ -42,7 +41,7 @@ export function markAsReady(
  */
 export function executeScriptElement(el: HTMLScriptElement): void {
   // 1. Let document be el's node document.
-  const document = DOM.$(el).nodeDocument;
+  const document = $(el).nodeDocument;
 
   // 2. If el's preparation-time document is not equal to document, then return.
   if ($(el).preparationTimeDocument !== document) return;
@@ -63,20 +62,20 @@ export function executeScriptElement(el: HTMLScriptElement): void {
   // 5. If el's from an external file is true, or el's type is "module", then increment document's ignore-destructive-writes counter.
   if ($(el).fromExternalFile || $(el).type === "module") {
     incremented = true;
-    DOM.$(document).ignoreDestructiveWritesCounter++;
+    $(document).ignoreDestructiveWritesCounter++;
   }
 
   // 6. Switch on el's type:
   switch ($(el).type) {
     case "classic": {
       // 1. Let oldCurrentScript be the value to which document's currentScript object was most recently set.
-      const oldCurrentScript = DOM.$(document).currentScript;
+      const oldCurrentScript = $(document).currentScript;
 
       // 2. If el's root is not a shadow root, then set document's currentScript attribute to el.
-      if (!isShadowRootNode(DOM.tree.root(el))) {
-        DOM.$(document).currentScript = el;
+      if (!isShadowRootNode(tree.root(el))) {
+        $(document).currentScript = el;
       } // Otherwise, set it to null.
-      else DOM.$(document).currentScript = null;
+      else $(document).currentScript = null;
 
       const { result } = $(el);
       // 3. Run the classic script given by el's result.
@@ -85,7 +84,7 @@ export function executeScriptElement(el: HTMLScriptElement): void {
       }
 
       // 4. Set document's currentScript attribute to oldCurrentScript.
-      DOM.$(document).currentScript = oldCurrentScript;
+      $(document).currentScript = oldCurrentScript;
       break;
     }
     case "module": {
@@ -101,7 +100,7 @@ export function executeScriptElement(el: HTMLScriptElement): void {
   }
 
   // 7. Decrement the ignore-destructive-writes counter of document, if it was incremented in the earlier step.
-  if (incremented) DOM.$(document).ignoreDestructiveWritesCounter--;
+  if (incremented) $(document).ignoreDestructiveWritesCounter--;
 
   // 8. If el's from an external file is true, then fire an event named load at el.
   if ($(el).fromExternalFile) fireEvent("load", el);
@@ -125,7 +124,7 @@ export async function prepareScriptElement(
   // 4. If parser document is non-null and el does not have an async attribute, then set el's force async to true.
 
   // 5. Let source text be el's child text content.
-  const sourceText = DOM.tree.childTextContent(el);
+  const sourceText = tree.childTextContent(el);
 
   // 6. If el has no src attribute, and source text is the empty string, then return.
   if (!el.hasAttribute("src") && !sourceText) return;
@@ -168,7 +167,7 @@ export async function prepareScriptElement(
   $(el).alreadyStarted = true;
 
   // 15. Set el's preparation-time document to its node document.
-  $(el).preparationTimeDocument = DOM.$(el).nodeDocument;
+  $(el).preparationTimeDocument = $(el).nodeDocument;
 
   // 16. If parser document is non-null, and parser document is not equal to el's preparation-time document, then return.
 
@@ -234,7 +233,7 @@ export async function prepareScriptElement(
     $(el).fromExternalFile = true;
 
     // 5. Let url be the result of encoding-parsing a URL given src, relative to el's node document.
-    const url = encodingParseURL(src, DOM.$(el).nodeDocument);
+    const url = encodingParseURL(src, $(el).nodeDocument);
 
     // 6. If url is failure,
     if (!url) {
@@ -271,7 +270,7 @@ export async function prepareScriptElement(
     // 32. If el does not have a src content attribute:
   } else {
     // 1. Let base URL be el's node document's document base URL.
-    const baseURL = documentBaseURL(DOM.$(el).nodeDocument);
+    const baseURL = documentBaseURL($(el).nodeDocument);
 
     // 2. Switch on el's type:
     switch ($(el).type) {

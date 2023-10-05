@@ -1,5 +1,4 @@
-import { internalSlots } from "../html/internal.ts";
-import { $ } from "../html/internal.ts";
+import { $, internalSlots } from "../internal.ts";
 import { Body } from "./infrastructure.ts";
 
 export class ResponseInternals {

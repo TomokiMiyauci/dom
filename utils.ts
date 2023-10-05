@@ -97,3 +97,28 @@ export function includes(derived: Function, constructor: Function): void {
     );
   });
 }
+
+export function extend(
+  left: object,
+  right: object,
+  options: { prototype?: boolean; excludes?: PropertyKey[] } = {},
+): object {
+  const { prototype = false, excludes = ["constructor"] } = options;
+  const desc = Object.getOwnPropertyDescriptors(right);
+  const properties: Record<PropertyKey, PropertyDescriptor> = prototype
+    ? (() => {
+      const proto = Object.getPrototypeOf(right);
+      const protoDesc = Object.getOwnPropertyDescriptors(proto);
+      return {
+        ...desc,
+        ...protoDesc,
+      };
+    })()
+    : desc;
+
+  for (const key of excludes) {
+    delete properties[key];
+  }
+
+  return Object.defineProperties(left, properties);
+}

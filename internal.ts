@@ -26,6 +26,16 @@ import { List } from "./infra/data_structures/list.ts";
 import { TextTree } from "./dom/nodes/text_utils.ts";
 import { emplace, UnionToIntersection } from "./deps.ts";
 import { extend } from "./utils.ts";
+import type { ResponseInternals } from "./fetch/response.ts";
+import type { RequestInternals } from "./fetch/request.ts";
+import {
+  Agent,
+  RealmRecord,
+} from "./ecma/executable_coce_and_execution_context.ts";
+import { EventLoop } from "./html/web_application_apis/scripting.ts";
+import { LocationInternals } from "./html/loading_web_pages/location.ts";
+import { WindowInternals } from "./html/loading_web_pages/window.ts";
+import { HTMLScriptElementInternals } from "./html/elements/scripting/html_script_element.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],
@@ -51,6 +61,13 @@ type InternalSlotEntries = [
     manuallyAssignedNodes: OrderedSet<Element | Text>;
     assignedNodes: List<Element | Text>;
   }],
+  [Response, ResponseInternals],
+  [Request, RequestInternals],
+  [object, { realm: RealmRecord }],
+  [Agent, EventLoop],
+  [Window, WindowInternals],
+  [Location, LocationInternals],
+  [HTMLScriptElement, HTMLScriptElementInternals],
 ];
 
 export interface InternalSlots<T extends [unknown, unknown]> {

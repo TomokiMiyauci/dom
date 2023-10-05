@@ -1,6 +1,5 @@
 import { fireEvent } from "../../dom/events/fire.ts";
-import * as DOM from "../../internal.ts";
-import { $ } from "../internal.ts";
+import { $ } from "../../internal.ts";
 import { encodingParseURL, matchAboutBlank } from "../infra/url.ts";
 import {
   activeDocument,
@@ -87,7 +86,7 @@ export function sharedAttributeProcessingSteps(
   // 2. If element has a src attribute specified, and its value is not the empty string, then:
   if (src) {
     // 1. Let maybeURL be the result of encoding-parsing a URL given that attribute's value, relative to element's node document.
-    const maybeURL = encodingParseURL(src, DOM.$(element).nodeDocument);
+    const maybeURL = encodingParseURL(src, $(element).nodeDocument);
 
     // 2. If maybeURL is not failure, then set url to maybeURL.
     if (maybeURL) url = maybeURL;
@@ -131,7 +130,7 @@ export async function navigateIframeOrFrame(
   contentNavigable && await navigate(
     contentNavigable,
     url,
-    DOM.$(element).nodeDocument,
+    $(element).nodeDocument,
     undefined,
     srcdocString,
     undefined,
@@ -152,7 +151,7 @@ export function iframeLoadEventSteps(element: Element): void {
   const childDocument = activeDocument($(element).contentNavigable!);
 
   // 3. If childDocument has its mute iframe load flag set, then return.
-  if (childDocument && DOM.$(childDocument).muteIframeLoad) return;
+  if (childDocument && $(childDocument).muteIframeLoad) return;
 
   // 4. If element's pending resource-timing start time is not null, then:
   if ($(element).pendingResourceTimingStartTime) {
@@ -167,13 +166,13 @@ export function iframeLoadEventSteps(element: Element): void {
   }
 
   // 5. Set childDocument's iframe load in progress flag.
-  if (childDocument) DOM.$(childDocument).iframeLoadInProgress = true;
+  if (childDocument) $(childDocument).iframeLoadInProgress = true;
 
   // 6. Fire an event named load at element.
   fireEvent("load", element);
 
   // 7. Unset childDocument's iframe load in progress flag.
-  if (childDocument) DOM.$(childDocument).iframeLoadInProgress = false;
+  if (childDocument) $(childDocument).iframeLoadInProgress = false;
 }
 
 export function isIframe(element: Element): element is HTMLIFrameElement {

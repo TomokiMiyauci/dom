@@ -21,7 +21,6 @@ import {
   loadTextDocument,
   loadXMLDocument,
 } from "../document_lifecycle.ts";
-import { $ } from "../../internal.ts";
 import { FetchController } from "../../../fetch/infrastructure.ts";
 import { informNavigationAPIAboutAbortingNavigation } from "../navigation_history_entry_utils.ts";
 import {
@@ -340,7 +339,7 @@ export async function navigate(
   if (response) {
     // 1. Let policyContainer be the result of determining navigation params policy container given response's URL, null, a clone of the sourceDocument's policy container, navigable's container document's policy container, and null.
     const policyContainer = determineNavigationParamsPolicyContainer(
-      $(response).url!,
+      DOM.$(response).url!,
       null,
       DOM.$(sourceDocument).policyContainer,
       DOM.$(containerDocument(navigable)!).policyContainer,
@@ -352,7 +351,7 @@ export async function navigate(
 
     // 3. Let responseOrigin be the result of determining the origin given response's URL, finalSandboxFlags, and documentState's initiator origin.
     const responseOrigin = determineOrigin(
-      $(response).url,
+      DOM.$(response).url,
       finalSandboxFlags,
       documentState.initiatorOrigin,
     );
@@ -363,7 +362,7 @@ export async function navigate(
     // 5. Let coopEnforcementResult be a new cross-origin opener policy enforcement result with
     const coopEnforcementResult = new CrossOriginOpenerPolicyEnforcementResult({
       // url: response's URL
-      url: $(response).url!,
+      url: DOM.$(response).url!,
       // origin: responseOrigin
       origin: responseOrigin,
       // cross-origin opener policy: coop

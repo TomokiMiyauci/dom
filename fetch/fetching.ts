@@ -1,4 +1,4 @@
-import { $, internalSlots } from "../html/internal.ts";
+import { $, internalSlots } from "../internal.ts";
 import {
   asBody,
   Body,

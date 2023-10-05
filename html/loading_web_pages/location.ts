@@ -2,8 +2,7 @@ import type { ILocation } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { stringifier } from "../../webidl/idl.ts";
 import { browsingContext } from "./window_utils.ts";
-import { $ } from "../internal.ts";
-import * as DOM from "../../internal.ts";
+import { $ } from "../../internal.ts";
 import { activeDocument } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { URLSerializer } from "../../url/serializer.ts";
 import { sameOriginDomain } from "./supporting_concepts.ts";
@@ -150,6 +149,6 @@ export class LocationInternals {
   get url(): URL {
     const document = this.relevantDocument;
 
-    return document ? DOM.$(document).URL : new URL("about:blank");
+    return document ? $(document).URL : new URL("about:blank");
   }
 }

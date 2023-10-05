@@ -4,8 +4,7 @@ import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 import { reflectSet } from "../../dom/nodes/utils/set_attribute_value.ts";
-import * as DOM from "../../internal.ts";
-import { internalSlots } from "../internal.ts";
+import { $ } from "../../internal.ts";
 import { processIframeAttributes } from "./html_iframe_element_utils.ts";
 import {
   contentDocument,
@@ -21,10 +20,6 @@ export class HTMLIFrameElement extends HTMLElement
   constructor(args: any) {
     super(args);
 
-    internalSlots.extends<HTMLIFrameElement>(
-      this,
-      new ContentNavigableInternals(),
-    );
     this.#_.insertionSteps.define(async (element: any) => {
       // // 1. Create a new child navigable for element.
       createNewChildNavigable(element);
@@ -168,7 +163,7 @@ export class HTMLIFrameElement extends HTMLElement
   }
 
   get #_() {
-    return DOM.$(this as HTMLIFrameElement);
+    return $(this as HTMLIFrameElement);
   }
 }
 

@@ -5,7 +5,6 @@ import {
   NavigationParams,
   setOngoingNavigation,
 } from "./navigation_and_session_histories/navigation.ts";
-import { $, internalSlots } from "../internal.ts";
 import { matchAboutBlank } from "../infra/url.ts";
 import * as DOM from "../../internal.ts";
 import {
@@ -25,7 +24,6 @@ import {
   PolicyContainer,
   sameOriginDomain,
 } from "./supporting_concepts.ts";
-import { navigationID } from "../internal.ts";
 import { HTMLParser } from "../html_parser.ts";
 import { ResponseInternals } from "../../fetch/response.ts";
 import { html } from "../../deps.ts";
@@ -80,7 +78,7 @@ export function createAndInitializeDocument(
   // 3. Let permissionsPolicy be the result of creating a permissions policy from a response given navigationParams's navigable's container, navigationParams's origin, and navigationParams's response. [PERMISSIONSPOLICY]
 
   // 4. Let creationURL be navigationParams's response's URL.
-  const creationURL = $(navigationParams.response).url;
+  const creationURL = DOM.$(navigationParams.response).url;
 
   // 5. If navigationParams's request is non-null, then set creationURL to navigationParams's request's current URL.
   if (navigationParams.request) {}
@@ -225,7 +223,7 @@ export function loadHTMLDocument(
     // create an HTML parser and associate it with the document. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
     // const parser = new DOMParser();
     const parser = new HTMLParser(document);
-    const body = $(navigationParams.response).body?.source;
+    const body = DOM.$(navigationParams.response).body?.source;
 
     if (!body) return document;
     const text = new TextDecoder().decode(body);
@@ -258,7 +256,7 @@ export function loadXMLDocument(
   if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
   else {
     const parser = new HTMLParser(document);
-    const body = $(navigationParams.response).body?.source;
+    const body = DOM.$(navigationParams.response).body?.source;
 
     if (!body) return document;
     const text = new TextDecoder().decode(body);
@@ -288,7 +286,7 @@ export function loadTextDocument(
 
   // 4. Create an HTML parser and associate it with the document. Act as if the tokenizer had emitted a start tag token with the tag name "pre" followed by a single U+000A LINE FEED (LF) character, and switch the HTML parser's tokenizer to the PLAINTEXT state. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
   const parser = new HTMLParser(document);
-  const body = $(navigationParams.response).body?.source;
+  const body = DOM.$(navigationParams.response).body?.source;
 
   if (!body) return document;
   const text = new TextDecoder().decode(body);
@@ -333,7 +331,7 @@ export function displayInlineContent(
   });
 
   const response = new Response();
-  internalSlots.extends(response, new ResponseInternals());
+  DOM.internalSlots.extends(response, new ResponseInternals());
 
   // 4. Let navigationParams be a new navigation params with
   const navigationParams: NavigationParams = {
@@ -412,8 +410,8 @@ export function stopLoading(navigable: Navigable) {
 
   // 2. If document's unload counter is 0, and navigable's ongoing navigation is a navigation ID,
   if (
-    !DOM.$(document).unloadCounter &&
-    navigable.ongoingNavigation === navigationID
+    !DOM.$(document).unloadCounter
+    // navigable.ongoingNavigation === navigationID
     // then set the ongoing navigation for navigable to null.
   ) setOngoingNavigation(navigable, null);
 

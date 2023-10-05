@@ -1,6 +1,6 @@
 import { List } from "../infra/data_structures/list.ts";
 import { extractSafely } from "./body_init_utils.ts";
-import { $ } from "../html/internal.ts";
+import { $ } from "../internal.ts";
 
 /**
  * @see [Fetch Living Standard](https://fetch.spec.whatwg.org/#fetch-params)

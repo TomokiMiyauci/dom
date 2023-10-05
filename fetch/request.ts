@@ -3,7 +3,7 @@ import {
   Environment,
   EnvironmentSettingsObject,
 } from "../html/web_application_apis/scripting.ts";
-import { $, internalSlots } from "../html/internal.ts";
+import { $, internalSlots } from "../internal.ts";
 import { Body } from "./infrastructure.ts";
 import { List } from "../infra/data_structures/list.ts";
 
@@ -155,9 +155,7 @@ export function clone(request: Request): Request {
   // 1. Let newRequest be a copy of request, except for its body.
   const newRequest = new Request(request.url, request);
 
-  const { body: _, ...rest } = $(request);
-
-  internalSlots.extends(newRequest, rest);
+  internalSlots.extends(newRequest, $(request));
 
   // 2. If request’s body is non-null, set newRequest’s body to the result of cloning request’s body.
 

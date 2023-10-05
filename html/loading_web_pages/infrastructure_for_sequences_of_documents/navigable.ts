@@ -11,8 +11,7 @@ import {
   BrowsingContext,
   createNewBrowsingContextAndDocument,
 } from "./browsing_context.ts";
-import { $ } from "../../internal.ts";
-import * as DOM from "../../../internal.ts";
+import { $ } from "../../../internal.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 
 /** A navigable presents a Document to the user via its active session history entry.
@@ -78,7 +77,7 @@ export function activeBrowsingContext(
   const navigableActiveDocument = activeDocument(navigable);
 
   return navigableActiveDocument &&
-    DOM.$(navigableActiveDocument).browsingContext;
+    $(navigableActiveDocument).browsingContext;
 }
 
 /**
@@ -106,7 +105,7 @@ export function targetName(navigable: Navigable): string {
 }
 
 export function nodeNavigable(node: NavigableContainer) {
-  const { nodeDocument } = DOM.$(node);
+  const { nodeDocument } = $(node);
 }
 
 export function initializeNavigable(
@@ -118,7 +117,7 @@ export function initializeNavigable(
   // URL            documentState's document's URL
   // document state documentState
   const entry = new SessionHistoryEntry({
-    URL: DOM.$(documentState.document).URL,
+    URL: $(documentState.document).URL,
     documentState,
   });
 
@@ -198,9 +197,9 @@ export function contentDocument(
 
   // 3. If document's origin and container's node document's origin are not same origin-domain, then return null.
   if (document) {
-    const documentOrigin = DOM.$(document).origin;
-    const containerNodeDocument = DOM.$(container).nodeDocument;
-    const containerNodeDocumentOrigin = DOM.$(containerNodeDocument).origin;
+    const documentOrigin = $(document).origin;
+    const containerNodeDocument = $(container).nodeDocument;
+    const containerNodeDocumentOrigin = $(containerNodeDocument).origin;
 
     if (!sameOriginDomain(documentOrigin, containerNodeDocumentOrigin)) {
       return null;
@@ -243,7 +242,7 @@ export function createNewChildNavigable(element: Element): void {
 
   // 3. Let browsingContext and document be the result of creating a new browsing context and document given element's node document, element, and group.
   const { document } = createNewBrowsingContextAndDocument(
-    DOM.$(element).nodeDocument,
+    $(element).nodeDocument,
     element,
     {},
   );
@@ -259,13 +258,13 @@ export function createNewChildNavigable(element: Element): void {
   // document              document
   documentState.document = document;
   // initiator origin      document's origin
-  documentState.initiatorOrigin = DOM.$(document).origin;
+  documentState.initiatorOrigin = $(document).origin;
   // origin                document's origin
-  documentState.origin = DOM.$(document).origin;
+  documentState.origin = $(document).origin;
   // navigable target name targetName
   documentState.navigableTargetName = targetName;
   // about base URL        document's about base URL
-  documentState.aboutBaseURL = DOM.$(document).aboutBaseURL;
+  documentState.aboutBaseURL = $(document).aboutBaseURL;
   // 8. Let navigable be a new navigable.
   const navigable = new Navigable();
 
@@ -311,5 +310,5 @@ export function containerDocument(navigable: Navigable): Document | null {
   if (!navigableContainer) return null;
 
   // 2. Return navigable's container's node document.
-  return DOM.$(navigableContainer).nodeDocument;
+  return $(navigableContainer).nodeDocument;
 }
