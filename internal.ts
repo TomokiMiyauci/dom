@@ -12,6 +12,7 @@ import { type EventTargetInternals } from "./dom/events/event_target.ts";
 import { type ShadowRootInternals } from "./dom/nodes/shadow_root.ts";
 import { type SlottableInternals } from "./dom/nodes/node_trees/slottable.ts";
 import { type MutationObserverInternals } from "./dom/nodes/mutation_observers/mutation_observer.ts";
+import { type AbortSignalInternals } from "./dom/aborts/abort_signal.ts";
 
 import { SelectionInternals } from "./selection/selection.ts";
 
@@ -68,6 +69,7 @@ type InternalSlotEntries = [
   [Window, WindowInternals],
   [Location, LocationInternals],
   [HTMLScriptElement, HTMLScriptElementInternals],
+  [AbortSignal, AbortSignalInternals],
 ];
 
 export interface InternalSlots<T extends [unknown, unknown]> {
