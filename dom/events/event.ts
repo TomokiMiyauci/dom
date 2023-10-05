@@ -20,13 +20,13 @@ export class Event implements IEvent {
       eventInitDict;
     this.#timestamp = Date.now();
 
-    const _ = new EventInternals();
-    _.type = type;
-    _.composed = composed;
-    _.bubbles = bubbles;
-    _.cancelable = cancelable;
+    const internal = new EventInternals();
 
-    internalSlots.extends<Event>(this, _);
+    internal.type = type;
+    internal.composed = composed;
+    internal.bubbles = bubbles;
+    internal.cancelable = cancelable;
+    internalSlots.extends<Event>(this, internal);
   }
 
   get type(): string {
@@ -412,7 +412,7 @@ export function initialize(
   type: string,
   bubbles: boolean,
   cancelable: boolean,
-) {
+): void {
   // 1. Set event’s initialized flag.
   $(event).initialized = true;
 
@@ -441,8 +441,9 @@ export function initialize(
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#set-the-canceled-flag)
  */
 export function setCanceled(event: Event): void {
-  // if event’s cancelable attribute value is true and event’s in passive listener flag is unset, then set event’s canceled flag, and do nothing otherwise.
+  // if event’s cancelable attribute value is true and event’s in passive listener flag is unset,
   if (event.cancelable && !$(event).inPassiveListener) {
+    // then set event’s canceled flag, and do nothing otherwise.
     $(event).canceled = true;
   }
 }

@@ -7,6 +7,7 @@ import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
 import { iter, last, lastItem } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
 import { $, tree } from "../../internal.ts";
+import { Node } from "../nodes/node.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -66,9 +67,8 @@ export function dispatch(
 
     // 6. Let slottable be target, if target is a slottable and is assigned, and null otherwise.
     // TODO
-    let slottable = isNodeLike(target) && isSlottable(target as any)
-      ? target
-      : null;
+    let slottable: globalThis.Node | null =
+      target instanceof Node && isSlottable(target) ? target : null;
 
     // 7. Let slot-in-closed-tree be false.
     let slotInClosedTree = false;
@@ -94,8 +94,7 @@ export function dispatch(
       }
 
       // 2. If parent is a slottable and is assigned, then set slottable to parent.
-      // TODO
-      if (isNodeLike(parent) && isSlottable(parent as any)) slottable = parent;
+      if (parent instanceof Node && isSlottable(parent)) slottable = parent;
 
       // 3. Let relatedTarget be the result of retargeting event’s relatedTarget against parent.
       const relatedTarget = retarget($(event).relatedTarget, parent);
@@ -184,7 +183,7 @@ export function dispatch(
     // 14. For each struct in event’s path:
     for (const struct of $(event).path) {
       // 1. If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET.
-      if (struct["shadowAdjustedTarget"]) $(event).eventPhase = event.AT_TARGET;
+      if (struct.shadowAdjustedTarget) $(event).eventPhase = event.AT_TARGET;
       // 2. Otherwise:
       else {
         // 1. If event’s bubbles attribute is false, then continue.
@@ -289,9 +288,7 @@ function resolveRoot(
 
   if (isShadowRoot(root)) return { isShadowRoot: true, root };
 
-  return {
-    isShadowRoot: false,
-  };
+  return { isShadowRoot: false };
 }
 
 /**

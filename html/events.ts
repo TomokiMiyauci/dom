@@ -48,8 +48,6 @@ export function determineEventHandler(
   return eventTarget;
 }
 
-// type HandlerMap = Map<EventHandlerName, EventHandler>;
-
 class HandlerMap extends Map<EventHandlerName, EventHandler> {
   override get(key: `on${string}`): EventHandler {
     if (super.has(key)) return super.get(key)!;

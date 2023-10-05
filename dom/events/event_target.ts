@@ -5,6 +5,7 @@ import { DOMExceptionName } from "../../webidl/exception.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { dispatch } from "./dispatch.ts";
 import { $, internalSlots } from "../../internal.ts";
+import { add } from "../aborts/abort_signal_utils.ts";
 
 @Exposed("*")
 export class EventTarget implements IEventTarget {
@@ -250,10 +251,10 @@ export function addEventListener(
   if (!contain) $(eventTarget).eventListenerList.append(listener);
 
   // 6. If listener’s signal is not null, then add the following abort steps to it:
-  // TODO
   if (listener.signal) {
-    // 1. Remove an event listener with eventTarget and listener.
-    removeEventListener(eventTarget, listener);
+    add(() =>
+      // 1. Remove an event listener with eventTarget and listener.
+      removeEventListener(eventTarget, listener), listener.signal);
   }
 }
 
