@@ -1,5 +1,6 @@
 import type { IHTMLInputElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
 
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   get accept(): string {
@@ -62,11 +63,21 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   set dirName(value: string) {
     throw new Error("dirName#setter");
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-fe-disabled)
+   */
   get disabled(): boolean {
-    throw new Error("disabled#getter");
+    // reflect the disabled content attribute.
+    return reflectGet(this, "disabled");
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-fe-disabled)
+   */
   set disabled(value: boolean) {
-    throw new Error("disabled#setter");
+    // reflect the disabled content attribute.
+    reflectSet(this, "disabled", value);
   }
 
   get files(): FileList | null {
