@@ -28,6 +28,7 @@ import {
 import { navigationID } from "../internal.ts";
 import { HTMLParser } from "../html_parser.ts";
 import { ResponseInternals } from "../../fetch/response.ts";
+import { html } from "../../deps.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#populate-with-html/head/body)
@@ -270,6 +271,43 @@ export function loadXMLDocument(
 }
 
 /**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#navigate-text)
+ */
+export function loadTextDocument(
+  navigationParams: NavigationParams,
+  type: string,
+): Document {
+  // 1. Let document be the result of creating and initializing a Document object given "html", type, and navigationParams.
+  const document = createAndInitializeDocument("html", type, navigationParams);
+
+  // 2. Set document's parser cannot change the mode flag to true.
+
+  // 3. Set document's mode to "no-quirks".
+  DOM.$(document).mode = html.DOCUMENT_MODE.NO_QUIRKS;
+
+  // 4. Create an HTML parser and associate it with the document. Act as if the tokenizer had emitted a start tag token with the tag name "pre" followed by a single U+000A LINE FEED (LF) character, and switch the HTML parser's tokenizer to the PLAINTEXT state. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
+  const parser = new HTMLParser(document);
+  const body = $(navigationParams.response).body?.source;
+
+  if (!body) return document;
+  const text = new TextDecoder().decode(body);
+  parser.parse(text);
+
+  // document's encoding must be set to the character encoding used to decode the document during parsing.
+
+  // The first task that the networking task source places on the task queue while fetching runs must process link headers given document, navigationParams's response, and "media", after the task has been processed by the HTML parser.
+
+  // Before any script execution occurs, the user agent must wait for scripts may run for the newly-created document to be true for document.
+
+  // When no more bytes are available, the user agent must queue a global task on the networking task source given document's relevant global object to have the parser to process the implied EOF character, which eventually causes a load event to be fired.
+
+  // 5. User agents may add content to the head element of document, e.g., linking to a style sheet, providing script, or giving the document a title.
+
+  // 6. Return document.
+  return document;
+}
+
+/**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#read-ua-inline)
  */
 export function displayInlineContent(
@@ -340,6 +378,21 @@ export function displayInlineContent(
 
   // 7. Return document.
   return document;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#completely-finish-loading)
+ */
+export function finishLoadingCompletely(document: Document) {
+  // 1. Assert: document's browsing context is non-null.
+
+  // 2. Set document's completely loaded time to the current time.
+
+  // 3. Let container be document's node navigable's container.
+
+  // 4. If container is an iframe element, then queue an element task on the DOM manipulation task source given container to run the iframe load event steps given container.
+
+  // 5. Otherwise, if container is non-null, then queue an element task on the DOM manipulation task source given container to fire an event named load at container.
 }
 
 /**

@@ -18,6 +18,7 @@ import { equalsURL } from "../../../url/url.ts";
 import {
   displayInlineContent,
   loadHTMLDocument,
+  loadTextDocument,
   loadXMLDocument,
 } from "../document_lifecycle.ts";
 import { $ } from "../../internal.ts";
@@ -32,6 +33,7 @@ import { attemptPopulateHistoryEntryDocument } from "./populating_session_histor
 import { determineOrigin } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { parseMediaType } from "../../../deps.ts";
+import { isJSONMIMEType, JavaScriptMIMETypes } from "../../../mimesniff/mod.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#source-snapshot-params)
@@ -495,6 +497,17 @@ export function loadDocument(
   if (type === "text/html") return loadHTMLDocument(navigationParams);
   if (type.endsWith("+xml") || type === "application/xml") {
     return loadXMLDocument(navigationParams, type);
+  }
+
+  if (
+    JavaScriptMIMETypes.has(type) ||
+    isJSONMIMEType(type) ||
+    type === "text/css" ||
+    type === "text/plain" ||
+    type === "text/vtt"
+  ) {
+    // Return the result of loading a text document given navigationParams and type.
+    return loadTextDocument(navigationParams, type);
   }
 
   return null;
