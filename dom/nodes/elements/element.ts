@@ -167,7 +167,7 @@ export class Element extends Node implements IElement {
     return this.#_.nodeDocument;
   }
 
-  protected override clone(document: Document): Element {
+  protected override clone(document: Document): globalThis.Element {
     // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
     const copy = createElement(
       document,

@@ -12,7 +12,7 @@ export function createElement(
   prefix: string | null = null, // 1. If prefix was not given, let prefix be null.
   is: string | null = null, // 2. If is was not given, let is be null.
   synchronousCustomElements: boolean | null = null,
-): Element {
+): globalThis.Element {
   // 3. Let result be null.
   let result: Element | null = null;
 
