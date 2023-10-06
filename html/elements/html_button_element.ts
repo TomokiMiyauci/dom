@@ -1,8 +1,58 @@
 import type { IHTMLButtonElement } from "../../interface.d.ts";
+import { $ } from "../../internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
+import {
+  isDisabled,
+  reset,
+  submit,
+} from "./forms/attributes_common_to_form_control.ts";
+import { userNavigationInvolvement } from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
 
 export class HTMLButtonElement extends HTMLElement
   implements IHTMLButtonElement {
+  constructor(...args: any) {
+    super(...args);
+
+    this.#_.activationBehavior = (event) => {
+      // 1. If element is disabled, then return.
+      if (isDisabled(this)) return;
+
+      // 2. If element's node document is not fully active, then return.
+
+      // 3. If element has a form owner then switch on element's type attribute's state, then:
+      if (this.#_.formOwner) {
+        switch (this.type) {
+          // Submit Button
+          case "submit": {
+            // Submit element's form owner from element with userInvolvement set to event's user navigation involvement.
+            submit(
+              this.#_.formOwner,
+              this,
+              undefined,
+              userNavigationInvolvement(event),
+            );
+            break;
+          }
+
+          // Reset Button
+          case "reset": {
+            // Reset element's form owner.
+            reset(this.#_.formOwner);
+            break;
+          }
+
+          // Button
+          case "button": {
+            // Do nothing.
+          }
+        }
+      }
+
+      // 4. Run the popover target attribute activation behavior given element.
+    };
+  }
+
   get disabled(): boolean {
     throw new Error("disabled#getter");
   }
@@ -68,11 +118,14 @@ export class HTMLButtonElement extends HTMLElement
   }
 
   get type(): "submit" | "reset" | "button" {
-    throw new Error("type#getter");
+    return reflectGet("DOMString", this, "type") as
+      | "submit"
+      | "reset"
+      | "button";
   }
 
   set type(value: "submit" | "reset" | "button") {
-    throw new Error("type#setter");
+    reflectSet(this, "type", value);
   }
 
   get validationMessage(): string {
@@ -104,5 +157,9 @@ export class HTMLButtonElement extends HTMLElement
 
   setCustomValidity(error: string): void {
     throw new Error("setCustomValidity");
+  }
+
+  get #_() {
+    return $<HTMLButtonElement>(this);
   }
 }
