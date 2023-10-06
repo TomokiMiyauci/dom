@@ -37,6 +37,8 @@ import { EventLoop } from "./html/web_application_apis/scripting.ts";
 import { LocationInternals } from "./html/loading_web_pages/location.ts";
 import { WindowInternals } from "./html/loading_web_pages/window.ts";
 import { HTMLScriptElementInternals } from "./html/elements/scripting/html_script_element.ts";
+import type { HTMLInputElementInternals } from "./html/elements/html_input_element.ts";
+import type { FormAssociatedElement } from "./html/elements/forms/attributes_common_to_form_control.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],
@@ -70,6 +72,8 @@ type InternalSlotEntries = [
   [Location, LocationInternals],
   [HTMLScriptElement, HTMLScriptElementInternals],
   [AbortSignal, AbortSignalInternals],
+  [HTMLInputElement, HTMLInputElementInternals],
+  [FormAssociatedElement, { formOwner: HTMLFormElement | null }],
 ];
 
 export interface InternalSlots<T extends [unknown, unknown]> {
