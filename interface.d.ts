@@ -141,3 +141,5 @@ export type IWindow = Omit<
   | "add_completion_callback"
 >;
 export type ILocation = Location;
+export type IMouseEvent = MouseEvent;
+export type IUIEvent = UIEvent;
