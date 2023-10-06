@@ -256,11 +256,10 @@ export function dispatch(
   if (activationTarget) {
     // 1. If event’s canceled flag is unset, then run activationTarget’s activation behavior with event.
     if (!$(event).canceled) $(activationTarget).activationBehavior?.(event);
-    // 2. Otherwise, if activationTarget has legacy-canceled-activation behavior, then run activationTarget’s legacy-canceled-activation behavior.
-    else {
-      if ($(activationTarget).legacyCanceledActivation) {
-        $(activationTarget).legacyCanceledActivation?.();
-      }
+    // 2. Otherwise, if activationTarget has legacy-canceled-activation behavior,
+    else if ($(activationTarget).legacyCanceledActivation) {
+      // then run activationTarget’s legacy-canceled-activation behavior.
+      $(activationTarget).legacyCanceledActivation?.();
     }
   }
 

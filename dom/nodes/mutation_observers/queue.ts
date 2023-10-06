@@ -93,7 +93,10 @@ export function notifyMutationObservers(): void {
   }
 
   // 7. For each slot of signalSet, fire an event named slotchange, with its bubbles attribute set to true, at slot.
-  for (const slot of signalSet) fireEvent("slotchange", slot); // TODO bubbles
+  for (const slot of signalSet) {
+    fireEvent("slotchange", slot, undefined, (event) =>
+      $(event).bubbles = true);
+  }
 }
 
 /**

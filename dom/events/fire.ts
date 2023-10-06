@@ -11,6 +11,7 @@ export function fireEvent(
   e: string,
   target: EventTarget,
   eventConstructor: typeof Event = Event, // 1. If eventConstructor is not given, then let eventConstructor be Event.
+  initialize?: (event: globalThis.Event) => void,
   legacyTargetOverride?: boolean,
 ): void {
   // 2. Let event be the result of creating an event given eventConstructor, in the relevant realm of target.
@@ -21,7 +22,7 @@ export function fireEvent(
   $(event).type = e;
 
   // 4. Initialize any other IDL attributes of event as described in the invocation of this algorithm.
-  $(event).isTrusted = false;
+  initialize?.(event);
 
   // 5. Return the result of dispatching event at target, with legacy target override flag set if set.
   dispatch(event, target, legacyTargetOverride);

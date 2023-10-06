@@ -79,8 +79,8 @@ export class EventTargetInternals {
   activationBehavior: ActivationBehavior | undefined;
 
   getParent: (event: Event) => globalThis.EventTarget | null = () => null;
-  legacyCanceledActivation: Function | undefined;
   legacyPreActivationBehavior: Function | undefined;
+  legacyCanceledActivation: Function | undefined;
 }
 
 interface ActivationBehavior {
