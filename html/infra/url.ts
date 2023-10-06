@@ -1,5 +1,6 @@
 import { $ } from "../../internal.ts";
 import { EnvironmentSettingsObject } from "../web_application_apis/scripting.ts";
+import { URLSerializer } from "../../url/serializer.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#fallback-base-url)
@@ -76,4 +77,21 @@ export function encodingParseURL(
   // 5. Return the result of applying the URL parser to url, with baseURL and encoding.
 
   return new URL(url, baseURL);
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#encoding-parsing-and-serializing-a-url)
+ */
+export function encodingParseAndSerializeURL(
+  url: string,
+  environment: Document | EnvironmentSettingsObject,
+): string | false {
+  // 1. Let url be the result of encoding-parsing a URL given url, relative to environment.
+  const parsedURL = encodingParseURL(url, environment);
+
+  // 2. If url is failure, then return failure.
+  if (!parsedURL) return false;
+
+  // 3. Return the result of applying the URL serializer to url.
+  return URLSerializer.serialize(parsedURL);
 }

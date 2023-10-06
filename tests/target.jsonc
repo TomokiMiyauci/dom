@@ -23,7 +23,7 @@
   "dom/events/Event-dispatch-bubble-canceled.html",
   // "dom/events/Event-dispatch-bubbles-false.html",
   // "dom/events/Event-dispatch-bubbles-true.html",
-  // "dom/events/Event-dispatch-click.html",
+  "dom/events/Event-dispatch-click.html",
   // "dom/events/Event-dispatch-click.tentative.html",
   "dom/events/Event-dispatch-detached-click.html",
   // "dom/events/Event-dispatch-detached-input-and-change.html",

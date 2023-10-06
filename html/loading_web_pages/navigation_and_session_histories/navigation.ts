@@ -12,7 +12,7 @@ import {
   Navigable,
   targetName,
 } from "../infrastructure_for_sequences_of_documents/navigable.ts";
-import * as DOM from "../../../internal.ts";
+import { $ } from "../../../internal.ts";
 import { documentBaseURL, matchAboutBlank } from "../../infra/url.ts";
 import { equalsURL } from "../../../url/url.ts";
 import {
@@ -33,6 +33,7 @@ import { determineOrigin } from "../infrastructure_for_sequences_of_documents/br
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { parseMediaType } from "../../../deps.ts";
 import { isJSONMIMEType, JavaScriptMIMETypes } from "../../../mimesniff/mod.ts";
+import { URLSerializer } from "../../../url/serializer.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#source-snapshot-params)
@@ -77,7 +78,7 @@ export function snapshotSourceSnapshotParams(
     hasTransientActivation: false,
     sandboxingFlags: {},
     allowsDownloading: false,
-    sourcePolicyContainer: DOM.$(sourceDocument).policyContainer,
+    sourcePolicyContainer: $(sourceDocument).policyContainer,
     fetchClient: {},
   };
 }
@@ -210,7 +211,7 @@ export async function navigate(
   const sourceSnapshotParams = snapshotSourceSnapshotParams(sourceDocument);
 
   // 3. Let initiatorOriginSnapshot be sourceDocument's origin.
-  const initiatorOriginSnapshot = DOM.$(sourceDocument).origin;
+  const initiatorOriginSnapshot = $(sourceDocument).origin;
 
   // 4. Let initiatorBaseURLSnapshot be sourceDocument's document base URL.
   const initiatorBaseURLSnapshot = documentBaseURL(sourceDocument);
@@ -239,7 +240,7 @@ export async function navigate(
     // 1. If url equals navigable's active document's URL, and initiatorOriginSnapshot is same origin with targetNavigable's active document's origin, then set historyHandling to "replace".
     if (
       navigableActiveDocument &&
-      equalsURL(url, DOM.$(navigableActiveDocument).URL) // TODO
+      equalsURL(url, $(navigableActiveDocument).URL) // TODO
     ) historyHandling = NavigationHistoryBehavior.Replace;
     // 2. Otherwise, set historyHandling to "push".
     else historyHandling = NavigationHistoryBehavior.Push;
@@ -288,6 +289,15 @@ export async function navigate(
   // 18. If url's scheme is "javascript", then:
   if (url.protocol === "javascript:") { // TODO use internal scheme
     // 1. Queue a global task on the navigation and traversal task source given navigable's active window to navigate to a javascript: URL given navigable, url, historyHandling, initiatorOriginSnapshot, and cspNavigationType.
+    queueMicrotask(() => {
+      navigateJavaScriptURL(
+        navigable,
+        url,
+        historyHandling,
+        initiatorOriginSnapshot,
+        cspNavigationType,
+      );
+    });
 
     // 2. Return.
     return;
@@ -356,10 +366,10 @@ export async function navigate(
   if (response) {
     // 1. Let policyContainer be the result of determining navigation params policy container given response's URL, null, a clone of the sourceDocument's policy container, navigable's container document's policy container, and null.
     const policyContainer = determineNavigationParamsPolicyContainer(
-      DOM.$(response).url!,
+      $(response).url!,
       null,
-      DOM.$(sourceDocument).policyContainer,
-      DOM.$(containerDocument(navigable)!).policyContainer,
+      $(sourceDocument).policyContainer,
+      $(containerDocument(navigable)!).policyContainer,
       null,
     );
 
@@ -368,7 +378,7 @@ export async function navigate(
 
     // 3. Let responseOrigin be the result of determining the origin given response's URL, finalSandboxFlags, and documentState's initiator origin.
     const responseOrigin = determineOrigin(
-      DOM.$(response).url,
+      $(response).url,
       finalSandboxFlags,
       documentState.initiatorOrigin,
     );
@@ -379,7 +389,7 @@ export async function navigate(
     // 5. Let coopEnforcementResult be a new cross-origin opener policy enforcement result with
     const coopEnforcementResult = new CrossOriginOpenerPolicyEnforcementResult({
       // url: response's URL
-      url: DOM.$(response).url!,
+      url: $(response).url!,
       // origin: responseOrigin
       origin: responseOrigin,
       // cross-origin opener policy: coop
@@ -494,6 +504,65 @@ export function finalizeCrossDocumentNavigation(
   // 4. Set targetStep to traversable's current session history step.
 
   // 10. Apply the push/replace history step targetStep to traversable.
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate-to-a-javascript:-url)
+ */
+export function navigateJavaScriptURL(
+  targetNavigable: Navigable,
+  url: URL,
+  historyHandling: NavigationHistoryBehavior,
+  initiatorOrigin: Origin,
+  cspNavigationType: string,
+): void {
+  // 6. Let newDocument be the result of evaluating a javascript: URL given targetNavigable, url, and initiatorOrigin.
+  const newDocument = evaluateJavaScriptURL(
+    targetNavigable,
+    url,
+    initiatorOrigin,
+  );
+
+  // 7. If newDocument is null, then return.
+  if (!newDocument) return;
+}
+
+/**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#evaluate-a-javascript:-url)
+ */
+export function evaluateJavaScriptURL(
+  targetNavigable: Navigable,
+  url: URL,
+  newDocumentOrigin: Origin,
+): Document | null {
+  // 1. Let urlString be the result of running the URL serializer on url.
+  const urlString = URLSerializer.serialize(url);
+
+  // 2. Let encodedScriptSource be the result of removing the leading "javascript:" from urlString.
+  const encodedScriptSource = urlString.replace(/^javascript:/, "");
+
+  // 3. Let scriptSource be the UTF-8 decoding of the percent-decoding of encodedScriptSource.
+  // TODO
+  const scriptSource = encodedScriptSource;
+
+  // Non-standard process
+  eval?.(scriptSource);
+
+  // // 4. Let settings be targetNavigable's active document's relevant settings object.
+
+  // // 5. Let baseURL be settings's API base URL.
+
+  // // 6. Let script be the result of creating a classic script given scriptSource, settings, baseURL, and the default classic script fetch options.
+  // const script = createClassicScript(scriptSource, {} as any, baseURL, {});
+
+  // // 7. Let evaluationStatus be the result of running the classic script script.
+  // const evaluationStatus = runClassicScript(script);
+
+  // ---
+
+  // 17. Return the result of loading an HTML document given navigationParams.
+  return null;
+  // return loadHTMLDocument(navigationParams);
 }
 
 /**
