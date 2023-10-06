@@ -1,8 +1,39 @@
 import type { IHTMLInputElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
+  constructor(...args: any) {
+    super(...args);
+
+    internalSlots.extends<HTMLInputElement>(
+      this,
+      new HTMLInputElementInternals(),
+    );
+
+    $<HTMLInputElement>(this).activationBehavior = (event) => {
+      // 1. If element is not mutable and is not in the Checkbox state and is not in the Radio state, then return.
+
+      // 2. Run element's input activation behavior, if any, and do nothing otherwise.
+
+      // 3. Run the popover target attribute activation behavior on element.
+    };
+
+    $<HTMLInputElement>(this).legacyPreActivationBehavior = () => {
+      // 1. If this element's type attribute is in the Checkbox state, then set this element's checkedness to its opposite value (i.e. true if it is false, false if it is true) and set this element's indeterminate IDL attribute to false.
+      if (this.type === "checkbox") {
+        this.#_.checkedness = !this.#_.checkedness, this.indeterminate = false;
+      }
+
+      // 2. If this element's type attribute is in the Radio Button state, then get a reference to the element in this element's radio button group that has its checkedness set to true, if any, and then set this element's checkedness to true.
+      // TODO
+      if (this.type === "radio") {
+        this.#_.checkedness = true;
+      }
+    };
+  }
+
   /**
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-accept)
    */
@@ -43,11 +74,16 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("capture#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-checked)
+   */
   get checked(): boolean {
-    throw new Error("checked#getter");
+    // return the current checkedness of the element;
+    return this.#_.checkedness;
   }
   set checked(value: boolean) {
-    throw new Error("checked#setter");
+    // set the element's checkedness to the new value and set the element's dirty checkedness flag to true.
+    this.#_.checkedness = value, this.#_.dirtyCheckednessFlag = true;
   }
 
   /**
@@ -149,11 +185,14 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("height#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-indeterminate)
+   */
   get indeterminate(): boolean {
-    throw new Error("indeterminate#getter");
+    return this.#_.indeterminate;
   }
   set indeterminate(value: boolean) {
-    throw new Error("indeterminate#setter");
+    this.#_.indeterminate = value;
   }
 
   get labels(): NodeListOf<HTMLLabelElement> | null {
@@ -402,4 +441,19 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   stepUp(n?: number): void {
     throw new Error("stepUp");
   }
+
+  get #_() {
+    return internalSlots.get<HTMLInputElement>(this);
+  }
+}
+
+export class HTMLInputElementInternals {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#concept-input-checked-dirty-flag)
+   */
+  dirtyCheckednessFlag = false;
+
+  checkedness = false;
+
+  indeterminate = false;
 }

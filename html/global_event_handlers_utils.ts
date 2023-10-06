@@ -1,7 +1,7 @@
 import { createEvent } from "../dom/events/construct.ts";
 import { dispatch } from "../dom/events/dispatch.ts";
 import { $ } from "../internal.ts";
-import { Event } from "../dom/events/event.ts";
+import { MouseEvent } from "../uievents/mouse_event.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#fire-a-synthetic-pointer-event)
@@ -13,7 +13,7 @@ export function fireSyntheticPointerEvent(
 ): boolean {
   // 1. Let event be the result of creating an event using PointerEvent.
   // TODO: use PointerEvent
-  const event = createEvent(Event);
+  const event = createEvent(MouseEvent);
 
   // 2. Initialize event's type attribute to e.
   $(event).type = e;
