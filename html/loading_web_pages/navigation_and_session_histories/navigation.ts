@@ -170,6 +170,23 @@ export enum UserNavigationInvolvement {
 }
 
 /**
+ * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#event-uni)
+ */
+export function userNavigationInvolvement(
+  event: Event,
+): UserNavigationInvolvement {
+  // 1. Assert: this algorithm is being called as part of an activation behavior definition.
+
+  // 2. Assert: event's type is "click".
+
+  // 3. If event's isTrusted is initialized to true, then return "activation".
+  if (event.isTrusted) return UserNavigationInvolvement.Activation;
+
+  // 4. Return "none".
+  return UserNavigationInvolvement.None;
+}
+
+/**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate)
  */
 export async function navigate(

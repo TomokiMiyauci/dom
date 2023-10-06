@@ -2,6 +2,8 @@ import type { IHTMLInputElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
 import { $, internalSlots } from "../../internal.ts";
+import { isConnected } from "../../dom/nodes/node_trees/node_tree.ts";
+import { fireEvent } from "../../dom/events/fire.ts";
 
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   constructor(...args: any) {
@@ -12,24 +14,50 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
       new HTMLInputElementInternals(),
     );
 
-    $<HTMLInputElement>(this).activationBehavior = (event) => {
+    this.#_.activationBehavior = (event) => {
       // 1. If element is not mutable and is not in the Checkbox state and is not in the Radio state, then return.
 
       // 2. Run element's input activation behavior, if any, and do nothing otherwise.
+      this.#_["feature"]?.inputActivationBehavior?.(this);
 
       // 3. Run the popover target attribute activation behavior on element.
     };
 
-    $<HTMLInputElement>(this).legacyPreActivationBehavior = () => {
+    const before = {
+      checkness: this.#_.checkedness,
+      indeterminate: this.indeterminate,
+    };
+
+    this.#_.legacyPreActivationBehavior = () => {
       // 1. If this element's type attribute is in the Checkbox state, then set this element's checkedness to its opposite value (i.e. true if it is false, false if it is true) and set this element's indeterminate IDL attribute to false.
       if (this.type === "checkbox") {
+        before.checkness = this.#_.checkedness,
+          before.indeterminate = this.indeterminate;
+
         this.#_.checkedness = !this.#_.checkedness, this.indeterminate = false;
       }
 
       // 2. If this element's type attribute is in the Radio Button state, then get a reference to the element in this element's radio button group that has its checkedness set to true, if any, and then set this element's checkedness to true.
       // TODO
       if (this.type === "radio") {
+        before.checkness = this.#_.checkedness;
         this.#_.checkedness = true;
+      }
+    };
+
+    this.#_.legacyCanceledActivation = () => {
+      // 1. If the element's type attribute is in the Checkbox state,
+      if (this.type === "checkbox") {
+        // then set the element's checkedness and the element's indeterminate IDL attribute back to the values they had before the legacy-pre-activation behavior was run.
+        this.#_.checkedness = before.checkness,
+          this.#_.indeterminate = before.indeterminate;
+      }
+
+      // 2. If this element's type attribute is in the Radio Button state,
+      if (this.type === "radio") {
+        // then if the element to which a reference was obtained in the legacy-pre-activation behavior, if any, is still in what is now this element's radio button group, if it still has one, and if so, setting that element's checkedness to true; or else, if there was no such element, or that element is no longer in this element's radio button group, or if this element no longer has a radio button group, setting this element's checkedness to false.
+        // TODO
+        this.#_.checkedness = false;
       }
     };
   }
@@ -330,6 +358,10 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   }
   set type(value: string) {
     reflectSet(this, "type", value);
+
+    if (inputmap.has(value)) {
+      $<HTMLInputElement>(this)["feature"] = inputmap.get(value)!;
+    }
   }
 
   get useMap(): string {
@@ -456,4 +488,47 @@ export class HTMLInputElementInternals {
   checkedness = false;
 
   indeterminate = false;
+
+  formOwner: HTMLFormElement | null = null;
+
+  private feature?: InputFeature;
 }
+
+interface InputFeature {
+  inputActivationBehavior?(element: Element): void;
+}
+
+const checkbox: InputFeature = {
+  inputActivationBehavior(element: Element): void {
+    // 1. If the element is not connected, then return.
+    if (!isConnected(element)) return;
+
+    // 2. Fire an event named input at the element with the bubbles and composed attributes initialized to true.
+    fireEvent("input", element, undefined, (event) => {
+      $(event).bubbles = true, $(event).composed = true;
+    });
+
+    // 3. Fire an event named change at the element with the bubbles attribute initialized to true.
+    fireEvent("change", element, undefined, (event) => $(event).bubbles = true);
+  },
+};
+
+const radio: InputFeature = {
+  inputActivationBehavior(element): void {
+    // 1. If the element is not connected, then return.
+    if (!isConnected(element)) return;
+
+    // 2. Fire an event named input at the element with the bubbles and composed attributes initialized to true.
+    fireEvent("input", element, undefined, (event) => {
+      $(event).bubbles = true, $(event).composed = true;
+    });
+
+    // 3. Fire an event named change at the element with the bubbles attribute initialized to true.
+    fireEvent("change", element, undefined, (event) => $(event).bubbles = true);
+  },
+};
+
+const inputmap = new Map<string, InputFeature>([
+  ["checkbox", checkbox],
+  ["radio", radio],
+]);
