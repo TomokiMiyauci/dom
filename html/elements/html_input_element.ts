@@ -3,11 +3,14 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
 
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-accept)
+   */
   get accept(): string {
-    throw new Error("accept#getter");
+    return reflectGet("DOMString", this, "accept");
   }
   set accept(value: string) {
-    throw new Error("accept#setter");
+    reflectSet(this, "accept", value);
   }
 
   get align(): string {
@@ -17,11 +20,14 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("align#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-alt)
+   */
   get alt(): string {
-    throw new Error("alt#getter");
+    return reflectGet("DOMString", this, "alt");
   }
   set alt(value: string) {
-    throw new Error("alt#setter");
+    reflectSet(this, "alt", value);
   }
 
   get autocomplete(): AutoFill {
@@ -44,24 +50,34 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("checked#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-defaultchecked)
+   */
   get defaultChecked(): boolean {
-    throw new Error("defaultChecked#getter");
+    return reflectGet("boolean", this, "checked");
   }
   set defaultChecked(value: boolean) {
-    throw new Error("defaultChecked#setter");
+    reflectSet(this, "checked", value);
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-defaultvalue)
+   */
   get defaultValue(): string {
-    throw new Error("defaultValue#getter");
+    return reflectGet("DOMString", this, "value");
   }
   set defaultValue(value: string) {
-    throw new Error("defaultValue#setter");
+    reflectSet(this, "value", value);
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-dirname)
+   */
   get dirName(): string {
-    throw new Error("dirName#getter");
+    return reflectGet("DOMString", this, "dirname");
   }
   set dirName(value: string) {
-    throw new Error("dirName#setter");
+    reflectSet(this, "dirname", value);
   }
 
   /**
@@ -69,7 +85,7 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
    */
   get disabled(): boolean {
     // reflect the disabled content attribute.
-    return reflectGet(this, "disabled");
+    return reflectGet("boolean", this, "disabled");
   }
 
   /**
@@ -149,10 +165,11 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   }
 
   get max(): string {
-    throw new Error("max#getter");
+    return reflectGet("DOMString", this, "max");
   }
+
   set max(value: string) {
-    throw new Error("max#setter");
+    reflectSet(this, "max", value);
   }
 
   get maxLength(): number {
@@ -163,11 +180,12 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   }
 
   get min(): string {
-    throw new Error("min#getter");
+    return reflectGet("DOMString", this, "min");
   }
   set min(value: string) {
-    throw new Error("min#setter");
+    reflectSet(this, "min", value);
   }
+
   get minLength(): number {
     throw new Error("minLength#getter");
   }
@@ -176,10 +194,11 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   }
 
   get multiple(): boolean {
-    throw new Error("multiple#getter");
+    return reflectGet("boolean", this, "multiple");
   }
+
   set multiple(value: boolean) {
-    throw new Error("multiple#setter");
+    reflectSet(this, "multiple", value);
   }
 
   get name(): string {
@@ -190,30 +209,36 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   }
 
   get pattern(): string {
-    throw new Error("pattern#getter");
+    return reflectGet("DOMString", this, "pattern");
   }
+
   set pattern(value: string) {
-    throw new Error("pattern#setter");
+    reflectSet(this, "pattern", value);
   }
 
   get placeholder(): string {
-    throw new Error("placeholder#getter");
+    return reflectGet("DOMString", this, "placeholder");
   }
   set placeholder(value: string) {
-    throw new Error("placeholder#setter");
+    reflectSet(this, "placeholder", value);
   }
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-readonly)
+   */
   get readOnly(): boolean {
-    throw new Error("readOnly#getter");
+    return reflectGet("boolean", this, "readonly");
   }
   set readOnly(value: boolean) {
-    throw new Error("readOnly#setter");
+    reflectSet(this, "readonly", value);
   }
 
   get required(): boolean {
-    throw new Error("required#getter");
+    return reflectGet("boolean", this, "required");
   }
+
   set required(value: boolean) {
-    throw new Error("required#setter");
+    reflectSet(this, "required", value);
   }
 
   get selectionDirection(): "forward" | "backward" | "none" | null {
@@ -257,11 +282,15 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     throw new Error("step#setter");
   }
 
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#dom-input-type)
+   */
   get type(): string {
-    throw new Error("type#getter");
+    //  reflect the respective content attribute of the same name, limited to only known values.
+    return reflectGet("DOMString", this, "type");
   }
   set type(value: string) {
-    throw new Error("type#setter");
+    reflectSet(this, "type", value);
   }
 
   get useMap(): string {

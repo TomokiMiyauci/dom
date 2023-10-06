@@ -179,12 +179,6 @@
       }
     ],
     "dom/nodes/Document-createElementNS.html": [],
-    "dom/nodes/MutationObserver-attributes.html": [
-      {
-        "name": "attributes HTMLInputElement.type: type update mutation",
-        "reason": "HTMLInputElement type setter is not supported"
-      }
-    ],
     "dom/traversal/NodeIterator.html": [
       {
         "name": "createNodeIterator() with null as arguments",
