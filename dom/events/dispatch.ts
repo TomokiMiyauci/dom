@@ -8,6 +8,7 @@ import { iter, last, lastItem } from "../../deps.ts";
 import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
 import { $, tree } from "../../internal.ts";
 import { Node } from "../nodes/node.ts";
+import { MouseEvent } from "../../uievents/mouse_event.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -57,8 +58,8 @@ export function dispatch(
     );
 
     // 4. Let isActivationEvent be true, if event is a MouseEvent object and event’s type attribute is "click"; otherwise false.
-    // TODO
-    const isActivationEvent = false;
+    const isActivationEvent = event instanceof MouseEvent &&
+      event.type === "click";
 
     // 5. If isActivationEvent is true and target has activation behavior, then set activationTarget to target.
     if (isActivationEvent && $(target).activationBehavior) {
@@ -109,19 +110,46 @@ export function dispatch(
         touchTargets.append(result);
       }
 
-      // 6. If parent is a Window object, or parent is a node and target’s root is a shadow-including inclusive ancestor of parent, then:
-      // 1. If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent.
-      // 2. Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree.
+      // 6. If parent is a Window object,
+      // TODO
+      if (
+        // or parent is a node and target’s root is a shadow-including inclusive ancestor of parent, then:
+        parent instanceof Node && target instanceof Node &&
+        tree.isShadowIncludingInclusiveAncestor(tree.root(target), parent)
+      ) {
+        // 1. If
+        if (
+          // isActivationEvent is true,
+          isActivationEvent &&
+          // event’s bubbles attribute is true,
+          event.bubbles &&
+          // activationTarget is null,
+          !activationTarget &&
+          // and parent has activation behavior,
+          $(parent).activationBehavior
+          // then set activationTarget to parent.
+        ) activationTarget = parent;
 
-      // 7. Otherwise, if parent is relatedTarget, then set parent to null.
-      if (parent === relatedTarget) parent = null;
+        // 2. Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree.
+        appendEventPath(
+          event,
+          parent,
+          null,
+          relatedTarget,
+          touchTargets,
+          slotInClosedTree,
+        );
+      } // 7. Otherwise, if parent is relatedTarget, then set parent to null.
+      else if (parent === relatedTarget) parent = null;
       // 8. Otherwise, set target to parent and then:
       else {
         target = parent;
-        // 1. If isActivationEvent is true, activationTarget is null, and target has activation behavior, then set activationTarget to target.
         if (
+          // 1. If isActivationEvent is true, activationTarget is null,
           isActivationEvent && activationTarget === null &&
+          // and target has activation behavior,
           $(target).activationBehavior
+          // then set activationTarget to target.
         ) activationTarget = target;
 
         // 2. Append to an event path with event, parent, target, relatedTarget, touchTargets, and slot-in-closed-tree.

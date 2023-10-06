@@ -143,6 +143,10 @@ export abstract class Node extends EventTarget implements INode {
     super();
 
     internalSlots.extends<Node>(this, new NodeInternals(nodeDocument));
+
+    // returns the node’s assigned slot, if node is assigned; otherwise node’s parent.
+    // TODO
+    $<Node>(this).getParent = () => tree.parent(this);
   }
 
   /**
