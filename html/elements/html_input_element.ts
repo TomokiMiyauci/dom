@@ -357,11 +357,14 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
     return reflectGet("DOMString", this, "type");
   }
   set type(value: string) {
+    const previous = this.type;
     reflectSet(this, "type", value);
 
     if (inputmap.has(value)) {
       $<HTMLInputElement>(this)["feature"] = inputmap.get(value)!;
     }
+
+    onChangeType(value, previous, this);
   }
 
   get useMap(): string {
@@ -477,6 +480,61 @@ export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   get #_() {
     return internalSlots.get<HTMLInputElement>(this);
   }
+
+  #reflectGet() {
+  }
+
+  #reflectSet(content: ContentAttribute, value: string | boolean) {
+    if (this.state.applicableContentAttributes.has(content)) {
+      reflectSet(this, content, value);
+    }
+  }
+
+  private state: State = resolveState("");
+}
+
+function onChangeType(
+  current: string,
+  previous: string,
+  element: HTMLInputElement,
+): void {
+  const previousState = resolveState(previous),
+    newState = resolveState(current);
+  // 1. If the previous state of the element's type attribute put the value IDL attribute in the value mode, and the element's value is not the empty string, and the new state of the element's type attribute puts the value IDL attribute in either the default mode or the default/on mode,
+  if (
+    previousState.valueIDL === ValueIDL.Value && $(element).value !== "" &&
+    [ValueIDL.Default, ValueIDL.DefaultOn].includes(newState.valueIDL)
+    // then set the element's value content attribute to the element's value.
+  ) element.value = $(element).value;
+  // 2. Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the value mode, and the new state of the element's type attribute puts the value IDL attribute in the value mode,
+  else if (
+    previousState.valueIDL !== ValueIDL.Value &&
+    newState.valueIDL === ValueIDL.Value
+  ) {
+    // then set the value of the element to the value of the value content attribute, if there is one, or the empty string otherwise, and then set the control's dirty value flag to false.
+    $(element).value = element.value, $(element).dirtyValueFlag = false;
+    // 3. Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the filename mode, and the new state of the element's type attribute puts the value IDL attribute in the filename mode,
+  } else if (
+    previousState.valueIDL !== ValueIDL.Filename &&
+    newState.valueIDL === ValueIDL.Filename
+  ) {
+    // then set the value of the element to the empty string.
+    $(element).value = "";
+  }
+
+  // 4. Update the element's rendering and behavior to the new state's.
+  element["state"] = newState;
+
+  // 5. Signal a type change for the element. (The Radio Button state uses this, in particular.)
+
+  // 6. Invoke the value sanitization algorithm, if one is defined for the type attribute's new state.
+  // newState.valueSanitizationAlgorithm?.();
+
+  // 7. Let previouslySelectable be true if setRangeText() previously applied to the element, and false otherwise.
+
+  // 8. Let nowSelectable be true if setRangeText() now applies to the element, and false otherwise.
+
+  // 9. If previouslySelectable is false and nowSelectable is true, set the element's text entry cursor position to the beginning of the text control, and set its selection direction to "none".
 }
 
 export class HTMLInputElementInternals {
@@ -485,7 +543,13 @@ export class HTMLInputElementInternals {
    */
   dirtyCheckednessFlag = false;
 
+  value = "";
   checkedness = false;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-fe-dirty)
+   */
+  dirtyValueFlag = false;
 
   indeterminate = false;
 
@@ -493,6 +557,83 @@ export class HTMLInputElementInternals {
 
   private feature?: InputFeature;
 }
+
+function resolveState(type: string): State {
+  return textState;
+}
+
+enum ValueIDL {
+  Value = "value",
+  Default = "default",
+  DefaultOn = "default/on",
+  Filename = "filename",
+}
+
+const textState: State = {
+  valueIDL: ValueIDL.Value,
+  applicableContentAttributes: new Set<ContentAttribute>([
+    "autocomplete",
+    "dirname",
+    "list",
+    "maxlength",
+    "minlength",
+    "pattern",
+    "placeholder",
+    "readonly",
+    "required",
+    "size",
+  ]),
+};
+
+interface State {
+  valueIDL: ValueIDL;
+
+  applicableContentAttributes: Set<ContentAttribute>;
+
+  valueSanitizationAlgorithm?(value: string): string;
+
+  /**
+   * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/input.html#concept-input-value-string-number)
+   */
+  convertStringToNumber?(): number;
+
+  convertNumberToString?(): string;
+
+  convertStringToDate?(): Date;
+
+  convertDateToString?(): string;
+}
+
+const stateMap: Map<string, State> = new Map();
+
+type ContentAttribute =
+  | "accept"
+  | "alt"
+  | "autocomplete"
+  | "checked"
+  | "dirname"
+  | "formaction"
+  | "formenctype"
+  | "formmethod"
+  | "formnovalidate"
+  | "formtarget"
+  | "height"
+  | "list"
+  | "max"
+  | "maxlength"
+  | "min"
+  | "minlength"
+  | "multiple"
+  | "pattern"
+  | "placeholder"
+  | "popovertarget"
+  | "popovertargetaction"
+  | "readonly"
+  | "required"
+  | "size"
+  | "src"
+  | "step"
+  | "width";
 
 interface InputFeature {
   inputActivationBehavior?(element: Element): void;

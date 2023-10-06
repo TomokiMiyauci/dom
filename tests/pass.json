@@ -755,6 +755,16 @@
         "name": "Detached Element.matches: :pseudo-only-of-type pseudo-class selector, matching em elements with no siblings of the same type (with no refNodes): #pseudo-only em:only-of-type",
         "reason": "not supported"
       }
+    ],
+    "dom/events/Event-dispatch-click.tentative.html": [
+      {
+        "name": "checkbox morphed into another type should not mutate checked state",
+        "reason": ""
+      },
+      {
+        "name": "radio morphed into another type should not steal the existing checked state",
+        "reason": ""
+      }
     ]
   }
 }
