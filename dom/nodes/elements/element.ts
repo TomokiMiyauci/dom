@@ -19,16 +19,7 @@ import { List } from "../../../infra/data_structures/list.ts";
 import { Text } from "../text.ts";
 import { find, iter, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
-import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
-import { Animatable } from "../../../web_animations/animatable.ts";
 import { DOMTokenList } from "../../sets/dom_token_list.ts";
-import { Element_CSSOMView } from "../../../cssom_view/element.ts";
-import { Element_CSSTypedOM } from "../../../css/css_typed_om/element.ts";
-import { Element_DomParsing } from "../../../domparsing/element.ts";
-import { Element_PointerEvents } from "../../../pointerevents/element.ts";
-import { Element_PointerLock } from "../../../pointerlock/element.ts";
-import { Element_Fullscreen } from "../../../fullscreen/element.ts";
-import { Element_CSSShadowParts } from "../../../css/css_shadow_parts/element.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
@@ -65,15 +56,6 @@ export interface ElementInits {
   isValue: string | null;
 }
 
-@ARIAMixin
-@Animatable
-@Element_CSSOMView
-@Element_CSSTypedOM
-@Element_DomParsing
-@Element_PointerEvents
-@Element_PointerLock
-@Element_Fullscreen
-@Element_CSSShadowParts
 export class Element extends Node implements IElement {
   constructor({
     namespace,
@@ -766,18 +748,6 @@ export class Element extends Node implements IElement {
     return qualifiedName;
   }
 }
-
-export interface Element
-  extends
-    ARIAMixin,
-    Animatable,
-    Element_CSSOMView,
-    Element_CSSTypedOM,
-    Element_DomParsing,
-    Element_PointerEvents,
-    Element_PointerLock,
-    Element_Fullscreen,
-    Element_CSSShadowParts {}
 
 export class ElementInternals {
   /**

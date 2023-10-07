@@ -1,4 +1,3 @@
-import { Constructor } from "../deps.ts";
 import type { IElement } from "../interface.d.ts";
 
 type IElement_PointerEvents = Pick<
@@ -6,24 +5,16 @@ type IElement_PointerEvents = Pick<
   "setPointerCapture" | "releasePointerCapture" | "hasPointerCapture"
 >;
 
-export function Element_PointerEvents<T extends Constructor>(Ctor: T) {
-  abstract class Element_PointerEvents extends Ctor
-    implements IElement_PointerEvents {
-    hasPointerCapture(pointerId: number): boolean {
-      throw new Error("hasPointerCapture");
-    }
-
-    setPointerCapture(pointerId: number): void {
-      throw new Error("setPointerCapture");
-    }
-
-    releasePointerCapture(pointerId: number): void {
-      throw new Error("releasePointerCapture");
-    }
+export class Element implements IElement_PointerEvents {
+  hasPointerCapture(pointerId: number): boolean {
+    throw new Error("hasPointerCapture");
   }
 
-  return Element_PointerEvents;
-}
+  setPointerCapture(pointerId: number): void {
+    throw new Error("setPointerCapture");
+  }
 
-// deno-lint-ignore no-empty-interface
-export interface Element_PointerEvents extends IElement_PointerEvents {}
+  releasePointerCapture(pointerId: number): void {
+    throw new Error("releasePointerCapture");
+  }
+}

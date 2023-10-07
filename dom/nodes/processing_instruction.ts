@@ -1,11 +1,9 @@
 import type { IProcessingInstruction } from "../../interface.d.ts";
 import { CharacterData } from "./character_data.ts";
-import { LinkStyle } from "../../cssom/link_style.ts";
 import { NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
 import { internalSlots } from "../../internal.ts";
 
-@LinkStyle
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
   constructor(
@@ -46,9 +44,6 @@ export class ProcessingInstruction extends CharacterData
     return internalSlots.get<ProcessingInstruction>(this);
   }
 }
-
-// deno-lint-ignore no-empty-interface
-export interface ProcessingInstruction extends LinkStyle {}
 
 export class ProcessingInstructionInternals {
   /**

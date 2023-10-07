@@ -1,8 +1,6 @@
 import type { IHTMLStyleElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { LinkStyle } from "../../cssom/link_style.ts";
 
-@LinkStyle
 export class HTMLStyleElement extends HTMLElement implements IHTMLStyleElement {
   get disabled(): boolean {
     throw new Error("disabled#getter");
@@ -25,6 +23,3 @@ export class HTMLStyleElement extends HTMLElement implements IHTMLStyleElement {
     throw new Error("type#setter");
   }
 }
-
-// deno-lint-ignore no-empty-interface
-export interface HTMLStyleElement extends LinkStyle {}

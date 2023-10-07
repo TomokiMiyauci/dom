@@ -1,5 +1,3 @@
-import { type Constructor } from "../deps.ts";
-
 interface IDocument_Fullscreen extends
   Pick<
     Document,
@@ -10,28 +8,22 @@ interface IDocument_Fullscreen extends
     | "onfullscreenerror"
   > {}
 
-export function Document_Fullscreen<T extends Constructor>(Ctor: T) {
-  abstract class Mixin extends Ctor implements IDocument_Fullscreen {
-    get fullscreen(): boolean {
-      throw new Error();
-    }
-
-    get fullscreenEnabled(): boolean {
-      throw new Error();
-    }
-
-    exitFullscreen(): Promise<void> {
-      throw new Error();
-    }
-
-    onfullscreenchange: ((this: globalThis.Document, ev: Event) => any) | null =
-      null;
-
-    onfullscreenerror: ((this: globalThis.Document, ev: Event) => any) | null =
-      null;
+export class Document implements IDocument_Fullscreen {
+  get fullscreen(): boolean {
+    throw new Error();
   }
 
-  return Mixin;
-}
+  get fullscreenEnabled(): boolean {
+    throw new Error();
+  }
 
-export interface Document_Fullscreen extends IDocument_Fullscreen {}
+  exitFullscreen(): Promise<void> {
+    throw new Error();
+  }
+
+  onfullscreenchange: ((this: globalThis.Document, ev: Event) => any) | null =
+    null;
+
+  onfullscreenerror: ((this: globalThis.Document, ev: Event) => any) | null =
+    null;
+}

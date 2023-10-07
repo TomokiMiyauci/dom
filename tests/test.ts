@@ -3,9 +3,24 @@ import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
 import { createHandler, Runner } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
 import * as DOM from "../mod.ts";
+import "../html/elements/html_iframe_element_polyfill.ts";
 import "../domparsing/extends/all.ts";
 import "../html/loading_web_pages/events/event_target_internals.ts";
-import "../html/extends/element.ts";
+import "../html/extends/all.ts";
+import "../wai_aria/extends/all.ts";
+import "../web_animations/extends/all.ts";
+import "../cssom_view/extends/all.ts";
+import "../css/css_typed_om/extends/all.ts";
+import "../pointerevents/extends/all.ts";
+import "../pointerlock/extends/all.ts";
+import "../fullscreen/extends/all.ts";
+import "../css/css_shadow_parts/extends/all.ts";
+import "../picture_in_picture/extends/all.ts";
+import "../storage_access_api/extends/all.ts";
+import "../selection/extends/all.ts";
+import "../svg/extends/all.ts";
+import "../css/css_font_loading/extends/all.ts";
+import "../cssom/extends/all.ts";
 
 import { $ } from "../internal.ts";
 

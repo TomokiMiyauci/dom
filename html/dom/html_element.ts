@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
 import { Element } from "../../dom/nodes/elements/element.ts";
-import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import { fireSyntheticPointerEvent } from "../global_event_handlers_utils.ts";
 import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";
@@ -16,7 +15,6 @@ import {
 import { isElement } from "../../dom/nodes/utils.ts";
 import { isHTMLElement } from "../utils.ts";
 
-@GlobalEventHandlers
 @ElementContentEditable
 @HTMLOrSVGElement
 @ElementCSSInlineStyle
@@ -204,7 +202,6 @@ export class HTMLElement extends Element implements IHTMLElement {
 
 export interface HTMLElement
   extends
-    GlobalEventHandlers,
     ElementContentEditable,
     HTMLOrSVGElement,
     ElementCSSInlineStyle,

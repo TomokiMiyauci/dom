@@ -4,7 +4,6 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
 } from "../node_utils.ts";
-import { XPathEvaluatorBase } from "../../../dom/xpath/x_path_evaluator_base.ts";
 import {
   isDocument,
   isDocumentFragment,
@@ -25,17 +24,6 @@ import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { CDATASection } from "../cdata_section.ts";
-import { GlobalEventHandlers } from "../../../html/global_event_handlers.ts";
-import { FontFaceSource } from "../../../css/css_font_loading/font_face_source.ts";
-import { Document_HTML } from "../../../html/document.ts";
-import { Document_CSSOM_View } from "../../../cssom_view/document.ts";
-import { Document_Picture_In_Picture } from "../../../picture_in_picture/document.ts";
-import { Document_Fullscreen } from "../../../fullscreen/document.ts";
-import { Document_Pointerlock } from "../../../pointerlock/document.ts";
-import { Document_Selection } from "../../../selection/document.ts";
-import { Document_Storage_Access_API } from "../../../storage_access_api/document.ts";
-import { Document_WebAnimation } from "../../../web_animations/document.ts";
-import { Document_SVG } from "../../../svg/document.ts";
 import { ReName } from "../../../xml/document.ts";
 import { getDocumentElement } from "../node_trees/node_tree.ts";
 import { convert, DOMString } from "../../../webidl/types.ts";
@@ -63,18 +51,6 @@ import {
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
-@Document_HTML
-@Document_CSSOM_View
-@Document_Picture_In_Picture
-@Document_Fullscreen
-@Document_Pointerlock
-@Document_Storage_Access_API
-@Document_Selection
-@Document_WebAnimation
-@Document_SVG
-@GlobalEventHandlers
-@FontFaceSource
-@XPathEvaluatorBase
 export class Document extends Node implements IDocument {
   constructor() {
     // @ts-ignore
@@ -739,20 +715,7 @@ export class Document extends Node implements IDocument {
   }
 }
 
-export interface Document
-  extends
-    FontFaceSource,
-    XPathEvaluatorBase,
-    GlobalEventHandlers,
-    Document_HTML,
-    Document_CSSOM_View,
-    Document_Picture_In_Picture,
-    Document_Fullscreen,
-    Document_Pointerlock,
-    Document_Selection,
-    Document_Storage_Access_API,
-    Document_WebAnimation,
-    Document_SVG {
+export interface Document {
   getElementById(elementId: string): HTMLElement | null;
   addEventListener<K extends keyof DocumentEventMap>(
     type: K,

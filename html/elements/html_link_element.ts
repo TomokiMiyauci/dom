@@ -1,11 +1,9 @@
 import type { IHTMLLinkElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { LinkStyle } from "../../cssom/link_style.ts";
 import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
 
-@LinkStyle
 export class HTMLLinkElement extends HTMLElement implements IHTMLLinkElement {
   get as(): string {
     throw new Error("as#getter");
@@ -128,6 +126,3 @@ export class HTMLLinkElement extends HTMLElement implements IHTMLLinkElement {
     throw new Error("type#setter");
   }
 }
-
-// deno-lint-ignore no-empty-interface
-export interface HTMLLinkElement extends LinkStyle {}

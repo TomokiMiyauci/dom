@@ -1,6 +1,5 @@
 import type { IWindow } from "../../interface.d.ts";
 import { EventTarget } from "../../dom/events/event_target.ts";
-import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import { WindowEventHandlers } from "../window_event_handlers.ts";
 import { Document } from "../../dom/nodes/documents/document.ts";
 import { $, internalSlots } from "../../internal.ts";
@@ -16,7 +15,6 @@ import { Location } from "./location.ts";
 import { Window_Selection } from "../../selection/window.ts";
 import { LegacyUnenumerableNamedProperties } from "../../webidl/legacy_extended_attributes.ts";
 
-@GlobalEventHandlers
 @WindowEventHandlers
 @Window_Selection
 @LegacyUnenumerableNamedProperties
@@ -390,8 +388,7 @@ export class Window extends EventTarget implements IWindow {
   }
 }
 
-export interface Window
-  extends GlobalEventHandlers, WindowEventHandlers, Window_Selection {
+export interface Window extends WindowEventHandlers, Window_Selection {
   addEventListener<K extends keyof WindowEventMap>(
     type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => any,

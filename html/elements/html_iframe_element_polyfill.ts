@@ -6,4 +6,4 @@ declare module "../../dom/nodes/elements/element.ts" {
   interface ElementInternals extends ContentNavigableInternals {}
 }
 
-extend(ElementInternals.prototype, ContentNavigableInternals.prototype);
+extend(ElementInternals.prototype, new ContentNavigableInternals());
