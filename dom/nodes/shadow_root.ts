@@ -1,15 +1,11 @@
 import type { IShadowRoot } from "../../interface.d.ts";
 import { DocumentFragment } from "./document_fragment.ts";
-import { DocumentOrShadowRoot } from "./node_trees/document_or_shadow_root.ts";
-import { InnerHTML } from "../../domparsing/inner_html.ts";
 import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "../../html/events.ts";
 import { internalSlots } from "../../internal.ts";
 
-@DocumentOrShadowRoot
-@InnerHTML
 /**
  * @see https://dom.spec.whatwg.org/#interface-shadowroot
  */
@@ -72,8 +68,6 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
     return internalSlots.get<ShadowRoot>(this);
   }
 }
-
-export interface ShadowRoot extends DocumentOrShadowRoot, InnerHTML {}
 
 export class ShadowRootInternals {
   /**

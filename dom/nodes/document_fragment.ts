@@ -1,12 +1,8 @@
 import { Node, NodeType } from "./node.ts";
-import { ParentNode } from "./node_trees/parent_node.ts";
-import { NonElementParentNode } from "./node_trees/non_element_parent_node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
 
-@ParentNode
-@NonElementParentNode
 /**
  * @see https://dom.spec.whatwg.org/#interface-documentfragment
  */
@@ -90,7 +86,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   }
 }
 
-export interface DocumentFragment extends ParentNode, NonElementParentNode {
+export interface DocumentFragment {
   getElementById(elementId: string): HTMLElement | null;
 }
 

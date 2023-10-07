@@ -7,8 +7,6 @@ import {
 import { getQualifiedName, isElement, isShadowHost } from "../utils.ts";
 import { Attr, cloneAttr } from "./attr.ts";
 import { changeAttributes } from "./attr_utils.ts";
-import { ParentNode } from "../node_trees/parent_node.ts";
-import { NonDocumentTypeChildNode } from "../node_trees/non_document_type_child_node.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
 import { isHTMLDocument } from "../documents/document_utils.ts";
 import {
@@ -23,9 +21,6 @@ import { find, iter, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { ARIAMixin } from "../../../wai_aria/aria_mixin.ts";
 import { Animatable } from "../../../web_animations/animatable.ts";
-import { InnerHTML } from "../../../domparsing/inner_html.ts";
-import { ChildNode } from "../node_trees/child_node.ts";
-import { Slottable } from "../node_trees/slottable.ts";
 import { DOMTokenList } from "../../sets/dom_token_list.ts";
 import { Element_CSSOMView } from "../../../cssom_view/element.ts";
 import { Element_CSSTypedOM } from "../../../css/css_typed_om/element.ts";
@@ -72,11 +67,6 @@ export interface ElementInits {
 
 @ARIAMixin
 @Animatable
-@InnerHTML
-@ParentNode
-@NonDocumentTypeChildNode
-@ChildNode
-@Slottable
 @Element_CSSOMView
 @Element_CSSTypedOM
 @Element_DomParsing
@@ -781,11 +771,6 @@ export interface Element
   extends
     ARIAMixin,
     Animatable,
-    ChildNode,
-    InnerHTML,
-    NonDocumentTypeChildNode,
-    ParentNode,
-    Slottable,
     Element_CSSOMView,
     Element_CSSTypedOM,
     Element_DomParsing,

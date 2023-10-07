@@ -12,20 +12,12 @@
       {
         "name": "new Text() should get the correct ownerDocument across globals",
         "reason": "Not supported onload event handler attribute"
-      },
-      {
-        "name": "new Text(): prototype chain",
-        "reason": "prototype chain"
       }
     ],
     "dom/nodes/Comment-constructor.html": [
       {
         "name": "new Comment() should get the correct ownerDocument across globals",
         "reason": "Not supported onload event handler attribute"
-      },
-      {
-        "name": "new Comment(): prototype chain",
-        "reason": "prototype chain"
       }
     ],
     "dom/nodes/Node-appendChild.html": [

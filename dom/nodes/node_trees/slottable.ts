@@ -1,32 +1,17 @@
-import { Constructor } from "../../../deps.ts";
 import type { ISlottable } from "../../../interface.d.ts";
 import { findSlot } from "./node_tree.ts";
 
-export function Slottable<T extends Constructor<Text>>(
-  Ctor: T,
-): T & Constructor<Slottable>;
-export function Slottable<T extends Constructor<Element>>(
-  Ctor: T,
-): T & Constructor<Slottable>;
-export function Slottable<T extends Constructor<Element>>(Ctor: T) {
-  abstract class Slottable extends Ctor implements ISlottable {
-    /**
-     * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-slottable-assignedslot)
-     */
-    override get assignedSlot(): HTMLSlotElement | null {
-      // return the result of find a slot given this and with the open flag set.
-      return findSlot(this, true) as HTMLSlotElement | null;
-    }
+export class Slottable implements ISlottable {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-slottable-assignedslot)
+   */
+  get assignedSlot(): HTMLSlotElement | null {
+    // return the result of find a slot given this and with the open flag set.
+    return findSlot(this, true) as HTMLSlotElement | null;
   }
-
-  // deno-lint-ignore no-empty-interface
-  interface Slottable extends Element {}
-
-  return Slottable;
 }
 
-// deno-lint-ignore no-empty-interface
-export interface Slottable extends ISlottable {}
+export interface Slottable extends Element {}
 
 export class SlottableInternals {
   /**

@@ -1,6 +1,5 @@
 import { NodeType } from "./node.ts";
 import { CharacterData, CharacterDataInternals } from "./character_data.ts";
-import { Slottable } from "./node_trees/slottable.ts";
 import { List } from "../../infra/data_structures/list.ts";
 import type { IText } from "../../interface.d.ts";
 import { iter } from "../../deps.ts";
@@ -10,7 +9,6 @@ import { Get } from "../../utils.ts";
 import { splitText } from "./utils/split_text.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
-@Slottable
 @Exposed(Window)
 export class Text extends CharacterData implements IText {
   /**
@@ -60,6 +58,3 @@ export class Text extends CharacterData implements IText {
     return splitText(this, offset);
   }
 }
-
-// deno-lint-ignore no-empty-interface
-export interface Text extends Slottable {}

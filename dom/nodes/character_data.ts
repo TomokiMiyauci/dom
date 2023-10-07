@@ -1,6 +1,4 @@
 import { Node, NodeInternals } from "./node.ts";
-import { ChildNode } from "./node_trees/child_node.ts";
-import { NonDocumentTypeChildNode } from "./node_trees/non_document_type_child_node.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
@@ -8,8 +6,6 @@ import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
 import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
 
-@NonDocumentTypeChildNode
-@ChildNode
 export abstract class CharacterData extends Node implements ICharacterData {
   constructor(data: string, document: Document) {
     super(document);
@@ -145,8 +141,6 @@ export abstract class CharacterData extends Node implements ICharacterData {
     return internalSlots.get<CharacterData>(this);
   }
 }
-
-export interface CharacterData extends ChildNode, NonDocumentTypeChildNode {}
 
 export class CharacterDataInternals extends NodeInternals {
   /**

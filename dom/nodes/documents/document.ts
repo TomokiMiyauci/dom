@@ -4,8 +4,6 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
 } from "../node_utils.ts";
-import { ParentNode } from "../node_trees/parent_node.ts";
-import { DocumentOrShadowRoot } from "../node_trees/document_or_shadow_root.ts";
 import { XPathEvaluatorBase } from "../../../dom/xpath/x_path_evaluator_base.ts";
 import {
   isDocument,
@@ -20,7 +18,6 @@ import { createElement } from "../utils/create_element.ts";
 import { type Element } from "../elements/element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { DocumentFragment } from "../document_fragment.ts";
-import { NonElementParentNode } from "../node_trees/non_element_parent_node.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
@@ -72,12 +69,9 @@ export type CompatMode = "BackCompat" | "CSS1Compat";
 @Document_Fullscreen
 @Document_Pointerlock
 @Document_Storage_Access_API
-@DocumentOrShadowRoot
 @Document_Selection
 @Document_WebAnimation
 @Document_SVG
-@ParentNode
-@NonElementParentNode
 @GlobalEventHandlers
 @FontFaceSource
 @XPathEvaluatorBase
@@ -747,10 +741,7 @@ export class Document extends Node implements IDocument {
 
 export interface Document
   extends
-    DocumentOrShadowRoot,
     FontFaceSource,
-    ParentNode,
-    NonElementParentNode,
     XPathEvaluatorBase,
     GlobalEventHandlers,
     Document_HTML,

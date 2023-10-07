@@ -86,16 +86,19 @@ export class Get {
   static data = prop("data");
 }
 
-// deno-lint-ignore ban-types
-export function includes(derived: Function, constructor: Function): void {
-  Object.getOwnPropertyNames(constructor.prototype).forEach((name) => {
-    Object.defineProperty(
-      derived.prototype,
-      name,
-      Object.getOwnPropertyDescriptor(constructor.prototype, name) ||
-        Object.create(null),
-    );
+export function includes(
+  derived: Function,
+  constructor: Function,
+  options: { excludes?: string[] } = {},
+): void {
+  const { excludes = ["constructor"] } = options;
+  const descriptors = Object.getOwnPropertyDescriptors(constructor.prototype);
+
+  excludes.forEach((key) => {
+    delete descriptors[key];
   });
+
+  Object.defineProperties(derived.prototype, descriptors);
 }
 
 export function extend(
