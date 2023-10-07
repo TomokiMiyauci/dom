@@ -17,8 +17,8 @@ import { fireEvent } from "../../dom/events/fire.ts";
 
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
-  constructor(args: any) {
-    super(args);
+  constructor() {
+    super();
 
     this.#_.insertionSteps.define(async (element: any) => {
       // // 1. Create a new child navigable for element.

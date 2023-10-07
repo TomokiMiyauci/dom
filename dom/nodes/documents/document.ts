@@ -14,11 +14,9 @@ import { Attr } from "../elements/attr.ts";
 import { Text } from "../text.ts";
 import { Comment } from "../comment.ts";
 import { createElement } from "../utils/create_element.ts";
-import { type Element } from "../elements/element.ts";
 import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
 import { DocumentFragment } from "../document_fragment.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
-import { type DocumentType } from "../document_type.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
@@ -53,7 +51,6 @@ export type CompatMode = "BackCompat" | "CSS1Compat";
 
 export class Document extends Node implements IDocument {
   constructor() {
-    // @ts-ignore
     super();
 
     const internal = new DocumentInternals({
@@ -250,7 +247,10 @@ export class Document extends Node implements IDocument {
     if (isHTMLDocument(this)) localName = toASCIILowerCase(localName);
 
     // 3. Return a new attribute whose local name is localName and node document is this.
-    return new Attr({ localName, nodeDocument: this });
+    const attribute = new Attr({ localName });
+    $(attribute).nodeDocument = this;
+
+    return attribute;
   }
 
   /**
@@ -267,12 +267,14 @@ export class Document extends Node implements IDocument {
     );
 
     // 2. Return a new attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, and node document is this.
-    return new Attr({
+    const attribute = new Attr({
       localName,
       namespacePrefix: prefix,
       namespace: ns,
-      nodeDocument: this,
     });
+    $(attribute).nodeDocument = this;
+
+    return attribute;
   }
 
   /**
@@ -585,7 +587,9 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new ProcessingInstruction node, with target set to target, data set to data, and node document set to this.
-    return new ProcessingInstruction({ data, target, nodeDocument: this });
+    const node = new ProcessingInstruction({ data, target });
+    $(node).nodeDocument = this;
+    return node;
   }
 
   /**

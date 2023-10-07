@@ -30,8 +30,8 @@ export function setAttributeValue(
       namespacePrefix: prefix,
       localName,
       value,
-      nodeDocument: $(element).nodeDocument,
     });
+    $(attr).nodeDocument = $(element).nodeDocument;
 
     appendAttribute(attr, element);
     return;

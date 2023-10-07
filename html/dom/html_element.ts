@@ -20,9 +20,8 @@ import { isHTMLElement } from "../utils.ts";
 @ElementCSSInlineStyle
 @HTMLElement_CSSOMView
 export class HTMLElement extends Element implements IHTMLElement {
-  constructor(...args: any) {
-    // @ts-ignore
-    super(...args);
+  constructor() {
+    super();
 
     $<HTMLElement>(this).insertionSteps.define((insertedNode) => {
       // 1. If insertedNode is an element whose namespace is the HTML namespace, and this standard defines HTML element insertion steps for insertedNode's local name, then run the corresponding HTML element insertion steps given insertedNode.

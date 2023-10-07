@@ -1,4 +1,4 @@
-import { Node, NodeStates, NodeType } from "../node.ts";
+import { Node, NodeType } from "../node.ts";
 import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
@@ -47,27 +47,11 @@ import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
 import { replaceAllString } from "../utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../../../selectors/hook.ts";
 
-export interface ElementInits {
-  namespace: string | null;
-  namespacePrefix: string | null;
-  localName: string;
-  customElementState: CustomElementState;
-  customElementDefinition: CustomElementDefinition | null;
-  isValue: string | null;
-}
-
 export class Element extends Node implements IElement {
-  constructor({
-    namespace,
-    namespacePrefix,
-    localName,
-    customElementState,
-    customElementDefinition,
-    isValue,
-    nodeDocument,
-  }: ElementInits & NodeStates) {
-    super(nodeDocument);
+  constructor() {
+    super();
 
+    const internal = new ElementInternals();
     const changeAttribute = (
       { localName, namespace, value }: AttributesContext,
     ): void => {
@@ -77,15 +61,6 @@ export class Element extends Node implements IElement {
         this.#_.ID = value ? value : null;
       }
     };
-
-    const internal = new ElementInternals({
-      namespace,
-      namespacePrefix,
-      localName,
-      customElementState,
-      customElementDefinition,
-      isValue,
-    });
     internal.attributeChangeSteps.define(changeAttribute);
     internalSlots.extends<Element>(this, internal);
   }
@@ -566,8 +541,8 @@ export class Element extends Node implements IElement {
       const attribute = new Attr({
         localName: qualifiedName,
         value,
-        nodeDocument: this.#_.nodeDocument,
       });
+      $(attribute).nodeDocument = this.#_.nodeDocument;
 
       appendAttribute(attribute, this);
       return;
@@ -643,8 +618,8 @@ export class Element extends Node implements IElement {
         const attr = new Attr({
           localName: qualifiedName,
           value: "",
-          nodeDocument: this.#_.nodeDocument,
         });
+        $(attr).nodeDocument = this.#_.nodeDocument;
 
         // then append this attribute to this,
         appendAttribute(attr, this);
@@ -753,29 +728,29 @@ export class ElementInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
    */
-  namespace: string | null;
+  namespace!: string | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace-prefix)
    */
-  namespacePrefix: string | null;
+  namespacePrefix!: string | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-local-name)
    */
-  localName: string;
+  localName!: string;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
    */
-  customElementState: CustomElementState;
+  customElementState!: CustomElementState;
 
-  customElementDefinition: CustomElementDefinition | null;
+  customElementDefinition!: CustomElementDefinition | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-is-value)
    */
-  isValue: string | null;
+  isValue!: string | null;
 
   /**
    * @default null
@@ -804,36 +779,8 @@ export class ElementInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-qualified-name)
    */
-  qualifiedName!: string;
-
-  constructor(
-    {
-      namespace,
-      namespacePrefix,
-      localName,
-      isValue,
-      customElementDefinition,
-      customElementState,
-    }: Pick<
-      ElementInternals,
-      | "namespace"
-      | "namespacePrefix"
-      | "localName"
-      | "isValue"
-      | "customElementState"
-      | "customElementDefinition"
-    >,
-  ) {
-    this.namespace = namespace;
-    this.namespacePrefix = namespacePrefix;
-    this.localName = localName;
-    this.isValue = isValue;
-    this.customElementState = customElementState;
-    this.customElementDefinition = customElementDefinition;
-
-    Object.defineProperty(this, "qualifiedName", {
-      get: () => getQualifiedName(this.localName, this.namespacePrefix),
-    });
+  get qualifiedName(): string {
+    return getQualifiedName(this.localName, this.namespacePrefix);
   }
 }
 

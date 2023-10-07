@@ -6,8 +6,8 @@ import { isConnected } from "../../dom/nodes/node_trees/node_tree.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
 
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
-  constructor(...args: any) {
-    super(...args);
+  constructor() {
+    super();
 
     internalSlots.extends<HTMLInputElement>(
       this,

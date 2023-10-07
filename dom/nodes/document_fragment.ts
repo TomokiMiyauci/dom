@@ -11,12 +11,13 @@ export class DocumentFragment extends Node implements IDocumentFragment {
    * @see https://dom.spec.whatwg.org/#dom-documentfragment-documentfragment
    */
   constructor() {
-    // set this’s node document to current global object’s associated Document.
-    super(globalThis.document);
+    super();
 
     const internal = new DocumentFragmentInternals();
-
     internalSlots.extends<DocumentFragment>(this, internal);
+
+    // set this’s node document to current global object’s associated Document.
+    $<DocumentFragment>(this).nodeDocument = globalThis.document;
   }
 
   /**

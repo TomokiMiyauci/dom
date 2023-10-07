@@ -21,12 +21,9 @@ export class Attr extends Node implements IAttr {
       localName,
       element = null,
       value = "",
-      nodeDocument,
-    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional> & {
-      nodeDocument: Document;
-    },
+    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional>,
   ) {
-    super(nodeDocument);
+    super();
 
     const internal = new AttrInternals({
       namespace,
@@ -217,5 +214,9 @@ export class AttrInternals {
 }
 
 export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
-  return new Attr({ ...$(attr), nodeDocument: document });
+  const attribute = new Attr({ ...$(attr) });
+
+  $(attribute).nodeDocument = document;
+
+  return attribute;
 }

@@ -7,17 +7,15 @@ type Optional = "publicId" | "systemId";
 
 export class DocumentType extends Node implements IDocumentType {
   constructor(
-    { name, publicId = "", systemId = "", nodeDocument }:
-      & PartialBy<
-        Pick<
-          DocumentTypeInternals,
-          "name" | "publicId" | "systemId"
-        >,
-        Optional
-      >
-      & { nodeDocument: Document },
+    { name, publicId = "", systemId = "" }: PartialBy<
+      Pick<
+        DocumentTypeInternals,
+        "name" | "publicId" | "systemId"
+      >,
+      Optional
+    >,
   ) {
-    super(nodeDocument);
+    super();
 
     const internal = new DocumentTypeInternals({ name });
     internal.publicId = publicId, internal.systemId = systemId;
@@ -70,14 +68,17 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   protected override clone(document: Document): DocumentType {
-    return new DocumentType(
+    const doctype = new DocumentType(
       {
         name: this.#_.name,
         publicId: this.#_.publicId,
         systemId: this.#_.systemId,
-        nodeDocument: document,
       },
     );
+
+    $(doctype).nodeDocument = document;
+
+    return doctype;
   }
 
   get name(): string {

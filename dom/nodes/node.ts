@@ -65,10 +65,6 @@ enum Position {
   DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32,
 }
 
-export interface NodeStates {
-  nodeDocument: Document;
-}
-
 @Exposed(Window)
 export abstract class Node extends EventTarget implements INode {
   @constant
@@ -139,10 +135,10 @@ export abstract class Node extends EventTarget implements INode {
   abstract get textContent(): string | null;
   abstract set textContent(value: string | null);
 
-  constructor(nodeDocument: Document) {
+  constructor() {
     super();
 
-    internalSlots.extends<Node>(this, new NodeInternals(nodeDocument));
+    internalSlots.extends<Node>(this, new NodeInternals());
 
     // returns the node’s assigned slot, if node is assigned; otherwise node’s parent.
     // TODO
@@ -552,11 +548,6 @@ export abstract class Node extends EventTarget implements INode {
     return getParentElement(this) as HTMLElement | null; // The specification is `Element`
   }
 
-  [inspect](): string {
-    return `${this.nodeName}
-  ${[...tree.children(this)].map((node) => this[inspect].call(node)).join("")}`;
-  }
-
   get #_() {
     return $<Node>(this);
   }
@@ -593,7 +584,7 @@ export interface Node
     > {}
 
 export class NodeInternals {
-  nodeDocument: Document;
+  nodeDocument!: Document;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
@@ -622,8 +613,4 @@ export class NodeInternals {
   registeredObserverList: List<
     RegisteredObserver | TransientRegisteredObserver
   > = new List();
-
-  constructor(nodeDocument: Document) {
-    this.nodeDocument = nodeDocument;
-  }
 }

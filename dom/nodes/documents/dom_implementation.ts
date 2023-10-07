@@ -26,12 +26,14 @@ export class DOMImplementation implements IDOMImplementation {
     validate(qualifiedName);
 
     // 2. Return a new doctype, with qualifiedName as its name, publicId as its public ID, and systemId as its system ID, and with its node document set to the associated document of this.
-    return new DocumentType({
+    const doctype = new DocumentType({
       name: qualifiedName,
       publicId,
       systemId,
-      nodeDocument: $<DOMImplementation>(this).document,
     });
+    $(doctype).nodeDocument = $<DOMImplementation>(this).document;
+
+    return doctype;
   }
 
   /**
@@ -89,7 +91,8 @@ export class DOMImplementation implements IDOMImplementation {
     $(doc).contentType = "text/html";
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
-    const docType = new DocumentType({ name: "html", nodeDocument: doc });
+    const docType = new DocumentType({ name: "html" });
+    $(docType).nodeDocument = doc;
     appendNode(docType, doc);
 
     // 4. Append the result of creating an element given doc, html, and the HTML namespace, to doc.

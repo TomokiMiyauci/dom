@@ -11,8 +11,8 @@ import { userNavigationInvolvement } from "../loading_web_pages/navigation_and_s
 
 export class HTMLButtonElement extends HTMLElement
   implements IHTMLButtonElement {
-  constructor(...args: any) {
-    super(...args);
+  constructor() {
+    super();
 
     this.#_.activationBehavior = (event) => {
       // 1. If element is disabled, then return.

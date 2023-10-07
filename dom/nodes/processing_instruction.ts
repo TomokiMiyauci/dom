@@ -2,18 +2,14 @@ import type { IProcessingInstruction } from "../../interface.d.ts";
 import { CharacterData } from "./character_data.ts";
 import { NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
-import { internalSlots } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
   constructor(
-    { data, target, nodeDocument }: {
-      data: string;
-      target: string;
-      nodeDocument: Document;
-    },
+    { data, target }: { data: string; target: string },
   ) {
-    super(data, nodeDocument);
+    super(data);
 
     internalSlots.extends<ProcessingInstruction>(
       this,
@@ -33,11 +29,13 @@ export class ProcessingInstruction extends CharacterData
   }
 
   protected override clone(document: Document): ProcessingInstruction {
-    return new ProcessingInstruction({
+    const node = new ProcessingInstruction({
       data: this.#_.data,
       target: this.#_.target,
-      nodeDocument: document,
     });
+    $(node).nodeDocument = document;
+
+    return node;
   }
 
   get #_() {

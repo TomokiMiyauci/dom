@@ -1,4 +1,4 @@
-import { Node, NodeInternals } from "./node.ts";
+import { Node } from "./node.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
 import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
@@ -7,12 +7,12 @@ import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
-  constructor(data: string, document: Document) {
-    super(document);
+  constructor(data: string) {
+    super();
 
     internalSlots.extends<CharacterData>(
       this,
-      new CharacterDataInternals({ data, nodeDocument: document }),
+      new CharacterDataInternals(data),
     );
   }
 
@@ -142,19 +142,13 @@ export abstract class CharacterData extends Node implements ICharacterData {
   }
 }
 
-export class CharacterDataInternals extends NodeInternals {
+export class CharacterDataInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
    */
   data: string;
 
-  constructor(
-    { data, nodeDocument }:
-      & { data: string }
-      & Pick<NodeInternals, "nodeDocument">,
-  ) {
-    super(nodeDocument);
-
+  constructor(data: string) {
     this.data = data;
   }
 }

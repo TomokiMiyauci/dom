@@ -4,7 +4,8 @@ import { isText } from "../dom/nodes/utils.ts";
 import { setAttributeValue } from "../dom/nodes/utils/set_attribute_value.ts";
 import { DocumentType } from "../dom/nodes/document_type.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../deps.ts";
-import { $ } from "../internal.ts";
+import { $, internalSlots } from "../internal.ts";
+import { appropriateTemplateContentsOwnerDocument } from "./elements/html_template_element_utils.ts";
 
 type Child = Node & ChildNode;
 
@@ -59,7 +60,20 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     templateElement: HTMLTemplateElement,
     contentElement: DocumentFragment,
   ): void {
-    const fragment = $(templateElement).templateContents;
+    const { nodeDocument } = $(templateElement);
+    // 1. Let doc be the template element's node document's appropriate template contents owner document.
+    const doc = appropriateTemplateContentsOwnerDocument(nodeDocument);
+
+    // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
+    const fragment = this.document.createDocumentFragment();
+    $(fragment).nodeDocument = doc;
+    $(fragment).host = templateElement;
+
+    // 3. Set the template element's template contents to the newly created DocumentFragment object.
+    internalSlots.extends<HTMLTemplateElement>(templateElement, {
+      templateContents: fragment,
+    });
+
     $(contentElement).nodeDocument = $(fragment).nodeDocument;
     $(contentElement).host = $(fragment).host;
     $(templateElement).templateContents = contentElement;
@@ -79,8 +93,8 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
       name,
       publicId,
       systemId,
-      nodeDocument: document,
     });
+    $(documentType).nodeDocument = document;
 
     document.appendChild(documentType);
   }
@@ -230,8 +244,8 @@ class AttrConvertor {
       namespacePrefix: attribute.prefix,
       localName: attribute.name,
       value: attribute.value,
-      nodeDocument: document,
     });
+    $(attr).nodeDocument = document;
 
     return attr;
   }

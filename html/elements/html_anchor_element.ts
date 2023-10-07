@@ -15,8 +15,8 @@ import { encodingParseAndSerializeURL } from "../infra/url.ts";
 @HTMLHyperlinkElementUtils
 export class HTMLAnchorElement extends HTMLElement
   implements IHTMLAnchorElement {
-  constructor(...args: any) {
-    super(...args);
+  constructor() {
+    super();
 
     internalSlots.get<HTMLAnchorElement>(this).activationBehavior = (event) => {
       // 1. If element has no href attribute, then return.

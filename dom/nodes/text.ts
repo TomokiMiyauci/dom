@@ -19,7 +19,9 @@ export class Text extends CharacterData implements IText {
     data = String(data);
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    super(data, globalThis.document);
+    super(data);
+    $<Text>(this).data = data;
+    $<Text>(this).nodeDocument = globalThis.document;
   }
 
   override get nodeType(): NodeType.TEXT_NODE | NodeType.CDATA_SECTION_NODE {
