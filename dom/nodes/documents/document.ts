@@ -587,8 +587,9 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new ProcessingInstruction node, with target set to target, data set to data, and node document set to this.
-    const node = new ProcessingInstruction({ data, target });
-    $(node).nodeDocument = this;
+    const node = new ProcessingInstruction();
+    $(node).nodeDocument = this, $(node).target = target, $(node).data = data;
+
     return node;
   }
 

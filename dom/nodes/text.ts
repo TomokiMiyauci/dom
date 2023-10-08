@@ -15,11 +15,11 @@ export class Text extends CharacterData implements IText {
    * @see https://dom.spec.whatwg.org/#dom-text-text
    */
   constructor(data: string = "") {
+    super();
     // Current Restrictions: parameter decorator alone cannot override arguments
     data = String(data);
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    super(data);
     $<Text>(this).data = data;
     $<Text>(this).nodeDocument = globalThis.document;
   }

@@ -8,8 +8,8 @@ export class Comment extends CharacterData implements IComment {
    * @see https://dom.spec.whatwg.org/#dom-comment-comment
    */
   constructor(data: string = "") {
+    super();
     data = String(data);
-    super(data);
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
     $<Comment>(this).data = data,

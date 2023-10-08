@@ -6,14 +6,12 @@ import { $, internalSlots } from "../../internal.ts";
 
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
-  constructor(
-    { data, target }: { data: string; target: string },
-  ) {
-    super(data);
+  constructor() {
+    super();
 
     internalSlots.extends<ProcessingInstruction>(
       this,
-      new ProcessingInstructionInternals(target),
+      new ProcessingInstructionInternals(),
     );
   }
 
@@ -29,11 +27,10 @@ export class ProcessingInstruction extends CharacterData
   }
 
   protected override clone(document: Document): ProcessingInstruction {
-    const node = new ProcessingInstruction({
-      data: this.#_.data,
-      target: this.#_.target,
-    });
-    $(node).nodeDocument = document;
+    const node = new ProcessingInstruction();
+    $(node).nodeDocument = document,
+      $(node).target = this.#_.target,
+      $(node).data = this.#_.data;
 
     return node;
   }
@@ -47,9 +44,5 @@ export class ProcessingInstructionInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-pi-target)
    */
-  target: string;
-
-  constructor(target: string) {
-    this.target = target;
-  }
+  target!: string;
 }

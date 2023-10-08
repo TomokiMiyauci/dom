@@ -7,12 +7,12 @@ import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
 
 export abstract class CharacterData extends Node implements ICharacterData {
-  constructor(data: string) {
+  constructor() {
     super();
 
     internalSlots.extends<CharacterData>(
       this,
-      new CharacterDataInternals(data),
+      new CharacterDataInternals(),
     );
   }
 
@@ -146,9 +146,5 @@ export class CharacterDataInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
    */
-  data: string;
-
-  constructor(data: string) {
-    this.data = data;
-  }
+  data!: string;
 }
