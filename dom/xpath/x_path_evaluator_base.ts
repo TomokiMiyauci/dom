@@ -1,26 +1,29 @@
-import { UnImplemented } from "../../utils.ts";
 import { type Node } from "../nodes/node.ts";
 import { type IXPathEvaluatorBase } from "../../interface.d.ts";
 
 export class XPathEvaluatorBase implements IXPathEvaluatorBase {
   createExpression(
-    expression: string,
-    resolver?: XPathNSResolver | null | undefined,
+    _expression: string,
+    _resolver: XPathNSResolver | null = null,
   ): XPathExpression {
-    throw new UnImplemented();
+    throw new Error("createExpression is not supported");
   }
 
+  /**
+   * @see [HTML Living Standard](https://dom.spec.whatwg.org/#dom-xpathevaluatorbase-creatensresolver)
+   */
   createNSResolver(nodeResolver: Node): Node {
-    throw new UnImplemented();
+    // return nodeResolver.
+    return nodeResolver;
   }
 
   evaluate(
-    expression: string,
-    contextNode: Node,
-    resolver?: XPathNSResolver | null | undefined,
-    type?: number | undefined,
-    result?: XPathResult | null | undefined,
+    _expression: string,
+    _contextNode: Node,
+    _resolver: XPathNSResolver | null = null,
+    _type = 0,
+    _result: XPathResult | null = null,
   ): XPathResult {
-    throw new UnImplemented();
+    throw new Error("evaluate is not supported");
   }
 }
