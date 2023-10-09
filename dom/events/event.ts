@@ -10,7 +10,7 @@ import { Steps } from "../infra/applicable.ts";
  */
 export type PotentialEventTarget = EventTarget | null;
 
-@Exposed("*")
+@Exposed("*", "Event")
 export class Event implements IEvent {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-event-event)

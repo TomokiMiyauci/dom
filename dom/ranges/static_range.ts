@@ -5,7 +5,7 @@ import { Exposed } from "../../webidl/extended_attribute.ts";
 import { isAttr, isDocumentType } from "../nodes/utils.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 
-@Exposed(Window)
+@Exposed("Window", "StaticRange")
 export class StaticRange extends AbstractRange implements IStaticRange {
   constructor(init: StaticRangeInit) {
     const startContainer = init.startContainer;

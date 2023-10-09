@@ -5,7 +5,9 @@ import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes
 import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
 import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "CharacterData")
 export abstract class CharacterData extends Node implements ICharacterData {
   constructor() {
     super();

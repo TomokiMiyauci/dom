@@ -12,7 +12,7 @@ import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import { convert, DOMString, unsignedLong } from "../../../webidl/types.ts";
 import { $, tree } from "../../../internal.ts";
 
-@Exposed(Window)
+@Exposed("Window", "HTMLCollection")
 @LegacyUnenumerableNamedProperties
 export class HTMLCollection extends LegacyPlatformObject
   implements IHTMLCollection {

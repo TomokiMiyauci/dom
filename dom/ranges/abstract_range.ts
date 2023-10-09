@@ -3,7 +3,7 @@ import { BoundaryPoint } from "./boundary_point.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
 
-@Exposed(Window)
+@Exposed("Window", "AbstractRange")
 export abstract class AbstractRange implements IAbstractRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-startcontainer

@@ -7,7 +7,9 @@ import {
   prepareScriptElement,
 } from "./elements/scripting/html_script_element_utils.ts";
 import { fireEvent } from "../dom/events/fire.ts";
+import { Exposed } from "../webidl/extended_attribute.ts";
 
+@Exposed("Window", "DOMParser")
 export class DOMParser implements IDOMParser {
   parseFromString(
     string: string,
@@ -35,7 +37,7 @@ export class DOMParser implements IDOMParser {
             fireEvent("load", script);
           }
 
-          dispatchEvent(new Event("load"));
+          fireEvent("load", globalThis);
         });
 
         return result;

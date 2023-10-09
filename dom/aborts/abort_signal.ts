@@ -13,7 +13,7 @@ import {
   runStepsAfterTimeout,
 } from "./abort_signal_utils.ts";
 
-@Exposed("*")
+@Exposed("*", "AbortSignal")
 export class AbortSignal extends EventTarget implements IAbortSignal {
   constructor() {
     super();

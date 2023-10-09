@@ -21,4 +21,4 @@ export const NodeFilter: INodeFilter = {
   SHOW_NOTATION: 0x800,
 };
 
-Exposed(Window)(NodeFilter);
+Exposed("Window", "NodeFilter")(NodeFilter);

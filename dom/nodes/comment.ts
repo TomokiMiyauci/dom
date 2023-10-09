@@ -2,7 +2,9 @@ import { NodeType } from "./node.ts";
 import { CharacterData } from "./character_data.ts";
 import { IComment } from "../../interface.d.ts";
 import { $ } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "Comment")
 export class Comment extends CharacterData implements IComment {
   /**
    * @see https://dom.spec.whatwg.org/#dom-comment-comment

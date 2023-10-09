@@ -11,7 +11,7 @@ import { $, internalSlots } from "../../../internal.ts";
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-mutationobserver)
  */
-@Exposed(Window)
+@Exposed("Window", "MutationObserver")
 export class MutationObserver implements IMutationObserver {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-mutationobserver-mutationobserver)

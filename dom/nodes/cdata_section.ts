@@ -3,7 +3,7 @@ import { NodeType } from "./node.ts";
 import type { ICDATASection } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
-@Exposed(Window)
+@Exposed("Window", "CDATASection")
 export class CDATASection extends Text implements ICDATASection {
   constructor() {
     super();

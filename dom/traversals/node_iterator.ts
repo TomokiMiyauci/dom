@@ -6,7 +6,7 @@ import { Steps } from "../infra/applicable.ts";
 import { iter, last } from "../../deps.ts";
 import { first } from "npm:itertools@2.1.2";
 
-@Exposed(Window)
+@Exposed("Window", "NodeIterator")
 export class NodeIterator implements INodeIterator {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-nodeiterator-root)

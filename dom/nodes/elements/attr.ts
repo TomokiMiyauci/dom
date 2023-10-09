@@ -3,7 +3,9 @@ import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
 import { $, internalSlots } from "../../../internal.ts";
 import { setExistAttributeValue } from "./attr_utils.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "Attr")
 export class Attr extends Node implements IAttr {
   constructor() {
     super();

@@ -39,6 +39,7 @@ import {
 import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
+import { MouseEvent } from "../../../uievents/mouse_event.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
 import { adoptNode, isHTMLDocument } from "./document_utils.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
@@ -46,9 +47,11 @@ import {
   OpaqueOrigin,
   Origin,
 } from "../../../html/loading_web_pages/supporting_concepts.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 
+@Exposed("Window", "Document")
 export class Document extends Node implements IDocument {
   constructor() {
     super();
@@ -835,6 +838,8 @@ const eventMap = new Map<string, typeof Event>(
     ["event", Event],
     ["events", Event],
     ["htmlevents", Event],
+    ["mouseevent", MouseEvent],
+    ["mouseevents", MouseEvent],
     ["svgevents", Event],
   ],
 );

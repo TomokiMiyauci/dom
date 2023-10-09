@@ -7,7 +7,7 @@ import { Event, initialize } from "./event.ts";
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-customevent)
  */
-@Exposed("*")
+@Exposed("*", "CustomEvent")
 export class CustomEvent<T = any> extends Event implements ICustomEvent {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-customevent-customevent)

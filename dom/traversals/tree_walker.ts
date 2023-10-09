@@ -5,7 +5,7 @@ import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
 import { $, tree } from "../../internal.ts";
 import { traverseChildren, traverseSiblings } from "./tree_walker_utils.ts";
 
-@Exposed(Window)
+@Exposed("Window", "TreeWalker")
 export class TreeWalker implements ITreeWalker {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-treewalker-root)

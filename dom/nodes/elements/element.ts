@@ -46,7 +46,9 @@ import {
 import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
 import { replaceAllString } from "../utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../../../selectors/hook.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "Element")
 export class Element extends Node implements IElement {
   constructor() {
     super();

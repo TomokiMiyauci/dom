@@ -41,7 +41,7 @@ import {
 
 @Range_CSSOM
 @Range_DOMParsing
-@Exposed(Window)
+@Exposed("Window", "Range")
 export class Range extends AbstractRange implements IRange {
   protected override get _(): AbstractRangeInternals {
     return $<Range>(this);

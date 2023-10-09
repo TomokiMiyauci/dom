@@ -9,7 +9,7 @@ import { Get } from "../../utils.ts";
 import { splitText } from "./utils/split_text.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
-@Exposed(Window)
+@Exposed("Window", "Text")
 export class Text extends CharacterData implements IText {
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-text

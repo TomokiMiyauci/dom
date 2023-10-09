@@ -1,8 +1,20 @@
-const map = new Map<object, object>();
+export const map = new Map<object, Metadata>();
 
-export function Exposed(global: object): (target: object) => void {
+export type Global = "Window";
+
+interface Metadata {
+  scope: Global;
+  name: string;
+}
+
+export function Exposed(
+  global: Global | "*",
+  name: string,
+): (target: object) => void {
   return (target): void => {
-    map.set(target, global);
+    if (global === "*") global = "Window";
+
+    map.set(target, { scope: global, name });
   };
 }
 

@@ -65,7 +65,7 @@ enum Position {
   DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32,
 }
 
-@Exposed(Window)
+@Exposed("Window", "Node")
 export abstract class Node extends EventTarget implements INode {
   @constant
   static DOCUMENT_POSITION_DISCONNECTED =

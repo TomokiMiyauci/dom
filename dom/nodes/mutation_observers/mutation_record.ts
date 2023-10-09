@@ -4,7 +4,7 @@ import { Exposed } from "../../../webidl/extended_attribute.ts";
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationrecord)
  */
-@Exposed(Window)
+@Exposed("Window", "MutationRecord")
 export class MutationRecord implements IMutationRecord {
   constructor(
     readonly type: MutationRecordType,
