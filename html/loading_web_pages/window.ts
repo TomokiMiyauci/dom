@@ -12,20 +12,32 @@ import { BrowsingContext } from "./infrastructure_for_sequences_of_documents/bro
 import { stopLoading } from "./document_lifecycle.ts";
 import { PutForwards } from "../../webidl/extended_attribute.ts";
 import { Location } from "./location.ts";
-import { Window_Selection } from "../../selection/window.ts";
 import { LegacyUnenumerableNamedProperties } from "../../webidl/legacy_extended_attributes.ts";
+import { map } from "../../webidl/extended_attribute.ts";
 
-@WindowEventHandlers
-@Window_Selection
-@LegacyUnenumerableNamedProperties
+// @WindowEventHandlers
+// @Window_Selection
+// @LegacyUnenumerableNamedProperties
 export class Window extends EventTarget implements IWindow {
-  constructor() {
+  constructor(url: URL) {
     super();
 
+    const internals = new WindowInternals();
+    $(internals.document).URL = url;
+    $(internals.location).document = internals.document;
     internalSlots.extends<globalThis.Window>(
       this as any,
-      new WindowInternals(),
+      internals,
     );
+
+    const objects = [...map.entries()].filter(([_, data]) =>
+      data.scope === "Window"
+    )
+      .map(([first, { name }]) => [name, { value: first }] as const);
+
+    const descriptorMap = Object.fromEntries(objects);
+
+    Object.defineProperties(this, descriptorMap);
   }
 
   get clientInformation(): Navigator {
@@ -70,6 +82,12 @@ export class Window extends EventTarget implements IWindow {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-frames)
    */
   get frames(): WindowProxy {
+    const iframes = (this.document as Document).querySelectorAll(
+      "iframe",
+    );
+
+    return [...iframes].map((iframe) => iframe.contentWindow) as any;
+
     // return this's relevant realm.[[GlobalEnv]].[[GlobalThisValue]].
     return this as any;
   }
@@ -195,17 +213,18 @@ export class Window extends EventTarget implements IWindow {
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-parent)
    */
   get parent(): WindowProxy {
-    // 1. Let navigable be this's navigable.
-    const navigable = this.#navigable;
+    return globalThis as any;
+    // // 1. Let navigable be this's navigable.
+    // const navigable = this.#navigable;
 
-    // 2. If navigable is null, then return null.
-    if (!navigable) return null!;
+    // // 2. If navigable is null, then return null.
+    // if (!navigable) return null!;
 
-    // 3. If navigable's parent is not null, then set navigable to navigable's parent.
-    if (!navigable.parent) navigable.parent = navigable;
+    // // 3. If navigable's parent is not null, then set navigable to navigable's parent.
+    // if (!navigable.parent) navigable.parent = navigable;
 
-    // 4. Return navigable's active WindowProxy.
-    return activeWindow(navigable)!;
+    // // 4. Return navigable's active WindowProxy.
+    // return activeWindow(navigable)!;
   }
 
   get personalbar(): BarProp {
@@ -388,7 +407,7 @@ export class Window extends EventTarget implements IWindow {
   }
 }
 
-export interface Window extends WindowEventHandlers, Window_Selection {
+export interface Window extends WindowEventHandlers {
   addEventListener<K extends keyof WindowEventMap>(
     type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => any,
