@@ -1,24 +1,12 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentType } from "../../interface.d.ts";
-import type { PartialBy } from "../../deps.ts";
 import { $, internalSlots } from "../../internal.ts";
 
-type Optional = "publicId" | "systemId";
-
 export class DocumentType extends Node implements IDocumentType {
-  constructor(
-    { name, publicId = "", systemId = "" }: PartialBy<
-      Pick<
-        DocumentTypeInternals,
-        "name" | "publicId" | "systemId"
-      >,
-      Optional
-    >,
-  ) {
+  constructor() {
     super();
 
-    const internal = new DocumentTypeInternals({ name });
-    internal.publicId = publicId, internal.systemId = systemId;
+    const internal = new DocumentTypeInternals();
     internalSlots.extends<DocumentType>(this, internal);
   }
 
@@ -68,15 +56,12 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   protected override clone(document: Document): DocumentType {
-    const doctype = new DocumentType(
-      {
-        name: this.#_.name,
-        publicId: this.#_.publicId,
-        systemId: this.#_.systemId,
-      },
-    );
+    const doctype = new DocumentType();
 
-    $(doctype).nodeDocument = document;
+    $(doctype).name = this.#_.name,
+      $(doctype).publicId = this.#_.publicId,
+      $(doctype).systemId = this.#_.systemId,
+      $(doctype).nodeDocument = document;
 
     return doctype;
   }
@@ -102,7 +87,7 @@ export class DocumentTypeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
    */
-  name: string;
+  name!: string;
 
   /**
    * @default ""
@@ -115,10 +100,4 @@ export class DocumentTypeInternals {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-systemid)
    */
   systemId = "";
-
-  constructor(
-    { name }: Pick<DocumentTypeInternals, "name">,
-  ) {
-    this.name = name;
-  }
 }

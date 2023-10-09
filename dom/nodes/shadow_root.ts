@@ -10,10 +10,10 @@ import { internalSlots } from "../../internal.ts";
  * @see https://dom.spec.whatwg.org/#interface-shadowroot
  */
 export class ShadowRoot extends DocumentFragment implements IShadowRoot {
-  constructor({ host }: { host: Element }) {
+  constructor() {
     super();
 
-    internalSlots.extends<ShadowRoot>(this, new ShadowRootInternals(host));
+    internalSlots.extends<ShadowRoot>(this, new ShadowRootInternals());
   }
 
   /**
@@ -88,9 +88,6 @@ export class ShadowRootInternals {
   availableElementInternals = false;
 
   slotAssignment: SlotAssignmentMode = "named";
-  host: Element;
 
-  constructor(host: Element) {
-    this.host = host;
-  }
+  host!: Element;
 }

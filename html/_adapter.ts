@@ -89,12 +89,11 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     publicId: string,
     systemId: string,
   ): void {
-    const documentType = new DocumentType({
-      name,
-      publicId,
-      systemId,
-    });
-    $(documentType).nodeDocument = document;
+    const documentType = new DocumentType();
+    $(documentType).name = name,
+      $(documentType).publicId = publicId,
+      $(documentType).systemId = systemId,
+      $(documentType).nodeDocument = document;
 
     document.appendChild(documentType);
   }
@@ -239,12 +238,11 @@ class AttrConvertor {
   }
 
   static to(attribute: Token.Attribute, document: Document): Attr {
-    const attr = new Attr({
-      namespace: attribute.namespace,
-      namespacePrefix: attribute.prefix,
-      localName: attribute.name,
-      value: attribute.value,
-    });
+    const attr = new Attr();
+    if (attribute.namespace) $(attr).namespace = attribute.namespace;
+    if (attribute.prefix) $(attr).namespacePrefix = attribute.prefix;
+    $(attr).localName = attribute.name;
+    $(attr).value = attribute.value;
     $(attr).nodeDocument = document;
 
     return attr;

@@ -263,12 +263,12 @@ export class Element extends Node implements IElement {
     }
 
     // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
-    const shadow = new ShadowRoot({ host: this });
-    $(shadow).mode = init.mode;
+    const shadow = new ShadowRoot();
     $(shadow).nodeDocument = this.#_.nodeDocument;
-
-    // 6. Set shadow’s delegates focus to init["delegatesFocus"].
-    $(shadow).delegatesFocus = init.delegatesFocus ?? false;
+    $(shadow).host = this,
+      $(shadow).mode = init.mode,
+      // 6. Set shadow’s delegates focus to init["delegatesFocus"].
+      $(shadow).delegatesFocus = init.delegatesFocus ?? false;
 
     const { customElementState } = this.#_;
     // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
@@ -538,11 +538,10 @@ export class Element extends Node implements IElement {
 
     // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
     if (attribute === null) {
-      const attribute = new Attr({
-        localName: qualifiedName,
-        value,
-      });
-      $(attribute).nodeDocument = this.#_.nodeDocument;
+      const attribute = new Attr();
+      $(attribute).localName = qualifiedName,
+        $(attribute).value = value,
+        $(attribute).nodeDocument = this.#_.nodeDocument;
 
       appendAttribute(attribute, this);
       return;
@@ -615,11 +614,10 @@ export class Element extends Node implements IElement {
       // 1. If force is not given or is true,
       if (typeof force === "undefined" || force) {
         // create an attribute whose local name is qualifiedName, value is the empty string, and node document is this’s node document,
-        const attr = new Attr({
-          localName: qualifiedName,
-          value: "",
-        });
-        $(attr).nodeDocument = this.#_.nodeDocument;
+        const attr = new Attr();
+        $(attr).localName = qualifiedName,
+          $(attr).value = "",
+          $(attr).nodeDocument = this.#_.nodeDocument;
 
         // then append this attribute to this,
         appendAttribute(attr, this);

@@ -25,13 +25,12 @@ export function setAttributeValue(
 
   // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
   if (attribute === null) {
-    const attr = new Attr({
-      namespace,
-      namespacePrefix: prefix,
-      localName,
-      value,
-    });
-    $(attr).nodeDocument = $(element).nodeDocument;
+    const attr = new Attr();
+    $(attr).namespace = namespace,
+      $(attr).namespacePrefix = prefix,
+      $(attr).localName = localName,
+      $(attr).value = value,
+      $(attr).nodeDocument = $(element).nodeDocument;
 
     appendAttribute(attr, element);
     return;

@@ -247,8 +247,8 @@ export class Document extends Node implements IDocument {
     if (isHTMLDocument(this)) localName = toASCIILowerCase(localName);
 
     // 3. Return a new attribute whose local name is localName and node document is this.
-    const attribute = new Attr({ localName });
-    $(attribute).nodeDocument = this;
+    const attribute = new Attr();
+    $(attribute).localName = localName, $(attribute).nodeDocument = this;
 
     return attribute;
   }
@@ -267,12 +267,11 @@ export class Document extends Node implements IDocument {
     );
 
     // 2. Return a new attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, and node document is this.
-    const attribute = new Attr({
-      localName,
-      namespacePrefix: prefix,
-      namespace: ns,
-    });
-    $(attribute).nodeDocument = this;
+    const attribute = new Attr();
+    $(attribute).localName = localName,
+      $(attribute).namespacePrefix = prefix,
+      $(attribute).namespace = ns,
+      $(attribute).nodeDocument = this;
 
     return attribute;
   }

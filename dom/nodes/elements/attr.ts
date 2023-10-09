@@ -1,37 +1,14 @@
 import { Node, NodeType } from "../node.ts";
-import { type PartialBy } from "../../../deps.ts";
 import type { IAttr } from "../../../interface.d.ts";
 import { getQualifiedName } from "../utils.ts";
 import { $, internalSlots } from "../../../internal.ts";
 import { setExistAttributeValue } from "./attr_utils.ts";
 
-type Required = "localName";
-
-type Optional =
-  | "namespace"
-  | "namespacePrefix"
-  | "value"
-  | "element";
-
 export class Attr extends Node implements IAttr {
-  constructor(
-    {
-      namespace = null,
-      namespacePrefix = null,
-      localName,
-      element = null,
-      value = "",
-    }: PartialBy<Pick<AttrInternals, Required | Optional>, Optional>,
-  ) {
+  constructor() {
     super();
 
-    const internal = new AttrInternals({
-      namespace,
-      namespacePrefix,
-      value,
-      localName,
-      element,
-    });
+    const internal = new AttrInternals();
     internalSlots.extends<Attr>(this, internal);
   }
 
@@ -164,59 +141,44 @@ export class AttrInternals {
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
    */
-  namespace: string | null;
+  namespace: string | null = null;
 
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix
    */
-  namespacePrefix: string | null;
+  namespacePrefix: string | null = null;
 
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-local-name
    */
-  localName: string;
+  localName!: string;
 
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-value
    */
-  value: string;
+  value = "";
 
   /**
    * @see https://dom.spec.whatwg.org/#concept-attribute-element
    */
-  element: Element | null;
-
-  constructor(
-    { namespace, localName, value, element, namespacePrefix }: Pick<
-      AttrInternals,
-      | "namespace"
-      | "localName"
-      | "value"
-      | "element"
-      | "namespacePrefix"
-    >,
-  ) {
-    this.namespace = namespace;
-    this.localName = localName;
-    this.value = value;
-    this.element = element;
-    this.namespacePrefix = namespacePrefix;
-
-    Object.defineProperty(this, "qualifiedName", {
-      get: () => getQualifiedName(this.localName, this.namespacePrefix),
-    });
-  }
+  element: Element | null = null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
    */
-  qualifiedName!: string;
+  get qualifiedName(): string {
+    return getQualifiedName(this.localName, this.namespacePrefix);
+  }
 }
 
 export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
-  const attribute = new Attr({ ...$(attr) });
-
-  $(attribute).nodeDocument = document;
+  const attribute = new Attr();
+  $(attribute).localName = $(attr).localName,
+    $(attribute).value = $(attr).value,
+    $(attribute).namespace = $(attr).namespace,
+    $(attribute).namespacePrefix = $(attr).namespacePrefix,
+    $(attribute).element = $(attr).element,
+    $(attribute).nodeDocument = document;
 
   return attribute;
 }
