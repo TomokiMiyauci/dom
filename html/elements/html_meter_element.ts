@@ -1,6 +1,8 @@
 import type { IHTMLMeterElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLMeterElement")
 export class HTMLMeterElement extends HTMLElement implements IHTMLMeterElement {
   get high(): number {
     throw new Error("high#getter");

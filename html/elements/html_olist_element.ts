@@ -1,6 +1,8 @@
 import type { IHTMLOListElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLOListElement")
 export class HTMLOListElement extends HTMLElement implements IHTMLOListElement {
   get compact(): boolean {
     throw new Error("compact#getter");

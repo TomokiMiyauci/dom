@@ -1,6 +1,8 @@
 import type { IHTMLModElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLModElement")
 export class HTMLModElement extends HTMLElement implements IHTMLModElement {
   get cite(): string {
     throw new Error("cite#getter");

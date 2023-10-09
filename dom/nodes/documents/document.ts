@@ -805,6 +805,7 @@ export class DocumentInternals {
   }
 }
 
+@Exposed("Window", "XMLDocument")
 export class XMLDocument extends Document implements IXMLDocument {}
 
 /**

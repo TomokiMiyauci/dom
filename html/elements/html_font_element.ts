@@ -1,6 +1,8 @@
 import type { IHTMLFontElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLFontElement")
 export class HTMLFontElement extends HTMLElement implements IHTMLFontElement {
   get color(): string {
     throw new Error("color#getter");

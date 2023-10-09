@@ -1,6 +1,8 @@
 import type { IHTMLMediaElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLMediaElement")
 export class HTMLMediaElement extends HTMLElement implements IHTMLMediaElement {
   get autoplay(): boolean {
     throw new Error("autoplay#getter");

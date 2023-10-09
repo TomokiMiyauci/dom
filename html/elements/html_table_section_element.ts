@@ -3,7 +3,9 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
 import { tree } from "../../internal.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLTableSectionElement")
 export class HTMLTableSectionElement extends HTMLElement
   implements IHTMLTableSectionElement {
   get align(): string {

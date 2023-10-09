@@ -3,7 +3,9 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLOutputElement")
 export class HTMLOutputElement extends HTMLElement
   implements IHTMLOutputElement {
   get defaultValue(): string {

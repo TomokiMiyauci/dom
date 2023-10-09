@@ -2,15 +2,21 @@ import type { ILocation } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { stringifier } from "../../webidl/idl.ts";
 import { browsingContext } from "./window_utils.ts";
-import { $ } from "../../internal.ts";
+import { $, internalSlots } from "../../internal.ts";
 import { activeDocument } from "./infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { URLSerializer } from "../../url/serializer.ts";
 import { sameOriginDomain } from "./supporting_concepts.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { encodingParseURL } from "../infra/url.ts";
 
-@Exposed(Window)
+@Exposed("Window", "Location")
 export class Location implements ILocation {
+  constructor() {
+    const internals = new LocationInternals();
+
+    internalSlots.extends<Location>(this, internals);
+  }
+
   /**
    * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/nav-history-apis.html#dom-location-href)
    */
@@ -47,7 +53,7 @@ export class Location implements ILocation {
   }
 
   get origin(): string {
-    throw new Error("origin#getter");
+    return this.#_.url.origin;
   }
 
   get protocol(): string {
@@ -147,8 +153,11 @@ export class LocationInternals {
   }
 
   get url(): URL {
-    const document = this.relevantDocument;
+    const document = this.document;
 
     return document ? $(document).URL : new URL("about:blank");
   }
+
+  // NON-standard
+  document!: Document;
 }

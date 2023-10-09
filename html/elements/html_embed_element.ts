@@ -1,6 +1,8 @@
 import type { IHTMLEmbedElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLEmbedElement")
 export class HTMLEmbedElement extends HTMLElement implements IHTMLEmbedElement {
   get align(): string {
     throw new Error("align#getter");

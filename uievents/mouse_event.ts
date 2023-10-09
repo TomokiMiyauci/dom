@@ -2,7 +2,7 @@ import type { IMouseEvent } from "../interface.d.ts";
 import { UIEvent } from "./ui_event.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 
-@Exposed(Window)
+@Exposed("Window", "MouseEvent")
 export class MouseEvent extends UIEvent implements IMouseEvent {
   get screenX(): number {
     throw new Error("screenX");

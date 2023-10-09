@@ -1,6 +1,8 @@
 import type { IHTMLProgressElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLProgressElement")
 export class HTMLProgressElement extends HTMLElement
   implements IHTMLProgressElement {
   get labels(): NodeListOf<HTMLLabelElement> {

@@ -1,6 +1,8 @@
 import type { IHTMLSelectElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLSelectElement")
 export class HTMLSelectElement extends HTMLElement
   implements IHTMLSelectElement {
   [name: number]: HTMLOptionElement | HTMLOptGroupElement;

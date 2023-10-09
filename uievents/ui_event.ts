@@ -2,7 +2,7 @@ import type { IUIEvent } from "../interface.d.ts";
 import { Event } from "../dom/events/event.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 
-@Exposed(Window)
+@Exposed("Window", "UIEvent")
 export class UIEvent extends Event implements IUIEvent {
   get view(): Window | null {
     throw new Error("view#getter");

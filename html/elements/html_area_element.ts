@@ -4,8 +4,10 @@ import { HTMLHyperlinkElementUtils } from "../html_hyperlink_element_utils.ts";
 import { DOMTokenList } from "../../dom/sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @HTMLHyperlinkElementUtils
+@Exposed("Window", "HTMLAreaElement")
 export class HTMLAreaElement extends HTMLElement implements IHTMLAreaElement {
   get alt(): string {
     throw new Error("alt#getter");

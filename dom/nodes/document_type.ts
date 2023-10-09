@@ -1,7 +1,9 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentType } from "../../interface.d.ts";
 import { $, internalSlots } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "DocumentType")
 export class DocumentType extends Node implements IDocumentType {
   constructor() {
     super();

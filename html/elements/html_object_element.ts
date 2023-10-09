@@ -1,6 +1,8 @@
 import type { IHTMLObjectElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLObjectElement")
 export class HTMLObjectElement extends HTMLElement
   implements IHTMLObjectElement {
   get align(): string {

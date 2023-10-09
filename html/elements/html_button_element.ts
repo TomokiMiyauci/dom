@@ -8,7 +8,9 @@ import {
   submit,
 } from "./forms/attributes_common_to_form_control.ts";
 import { userNavigationInvolvement } from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLButtonElement")
 export class HTMLButtonElement extends HTMLElement
   implements IHTMLButtonElement {
   constructor() {

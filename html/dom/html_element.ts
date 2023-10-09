@@ -14,11 +14,13 @@ import {
 } from "../elements/forms/attributes_common_to_form_control.ts";
 import { isElement } from "../../dom/nodes/utils.ts";
 import { isHTMLElement } from "../utils.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @ElementContentEditable
 @HTMLOrSVGElement
 @ElementCSSInlineStyle
 @HTMLElement_CSSOMView
+@Exposed("Window", "HTMLElement")
 export class HTMLElement extends Element implements IHTMLElement {
   constructor() {
     super();

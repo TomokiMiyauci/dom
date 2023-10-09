@@ -1,6 +1,8 @@
 import type { IHTMLLegendElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLLegendElement")
 export class HTMLLegendElement extends HTMLElement
   implements IHTMLLegendElement {
   get align(): string {

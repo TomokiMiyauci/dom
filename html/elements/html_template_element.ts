@@ -1,10 +1,13 @@
 import type { IHTMLTemplateElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { $ } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
 /**
  * @see https://html.spec.whatwg.org/multipage/scripting.html#the-template-element
  */
+
+@Exposed("Window", "HTMLTemplateElement")
 export class HTMLTemplateElement extends HTMLElement
   implements IHTMLTemplateElement {
   /**

@@ -3,7 +3,9 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLCollection } from "../../dom/nodes/node_trees/html_collection.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";
 import { tree } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLTableRowElement")
 export class HTMLTableRowElement extends HTMLElement
   implements IHTMLTableRowElement {
   get align(): string {

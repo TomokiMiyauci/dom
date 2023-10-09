@@ -6,7 +6,9 @@ import { SameObject } from "../../webidl/extended_attribute.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { removeNode } from "../../dom/nodes/node_trees/mutation.ts";
 import { isElement } from "../../dom/nodes/utils.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLTableElement")
 export class HTMLTableElement extends HTMLElement implements IHTMLTableElement {
   get align(): string {
     throw new Error("align#getter");

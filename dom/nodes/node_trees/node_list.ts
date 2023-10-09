@@ -5,6 +5,7 @@ import { LegacyPlatformObject } from "../../../webidl/legacy_extended_attributes
 import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
 import { $filter, $root } from "../internal.ts";
 import { tree } from "../../../internal.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-collection
@@ -40,6 +41,7 @@ abstract class CollectiveNodeList extends LegacyPlatformObject
 
 interface CollectiveNodeList extends Getter<"index", Node>, Iterable<Node> {}
 
+@Exposed("Window", "NodeList")
 export class NodeList extends CollectiveNodeList implements INodeList {
   [$root]: Node;
   [$filter]: (node: Node, root: Node) => boolean;

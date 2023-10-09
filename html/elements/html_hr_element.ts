@@ -1,6 +1,8 @@
 import type { IHTMLHRElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLHRElement")
 export class HTMLHRElement extends HTMLElement implements IHTMLHRElement {
   get align(): string {
     throw new Error("align#getter");

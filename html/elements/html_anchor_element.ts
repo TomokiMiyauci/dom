@@ -11,8 +11,10 @@ import {
   userNavigationInvolvement,
 } from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
 import { encodingParseAndSerializeURL } from "../infra/url.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @HTMLHyperlinkElementUtils
+@Exposed("Window", "HTMLAnchorElement")
 export class HTMLAnchorElement extends HTMLElement
   implements IHTMLAnchorElement {
   constructor() {

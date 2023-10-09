@@ -1,6 +1,8 @@
 import type { IHTMLTrackElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLTrackElement")
 export class HTMLTrackElement extends HTMLElement implements IHTMLTrackElement {
   get default(): boolean {
     throw new Error("default#getter");

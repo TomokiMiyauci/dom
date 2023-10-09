@@ -1,6 +1,8 @@
 import type { IHTMLSourceElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLSourceElement")
 export class HTMLSourceElement extends HTMLElement
   implements IHTMLSourceElement {
   get height(): number {

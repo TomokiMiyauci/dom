@@ -1,6 +1,8 @@
 import type { IHTMLFormElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLFormElement")
 export class HTMLFormElement extends HTMLElement implements IHTMLFormElement {
   [index: number]: Element;
   [name: string]: any;

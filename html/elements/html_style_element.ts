@@ -1,6 +1,8 @@
 import type { IHTMLStyleElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLStyleElement")
 export class HTMLStyleElement extends HTMLElement implements IHTMLStyleElement {
   get disabled(): boolean {
     throw new Error("disabled#getter");

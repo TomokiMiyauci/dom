@@ -1,6 +1,8 @@
 import type { IHTMLCanvasElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLCanvasElement")
 export class HTMLCanvasElement extends HTMLElement
   implements IHTMLCanvasElement {
   get height(): number {

@@ -4,7 +4,9 @@ import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
 import { $, internalSlots } from "../../internal.ts";
 import { isConnected } from "../../dom/nodes/node_trees/node_tree.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLInputElement")
 export class HTMLInputElement extends HTMLElement implements IHTMLInputElement {
   constructor() {
     super();

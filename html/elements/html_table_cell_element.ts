@@ -1,6 +1,8 @@
 import type { IHTMLTableCellElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLTableCellElement")
 export class HTMLTableCellElement extends HTMLElement
   implements IHTMLTableCellElement {
   get abbr(): string {

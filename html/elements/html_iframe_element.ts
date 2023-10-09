@@ -14,7 +14,9 @@ import {
 import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { reflectGet } from "../../dom/nodes/elements/element_utils.ts";
 import { fireEvent } from "../../dom/events/fire.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLIFrameElement")
 export class HTMLIFrameElement extends HTMLElement
   implements IHTMLIFrameElement {
   constructor() {

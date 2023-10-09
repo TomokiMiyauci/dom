@@ -9,7 +9,7 @@ import {
 } from "../../web_application_apis/scripting.ts";
 import { internalSlots } from "../../../internal.ts";
 
-@Exposed(Window)
+@Exposed("Window", "HTMLScriptElement")
 export class HTMLScriptElement extends HTMLElement
   implements IHTMLScriptElement {
   constructor(...args: any[]) {

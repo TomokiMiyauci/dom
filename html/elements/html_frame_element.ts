@@ -1,6 +1,8 @@
 import type { IHTMLFrameElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "HTMLFrameElement")
 export class HTMLFrameElement extends HTMLElement implements IHTMLFrameElement {
   get contentDocument(): Document | null {
     throw new Error("contentDocument");

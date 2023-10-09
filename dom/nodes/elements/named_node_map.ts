@@ -18,6 +18,7 @@ import { isHTMLDocument } from "../documents/document_utils.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
 import { $ } from "../../../internal.ts";
+import { Exposed } from "../../../webidl/extended_attribute.ts";
 
 const $attributeList = Symbol();
 
@@ -26,6 +27,7 @@ export interface NamedNodeMapInits {
   attributeList: List<Attr>;
 }
 
+@Exposed("Window", "NamedNodeMap")
 @LegacyUnenumerableNamedProperties
 export class NamedNodeMap extends LegacyPlatformObject
   implements INamedNodeMap {

@@ -1,4 +1,4 @@
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
-@Exposed(Window)
+@Exposed("Window", "Navigation")
 export class Navigation {}

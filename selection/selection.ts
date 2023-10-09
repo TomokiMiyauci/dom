@@ -12,7 +12,7 @@ import { nodeLength } from "../dom/nodes/node_trees/node_tree.ts";
 import { root, setStartOrEnd } from "../dom/ranges/range_utils.ts";
 import { Range } from "../dom/ranges/range.ts";
 
-@Exposed(Window)
+@Exposed("Window", "Selection")
 export class Selection implements ISelection {
   constructor() {
     const internal = new SelectionInternals();

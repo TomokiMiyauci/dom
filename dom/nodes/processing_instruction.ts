@@ -3,7 +3,9 @@ import { CharacterData } from "./character_data.ts";
 import { NodeType } from "./node.ts";
 import { Document } from "./documents/document.ts";
 import { $, internalSlots } from "../../internal.ts";
+import { Exposed } from "../../webidl/extended_attribute.ts";
 
+@Exposed("Window", "ProcessingInstruction")
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
   constructor() {
