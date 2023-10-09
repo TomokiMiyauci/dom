@@ -2,7 +2,13 @@ import { fromFileUrl } from "https://deno.land/std@0.190.0/path/mod.ts";
 import { parse } from "https://deno.land/std@0.190.0/jsonc/mod.ts";
 import { createHandler, Runner } from "./wpt-runner.ts";
 import pass from "./pass.json" assert { type: "json" };
-import * as DOM from "../mod.ts";
+import { Window } from "../mod.ts";
+import * as HTML from "../html/dom/html_element_algorithm.ts";
+import * as SVG from "../svg/tagname_map.ts";
+
+HTML.register();
+SVG.register();
+
 import "../html/elements/html_iframe_element_polyfill.ts";
 import "../domparsing/extends/all.ts";
 import "../html/loading_web_pages/events/event_target_internals.ts";
@@ -21,8 +27,6 @@ import "../selection/extends/all.ts";
 import "../svg/extends/all.ts";
 import "../css/css_font_loading/extends/all.ts";
 import "../cssom/extends/all.ts";
-
-import { $ } from "../internal.ts";
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));
 const wptRoot = fromFileUrl(wptRootURL);
@@ -50,40 +54,8 @@ Deno.test("wpt", async (t) => {
     await t.step({
       name: url.pathname,
       fn: async (t) => {
-        const window = new DOM.Window();
-        const document = new DOM.Document();
-        $(document).URL = url;
-
-        const runner = new Runner({
-          dispatchEvent: window.dispatchEvent.bind(window),
-          addEventListener: window.addEventListener.bind(window),
-          removeEventListener: window.removeEventListener.bind(window),
-          ...DOM,
-          location: {
-            href: url.href,
-            toString() {
-              return url.href;
-            },
-            get origin() {
-              return url.origin;
-            },
-          },
-          document,
-          get parent() {
-            return globalThis;
-          },
-          get frames() {
-            const iframes = (this.document as Document).querySelectorAll(
-              "iframe",
-            );
-
-            return [...iframes].map((iframe) => iframe.contentWindow);
-          },
-
-          getSelection() {
-            return (globalThis.document as Document).getSelection();
-          },
-        });
+        const window = new Window(url);
+        const runner = new Runner(window as any);
 
         const reports = await runner.run(url);
 

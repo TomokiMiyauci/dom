@@ -3,13 +3,17 @@ import {
   join,
   toFileUrl,
 } from "https://deno.land/std@0.190.0/path/mod.ts";
+import {
+  mapEntries,
+} from "https://deno.land/std@0.190.0/collections/map_entries.ts";
 import { typeByExtension } from "https://deno.land/std@0.190.0/media_types/mod.ts";
-import { DOMParser } from "../mod.ts";
 import { TestReport } from "./types.ts";
 import { PubSub } from "./pubsub.ts";
 import { EncodingHandler } from "./handlers/encoding.ts";
 import { RedirectHandler } from "./handlers/redirect.ts";
 import { type Handler } from "./handlers/types.ts";
+import { getPropertyDescriptors } from "../utils.ts";
+import { $, internalSlots } from "../internal.ts";
 
 const injectCode = `add_result_callback((t) => {
   pubsub.publish(t._structured_clone)
@@ -105,21 +109,27 @@ export class Runner {
 
   async run(url: URL): Promise<AsyncIterable<TestReport>> {
     const content = await this.resolve(url);
-    const { location, ...rest } = Object.getOwnPropertyDescriptors(this.window);
+
+    internalSlots.extends(globalThis, internalSlots.get(this.window));
+
+    const windowDesc = getPropertyDescriptors(this.window);
+    const desc = mapEntries(
+      windowDesc,
+      ([name, desc]) => [
+        name,
+        /^[A-Z]/.test(name) ? desc : bindDescriptor(this.window, desc),
+      ],
+    );
+
+    const { location, window: _, self, ...rest } = desc;
 
     Object.defineProperties(globalThis, rest);
-    if (location) {
-      (globalThis as any)["location"] = this.window["location"];
-    }
+    // Avoid re-setting error. It maybe be Deno's bug.
+    if (location) (globalThis as any)["location"] = this.window["location"];
 
     const parser = new this.window.DOMParser();
     const document = parser.parseFromString(content, "text/html");
-
-    Object.defineProperty(globalThis, "document", {
-      value: document,
-      configurable: true,
-      writable: true,
-    });
+    ($(this.window) as any).document = document;
 
     if (!document.scripts.length) {
       this.#pubsub.unsubscribe();
@@ -127,4 +137,26 @@ export class Runner {
 
     return this.#pubsub;
   }
+}
+
+function bindDescriptor(
+  target: object,
+  desc: PropertyDescriptor,
+): PropertyDescriptor {
+  if ("value" in desc) {
+    const value: unknown = desc.value;
+
+    return {
+      ...desc,
+      value: typeof value === "function" ? value.bind(target) : value,
+    };
+  }
+
+  const { get, set, ...rest } = desc;
+
+  return {
+    ...rest,
+    get: get && get.bind(target),
+    set: set && set.bind(target),
+  };
 }
