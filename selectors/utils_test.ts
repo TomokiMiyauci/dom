@@ -6,13 +6,11 @@ import { createParser } from "npm:css-selector-parser@2.3.2";
 
 const parser = createParser();
 
-console.log(parser("div > div2 > div3"));
-
 describe("astToSelectorList", () => {
   it("should return selector list", () => {
     const table: [string, SelectorList][] = [
       ["div", [[[
-        [{ type: "type", value: "div" }],
+        [{ type: "type", value: "div", namespace: undefined }],
       ]]]],
       [".class", [[[
         [{ type: "class", value: "class" }],
@@ -21,7 +19,7 @@ describe("astToSelectorList", () => {
         [{ type: "id", value: "id" }],
       ]]]],
       ["[name]", [[[
-        [{ type: "attr", name: "name" }],
+        [{ type: "attr", name: "name", namespace: undefined }],
       ]]]],
       ["[name=value]", [[[
         [{
@@ -29,6 +27,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.ExactEq,
+          namespace: undefined,
         }],
       ]]]],
       ["[name~=value]", [[[
@@ -37,6 +36,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.OneOf,
+          namespace: undefined,
         }],
       ]]]],
       ["[name*=value]", [[[
@@ -45,6 +45,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.PartOf,
+          namespace: undefined,
         }],
       ]]]],
       ["[name^=value]", [[[
@@ -53,6 +54,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.StartWith,
+          namespace: undefined,
         }],
       ]]]],
       ["[name$=value]", [[[
@@ -61,6 +63,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.EndWith,
+          namespace: undefined,
         }],
       ]]]],
       ["[name|=value]", [[[
@@ -69,6 +72,7 @@ describe("astToSelectorList", () => {
           name: "name",
           value: "value",
           operator: Operator.HyphenOf,
+          namespace: undefined,
         }],
       ]]]],
       ["[name=value i]", [[[
@@ -78,6 +82,7 @@ describe("astToSelectorList", () => {
           value: "value",
           operator: Operator.ExactEq,
           case: Case.i,
+          namespace: undefined,
         }],
       ]]]],
       ["[name=value s]", [[[
@@ -87,6 +92,7 @@ describe("astToSelectorList", () => {
           value: "value",
           operator: Operator.ExactEq,
           case: Case.s,
+          namespace: undefined,
         }],
       ]]]],
       [":valid", [[[
@@ -96,7 +102,7 @@ describe("astToSelectorList", () => {
         [{
           type: "pseudo-class",
           value: "not",
-          argument: [{ type: "type", value: "div" }],
+          argument: [{ type: "type", value: "div", namespace: undefined }],
         }],
       ]]]],
       [":not(div, #id)", [[[
@@ -104,26 +110,29 @@ describe("astToSelectorList", () => {
           type: "pseudo-class",
           value: "not",
           argument: [
-            { type: "type", value: "div" },
+            { type: "type", value: "div", namespace: undefined },
             { type: "id", value: "id" },
           ],
         }],
       ]]]],
       ["div.class", [[[
-        [{ type: "type", value: "div" }, { type: "class", value: "class" }],
+        [{ type: "type", value: "div", namespace: undefined }, {
+          type: "class",
+          value: "class",
+        }],
       ]]]],
       ["div > div2", [[
         {
-          combinator: { type: "descendant" },
-          unit: [[{ type: "type", value: "div" }]],
+          combinator: { type: "child" },
+          unit: [[{ type: "type", value: "div", namespace: undefined }]],
         },
         [
-          [{ type: "type", value: "div2" }],
+          [{ type: "type", value: "div2", namespace: undefined }],
         ],
       ]]],
       [".div > .div2", [[
         {
-          combinator: { type: "descendant" },
+          combinator: { type: "child" },
           unit: [[{ type: "class", value: "div" }]],
         },
         [
@@ -150,6 +159,7 @@ describe("attr", () => {
     assertEquals(attr({ name: "", type: "Attribute" }), {
       type: "attr",
       name: "",
+      namespace: undefined,
     });
   });
 
@@ -166,6 +176,7 @@ describe("attr", () => {
         name: "a",
         value: "b",
         operator: Operator.ExactEq,
+        namespace: undefined,
       },
     );
   });
