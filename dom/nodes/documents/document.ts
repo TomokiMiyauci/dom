@@ -331,25 +331,13 @@ export class Document extends Node implements IDocument {
   }
 
   /**
-   * [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-createelement)
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-createelement)
    */
-  createElement<K extends keyof HTMLElementTagNameMap>(
-    tagName: K,
-    options?: ElementCreationOptions,
-  ): HTMLElementTagNameMap[K];
-  createElement<K extends keyof HTMLElementDeprecatedTagNameMap>(
-    tagName: K,
-    options?: ElementCreationOptions,
-  ): HTMLElementDeprecatedTagNameMap[K];
-  createElement(
-    tagName: string,
-    options?: ElementCreationOptions,
-  ): HTMLElement;
   @convert
   createElement(
     @DOMString tagName: string,
     options: ElementCreationOptions = {},
-  ): HTMLElement {
+  ): Element {
     // 1. If localName does not match the Name production, then throw an "InvalidCharacterError" DOMException.
     if (!ReName.test(tagName)) {
       throw new DOMException(
@@ -374,31 +362,12 @@ export class Document extends Node implements IDocument {
         : null;
 
     // 6. Return the result of creating an element given this, localName, namespace, null, is, and with the synchronous custom elements flag set.
-    return createElement(
-      this,
-      tagName,
-      namespace,
-      null,
-      is,
-      true,
-    ) as any as HTMLElement;
+    return createElement(this, tagName, namespace, null, is, true);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createelementns
    */
-  createElementNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    qualifiedName: string,
-  ): HTMLElement;
-  createElementNS<K extends keyof SVGElementTagNameMap>(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    qualifiedName: K,
-  ): SVGElementTagNameMap[K];
-  createElementNS(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    qualifiedName: string,
-  ): SVGElement;
   createElementNS<K extends keyof MathMLElementTagNameMap>(
     namespaceURI: "http://www.w3.org/1998/Math/MathML",
     qualifiedName: K,
@@ -422,7 +391,7 @@ export class Document extends Node implements IDocument {
     namespace: string | null,
     @DOMString qualifiedName: string,
     options: string | ElementCreationOptions = {},
-  ): globalThis.Element {
+  ): Element {
     // return the result of running the internal createElementNS steps, given this, namespace, qualifiedName, and options.
     return internalCreateElement(this, namespace, qualifiedName, options);
   }

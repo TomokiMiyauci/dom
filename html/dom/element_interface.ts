@@ -1,7 +1,5 @@
 import { isValidCustomElementName } from "../custom_element.ts";
 import { HTMLUnknownElement } from "./html_unknown_element.ts";
-import { Namespace } from "../../infra/namespace.ts";
-import { interfaceRegistry } from "../../dom/nodes/utils/create_element.ts";
 import { HTMLElement } from "./html_element.ts";
 import { tagNameMap } from "../tagname_map.ts";
 
@@ -54,8 +52,4 @@ export function resolveInterface(name: string): typeof HTMLElement {
 
   // 7. Return HTMLUnknownElement.
   return HTMLUnknownElement;
-}
-
-export function register(): void {
-  interfaceRegistry.set(Namespace.HTML, resolveInterface);
 }
