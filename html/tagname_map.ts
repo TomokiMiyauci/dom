@@ -39,7 +39,7 @@ import { HTMLMapElement } from "./elements/html_map_element.ts";
 import { HTMLMetaElement } from "./elements/html_meta_element.ts";
 import { HTMLMeterElement } from "./elements/html_meter_element.ts";
 import { HTMLObjectElement } from "./elements/html_object_element.ts";
-import { HTMLScriptElement } from "./elements/html_script_element.ts";
+import { HTMLScriptElement } from "./elements/scripting/html_script_element.ts";
 import { HTMLSelectElement } from "./elements/html_select_element.ts";
 import { HTMLSourceElement } from "./elements/html_source_element.ts";
 import { HTMLSpanElement } from "./elements/html_span_element.ts";
