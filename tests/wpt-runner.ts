@@ -12,7 +12,6 @@ import { PubSub } from "./pubsub.ts";
 import { EncodingHandler } from "./handlers/encoding.ts";
 import { RedirectHandler } from "./handlers/redirect.ts";
 import { type Handler } from "./handlers/types.ts";
-import { getPropertyDescriptors } from "../utils.ts";
 import { $, internalSlots } from "../internal.ts";
 
 const injectCode = `add_result_callback((t) => {
@@ -160,4 +159,19 @@ function bindDescriptor(
     get: get && get.bind(target),
     set: set && set.bind(target),
   };
+}
+
+export function getPropertyDescriptors(
+  obj: object,
+): { [x: string]: PropertyDescriptor } {
+  let currentObj = obj;
+  let members: { [x: string]: PropertyDescriptor } = {};
+
+  do {
+    const desc = Object.getOwnPropertyDescriptors(currentObj);
+    members = { ...desc, ...members };
+    currentObj = Object.getPrototypeOf(currentObj);
+  } while (currentObj !== null);
+
+  return members;
 }
