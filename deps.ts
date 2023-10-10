@@ -30,7 +30,7 @@ import {
 } from "npm:itertools@2.1.2";
 export { default as xmlValidator } from "npm:xml-name-validator@4.0.0";
 export { initLast } from "https://deno.land/x/seqtools@1.0.0/init_last.ts";
-export { insert } from "https://deno.land/x/upsert@1.2.0/mod.ts";
+export { emplace, insert } from "https://deno.land/x/upsert@1.2.0/mod.ts";
 export {
   Err,
   isOk,
@@ -43,6 +43,7 @@ export { isEmpty } from "https://deno.land/x/isx@1.5.0/iterable/is_empty.ts";
 export { default as isNegativeZero } from "npm:is-negative-zero";
 export { isSingle } from "https://deno.land/x/isx@1.5.0/iterable/is_single.ts";
 export { last as lastItem } from "https://deno.land/x/seqtools@1.0.0/last.ts";
+export { parseMediaType } from "https://deno.land/std@0.190.0/media_types/mod.ts";
 export { enumerate, find };
 
 export type Public<T> = { [k in keyof T]: T[k] };
@@ -176,6 +177,10 @@ class ESIterable<T> implements Iterable<T> {
   toArray(): T[] {
     return Array.from(this);
   }
+
+  forEach(callbackfn: (value: T) => void): void {
+    for (const value of this) callbackfn(value);
+  }
 }
 
 export function iter<T>(iterable: Iterable<T>): ESIterable<T> {
@@ -194,3 +199,35 @@ declare module "npm:itertools@2.1.2" {
     predicate: (value: T) => value is S,
   ): Iterable<S>;
 }
+
+export function composeIs<T, U extends T, V extends U>(
+  left: (input: T) => input is U,
+  right: (input: U) => input is V,
+): (input: T) => input is V;
+export function composeIs<T, U extends T>(
+  left: (input: T) => input is U,
+  right: (input: U) => boolean,
+): (input: T) => input is U;
+export function composeIs<T>(
+  left: (input: T) => boolean,
+  right: (input: T) => boolean,
+): (input: T) => boolean;
+export function composeIs<T>(
+  left: (input: T) => boolean,
+  right: (input: T) => boolean,
+): (input: T) => boolean {
+  return (input) => left(input) && right(input);
+}
+
+export function not<T extends readonly unknown[]>(
+  predicate: (...args: T) => boolean,
+): (...args: T) => boolean {
+  return new Proxy(predicate, {
+    apply: (...args) => !Reflect.apply(...args),
+  });
+}
+
+export type Match<T, U> = T extends U ? U extends T ? true : false : false;
+export type UnionToIntersection<U> =
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I
+    : never;

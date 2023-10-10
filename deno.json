@@ -1,20 +1,24 @@
 {
   "tasks": {
-    "test": "deno test --import-map=_test_import_map.json --doc",
+    "test": "deno test --doc",
     "build:npm": "deno run -A --no-lock _tools/build_npm.ts"
   },
   "fmt": {
-    "exclude": ["CHANGELOG.md"]
+    "exclude": ["./wpt", "CHANGELOG.md"]
   },
   "lint": {
-    "exclude": ["CHANGELOG.md"]
+    "exclude": ["./wpt", "CHANGELOG.md"],
+    "rules": {
+      "exclude": ["no-namespace", "no-empty-interface"]
+    }
   },
   "test": {
-    "exclude": ["CHANGELOG.md", "npm"]
+    "exclude": ["./wpt", "CHANGELOG.md", "npm"]
   },
   "compilerOptions": {
     "noImplicitReturns": true,
     "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "types": ["./deps.d.ts"]
   }
 }
