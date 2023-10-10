@@ -18,9 +18,7 @@ import { $, internalSlots } from "../internal.ts";
 const injectCode = `add_result_callback((t) => {
   pubsub.publish(t._structured_clone)
 });
-add_completion_callback((_, testStatus, __, tests) => {
-  clearTimeout(tests?.timeout_id ?? undefined);
-
+add_completion_callback((_, testStatus) => {
   switch (testStatus.status) {
     case 0:
     case 1:
@@ -38,8 +36,8 @@ add_completion_callback((_, testStatus, __, tests) => {
 
 export function createHandler(
   { baseDir }: { baseDir: string },
-): (request: Request) => Response {
-  return (request) => {
+): (request: Request) => Promise<Response> {
+  return async (request) => {
     const url = new URL(request.url);
     const path = join(baseDir, url.pathname);
     const ext = extname(path);
@@ -51,13 +49,16 @@ export function createHandler(
       ]);
     }
     const fileURL = toFileUrl(path);
-    const stream = Deno.readFileSync(fileURL);
+    const contents = await Deno.readTextFile(fileURL);
+    const modified = fileURL.pathname.includes("testharness.js")
+      ? contents.replace(`output:true,`, "output:false,")
+      : contents;
 
     const maybeContentType = typeByExtension(ext);
     const headers = maybeContentType
       ? new Headers({ "content-type": maybeContentType })
       : undefined;
-    const proxyResponse = new Response(stream, { headers });
+    const proxyResponse = new Response(modified, { headers });
     Object.defineProperty(proxyResponse, "url", {
       value: url,
     });
