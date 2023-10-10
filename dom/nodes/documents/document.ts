@@ -589,7 +589,7 @@ export class Document extends Node implements IDocument {
       // 4. Set walker’s filter to filter.
       filter,
     });
-    internalSlots.extends(walker as globalThis.TreeWalker, internal);
+    internalSlots.extends(walker, internal);
 
     // 5. Return walker.
     return walker;
@@ -609,39 +609,10 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-getelementsbytagname
    */
-  getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof SVGElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<SVGElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof MathMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<MathMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof HTMLElementDeprecatedTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
-  getElementsByTagName(qualifiedName: string): HTMLCollectionOf<Element>;
   getElementsByTagName(qualifiedName: string): HTMLCollection {
     return getElementsByQualifiedName(qualifiedName, this);
   }
 
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    localName: string,
-  ): HTMLCollectionOf<HTMLElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    localName: string,
-  ): HTMLCollectionOf<SVGElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    localName: string,
-  ): HTMLCollectionOf<MathMLElement>;
-  getElementsByTagNameNS(
-    namespace: string | null,
-    localName: string,
-  ): HTMLCollectionOf<globalThis.Element>;
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
@@ -663,11 +634,11 @@ export class Document extends Node implements IDocument {
     }
 
     // TODO(miyauci): improve dirty re-assignment
-    const document = $(node as globalThis.Node).nodeDocument;
-    $(node as globalThis.Node).nodeDocument = this;
+    const document = $<globalThis.Node>(node).nodeDocument;
+    $<globalThis.Node>(node).nodeDocument = this;
     // 2. Return a clone of node, with this and the clone children flag set if deep is true.
     const copy = node.cloneNode(deep) as T;
-    $(node as globalThis.Node).nodeDocument = document;
+    $<globalThis.Node>(node).nodeDocument = document;
 
     return copy;
   }

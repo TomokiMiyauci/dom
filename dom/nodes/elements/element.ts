@@ -367,47 +367,19 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-getelementsbytagname
    */
-  getElementsByTagName<K extends keyof HTMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<HTMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof SVGElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<SVGElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof MathMLElementTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<MathMLElementTagNameMap[K]>;
-  getElementsByTagName<K extends keyof HTMLElementDeprecatedTagNameMap>(
-    qualifiedName: K,
-  ): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>;
-  getElementsByTagName(
-    qualifiedName: string,
-  ): HTMLCollectionOf<Element>;
   getElementsByTagName(
     qualifiedName: string,
   ): HTMLCollection {
     return getElementsByQualifiedName(qualifiedName, this);
   }
 
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1999/xhtml",
-    localName: string,
-  ): HTMLCollectionOf<HTMLElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/2000/svg",
-    localName: string,
-  ): HTMLCollectionOf<SVGElement>;
-  getElementsByTagNameNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    localName: string,
-  ): HTMLCollectionOf<MathMLElement>;
+  /**
+   * @see https://dom.spec.whatwg.org/#dom-element-getelementsbytagnamens
+   */
   getElementsByTagNameNS(
     namespace: string | null,
     localName: string,
-  ): HTMLCollectionOf<globalThis.Element>;
-  getElementsByTagNameNS(
-    namespace: string | null,
-    localName: string,
-  ): HTMLCollectionOf<globalThis.Element> {
+  ): HTMLCollection {
     return getElementsByNamespaceAndLocalName(namespace, localName, this);
   }
 
@@ -642,20 +614,8 @@ export class Element extends Node implements IElement {
     return true;
   }
 
-  closest<K extends keyof HTMLElementTagNameMap>(
-    selector: K,
-  ): HTMLElementTagNameMap[K] | null;
-  closest<K extends keyof SVGElementTagNameMap>(
-    selector: K,
-  ): SVGElementTagNameMap[K] | null;
-  closest<K extends keyof MathMLElementTagNameMap>(
-    selector: K,
-  ): MathMLElementTagNameMap[K] | null;
-  closest<E extends Element = Element>(selectors: string): E | null;
   @convert
-  closest(
-    @DOMString selectors: string,
-  ): globalThis.Element | null {
+  closest(@DOMString selectors: string): globalThis.Element | null {
     // 1. Let s be the result of parse a selector from selectors. [SELECTORS4]
     const s = parseSelector(selectors);
 
