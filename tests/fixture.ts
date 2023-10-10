@@ -1,4 +1,4 @@
-import { Document } from "../dom/nodes/documents/document.ts";
+import { Document } from "../mod.ts";
 
 const document = new Document();
 
