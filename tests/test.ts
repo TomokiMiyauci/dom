@@ -22,6 +22,7 @@ import "../selection/extends/all.ts";
 import "../svg/extends/all.ts";
 import "../css/css_font_loading/extends/all.ts";
 import "../cssom/extends/all.ts";
+import "../mathml/extends/all.ts";
 
 const wptRootURL = new URL(import.meta.resolve("../wpt/"));
 const wptRoot = fromFileUrl(wptRootURL);

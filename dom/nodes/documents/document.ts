@@ -368,24 +368,6 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-createelementns
    */
-  createElementNS<K extends keyof MathMLElementTagNameMap>(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    qualifiedName: K,
-  ): MathMLElementTagNameMap[K];
-  createElementNS(
-    namespaceURI: "http://www.w3.org/1998/Math/MathML",
-    qualifiedName: string,
-  ): MathMLElement;
-  createElementNS(
-    namespaceURI: string | null,
-    qualifiedName: string,
-    options?: ElementCreationOptions,
-  ): Element;
-  createElementNS(
-    namespace: string | null,
-    qualifiedName: string,
-    options?: string | ElementCreationOptions,
-  ): Element;
   @convert
   createElementNS(
     namespace: string | null,
