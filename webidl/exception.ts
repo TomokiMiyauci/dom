@@ -1,4 +1,5 @@
 export enum DOMExceptionName {
+  AbortError = "AbortError",
   NamespaceError = "NamespaceError",
   NotSupportedError = "NotSupportedError",
   NotFoundError = "NotFoundError",
@@ -9,6 +10,7 @@ export enum DOMExceptionName {
   InvalidNodeTypeError = "InvalidNodeTypeError",
   WrongDocumentError = "WrongDocumentError",
   InvalidStateError = "InvalidStateError",
+  SecurityError = "SecurityError",
 }
 
 export enum DOMExceptionDescription {
