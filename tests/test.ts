@@ -46,15 +46,9 @@ const passMap = new Map(
   }),
 );
 const handler = createHandler({ baseDir: wptRoot });
-Deno.serve(
-  { hostname: "localhost", port: 8000 },
-  handler,
-);
+Deno.serve({ hostname: "localhost", port: 8000 }, handler);
 
-Deno.test("wpt", {
-  sanitizeOps: false,
-  sanitizeResources: false,
-}, async (t) => {
+Deno.test("wpt", async (t) => {
   for (const { url, name } of targets) {
     await t.step({
       name: url.pathname,

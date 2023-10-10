@@ -33,6 +33,12 @@ add_completion_callback((_, testStatus) => {
 });
 `;
 
+// Add clearTimeout process for Tests instance to avoid leak timer.
+const clearTimeoutModifier = {
+  pattern: /(forEach \(this.all_done_callbacks,[\s\S]+?\}\);)/,
+  placement: "$1clearTimeout(this.timeout_id);",
+};
+
 export function createHandler(
   { baseDir }: { baseDir: string },
 ): (request: Request) => Promise<Response> {
@@ -50,7 +56,10 @@ export function createHandler(
     const fileURL = toFileUrl(path);
     const contents = await Deno.readTextFile(fileURL);
     const modified = fileURL.pathname.includes("testharness.js")
-      ? contents.replace(`output:true,`, "output:false,")
+      ? contents.replace(`output:true,`, "output:false,").replace(
+        clearTimeoutModifier.pattern,
+        clearTimeoutModifier.placement,
+      )
       : contents;
 
     const maybeContentType = typeByExtension(ext);
