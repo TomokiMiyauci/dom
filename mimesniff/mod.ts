@@ -20,6 +20,14 @@ export const JavaScriptMIMETypes = new Set<string>([
 ]);
 
 /**
+ * @see [MIME Sniffing living standard](https://mimesniff.spec.whatwg.org/#json-mime-type)
+ */
+export function isJSONMIMEType(type: string): boolean {
+  return type.endsWith("+json") || type === "application/json" ||
+    type === "text/json";
+}
+
+/**
  * @see [MIME Sniffing living standard](https://mimesniff.spec.whatwg.org/#javascript-mime-type-essence-match)
  */
 export function matchJavaScriptMIMETypeEssence(input: string): boolean {
