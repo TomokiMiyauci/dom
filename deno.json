@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "test": "deno test -A --import-map=./_test_import_map.json --doc",
+    "test": "deno test -A --import-map=./_test_import_map.json",
     "build:npm": "deno run -A --no-lock _tools/build_npm.ts"
   },
   "fmt": {
