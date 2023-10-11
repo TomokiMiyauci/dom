@@ -1,8 +1,6 @@
 import { NodeType } from "./node.ts";
 import { $, internalSlots } from "../internal.ts";
 
-export class UnImplemented extends Error {}
-
 export interface NodeLike {
   nodeType: unknown;
 }
