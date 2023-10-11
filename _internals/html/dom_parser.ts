@@ -1,5 +1,5 @@
 import { Document } from "../../nodes/documents/document.ts";
-import type { IDOMParser } from "../../interface.d.ts";
+import type { IDOMParser } from "../interface.d.ts";
 import { $ } from "../../internal.ts";
 import { HTMLParser } from "./html_parser.ts";
 import {

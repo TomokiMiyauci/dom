@@ -1,5 +1,5 @@
 import { HTMLElement } from "../dom/html_element.ts";
-import type { IHTMLHeadElement } from "../../../interface.d.ts";
+import type { IHTMLHeadElement } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
 /**

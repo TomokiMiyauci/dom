@@ -1,5 +1,5 @@
 import { Constructor } from "../../deps.ts";
-import type { ISVGURIReference } from "../../interface.d.ts";
+import type { ISVGURIReference } from "../interface.d.ts";
 
 export function SVGURIReference<T extends Constructor>(Ctor: T) {
   abstract class SVGURIReference extends Ctor implements ISVGURIReference {

@@ -1,5 +1,5 @@
 import { Constructor } from "../../../deps.ts";
-import type { IElementCSSInlineStyle } from "../../../interface.d.ts";
+import type { IElementCSSInlineStyle } from "../../interface.d.ts";
 
 type IElementCSSInlineStyle_CSSTypedOM = Pick<
   IElementCSSInlineStyle,

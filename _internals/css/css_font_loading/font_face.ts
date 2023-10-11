@@ -1,5 +1,5 @@
 import { UnImplemented } from "../../../utils.ts";
-import { type IFontFace } from "../../../interface.d.ts";
+import { type IFontFace } from "../../interface.d.ts";
 
 export class FontFace implements IFontFace {
   ascentOverride: string = "";

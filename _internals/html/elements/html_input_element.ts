@@ -1,4 +1,4 @@
-import type { IHTMLInputElement } from "../../../interface.d.ts";
+import type { IHTMLInputElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";
 import { $, internalSlots } from "../../../internal.ts";

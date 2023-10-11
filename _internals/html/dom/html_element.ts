@@ -5,7 +5,7 @@ import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";
 import { HTMLElement_CSSOMView } from "../../cssom/html_element.ts";
 import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";
-import type { IHTMLElement } from "../../../interface.d.ts";
+import type { IHTMLElement } from "../../interface.d.ts";
 import { $ } from "../../../internal.ts";
 import {
   isDisabled,

@@ -1,5 +1,5 @@
 import { type Constructor } from "../../deps.ts";
-import type { IWindowEventHandlers } from "../../interface.d.ts";
+import type { IWindowEventHandlers } from "../interface.d.ts";
 
 export function WindowEventHandlers<T extends Constructor>(Ctor: T) {
   abstract class Mixin extends Ctor

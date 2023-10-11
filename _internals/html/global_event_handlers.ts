@@ -2,7 +2,7 @@ import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "./events.ts";
-import type { IGlobalEventHandlers } from "../../interface.d.ts";
+import type { IGlobalEventHandlers } from "../interface.d.ts";
 
 export class GlobalEventHandlers
   implements

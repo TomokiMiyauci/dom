@@ -1,4 +1,4 @@
-import type { ISVGAElement } from "../../../interface.d.ts";
+import type { ISVGAElement } from "../../interface.d.ts";
 import { SVGGraphicsElement } from "./svg_graphics_element.ts";
 import { SVGURIReference } from "../svg_uri_reference.ts";
 import { reflect } from "../infrastructure.ts";

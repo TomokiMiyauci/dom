@@ -1,4 +1,4 @@
-import type { ILocation } from "../../../interface.d.ts";
+import type { ILocation } from "../../interface.d.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 import { stringifier } from "../../webidl/idl.ts";
 import { browsingContext } from "./window_utils.ts";

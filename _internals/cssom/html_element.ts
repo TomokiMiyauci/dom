@@ -1,5 +1,5 @@
 import { Constructor } from "../../deps.ts";
-import type { IHTMLElement } from "../../interface.d.ts";
+import type { IHTMLElement } from "../interface.d.ts";
 
 type IHTMLElement_CSSOMView = Pick<
   IHTMLElement,

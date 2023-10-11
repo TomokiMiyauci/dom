@@ -1,4 +1,4 @@
-import type { IHTMLScriptElement } from "../../../../interface.d.ts";
+import type { IHTMLScriptElement } from "../../../interface.d.ts";
 import { HTMLElement } from "../../dom/html_element.ts";
 import { reflectSet } from "../../../../nodes/utils/set_attribute_value.ts";
 import { reflectGet } from "../../../../nodes/elements/element_utils.ts";

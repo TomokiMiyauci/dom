@@ -1,5 +1,5 @@
 import { Constructor } from "../../deps.ts";
-import type { ISVGTests } from "../../interface.d.ts";
+import type { ISVGTests } from "../interface.d.ts";
 
 export function SVGTests<T extends Constructor>(Ctor: T) {
   abstract class SVGTests extends Ctor implements ISVGTests {

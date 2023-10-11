@@ -1,4 +1,4 @@
-import type { IDocumentOrShadowRoot } from "../../interface.d.ts";
+import type { IDocumentOrShadowRoot } from "../interface.d.ts";
 
 export type IDocumentOrShadowRoot_CSSOM = Pick<
   IDocumentOrShadowRoot,

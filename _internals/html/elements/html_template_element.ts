@@ -1,4 +1,4 @@
-import type { IHTMLTemplateElement } from "../../../interface.d.ts";
+import type { IHTMLTemplateElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { $ } from "../../../internal.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";

@@ -1,4 +1,4 @@
-import type { IUIEvent } from "../../interface.d.ts";
+import type { IUIEvent } from "../interface.d.ts";
 import { Event } from "../../events/event.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 

@@ -1,4 +1,4 @@
-import type { IAnimatable } from "../../interface.d.ts";
+import type { IAnimatable } from "../interface.d.ts";
 
 export class Animatable implements IAnimatable {
   animate(

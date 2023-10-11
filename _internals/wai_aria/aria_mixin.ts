@@ -1,4 +1,4 @@
-import type { IARIAMixin } from "../../interface.d.ts";
+import type { IARIAMixin } from "../interface.d.ts";
 
 export class ARIAMixin implements IARIAMixin {
   get ariaAtomic(): string | null {

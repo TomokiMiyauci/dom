@@ -1,4 +1,4 @@
-import type { IHTMLUnknownElement } from "../../../interface.d.ts";
+import type { IHTMLUnknownElement } from "../../interface.d.ts";
 import { HTMLElement } from "./html_element.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

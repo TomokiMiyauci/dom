@@ -1,4 +1,4 @@
-import type { IHTMLTableSectionElement } from "../../../interface.d.ts";
+import type { IHTMLTableSectionElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLCollection } from "../../../nodes/node_trees/html_collection.ts";
 import { tree } from "../../../internal.ts";

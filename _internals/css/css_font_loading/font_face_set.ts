@@ -1,4 +1,4 @@
-import { type IFontFaceSet } from "../../../interface.d.ts";
+import { type IFontFaceSet } from "../../interface.d.ts";
 import { UnImplemented } from "../../../utils.ts";
 
 export class FontFaceSet extends EventTarget implements IFontFaceSet {

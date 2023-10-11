@@ -1,4 +1,4 @@
-import type { IElement } from "../../../interface.d.ts";
+import type { IElement } from "../../interface.d.ts";
 
 type IElement_CSSTypedOM = Pick<IElement, "computedStyleMap">;
 

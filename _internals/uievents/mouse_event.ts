@@ -1,4 +1,4 @@
-import type { IMouseEvent } from "../../interface.d.ts";
+import type { IMouseEvent } from "../interface.d.ts";
 import { UIEvent } from "./ui_event.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 

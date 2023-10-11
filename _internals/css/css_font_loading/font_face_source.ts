@@ -1,4 +1,4 @@
-import { type IFontFaceSource } from "../../../interface.d.ts";
+import { type IFontFaceSource } from "../../interface.d.ts";
 
 export class FontFaceSource implements IFontFaceSource {
   get fonts(): any {

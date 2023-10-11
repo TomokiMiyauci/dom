@@ -1,5 +1,5 @@
 import { GlobalEventHandlers } from "../global_event_handlers.ts";
-import type { IGlobalEventHandlers } from "../../../interface.d.ts";
+import type { IGlobalEventHandlers } from "../../interface.d.ts";
 import { Document } from "../../../nodes/documents/document.ts";
 import { Window } from "../loading_web_pages/window.ts";
 import { HTMLElement } from "../dom/html_element.ts";

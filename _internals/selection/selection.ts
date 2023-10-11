@@ -1,4 +1,4 @@
-import type { ISelection } from "../../interface.d.ts";
+import type { ISelection } from "../interface.d.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 import { convert, DOMString, unsignedLong } from "../webidl/types.ts";
 import { $, internalSlots, tree } from "../../internal.ts";

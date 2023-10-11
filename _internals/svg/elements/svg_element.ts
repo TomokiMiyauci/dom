@@ -1,4 +1,4 @@
-import type { ISVGElement } from "../../../interface.d.ts";
+import type { ISVGElement } from "../../interface.d.ts";
 import { Element } from "../../../nodes/elements/element.ts";
 import { HTMLOrSVGElement } from "../../html/dom/html_or_svg_element.ts";
 import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";

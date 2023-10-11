@@ -1,4 +1,4 @@
-import type { IHTMLButtonElement } from "../../../interface.d.ts";
+import type { IHTMLButtonElement } from "../../interface.d.ts";
 import { $ } from "../../../internal.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { reflectGet, reflectSet } from "../infra/common_dom_interface.ts";

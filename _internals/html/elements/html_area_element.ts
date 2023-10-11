@@ -1,4 +1,4 @@
-import type { IHTMLAreaElement } from "../../../interface.d.ts";
+import type { IHTMLAreaElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLHyperlinkElementUtils } from "../html_hyperlink_element_utils.ts";
 import { DOMTokenList } from "../../../sets/dom_token_list.ts";

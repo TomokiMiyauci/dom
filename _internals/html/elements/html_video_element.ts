@@ -1,4 +1,4 @@
-import type { IHTMLVideoElement } from "../../../interface.d.ts";
+import type { IHTMLVideoElement } from "../../interface.d.ts";
 import { HTMLMediaElement } from "./html_media_element.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

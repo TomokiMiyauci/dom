@@ -1,4 +1,4 @@
-import type { IHTMLTableRowElement } from "../../../interface.d.ts";
+import type { IHTMLTableRowElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { HTMLCollection } from "../../../nodes/node_trees/html_collection.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";

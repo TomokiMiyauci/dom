@@ -1,5 +1,5 @@
 import { Constructor } from "../../deps.ts";
-import type { IRange } from "../../interface.d.ts";
+import type { IRange } from "../interface.d.ts";
 
 type IRange_CSSOM = Pick<IRange, "getClientRects" | "getBoundingClientRect">;
 

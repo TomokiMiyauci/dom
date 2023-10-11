@@ -1,4 +1,4 @@
-import type { IHTMLAnchorElement } from "../../../interface.d.ts";
+import type { IHTMLAnchorElement } from "../../interface.d.ts";
 import { HTMLHyperlinkElementUtils } from "../html_hyperlink_element_utils.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { DOMTokenList } from "../../../sets/dom_token_list.ts";

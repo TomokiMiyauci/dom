@@ -1,4 +1,4 @@
-import type { ICSSStyleDeclaration } from "../../interface.d.ts";
+import type { ICSSStyleDeclaration } from "../interface.d.ts";
 import { setAttributeValue } from "../../nodes/utils/set_attribute_value.ts";
 
 export class CSSStyleDeclaration implements ICSSStyleDeclaration {

@@ -1,6 +1,6 @@
 import { Constructor, isOk, Result } from "../../deps.ts";
 import { type Element } from "../../nodes/elements/element.ts";
-import type { IHTMLHyperlinkElementUtils } from "../../interface.d.ts";
+import type { IHTMLHyperlinkElementUtils } from "../interface.d.ts";
 import { $ } from "../../internal.ts";
 
 export function HTMLHyperlinkElementUtils<T extends Constructor<Element>>(

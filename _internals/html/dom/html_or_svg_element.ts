@@ -1,5 +1,5 @@
 import { Constructor } from "../../../deps.ts";
-import type { IHTMLOrSVGElement } from "../../../interface.d.ts";
+import type { IHTMLOrSVGElement } from "../../interface.d.ts";
 
 /**
  * @see https://html.spec.whatwg.org/multipage/interaction.html#contenteditable
