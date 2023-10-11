@@ -30,11 +30,11 @@ specification.
 import * as mod from "https://deno.land/x/dom_std/mod.ts";
 ```
 
-npm:
+<!-- npm:
 
 ```bash
 npm i dom-std
-```
+``` -->
 
 ## Usage
 
