@@ -1,5 +1,5 @@
 import { Text } from "../text.ts";
-import { replaceAllNode } from "../mutation.ts";
+import { replaceAllNode } from "./mutation.ts";
 import { $ } from "../../internal.ts";
 
 /**

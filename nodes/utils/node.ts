@@ -3,7 +3,7 @@
  */
 
 import { isElement, isText } from "./type.ts";
-import { getDocumentElement } from "../node_tree.ts";
+import { getDocumentElement } from "./node_tree.ts";
 import { HTMLCollection } from "../html_collection.ts";
 import { Namespace } from "../../_internals/infra/namespace.ts";
 import { html, iter, izip, takewhile } from "../../deps.ts";

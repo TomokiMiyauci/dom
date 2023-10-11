@@ -11,7 +11,7 @@ import {
   ensurePreInsertionValidity,
   preInsertNode,
   replaceAllNode,
-} from "./mutation.ts";
+} from "./utils/mutation.ts";
 import { convert, DOMString } from "./../_internals/webidl/types.ts";
 import { $, tree } from "./../internal.ts";
 

@@ -2,9 +2,9 @@
  * @module
  */
 
-import { queueMutationRecord } from "../queue.ts";
+import { queueMutationRecord } from "./queue.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
-import { nodeLength } from "../node_tree.ts";
+import { nodeLength } from "./node_tree.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { $, tree } from "../../internal.ts";
 import { iter } from "../../deps.ts";
@@ -13,7 +13,7 @@ import {
   equalsNodeEndNode,
   equalsNodeStartNode,
   Operator,
-} from "../mutation.ts";
+} from "./mutation.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace

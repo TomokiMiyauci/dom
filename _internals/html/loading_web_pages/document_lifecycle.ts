@@ -1,4 +1,4 @@
-import { appendNode } from "../../../nodes/mutation.ts";
+import { appendNode } from "../../../nodes/utils/mutation.ts";
 import { createElement } from "../../../nodes/utils/create_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import {

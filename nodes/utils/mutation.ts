@@ -7,11 +7,11 @@ import {
   isShadowHost,
   isShadowRoot,
   isText,
-} from "./utils/type.ts";
-import { OrderedSet } from "../_internals/infra/data_structures/set.ts";
-import { DOMExceptionName } from "../_internals/webidl/exception.ts";
-import { isHostIncludingInclusiveAncestorOf } from "./document_fragment_algorithm.ts";
-import { filter, find, iter, some } from "../deps.ts";
+} from "./type.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+import { isHostIncludingInclusiveAncestorOf } from "./document_fragment.ts";
+import { filter, find, iter, some } from "../../deps.ts";
 import {
   assignSlot,
   assignSlottables,
@@ -22,12 +22,12 @@ import {
   signalSlotChange,
 } from "./node_tree.ts";
 import { queueTreeMutationRecord } from "./queue.ts";
-import { $, tree } from "../internal.ts";
-import { isCustom } from "./utils/element.ts";
-import { enqueueCustomElementCallbackReaction } from "../_internals/html/elements/custom_elements/custom_element_reaction.ts";
-import { isAssigned } from "./utils/slottable.ts";
-import { tryUpgradeElement } from "../_internals/html/elements/custom_elements/upgrade.ts";
-import { adoptNode } from "./utils/document.ts";
+import { $, tree } from "../../internal.ts";
+import { isCustom } from "./element.ts";
+import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
+import { isAssigned } from "./slottable.ts";
+import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
+import { adoptNode } from "./document.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace

@@ -1,8 +1,8 @@
-import { StaticNodeList } from "./node_list.ts";
-import { MutationRecord } from "./mutation_record.ts";
-import { OrderedSet } from "../_internals/infra/data_structures/set.ts";
-import { $, tree } from "../internal.ts";
-import { fireEvent } from "../events/fire.ts";
+import { StaticNodeList } from "../node_list.ts";
+import { MutationRecord } from "../mutation_record.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
+import { $, tree } from "../../internal.ts";
+import { fireEvent } from "../../events/fire.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)

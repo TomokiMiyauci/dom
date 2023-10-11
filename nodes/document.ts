@@ -26,7 +26,7 @@ import { DOMImplementation } from "./dom_implementation.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { CDATASection } from "./cdata_section.ts";
 import { ReName } from "../_internals/xml/document.ts";
-import { getDocumentElement } from "./node_tree.ts";
+import { getDocumentElement } from "./utils/node_tree.ts";
 import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
 import { Range } from "../ranges/range.ts";

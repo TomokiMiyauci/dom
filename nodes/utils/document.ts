@@ -3,7 +3,7 @@ import { iter } from "../../deps.ts";
 import { $, tree } from "../../internal.ts";
 import { isCustom } from "./element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
-import { removeNode } from "../mutation.ts";
+import { removeNode } from "./mutation.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-adopt

@@ -1,6 +1,6 @@
 import { Node } from "./node.ts";
 import { type ICharacterData } from "../interface.d.ts";
-import { nodeLength } from "./node_tree.ts";
+import { nodeLength } from "./utils/node_tree.ts";
 import { LegacyNullToEmptyString } from "../_internals/webidl/legacy_extended_attributes.ts";
 import {
   convert,

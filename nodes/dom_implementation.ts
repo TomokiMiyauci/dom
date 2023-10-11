@@ -1,7 +1,7 @@
 import { Document, XMLDocument } from "./document.ts";
 import { DocumentType } from "./document_type.ts";
 import { Text } from "./text.ts";
-import { appendNode } from "./mutation.ts";
+import { appendNode } from "./utils/mutation.ts";
 import type { IDOMImplementation } from "../interface.d.ts";
 import { Namespace } from "../_internals/infra/namespace.ts";
 import { validate } from "../_internals/infra/namespace.ts";

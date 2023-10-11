@@ -8,13 +8,13 @@ import { isProcessingInstruction } from "../../nodes/utils/type.ts";
 import { isComment } from "../../nodes/utils/type.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { DocumentFragment } from "../../nodes/document_fragment.ts";
-import { nodeLength } from "../../nodes/node_tree.ts";
+import { nodeLength } from "../../nodes/utils/node_tree.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
   preInsertNode,
   removeNode,
-} from "../../nodes/mutation.ts";
+} from "../../nodes/utils/mutation.ts";
 import {
   replaceData,
   substringData,

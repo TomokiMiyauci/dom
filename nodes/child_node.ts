@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-empty-interface
 import type { IChildNode } from "../interface.d.ts";
 import { find, isObject } from "../deps.ts";
-import { preInsertNode, removeNode, replaceChild } from "./mutation.ts";
+import { preInsertNode, removeNode, replaceChild } from "./utils/mutation.ts";
 import { convertNodesToNode } from "./parent_node.ts";
 import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { $, tree } from "../internal.ts";

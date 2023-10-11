@@ -1,7 +1,7 @@
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
 import { isSingle, iter } from "./../../deps.ts";
-import { appendNode } from "../mutation.ts";
+import { appendNode } from "./mutation.ts";
 import { $ } from "./../../internal.ts";
 
 /**

@@ -11,7 +11,7 @@ import {
   isText,
 } from "../nodes/utils/type.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
-import { nodeLength } from "../nodes/node_tree.ts";
+import { nodeLength } from "../nodes/utils/node_tree.ts";
 import {
   substringCodeUnitByPositions,
   substringCodeUnitToEnd,
@@ -37,7 +37,11 @@ import {
 import { isCollapsed } from "./utils/abstract_range.ts";
 import { replaceData } from "../nodes/utils/character_data.ts";
 import { iter } from "../deps.ts";
-import { appendNode, removeNode, replaceAllNode } from "../nodes/mutation.ts";
+import {
+  appendNode,
+  removeNode,
+  replaceAllNode,
+} from "../nodes/utils/mutation.ts";
 
 @Range_CSSOM
 @Range_DOMParsing

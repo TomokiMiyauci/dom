@@ -1,6 +1,6 @@
 import { iter } from "../../deps.ts";
 import { isElement } from "../../nodes/utils/type.ts";
-import { getDocumentElement } from "../../nodes/node_tree.ts";
+import { getDocumentElement } from "../../nodes/utils/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $ } from "../../internal.ts";

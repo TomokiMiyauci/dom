@@ -4,7 +4,7 @@
  * @module
  */
 
-import { tree } from "../internal.ts";
+import { tree } from "../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-tree-host-including-inclusive-ancestor

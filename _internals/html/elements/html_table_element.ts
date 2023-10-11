@@ -4,7 +4,7 @@ import { HTMLCollection } from "../../../nodes/html_collection.ts";
 import { tree } from "../../../internal.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
-import { removeNode } from "../../../nodes/mutation.ts";
+import { removeNode } from "../../../nodes/utils/mutation.ts";
 import { isElement } from "../../../nodes/utils/type.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

@@ -5,7 +5,7 @@ import { List } from "../_internals/infra/data_structures/list.ts";
 import { Queue } from "../_internals/infra/data_structures/queue.ts";
 import { iter } from "../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
-import { RegisteredObserver } from "./queue.ts";
+import { RegisteredObserver } from "./utils/queue.ts";
 import { $, internalSlots } from "../internal.ts";
 
 /**

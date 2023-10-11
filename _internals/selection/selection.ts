@@ -8,7 +8,7 @@ import {
   position,
 } from "../../ranges/boundary_point.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { nodeLength } from "../../nodes/node_tree.ts";
+import { nodeLength } from "../../nodes/utils/node_tree.ts";
 import { root, setStartOrEnd } from "../../ranges/utils/range.ts";
 import { Range } from "../../ranges/range.ts";
 
