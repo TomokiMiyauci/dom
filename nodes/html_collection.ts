@@ -1,19 +1,19 @@
-import type { IHTMLCollection } from "../../interface.d.ts";
-import { at, find, len, range } from "../../deps.ts";
-import { Namespace } from "../../_internals/infra/namespace.ts";
-import { isElement } from "../utils/type.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import type { IHTMLCollection } from "../interface.d.ts";
+import { at, find, len, range } from "../deps.ts";
+import { Namespace } from "../_internals/infra/namespace.ts";
+import { isElement } from "./utils/type.ts";
+import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import {
   LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-} from "../../_internals/webidl/legacy_extended_attributes.ts";
-import { Getter, getter, WebIDL } from "../../_internals/webidl/idl.ts";
+} from "../_internals/webidl/legacy_extended_attributes.ts";
+import { Getter, getter, WebIDL } from "../_internals/webidl/idl.ts";
 import {
   convert,
   DOMString,
   unsignedLong,
-} from "../../_internals/webidl/types.ts";
-import { $, tree } from "../../internal.ts";
+} from "../_internals/webidl/types.ts";
+import { $, tree } from "../internal.ts";
 
 export const $root = Symbol();
 export const $filter = Symbol();

@@ -1,5 +1,5 @@
-import type { IMutationRecord } from "../../interface.d.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import type { IMutationRecord } from "../interface.d.ts";
+import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#mutationrecord)

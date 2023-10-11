@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import { Element } from "../../../nodes/elements/element.ts";
+import { Element } from "../../../nodes/element.ts";
 import { fireSyntheticPointerEvent } from "../global_event_handlers_utils.ts";
 import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";

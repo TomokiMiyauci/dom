@@ -1,10 +1,10 @@
-import { DocumentOrShadowRoot } from "../nodes/node_trees/document_or_shadow_root.ts";
-import { Document } from "../nodes/documents/document.ts";
+import { DocumentOrShadowRoot } from "../nodes/document_or_shadow_root.ts";
+import { Document } from "../nodes/document.ts";
 import { ShadowRoot } from "../nodes/shadow_root.ts";
 import { IDocumentOrShadowRoot } from "../interface.d.ts";
 import { includes } from "../utils.ts";
 
-declare module "../nodes/documents/document.ts" {
+declare module "../nodes/document.ts" {
   interface Document extends IDocumentOrShadowRoot {}
 }
 

@@ -1,5 +1,5 @@
 import { lookUpCustomElementDefinition } from "../../_internals/html/custom_element.ts";
-import { Element } from "../elements/element.ts";
+import { Element } from "../element.ts";
 import { $ } from "../../internal.ts";
 
 /**

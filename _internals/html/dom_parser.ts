@@ -1,4 +1,4 @@
-import { Document } from "../../nodes/documents/document.ts";
+import { Document } from "../../nodes/document.ts";
 import type { IDOMParser } from "../interface.d.ts";
 import { $ } from "../../internal.ts";
 import { HTMLParser } from "./html_parser.ts";

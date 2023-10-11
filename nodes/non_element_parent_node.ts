@@ -1,7 +1,7 @@
-import { isElement } from "../utils/type.ts";
-import type { INonElementParentNode } from "../../interface.d.ts";
-import { convert, DOMString } from "../../_internals/webidl/types.ts";
-import { $, tree } from "../../internal.ts";
+import { isElement } from "./utils/type.ts";
+import type { INonElementParentNode } from "./../interface.d.ts";
+import { convert, DOMString } from "./../_internals/webidl/types.ts";
+import { $, tree } from "./../internal.ts";
 
 export class NonElementParentNode implements INonElementParentNode {
   /**

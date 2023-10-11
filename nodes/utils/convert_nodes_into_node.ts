@@ -1,8 +1,8 @@
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
-import { isSingle, iter } from "../../../deps.ts";
-import { appendNode } from "../node_trees/mutation.ts";
-import { $ } from "../../../internal.ts";
+import { isSingle, iter } from "./../../deps.ts";
+import { appendNode } from "../mutation.ts";
+import { $ } from "./../../internal.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#converting-nodes-into-a-node

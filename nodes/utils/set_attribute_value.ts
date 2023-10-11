@@ -1,4 +1,4 @@
-import { Attr } from "../elements/attr.ts";
+import { Attr } from "../attr.ts";
 import {
   appendAttribute,
   getAttributeByNamespaceAndLocalName,

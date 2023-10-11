@@ -1,6 +1,6 @@
 import { iter } from "../../deps.ts";
 import { isElement } from "../../nodes/utils/type.ts";
-import { getDocumentElement } from "../../nodes/node_trees/node_tree.ts";
+import { getDocumentElement } from "../../nodes/node_tree.ts";
 import { stripAndCollapseASCIIWhitespace } from "../infra/string.ts";
 import { Namespace } from "../infra/namespace.ts";
 import { $ } from "../../internal.ts";
@@ -12,7 +12,7 @@ import {
 } from "./loading_web_pages/supporting_concepts.ts";
 import { OrderedSet } from "../infra/data_structures/set.ts";
 import { SameObject } from "../webidl/extended_attribute.ts";
-import { HTMLCollection } from "../../nodes/node_trees/html_collection.ts";
+import { HTMLCollection } from "../../nodes/html_collection.ts";
 import { isHTMLScriptElement } from "./elements/scripting/html_script_element_utils.ts";
 
 type PartialDocument =

@@ -1,7 +1,7 @@
 import { Iterable, iterable } from "../_internals/webidl/iterable.ts";
 import type { IDOMTokenList } from "../interface.d.ts";
 import { OrderedSet } from "../_internals/infra/data_structures/set.ts";
-import { type AttributesContext } from "../nodes/elements/element.ts";
+import { type AttributesContext } from "../nodes/element.ts";
 import { getAttributeValue } from "../nodes/utils/element.ts";
 import { setAttributeValue } from "../nodes/utils/set_attribute_value.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";

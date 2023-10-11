@@ -1,5 +1,5 @@
 import { insert } from "../../../deps.ts";
-import { Document } from "../../../nodes/documents/document.ts";
+import { Document } from "../../../nodes/document.ts";
 
 const documentMap = new WeakMap<globalThis.Document, globalThis.Document>();
 

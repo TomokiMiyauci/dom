@@ -1,10 +1,10 @@
-import "../../../nodes/documents/document.ts";
-import "../../../nodes/elements/element.ts";
+import "../../../nodes/document.ts";
+import "../../../nodes/element.ts";
 import { interfaceRegistry } from "../../../nodes/utils/create_element.ts";
 import { resolveInterface } from "../element_interface.ts";
 import { Namespace } from "../../infra/namespace.ts";
 
-declare module "../../../nodes/documents/document.ts" {
+declare module "../../../nodes/document.ts" {
   interface Document {
     createElementNS<K extends keyof MathMLElementTagNameMap>(
       namespaceURI: "http://www.w3.org/1998/Math/MathML",
@@ -25,7 +25,7 @@ declare module "../../../nodes/documents/document.ts" {
   }
 }
 
-declare module "../../../nodes/elements/element.ts" {
+declare module "../../../nodes/element.ts" {
   interface Element {
     getElementsByTagName<K extends keyof MathMLElementTagNameMap>(
       qualifiedName: K,

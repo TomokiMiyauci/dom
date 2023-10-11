@@ -7,7 +7,7 @@ import {
   describe,
   it,
 } from "../../_dev_deps.ts";
-import { Document } from "../../nodes/documents/document.ts";
+import { Document } from "../../nodes/document.ts";
 import { Operator } from "./types.ts";
 
 const document = new Document();

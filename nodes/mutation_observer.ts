@@ -1,12 +1,12 @@
-import type { Node } from "../node.ts";
-import type { IMutationObserver } from "../../interface.d.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
-import { List } from "../../_internals/infra/data_structures/list.ts";
-import { Queue } from "../../_internals/infra/data_structures/queue.ts";
-import { iter } from "../../deps.ts";
+import type { Node } from "./node.ts";
+import type { IMutationObserver } from "../interface.d.ts";
+import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import { List } from "../_internals/infra/data_structures/list.ts";
+import { Queue } from "../_internals/infra/data_structures/queue.ts";
+import { iter } from "../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { RegisteredObserver } from "./queue.ts";
-import { $, internalSlots } from "../../internal.ts";
+import { $, internalSlots } from "../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-mutationobserver)

@@ -1,7 +1,7 @@
 import { isDocument, isText } from "./utils/type.ts";
 import { isAttr } from "./utils/attr.ts";
-import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
-import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
+import { NodeList, NodeListOf } from "./node_list.ts";
+import { isConnected, nodeLength } from "./node_tree.ts";
 import type { INode } from "../interface.d.ts";
 import {
   appendNode,
@@ -13,7 +13,7 @@ import {
   preRemoveChild,
   removeNode,
   replaceChild,
-} from "./node_trees/mutation.ts";
+} from "./mutation.ts";
 import { ifilter, iter } from "../deps.ts";
 import { concatString } from "../_internals/infra/string.ts";
 import {
@@ -26,7 +26,7 @@ import { replaceData } from "./utils/character_data.ts";
 import {
   type RegisteredObserver,
   type TransientRegisteredObserver,
-} from "./mutation_observers/queue.ts";
+} from "./queue.ts";
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
 import { $, internalSlots, tree } from "../internal.ts";

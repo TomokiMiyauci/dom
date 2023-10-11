@@ -1,10 +1,10 @@
-import "../../../nodes/documents/document.ts";
-import "../../../nodes/elements/element.ts";
+import "../../../nodes/document.ts";
+import "../../../nodes/element.ts";
 import { interfaceRegistry } from "../../../nodes/utils/create_element.ts";
 import { resolveInterface } from "../dom/element_interface.ts";
 import { Namespace } from "../../infra/namespace.ts";
 
-declare module "../../../nodes/documents/document.ts" {
+declare module "../../../nodes/document.ts" {
   interface Document {
     createElement<K extends keyof HTMLElementTagNameMap>(
       tagName: K,
@@ -38,7 +38,7 @@ declare module "../../../nodes/documents/document.ts" {
   }
 }
 
-declare module "../../../nodes/elements/element.ts" {
+declare module "../../../nodes/element.ts" {
   interface Element {
     getElementsByTagNameNS(
       namespaceURI: "http://www.w3.org/1999/xhtml",

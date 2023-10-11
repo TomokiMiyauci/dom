@@ -1,10 +1,10 @@
 import type { IHTMLTableElement } from "../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { HTMLCollection } from "../../../nodes/node_trees/html_collection.ts";
+import { HTMLCollection } from "../../../nodes/html_collection.ts";
 import { tree } from "../../../internal.ts";
 import { SameObject } from "../../webidl/extended_attribute.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
-import { removeNode } from "../../../nodes/node_trees/mutation.ts";
+import { removeNode } from "../../../nodes/mutation.ts";
 import { isElement } from "../../../nodes/utils/type.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

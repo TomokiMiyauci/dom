@@ -1,4 +1,4 @@
-import type { ISlottable } from "../../interface.d.ts";
+import type { ISlottable } from "./../interface.d.ts";
 import { findSlot } from "./node_tree.ts";
 
 export class Slottable implements ISlottable {

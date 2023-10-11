@@ -8,8 +8,8 @@ import { DocumentType as MyDocumentType } from "./nodes/document_type.ts";
 import { ProcessingInstruction as MyProcessingInstruction } from "./nodes/processing_instruction.ts";
 import { ShadowRoot as MyShadowRoot } from "./nodes/shadow_root.ts";
 import { Text as MyText } from "./nodes/text.ts";
-import { Attr as MyAttr } from "./nodes/elements/attr.ts";
-import { Element as MyElement } from "./nodes/elements/element.ts";
+import { Attr as MyAttr } from "./nodes/attr.ts";
+import { Element as MyElement } from "./nodes/element.ts";
 import { Comment as MyComment } from "./nodes/comment.ts";
 
 import { assertType, IsExact } from "./_dev_deps.ts";

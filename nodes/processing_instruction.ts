@@ -1,7 +1,7 @@
 import type { IProcessingInstruction } from "../interface.d.ts";
 import { CharacterData } from "./character_data.ts";
 import { NodeType } from "./node.ts";
-import { Document } from "./documents/document.ts";
+import { Document } from "./document.ts";
 import { $, internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 

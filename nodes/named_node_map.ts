@@ -1,23 +1,23 @@
-import type { INamedNodeMap } from "../../interface.d.ts";
-import { find, html, map, range } from "../../deps.ts";
-import { getQualifiedName } from "../utils/attr.ts";
-import { List } from "../../_internals/infra/data_structures/list.ts";
+import type { INamedNodeMap } from "../interface.d.ts";
+import { find, html, map, range } from "../deps.ts";
+import { getQualifiedName } from "./utils/attr.ts";
+import { List } from "../_internals/infra/data_structures/list.ts";
 import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "../utils/element.ts";
-import { Getter, getter, WebIDL } from "../../_internals/webidl/idl.ts";
+} from "./utils/element.ts";
+import { Getter, getter, WebIDL } from "../_internals/webidl/idl.ts";
 import {
   LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-} from "../../_internals/webidl/legacy_extended_attributes.ts";
-import { Namespace } from "../../_internals/infra/namespace.ts";
-import { isHTMLDocument } from "../utils/document.ts";
-import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
-import { toASCIILowerCase } from "../../_internals/infra/string.ts";
-import { $ } from "../../internal.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+} from "../_internals/webidl/legacy_extended_attributes.ts";
+import { Namespace } from "../_internals/infra/namespace.ts";
+import { isHTMLDocument } from "./utils/document.ts";
+import { DOMExceptionName } from "../_internals/webidl/exception.ts";
+import { toASCIILowerCase } from "../_internals/infra/string.ts";
+import { $ } from "../internal.ts";
+import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
 const $attributeList = Symbol();
 const $element = Symbol();

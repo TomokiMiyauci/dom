@@ -1,10 +1,10 @@
-import { at, iter, len, range } from "../../deps.ts";
-import { INodeList } from "../../interface.d.ts";
-import { Iterable, iterable } from "../../_internals/webidl/iterable.ts";
-import { LegacyPlatformObject } from "../../_internals/webidl/legacy_extended_attributes.ts";
-import { Getter, getter, WebIDL } from "../../_internals/webidl/idl.ts";
-import { tree } from "../../internal.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import { at, iter, len, range } from "./../deps.ts";
+import { INodeList } from "./../interface.d.ts";
+import { Iterable, iterable } from "./../_internals/webidl/iterable.ts";
+import { LegacyPlatformObject } from "./../_internals/webidl/legacy_extended_attributes.ts";
+import { Getter, getter, WebIDL } from "./../_internals/webidl/idl.ts";
+import { tree } from "./../internal.ts";
+import { Exposed } from "./../_internals/webidl/extended_attribute.ts";
 
 export const $root = Symbol();
 export const $filter = Symbol();

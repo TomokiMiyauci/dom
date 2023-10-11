@@ -1,19 +1,19 @@
-import { Element } from "../nodes/elements/element.ts";
-import { Document } from "../nodes/documents/document.ts";
+import { Element } from "../nodes/element.ts";
+import { Document } from "../nodes/document.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { IParentNode } from "../interface.d.ts";
-import { ParentNode } from "../nodes/node_trees/parent_node.ts";
+import { ParentNode } from "../nodes/parent_node.ts";
 import { includes } from "../utils.ts";
 
 declare module "../nodes/document_fragment.ts" {
   interface DocumentFragment extends IParentNode {}
 }
 
-declare module "../nodes/documents/document.ts" {
+declare module "../nodes/document.ts" {
   interface Document extends IParentNode {}
 }
 
-declare module "../nodes/elements/element.ts" {
+declare module "../nodes/element.ts" {
   interface Element extends IParentNode {}
 }
 

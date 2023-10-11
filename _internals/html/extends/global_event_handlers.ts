@@ -1,12 +1,12 @@
 import { GlobalEventHandlers } from "../global_event_handlers.ts";
 import type { IGlobalEventHandlers } from "../../interface.d.ts";
-import { Document } from "../../../nodes/documents/document.ts";
+import { Document } from "../../../nodes/document.ts";
 import { Window } from "../loading_web_pages/window.ts";
 import { HTMLElement } from "../dom/html_element.ts";
 import { SVGElement } from "../../../_internals/svg/elements/svg_element.ts";
 import { includes } from "../../../utils.ts";
 
-declare module "../../../nodes/documents/document.ts" {
+declare module "../../../nodes/document.ts" {
   interface Document extends IGlobalEventHandlers {}
 }
 

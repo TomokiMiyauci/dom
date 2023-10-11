@@ -1,7 +1,7 @@
 import type { IWindow } from "../../interface.d.ts";
 import { EventTarget } from "../../../events/event_target.ts";
 import { WindowEventHandlers } from "../window_event_handlers.ts";
-import { Document } from "../../../nodes/documents/document.ts";
+import { Document } from "../../../nodes/document.ts";
 import { $, internalSlots } from "../../../internal.ts";
 import {
   activeWindow,

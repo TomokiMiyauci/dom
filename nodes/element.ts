@@ -1,40 +1,40 @@
-import { Node, NodeType } from "../node.ts";
+import { Node, NodeType } from "./node.ts";
 import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
-} from "../utils/node.ts";
-import { isElement, isShadowHost } from "../utils/type.ts";
-import { getQualifiedName } from "../utils/element.ts";
+} from "./utils/node.ts";
+import { isElement, isShadowHost } from "./utils/type.ts";
+import { getQualifiedName } from "./utils/element.ts";
 import { Attr, cloneAttr } from "./attr.ts";
-import { changeAttributes } from "../utils/attr.ts";
+import { changeAttributes } from "./utils/attr.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { isHTMLDocument } from "../utils/document.ts";
+import { isHTMLDocument } from "./utils/document.ts";
 import {
   CustomElementDefinition,
   isValidCustomElementName,
   lookUpCustomElementDefinition,
-} from "../../_internals/html/custom_element.ts";
+} from "../_internals/html/custom_element.ts";
 import {
   Namespace,
   validateAndExtract,
-} from "../../_internals/infra/namespace.ts";
-import { List } from "../../_internals/infra/data_structures/list.ts";
-import { Text } from "../text.ts";
-import { find, iter, map, some, xmlValidator } from "../../deps.ts";
-import type { CustomElementState, IElement } from "../../interface.d.ts";
-import { DOMTokenList } from "../../sets/dom_token_list.ts";
-import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+} from "../_internals/infra/namespace.ts";
+import { List } from "../_internals/infra/data_structures/list.ts";
+import { Text } from "./text.ts";
+import { find, iter, map, some, xmlValidator } from "../deps.ts";
+import type { CustomElementState, IElement } from "../interface.d.ts";
+import { DOMTokenList } from "../sets/dom_token_list.ts";
+import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import {
   PutForwards,
   SameObject,
-} from "../../_internals/webidl/extended_attribute.ts";
-import { convert, DOMString } from "../../_internals/webidl/types.ts";
-import { createElement } from "../utils/create_element.ts";
-import { toASCIILowerCase } from "../../_internals/infra/string.ts";
-import { Steps } from "../../infra/applicable.ts";
-import { $, internalSlots, tree } from "../../internal.ts";
-import { ShadowRoot } from "../shadow_root.ts";
+} from "../_internals/webidl/extended_attribute.ts";
+import { convert, DOMString } from "../_internals/webidl/types.ts";
+import { createElement } from "./utils/create_element.ts";
+import { toASCIILowerCase } from "../_internals/infra/string.ts";
+import { Steps } from "../infra/applicable.ts";
+import { $, internalSlots, tree } from "../internal.ts";
+import { ShadowRoot } from "./shadow_root.ts";
 import {
   appendAttribute,
   getAttributeByName,
@@ -48,14 +48,11 @@ import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "../utils/element.ts";
-import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
-import { replaceAllString } from "../utils/replace_all_string.ts";
-import {
-  matchSelector,
-  parseSelector,
-} from "../../_internals/selectors/hook.ts";
-import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+} from "./utils/element.ts";
+import { reflectSet, setAttributeValue } from "./utils/set_attribute_value.ts";
+import { replaceAllString } from "./utils/replace_all_string.ts";
+import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
+import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
 @Exposed("Window", "Element")
 export class Element extends Node implements IElement {
