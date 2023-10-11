@@ -7,7 +7,7 @@ import {
   replaceChild,
 } from "../node_trees/mutation.ts";
 import { convertNodesToNode } from "../node_trees/parent_node.ts";
-import { convert, DOMString } from "../../../webidl/types.ts";
+import { convert, DOMString } from "../../../_internals/webidl/types.ts";
 import { $, tree } from "../../../internal.ts";
 
 export class ChildNode implements IChildNode {

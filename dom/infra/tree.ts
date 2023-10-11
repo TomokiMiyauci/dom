@@ -1,6 +1,6 @@
 import { insert, last, len, some, takewhile } from "../../deps.ts";
-import { Entry } from "../../infra/data_structures/common.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { Entry } from "../../_internals/infra/data_structures/common.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { Steps } from "./applicable.ts";
 
 class TrappedOrderedSet<T> extends OrderedSet<T> {

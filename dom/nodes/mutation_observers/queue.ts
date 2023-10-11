@@ -1,6 +1,6 @@
 import { StaticNodeList } from "../node_trees/node_list.ts";
 import { MutationRecord } from "./mutation_record.ts";
-import { OrderedSet } from "../../../infra/data_structures/set.ts";
+import { OrderedSet } from "../../../_internals/infra/data_structures/set.ts";
 import { $, tree } from "../../../internal.ts";
 import { fireEvent } from "../../events/fire.ts";
 

@@ -1,5 +1,8 @@
-import { matchSelectorToTree, parseSelector } from "../../selectors/hook.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import {
+  matchSelectorToTree,
+  parseSelector,
+} from "../../_internals/selectors/hook.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { tree } from "../../internal.ts";
 
 /**

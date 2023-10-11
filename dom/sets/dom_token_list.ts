@@ -1,17 +1,17 @@
-import { Iterable, iterable } from "../../webidl/iterable.ts";
+import { Iterable, iterable } from "../../_internals/webidl/iterable.ts";
 import type { IDOMTokenList } from "../../interface.d.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { type AttributesContext } from "../nodes/elements/element.ts";
 import { getAttributeValue } from "../nodes/elements/element_utils.ts";
 import { setAttributeValue } from "../nodes/utils/set_attribute_value.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { parseOrderSet, serializeOrderSet } from "../infra/ordered_set.ts";
-import { reAsciiWhitespace } from "../../infra/code_point.ts";
-import { LegacyPlatformObject } from "../../webidl/legacy_extended_attributes.ts";
-import { getter, stringifier, WebIDL } from "../../webidl/idl.ts";
-import { convert, DOMString } from "../../webidl/types.ts";
+import { reAsciiWhitespace } from "../../_internals/infra/code_point.ts";
+import { LegacyPlatformObject } from "../../_internals/webidl/legacy_extended_attributes.ts";
+import { getter, stringifier, WebIDL } from "../../_internals/webidl/idl.ts";
+import { convert, DOMString } from "../../_internals/webidl/types.ts";
 import { range } from "../../deps.ts";
-import { toASCIILowerCase } from "../../infra/string.ts";
+import { toASCIILowerCase } from "../../_internals/infra/string.ts";
 import { $ } from "../../internal.ts";
 
 const $tokenSet = Symbol();

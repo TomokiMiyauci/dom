@@ -12,7 +12,7 @@ import {
   preInsertNode,
   replaceAllNode,
 } from "../node_trees/mutation.ts";
-import { convert, DOMString } from "../../../webidl/types.ts";
+import { convert, DOMString } from "../../../_internals/webidl/types.ts";
 import { $, tree } from "../../../internal.ts";
 
 export class ParentNode implements IParentNode {

@@ -1,7 +1,7 @@
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { NodeFilter } from "./node_filter.ts";
 import { $ } from "../../internal.ts";
-import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
+import { callUserObjectOperation } from "../../_internals/webidl/ecmascript_bindings/callback_interface.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-filter)

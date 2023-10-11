@@ -8,7 +8,7 @@ import {
 } from "../node_trees/mutation.ts";
 import { nodeLength } from "../node_trees/node_tree.ts";
 import { isNotNull, iter } from "../../../deps.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
 import { $, tree } from "../../../internal.ts";
 import { Text } from "../text.ts";
 

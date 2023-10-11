@@ -1,5 +1,5 @@
 import { createElement } from "./create_element.ts";
-import { validateAndExtract } from "../../../infra/namespace.ts";
+import { validateAndExtract } from "../../../_internals/infra/namespace.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps

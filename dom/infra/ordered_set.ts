@@ -1,5 +1,5 @@
-import { OrderedSet } from "../../infra/data_structures/set.ts";
-import { reAsciiWhitespace } from "../../infra/code_point.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
+import { reAsciiWhitespace } from "../../_internals/infra/code_point.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-ordered-set-serializer

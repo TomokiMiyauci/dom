@@ -14,10 +14,10 @@ import {
   replaceChild,
 } from "./node_trees/mutation.ts";
 import { ifilter, iter } from "../../deps.ts";
-import { concatString } from "../../infra/string.ts";
-import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
-import { type Const, constant } from "../../webidl/idl.ts";
-import { List } from "../../infra/data_structures/list.ts";
+import { concatString } from "../../_internals/infra/string.ts";
+import { Exposed, SameObject } from "../../_internals/webidl/extended_attribute.ts";
+import { type Const, constant } from "../../_internals/webidl/idl.ts";
+import { List } from "../../_internals/infra/data_structures/list.ts";
 import { replaceData } from "./character_data_utils.ts";
 import {
   type RegisteredObserver,
@@ -26,7 +26,7 @@ import {
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { Get } from "../../utils.ts";
 import {
   equals,
@@ -35,8 +35,8 @@ import {
   locateNamespace,
   locateNamespacePrefix,
 } from "./node_utils.ts";
-import { documentBaseURL } from "../../html/infra/url.ts";
-import { URLSerializer } from "../../url/serializer.ts";
+import { documentBaseURL } from "../../_internals/html/infra/url.ts";
+import { URLSerializer } from "../../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./text_utils.ts";
 
 const inspect = Symbol.for("Deno.customInspect");

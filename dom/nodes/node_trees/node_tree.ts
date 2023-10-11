@@ -9,7 +9,7 @@ import {
 import { $, tree } from "../../../internal.ts";
 import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
 import { iter } from "../../../deps.ts";
-import { List } from "../../../infra/data_structures/list.ts";
+import { List } from "../../../_internals/infra/data_structures/list.ts";
 import { isShadowRootNode } from "../shadow_root_utils.ts";
 
 /**

@@ -1,5 +1,5 @@
 import { $ } from "../../internal.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { fireEvent } from "../events/fire.ts";
 
 /**

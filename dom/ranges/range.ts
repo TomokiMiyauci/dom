@@ -1,6 +1,6 @@
 import type { IRange } from "../../interface.d.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
-import { Const, constant } from "../../webidl/idl.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import { Const, constant } from "../../_internals/webidl/idl.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 import { BoundaryPoint, Position, position } from "./boundary_point.ts";
 import {
@@ -10,15 +10,15 @@ import {
   isDocumentType,
   isText,
 } from "../nodes/utils.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import {
   substringCodeUnitByPositions,
   substringCodeUnitToEnd,
-} from "../../infra/string.ts";
-import { convert, unsignedLong, unsignedShort } from "../../webidl/types.ts";
-import { Range_CSSOM } from "../../cssom/range.ts";
-import { Range_DOMParsing } from "../../domparsing/range.ts";
+} from "../../_internals/infra/string.ts";
+import { convert, unsignedLong, unsignedShort } from "../../_internals/webidl/types.ts";
+import { Range_CSSOM } from "../../_internals/cssom/range.ts";
+import { Range_DOMParsing } from "../../_internals/domparsing/range.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
 import {
   cloneContents,

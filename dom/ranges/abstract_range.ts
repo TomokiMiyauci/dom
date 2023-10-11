@@ -1,6 +1,6 @@
 import type { IAbstractRange } from "../../interface.d.ts";
 import { BoundaryPoint } from "./boundary_point.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 import { isCollapsed } from "./abstract_range_utils.ts";
 
 @Exposed("Window", "AbstractRange")

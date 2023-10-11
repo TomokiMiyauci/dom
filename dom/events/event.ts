@@ -1,8 +1,8 @@
-import { List } from "../../infra/data_structures/list.ts";
+import { List } from "../../_internals/infra/data_structures/list.ts";
 import type { IEvent } from "../../interface.d.ts";
 import { $, internalSlots } from "../../internal.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
-import { Const, constant } from "../../webidl/idl.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import { Const, constant } from "../../_internals/webidl/idl.ts";
 import { Steps } from "../infra/applicable.ts";
 
 /**

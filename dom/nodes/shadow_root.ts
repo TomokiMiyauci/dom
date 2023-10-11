@@ -3,7 +3,7 @@ import { DocumentFragment } from "./document_fragment.ts";
 import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
-} from "../../html/events.ts";
+} from "../../_internals/html/events.ts";
 import { internalSlots } from "../../internal.ts";
 
 /**

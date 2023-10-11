@@ -1,24 +1,24 @@
 import type { INamedNodeMap } from "../../../interface.d.ts";
 import { find, html, map, range } from "../../../deps.ts";
 import { getQualifiedName } from "../utils.ts";
-import { List } from "../../../infra/data_structures/list.ts";
+import { List } from "../../../_internals/infra/data_structures/list.ts";
 import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
 } from "../elements/element_utils.ts";
 import { $element } from "../internal.ts";
-import { Getter, getter, WebIDL } from "../../../webidl/idl.ts";
+import { Getter, getter, WebIDL } from "../../../_internals/webidl/idl.ts";
 import {
   LegacyPlatformObject,
   LegacyUnenumerableNamedProperties,
-} from "../../../webidl/legacy_extended_attributes.ts";
-import { Namespace } from "../../../infra/namespace.ts";
+} from "../../../_internals/webidl/legacy_extended_attributes.ts";
+import { Namespace } from "../../../_internals/infra/namespace.ts";
 import { isHTMLDocument } from "../documents/document_utils.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
-import { toASCIILowerCase } from "../../../infra/string.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
+import { toASCIILowerCase } from "../../../_internals/infra/string.ts";
 import { $ } from "../../../internal.ts";
-import { Exposed } from "../../../webidl/extended_attribute.ts";
+import { Exposed } from "../../../_internals/webidl/extended_attribute.ts";
 
 const $attributeList = Symbol();
 

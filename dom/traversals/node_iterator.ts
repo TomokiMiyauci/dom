@@ -1,5 +1,5 @@
 import type { INodeIterator } from "../../interface.d.ts";
-import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed, SameObject } from "../../_internals/webidl/extended_attribute.ts";
 import { $, tree } from "../../internal.ts";
 import { Direction, traverse } from "./node_iterator_utils.ts";
 import { Steps } from "../infra/applicable.ts";

@@ -6,7 +6,7 @@ import {
   isProcessingInstruction,
   isText,
 } from "../nodes/utils.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { DocumentFragment } from "../nodes/document_fragment.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import {

@@ -1,12 +1,12 @@
 import type { IAbortSignal } from "../../interface.d.ts";
 import { EventTarget } from "../events/event_target.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
-} from "../../html/events.ts";
+} from "../../_internals/html/events.ts";
 import { internalSlots } from "../../internal.ts";
 import {
   createDependentAbortSignal,

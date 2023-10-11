@@ -13,18 +13,24 @@ import {
   CustomElementDefinition,
   isValidCustomElementName,
   lookUpCustomElementDefinition,
-} from "../../../html/custom_element.ts";
-import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
-import { List } from "../../../infra/data_structures/list.ts";
+} from "../../../_internals/html/custom_element.ts";
+import {
+  Namespace,
+  validateAndExtract,
+} from "../../../_internals/infra/namespace.ts";
+import { List } from "../../../_internals/infra/data_structures/list.ts";
 import { Text } from "../text.ts";
 import { find, iter, map, some, xmlValidator } from "../../../deps.ts";
 import type { IElement } from "../../../interface.d.ts";
 import { DOMTokenList } from "../../sets/dom_token_list.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
-import { PutForwards, SameObject } from "../../../webidl/extended_attribute.ts";
-import { convert, DOMString } from "../../../webidl/types.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
+import {
+  PutForwards,
+  SameObject,
+} from "../../../_internals/webidl/extended_attribute.ts";
+import { convert, DOMString } from "../../../_internals/webidl/types.ts";
 import { createElement } from "../utils/create_element.ts";
-import { toASCIILowerCase } from "../../../infra/string.ts";
+import { toASCIILowerCase } from "../../../_internals/infra/string.ts";
 import { Steps } from "../../infra/applicable.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
 import { ShadowRoot } from "../shadow_root.ts";
@@ -45,8 +51,11 @@ import {
 } from "./element_utils.ts";
 import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
 import { replaceAllString } from "../utils/replace_all_string.ts";
-import { matchSelector, parseSelector } from "../../../selectors/hook.ts";
-import { Exposed } from "../../../webidl/extended_attribute.ts";
+import {
+  matchSelector,
+  parseSelector,
+} from "../../../_internals/selectors/hook.ts";
+import { Exposed } from "../../../_internals/webidl/extended_attribute.ts";
 
 @Exposed("Window", "Element")
 export class Element extends Node implements IElement {
@@ -436,8 +445,8 @@ export class Element extends Node implements IElement {
    */
   insertAdjacentElement(
     where: InsertPosition,
-    element: Element,
-  ): Element | null {
+    element: globalThis.Element,
+  ): globalThis.Element | null {
     // result of running insert adjacent, give this, where, and element.
     return insertAdjacent(this, where, element) as Element | null;
   }

@@ -1,7 +1,7 @@
 import type { IAbortController } from "../../interface.d.ts";
 import { AbortSignal } from "./abort_signal.ts";
 import { signalAbort as abortSignal } from "./abort_signal_utils.ts";
-import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed, SameObject } from "../../_internals/webidl/extended_attribute.ts";
 
 @Exposed("*", "AbortController")
 export class AbortController implements IAbortController {

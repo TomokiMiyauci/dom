@@ -1,11 +1,11 @@
 import { Node } from "./node.ts";
 import { type ICharacterData } from "../../interface.d.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import { LegacyNullToEmptyString } from "../../webidl/legacy_extended_attributes.ts";
-import { convert, DOMString, unsignedLong } from "../../webidl/types.ts";
+import { LegacyNullToEmptyString } from "../../_internals/webidl/legacy_extended_attributes.ts";
+import { convert, DOMString, unsignedLong } from "../../_internals/webidl/types.ts";
 import { replaceData, substringData } from "./character_data_utils.ts";
 import { internalSlots } from "../../internal.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 
 @Exposed("Window", "CharacterData")
 export abstract class CharacterData extends Node implements ICharacterData {

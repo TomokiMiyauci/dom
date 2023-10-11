@@ -1,10 +1,10 @@
 import { handleAttributesChanges } from "./attr_utils.ts";
-import { isValidCustomElementName } from "../../../html/custom_element.ts";
-import { Namespace } from "../../../infra/namespace.ts";
+import { isValidCustomElementName } from "../../../_internals/html/custom_element.ts";
+import { Namespace } from "../../../_internals/infra/namespace.ts";
 import { find } from "../../../deps.ts";
 import { preInsertNode } from "../node_trees/mutation.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
-import { toASCIILowerCase } from "../../../infra/string.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
+import { toASCIILowerCase } from "../../../_internals/infra/string.ts";
 import { $, tree } from "../../../internal.ts";
 
 /**

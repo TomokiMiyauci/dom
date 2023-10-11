@@ -1,8 +1,8 @@
 import type { Node } from "../node.ts";
 import type { IMutationObserver } from "../../../interface.d.ts";
-import { Exposed } from "../../../webidl/extended_attribute.ts";
-import { List } from "../../../infra/data_structures/list.ts";
-import { Queue } from "../../../infra/data_structures/queue.ts";
+import { Exposed } from "../../../_internals/webidl/extended_attribute.ts";
+import { List } from "../../../_internals/infra/data_structures/list.ts";
+import { Queue } from "../../../_internals/infra/data_structures/queue.ts";
 import { iter } from "../../../deps.ts";
 import { MutationRecord } from "./mutation_record.ts";
 import { RegisteredObserver } from "./queue.ts";

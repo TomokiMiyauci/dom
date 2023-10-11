@@ -14,31 +14,31 @@ import { type SlottableInternals } from "./dom/nodes/node_trees/slottable.ts";
 import { type MutationObserverInternals } from "./dom/nodes/mutation_observers/mutation_observer.ts";
 import { type AbortSignalInternals } from "./dom/aborts/abort_signal.ts";
 
-import { SelectionInternals } from "./selection/selection.ts";
+import { SelectionInternals } from "./_internals/selection/selection.ts";
 
-import { HTMLTemplateElementInternals } from "./html/elements/html_template_element.ts";
+import { HTMLTemplateElementInternals } from "./_internals/html/elements/html_template_element.ts";
 import { Tree } from "./dom/infra/tree.ts";
 import { ShadowTree } from "./dom/nodes/shadow_root_utils.ts";
 import { AbstractRangeInternals } from "./dom/ranges/abstract_range.ts";
 import { NodeIteratorInternals } from "./dom/traversals/node_iterator.ts";
 import { TreeWalkerInternals } from "./dom/traversals/tree_walker.ts";
-import { OrderedSet } from "./infra/data_structures/set.ts";
-import { List } from "./infra/data_structures/list.ts";
+import { OrderedSet } from "./_internals/infra/data_structures/set.ts";
+import { List } from "./_internals/infra/data_structures/list.ts";
 import { TextTree } from "./dom/nodes/text_utils.ts";
 import { emplace, UnionToIntersection } from "./deps.ts";
 import { extend } from "./utils.ts";
-import type { ResponseInternals } from "./fetch/response.ts";
-import type { RequestInternals } from "./fetch/request.ts";
+import type { ResponseInternals } from "./_internals/fetch/response.ts";
+import type { RequestInternals } from "./_internals/fetch/request.ts";
 import {
   Agent,
   RealmRecord,
 } from "./ecma/executable_coce_and_execution_context.ts";
-import { EventLoop } from "./html/web_application_apis/scripting.ts";
-import { LocationInternals } from "./html/loading_web_pages/location.ts";
-import { WindowInternals } from "./html/loading_web_pages/window.ts";
-import { HTMLScriptElementInternals } from "./html/elements/scripting/html_script_element.ts";
-import type { HTMLInputElementInternals } from "./html/elements/html_input_element.ts";
-import type { FormAssociatedElement } from "./html/elements/forms/attributes_common_to_form_control.ts";
+import { EventLoop } from "./_internals/html/web_application_apis/scripting.ts";
+import { LocationInternals } from "./_internals/html/loading_web_pages/location.ts";
+import { WindowInternals } from "./_internals/html/loading_web_pages/window.ts";
+import { HTMLScriptElementInternals } from "./_internals/html/elements/scripting/html_script_element.ts";
+import type { HTMLInputElementInternals } from "./_internals/html/elements/html_input_element.ts";
+import type { FormAssociatedElement } from "./_internals/html/elements/forms/attributes_common_to_form_control.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],

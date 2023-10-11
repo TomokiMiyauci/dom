@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import type { ICustomEvent } from "../../interface.d.ts";
 import { $ } from "../../internal.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 import { Event, initialize } from "./event.ts";
 
 /**

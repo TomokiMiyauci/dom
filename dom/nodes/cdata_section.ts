@@ -1,7 +1,7 @@
 import { Text } from "./text.ts";
 import { NodeType } from "./node.ts";
 import type { ICDATASection } from "../../interface.d.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 
 @Exposed("Window", "CDATASection")
 export class CDATASection extends Text implements ICDATASection {

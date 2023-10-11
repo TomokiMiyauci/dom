@@ -8,8 +8,8 @@ import {
   isShadowRoot,
   isText,
 } from "../utils.ts";
-import { OrderedSet } from "../../../infra/data_structures/set.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { OrderedSet } from "../../../_internals/infra/data_structures/set.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";
 import { filter, find, iter, some } from "../../../deps.ts";
 import {
@@ -24,9 +24,9 @@ import {
 import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
 import { $, tree } from "../../../internal.ts";
 import { isCustom } from "../elements/element_utils.ts";
-import { enqueueCustomElementCallbackReaction } from "../../../html/elements/custom_elements/custom_element_reaction.ts";
+import { enqueueCustomElementCallbackReaction } from "../../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
 import { isAssigned } from "./slottable_utils.ts";
-import { tryUpgradeElement } from "../../../html/elements/custom_elements/upgrade.ts";
+import { tryUpgradeElement } from "../../../_internals/html/elements/custom_elements/upgrade.ts";
 import { adoptNode } from "../documents/document_utils.ts";
 
 /**

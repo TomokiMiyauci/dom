@@ -3,9 +3,9 @@
  */
 
 import { queueMutationRecord } from "./mutation_observers/queue.ts";
-import { OrderedSet } from "../../infra/data_structures/set.ts";
+import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { nodeLength } from "./node_trees/node_tree.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { $, tree } from "../../internal.ts";
 import { iter } from "../../deps.ts";
 import {

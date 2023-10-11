@@ -1,5 +1,5 @@
 import type { INodeFilter } from "../../interface.d.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 
 export const NodeFilter: INodeFilter = {
   FILTER_ACCEPT: 1,

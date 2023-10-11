@@ -1,7 +1,7 @@
 import "./dom/extends/all.ts";
 
-export { DOMParser } from "./html/dom_parser.ts";
-export { Window } from "./html/loading_web_pages/window.ts";
+export { DOMParser } from "./_internals/html/dom_parser.ts";
+export { Window } from "./_internals/html/loading_web_pages/window.ts";
 
 export { AbortController } from "./dom/aborts/abort_controller.ts";
 export { AbortSignal } from "./dom/aborts/abort_signal.ts";

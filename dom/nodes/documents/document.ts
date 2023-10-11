@@ -14,20 +14,23 @@ import { Attr } from "../elements/attr.ts";
 import { Text } from "../text.ts";
 import { Comment } from "../comment.ts";
 import { createElement } from "../utils/create_element.ts";
-import { Namespace, validateAndExtract } from "../../../infra/namespace.ts";
+import {
+  Namespace,
+  validateAndExtract,
+} from "../../../_internals/infra/namespace.ts";
 import { DocumentFragment } from "../document_fragment.ts";
 import type { IDocument, IXMLDocument } from "../../../interface.d.ts";
 import { find, html, xmlValidator } from "../../../deps.ts";
 import { ProcessingInstruction } from "../processing_instruction.ts";
 import { DOMImplementation } from "../documents/dom_implementation.ts";
-import { DOMExceptionName } from "../../../webidl/exception.ts";
+import { DOMExceptionName } from "../../../_internals/webidl/exception.ts";
 import { CDATASection } from "../cdata_section.ts";
-import { ReName } from "../../../xml/document.ts";
+import { ReName } from "../../../_internals/xml/document.ts";
 import { getDocumentElement } from "../node_trees/node_tree.ts";
-import { convert, DOMString } from "../../../webidl/types.ts";
-import { toASCIILowerCase } from "../../../infra/string.ts";
+import { convert, DOMString } from "../../../_internals/webidl/types.ts";
+import { toASCIILowerCase } from "../../../_internals/infra/string.ts";
 import { Range } from "../../ranges/range.ts";
-import { type Encoding, utf8 } from "../../../encoding/encoding.ts";
+import { type Encoding, utf8 } from "../../../_internals/encoding/encoding.ts";
 import {
   NodeIterator,
   NodeIteratorInternals,
@@ -39,15 +42,15 @@ import {
 import { createEvent } from "../../events/construct.ts";
 import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
-import { MouseEvent } from "../../../uievents/mouse_event.ts";
+import { MouseEvent } from "../../../_internals/uievents/mouse_event.ts";
 import { $, internalSlots, tree } from "../../../internal.ts";
 import { adoptNode, isHTMLDocument } from "./document_utils.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
 import {
   OpaqueOrigin,
   Origin,
-} from "../../../html/loading_web_pages/supporting_concepts.ts";
-import { Exposed } from "../../../webidl/extended_attribute.ts";
+} from "../../../_internals/html/loading_web_pages/supporting_concepts.ts";
+import { Exposed } from "../../../_internals/webidl/extended_attribute.ts";
 
 export type CompatMode = "BackCompat" | "CSS1Compat";
 

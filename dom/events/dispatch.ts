@@ -1,14 +1,14 @@
 import { type PotentialEventTarget, type Struct } from "./event.ts";
 import { EventListener } from "./event_target.ts";
 import { retarget } from "../nodes/shadow_root_utils.ts";
-import { List } from "../../infra/data_structures/list.ts";
+import { List } from "../../_internals/infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
 import { iter, last, lastItem } from "../../deps.ts";
-import { callUserObjectOperation } from "../../webidl/ecmascript_bindings/callback_interface.ts";
+import { callUserObjectOperation } from "../../_internals/webidl/ecmascript_bindings/callback_interface.ts";
 import { $, tree } from "../../internal.ts";
 import { Node } from "../nodes/node.ts";
-import { MouseEvent } from "../../uievents/mouse_event.ts";
+import { MouseEvent } from "../../_internals/uievents/mouse_event.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)

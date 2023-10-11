@@ -1,7 +1,7 @@
 import type { ITreeWalker } from "../../interface.d.ts";
 import { filter } from "./traversal.ts";
 import { NodeFilter } from "./node_filter.ts";
-import { Exposed, SameObject } from "../../webidl/extended_attribute.ts";
+import { Exposed, SameObject } from "../../_internals/webidl/extended_attribute.ts";
 import { $, tree } from "../../internal.ts";
 import { traverseChildren, traverseSiblings } from "./tree_walker_utils.ts";
 

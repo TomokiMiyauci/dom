@@ -1,8 +1,8 @@
 import { find, type RequiredBy, some } from "../../deps.ts";
-import { List } from "../../infra/data_structures/list.ts";
+import { List } from "../../_internals/infra/data_structures/list.ts";
 import type { IEventTarget } from "../../interface.d.ts";
-import { DOMExceptionName } from "../../webidl/exception.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 import { dispatch } from "./dispatch.ts";
 import { $, internalSlots } from "../../internal.ts";
 import { add } from "../aborts/abort_signal_utils.ts";

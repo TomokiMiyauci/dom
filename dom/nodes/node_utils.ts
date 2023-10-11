@@ -5,12 +5,12 @@
 import { isElement, isText } from "./utils.ts";
 import { getDocumentElement } from "./node_trees/node_tree.ts";
 import { HTMLCollection } from "./node_trees/html_collection.ts";
-import { Namespace } from "../../infra/namespace.ts";
+import { Namespace } from "../../_internals/infra/namespace.ts";
 import { html, iter, izip, takewhile } from "../../deps.ts";
 import {
   matchASCIICaseInsensitive,
   toASCIILowerCase,
-} from "../../infra/string.ts";
+} from "../../_internals/infra/string.ts";
 import { parseOrderSet } from "../infra/ordered_set.ts";
 import { $, tree } from "../../internal.ts";
 

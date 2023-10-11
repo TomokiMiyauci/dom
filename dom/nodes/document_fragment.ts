@@ -2,7 +2,7 @@ import { Node, NodeType } from "./node.ts";
 import type { IDocumentFragment } from "../../interface.d.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
-import { Exposed } from "../../webidl/extended_attribute.ts";
+import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#interface-documentfragment

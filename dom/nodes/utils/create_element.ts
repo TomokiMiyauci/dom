@@ -1,4 +1,4 @@
-import { lookUpCustomElementDefinition } from "../../../html/custom_element.ts";
+import { lookUpCustomElementDefinition } from "../../../_internals/html/custom_element.ts";
 import { CustomElementState } from "../constant.ts";
 import { Element } from "../elements/element.ts";
 import { $ } from "../../../internal.ts";
