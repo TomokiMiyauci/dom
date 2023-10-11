@@ -10,6 +10,8 @@ import { ShadowRoot as MyShadowRoot } from "./nodes/shadow_root.ts";
 import { Text as MyText } from "./nodes/text.ts";
 import { Attr as MyAttr } from "./nodes/elements/attr.ts";
 import { Element as MyElement } from "./nodes/elements/element.ts";
+import { Comment as MyComment } from "./nodes/comment.ts";
+
 import { assertType, IsExact } from "./_dev_deps.ts";
 
 Deno.test("it should same constructor parameters", () => {
@@ -73,6 +75,13 @@ Deno.test("it should same constructor parameters", () => {
     IsExact<
       ConstructorParameters<typeof MyElement>,
       ConstructorParameters<typeof Element>
+    >
+  >(true);
+
+  assertType<
+    IsExact<
+      ConstructorParameters<typeof MyComment>,
+      ConstructorParameters<typeof Text>
     >
   >(true);
 });
