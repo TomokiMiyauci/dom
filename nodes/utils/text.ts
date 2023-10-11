@@ -1,11 +1,11 @@
-import { type CharacterDataInternals } from "./character_data.ts";
-import { isText } from "./utils.ts";
-import { List } from "../_internals/infra/data_structures/list.ts";
-import { composeIs, Constructor, iter } from "../deps.ts";
-import { concatString } from "../_internals/infra/string.ts";
-import { $ } from "../internal.ts";
-import { Get } from "../utils.ts";
-import { Tree } from "../infra/tree.ts";
+import { type CharacterDataInternals } from "../character_data.ts";
+import { isText } from "../utils.ts";
+import { List } from "../../_internals/infra/data_structures/list.ts";
+import { composeIs, Constructor, iter } from "../../deps.ts";
+import { concatString } from "../../_internals/infra/string.ts";
+import { $ } from "../../internal.ts";
+import { Get } from "../../utils.ts";
+import { Tree } from "../../infra/tree.ts";
 
 export function isExclusiveTextNode(text: Text): text is Text {
   return true;

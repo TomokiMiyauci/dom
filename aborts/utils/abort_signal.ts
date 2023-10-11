@@ -1,6 +1,6 @@
-import { $ } from "../internal.ts";
-import { DOMExceptionName } from "../_internals/webidl/exception.ts";
-import { fireEvent } from "../events/fire.ts";
+import { $ } from "../../internal.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+import { fireEvent } from "../../events/fire.ts";
 
 /**
  *  @see [DOM Living Standard](https://dom.spec.whatwg.org/#abortsignal-add)

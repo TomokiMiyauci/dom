@@ -33,9 +33,9 @@ import {
   root,
   select,
   setStartOrEnd,
-} from "./range_utils.ts";
-import { isCollapsed } from "./abstract_range_utils.ts";
-import { replaceData } from "../nodes/character_data_utils.ts";
+} from "./utils/range.ts";
+import { isCollapsed } from "./utils/abstract_range.ts";
+import { replaceData } from "../nodes/utils/character_data.ts";
 import { iter } from "../deps.ts";
 import {
   appendNode,

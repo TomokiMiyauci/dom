@@ -1,4 +1,4 @@
-import { replaceData, substringData } from "../character_data_utils.ts";
+import { replaceData, substringData } from "./character_data.ts";
 import {
   compareRangeOffset,
   equalsNodeEndNode,

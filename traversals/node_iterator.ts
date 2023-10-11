@@ -4,7 +4,7 @@ import {
   SameObject,
 } from "../_internals/webidl/extended_attribute.ts";
 import { $, tree } from "../internal.ts";
-import { Direction, traverse } from "./node_iterator_utils.ts";
+import { Direction, traverse } from "./utils/node_iterator.ts";
 import { Steps } from "../infra/applicable.ts";
 import { iter, last } from "../deps.ts";
 import { first } from "npm:itertools@2.1.2";

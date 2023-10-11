@@ -1,5 +1,5 @@
 import { fireEvent } from "../../../../events/fire.ts";
-import { isShadowRootNode } from "../../../../nodes/shadow_root_utils.ts";
+import { isShadowRootNode } from "../../../../nodes/utils/shadow_root.ts";
 import { $, tree } from "../../../../internal.ts";
 import { unblockRendering } from "../../semantics/document_utils.ts";
 import {

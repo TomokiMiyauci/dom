@@ -1,7 +1,7 @@
-import { Constructor } from "../deps.ts";
-import { $, tree } from "../internal.ts";
-import { Tree } from "../infra/tree.ts";
-import { isDocumentFragment, isNodeLike } from "./utils.ts";
+import { Constructor } from "../../deps.ts";
+import { $, tree } from "../../internal.ts";
+import { Tree } from "../../infra/tree.ts";
+import { isDocumentFragment, isNodeLike } from "../utils.ts";
 
 export function isShadowRoot(
   fragment: DocumentFragment,

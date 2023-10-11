@@ -1,6 +1,6 @@
-import { filter } from "./traversal.ts";
-import { NodeFilter } from "./node_filter.ts";
-import { $, tree } from "../internal.ts";
+import { filter } from "../traversal.ts";
+import { NodeFilter } from "../node_filter.ts";
+import { $, tree } from "../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traverse-children)

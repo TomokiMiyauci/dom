@@ -1,6 +1,6 @@
-import { Document } from "./documents/document.ts";
-import { assertEquals, describe, it } from "../_dev_deps.ts";
-import { tree } from "../internal.ts";
+import { Document } from "../documents/document.ts";
+import { assertEquals, describe, it } from "../../_dev_deps.ts";
+import { tree } from "../../internal.ts";
 
 const document = new Document();
 

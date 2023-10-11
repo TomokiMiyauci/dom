@@ -1,7 +1,7 @@
 import { isElement } from "../utils.ts";
 import { iter } from "../../deps.ts";
 import { $, tree } from "../../internal.ts";
-import { isCustom } from "../elements/element_utils.ts";
+import { isCustom } from "./element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
 import { removeNode } from "../node_trees/mutation.ts";
 

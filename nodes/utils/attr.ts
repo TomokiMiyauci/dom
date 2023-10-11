@@ -1,4 +1,4 @@
-import { isCustom } from "./element_utils.ts";
+import { isCustom } from "./element.ts";
 import { queueMutationRecord } from "../mutation_observers/queue.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { $ } from "../../internal.ts";

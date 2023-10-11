@@ -11,7 +11,7 @@ import { internalSlots } from "../internal.ts";
 import {
   createDependentAbortSignal,
   runStepsAfterTimeout,
-} from "./abort_signal_utils.ts";
+} from "./utils/abort_signal.ts";
 
 @Exposed("*", "AbortSignal")
 export class AbortSignal extends EventTarget implements IAbortSignal {

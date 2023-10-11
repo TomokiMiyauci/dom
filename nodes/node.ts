@@ -21,7 +21,7 @@ import {
 } from "../_internals/webidl/extended_attribute.ts";
 import { type Const, constant } from "../_internals/webidl/idl.ts";
 import { List } from "../_internals/infra/data_structures/list.ts";
-import { replaceData } from "./character_data_utils.ts";
+import { replaceData } from "./utils/character_data.ts";
 import {
   type RegisteredObserver,
   type TransientRegisteredObserver,
@@ -37,10 +37,10 @@ import {
   getParentElement,
   locateNamespace,
   locateNamespacePrefix,
-} from "./node_utils.ts";
+} from "./utils/node.ts";
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
-import { isExclusiveTextNode } from "./text_utils.ts";
+import { isExclusiveTextNode } from "./utils/text.ts";
 
 const inspect = Symbol.for("Deno.customInspect");
 

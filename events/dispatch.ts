@@ -1,6 +1,6 @@
 import { type PotentialEventTarget, type Struct } from "./event.ts";
 import { EventListener } from "./event_target.ts";
-import { retarget } from "../nodes/shadow_root_utils.ts";
+import { retarget } from "../nodes/utils/shadow_root.ts";
 import { List } from "../_internals/infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
 import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";

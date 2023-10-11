@@ -1,6 +1,6 @@
 import type { IAbortController } from "../interface.d.ts";
 import { AbortSignal } from "./abort_signal.ts";
-import { signalAbort as abortSignal } from "./abort_signal_utils.ts";
+import { signalAbort as abortSignal } from "./utils/abort_signal.ts";
 import {
   Exposed,
   SameObject,

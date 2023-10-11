@@ -9,7 +9,7 @@ import {
 } from "../../ranges/boundary_point.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { nodeLength } from "../../nodes/node_trees/node_tree.ts";
-import { root, setStartOrEnd } from "../../ranges/range_utils.ts";
+import { root, setStartOrEnd } from "../../ranges/utils/range.ts";
 import { Range } from "../../ranges/range.ts";
 
 @Exposed("Window", "Selection")

@@ -5,7 +5,7 @@ import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { dispatch } from "./dispatch.ts";
 import { $, internalSlots } from "../internal.ts";
-import { add } from "../aborts/abort_signal_utils.ts";
+import { add } from "../aborts/utils/abort_signal.ts";
 
 @Exposed("*", "EventTarget")
 export class EventTarget implements IEventTarget {

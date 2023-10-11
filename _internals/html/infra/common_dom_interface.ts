@@ -1,7 +1,7 @@
 import {
   getAttributeByNamespaceAndLocalName,
   removeAttributeByNamespaceAndLocalName,
-} from "../../../nodes/elements/element_utils.ts";
+} from "../../../nodes/utils/element.ts";
 import { setAttributeValue } from "../../../nodes/utils/set_attribute_value.ts";
 import { $ } from "../../../internal.ts";
 

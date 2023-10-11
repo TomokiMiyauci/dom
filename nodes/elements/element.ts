@@ -3,12 +3,12 @@ import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
-} from "../node_utils.ts";
+} from "../utils/node.ts";
 import { getQualifiedName, isElement, isShadowHost } from "../utils.ts";
 import { Attr, cloneAttr } from "./attr.ts";
-import { changeAttributes } from "./attr_utils.ts";
+import { changeAttributes } from "../utils/attr.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
-import { isHTMLDocument } from "../documents/document_utils.ts";
+import { isHTMLDocument } from "../utils/document.ts";
 import {
   CustomElementDefinition,
   isValidCustomElementName,
@@ -48,7 +48,7 @@ import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "./element_utils.ts";
+} from "../utils/element.ts";
 import { reflectSet, setAttributeValue } from "../utils/set_attribute_value.ts";
 import { replaceAllString } from "../utils/replace_all_string.ts";
 import {

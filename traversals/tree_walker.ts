@@ -6,7 +6,7 @@ import {
   SameObject,
 } from "../_internals/webidl/extended_attribute.ts";
 import { $, tree } from "../internal.ts";
-import { traverseChildren, traverseSiblings } from "./tree_walker_utils.ts";
+import { traverseChildren, traverseSiblings } from "./utils/tree_walker.ts";
 
 @Exposed("Window", "TreeWalker")
 export class TreeWalker implements ITreeWalker {

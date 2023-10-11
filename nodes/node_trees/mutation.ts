@@ -23,11 +23,11 @@ import {
 } from "./node_tree.ts";
 import { queueTreeMutationRecord } from "../mutation_observers/queue.ts";
 import { $, tree } from "../../internal.ts";
-import { isCustom } from "../elements/element_utils.ts";
+import { isCustom } from "../utils/element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
-import { isAssigned } from "./slottable_utils.ts";
+import { isAssigned } from "../utils/slottable.ts";
 import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
-import { adoptNode } from "../documents/document_utils.ts";
+import { adoptNode } from "../utils/document.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace

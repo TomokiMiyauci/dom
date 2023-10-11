@@ -7,7 +7,7 @@ import {
   DOMString,
   unsignedLong,
 } from "../_internals/webidl/types.ts";
-import { replaceData, substringData } from "./character_data_utils.ts";
+import { replaceData, substringData } from "./utils/character_data.ts";
 import { internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 

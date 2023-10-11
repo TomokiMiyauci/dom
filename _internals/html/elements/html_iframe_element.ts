@@ -12,7 +12,7 @@ import {
   createNewChildNavigable,
 } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
-import { reflectGet } from "../../../nodes/elements/element_utils.ts";
+import { reflectGet } from "../../../nodes/utils/element.ts";
 import { fireEvent } from "../../../events/fire.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

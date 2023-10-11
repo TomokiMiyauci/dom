@@ -5,25 +5,25 @@ import {
   isDocumentType,
   isProcessingInstruction,
   isText,
-} from "../nodes/utils.ts";
-import { DOMExceptionName } from "../_internals/webidl/exception.ts";
-import { DocumentFragment } from "../nodes/document_fragment.ts";
-import { nodeLength } from "../nodes/node_trees/node_tree.ts";
+} from "../../nodes/utils.ts";
+import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
+import { DocumentFragment } from "../../nodes/document_fragment.ts";
+import { nodeLength } from "../../nodes/node_trees/node_tree.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
   preInsertNode,
   removeNode,
-} from "../nodes/node_trees/mutation.ts";
+} from "../../nodes/node_trees/mutation.ts";
 import {
   replaceData,
   substringData,
-} from "../nodes/character_data_utils.ts";
-import { $, tree } from "../internal.ts";
-import { iter, last } from "../deps.ts";
-import { type BoundaryPoint, Position, position } from "./boundary_point.ts";
-import { isCollapsed } from "./abstract_range_utils.ts";
-import { splitText } from "../nodes/utils/split_text.ts";
+} from "../../nodes/utils/character_data.ts";
+import { $, tree } from "../../internal.ts";
+import { iter, last } from "../../deps.ts";
+import { type BoundaryPoint, Position, position } from "../boundary_point.ts";
+import { isCollapsed } from "./abstract_range.ts";
+import { splitText } from "../../nodes/utils/split_text.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)

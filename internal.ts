@@ -18,13 +18,13 @@ import { SelectionInternals } from "./_internals/selection/selection.ts";
 
 import { HTMLTemplateElementInternals } from "./_internals/html/elements/html_template_element.ts";
 import { Tree } from "./infra/tree.ts";
-import { ShadowTree } from "./nodes/shadow_root_utils.ts";
+import { ShadowTree } from "./nodes/utils/shadow_root.ts";
 import { AbstractRangeInternals } from "./ranges/abstract_range.ts";
 import { NodeIteratorInternals } from "./traversals/node_iterator.ts";
 import { TreeWalkerInternals } from "./traversals/tree_walker.ts";
 import { OrderedSet } from "./_internals/infra/data_structures/set.ts";
 import { List } from "./_internals/infra/data_structures/list.ts";
-import { TextTree } from "./nodes/text_utils.ts";
+import { TextTree } from "./nodes/utils/text.ts";
 import { emplace, UnionToIntersection } from "./deps.ts";
 import { extend } from "./utils.ts";
 import type { ResponseInternals } from "./_internals/fetch/response.ts";

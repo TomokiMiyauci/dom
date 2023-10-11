@@ -6,7 +6,7 @@ import {
   removeAttributeByName,
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
-} from "./element_utils.ts";
+} from "../utils/element.ts";
 import { $element } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../_internals/webidl/idl.ts";
 import {
@@ -14,7 +14,7 @@ import {
   LegacyUnenumerableNamedProperties,
 } from "../../_internals/webidl/legacy_extended_attributes.ts";
 import { Namespace } from "../../_internals/infra/namespace.ts";
-import { isHTMLDocument } from "../documents/document_utils.ts";
+import { isHTMLDocument } from "../utils/document.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../../_internals/infra/string.ts";
 import { $ } from "../../internal.ts";

@@ -10,7 +10,7 @@ import { $, tree } from "../../internal.ts";
 import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
 import { iter } from "../../deps.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
-import { isShadowRootNode } from "../shadow_root_utils.ts";
+import { isShadowRootNode } from "../utils/shadow_root.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length

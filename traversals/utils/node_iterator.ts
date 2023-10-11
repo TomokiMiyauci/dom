@@ -1,7 +1,7 @@
-import { filter } from "./traversal.ts";
-import { NodeFilter } from "./node_filter.ts";
-import { dropwhile, first, last, takewhile } from "../deps.ts";
-import { $ } from "../internal.ts";
+import { filter } from "../traversal.ts";
+import { NodeFilter } from "../node_filter.ts";
+import { dropwhile, first, last, takewhile } from "../../deps.ts";
+import { $ } from "../../internal.ts";
 
 export enum Direction {
   Next,

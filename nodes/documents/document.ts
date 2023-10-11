@@ -3,7 +3,7 @@ import {
   getElementsByClassName,
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
-} from "../node_utils.ts";
+} from "../utils/node.ts";
 import {
   isDocument,
   isDocumentFragment,
@@ -44,7 +44,7 @@ import { Event } from "../../events/event.ts";
 import { CustomEvent } from "../../events/custom_event.ts";
 import { MouseEvent } from "../../_internals/uievents/mouse_event.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
-import { adoptNode, isHTMLDocument } from "./document_utils.ts";
+import { adoptNode, isHTMLDocument } from "../utils/document.ts";
 import { internalCreateElement } from "../utils/internal_create_element.ts";
 import {
   OpaqueOrigin,

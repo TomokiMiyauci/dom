@@ -1,4 +1,4 @@
-import { $ } from "../internal.ts";
+import { $ } from "../../internal.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#range-collapsed)

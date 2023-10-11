@@ -1,4 +1,4 @@
-import { handleAttributesChanges } from "./attr_utils.ts";
+import { handleAttributesChanges } from "./attr.ts";
 import { isValidCustomElementName } from "../../_internals/html/custom_element.ts";
 import { Namespace } from "../../_internals/infra/namespace.ts";
 import { find } from "../../deps.ts";

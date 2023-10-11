@@ -2,8 +2,8 @@ import { Attr } from "../elements/attr.ts";
 import {
   appendAttribute,
   getAttributeByNamespaceAndLocalName,
-} from "../elements/element_utils.ts";
-import { changeAttributes } from "../elements/attr_utils.ts";
+} from "./element.ts";
+import { changeAttributes } from "./attr.ts";
 import { $ } from "../../internal.ts";
 
 /**
