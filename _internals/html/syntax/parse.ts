@@ -3,7 +3,7 @@
  * @module
  */
 
-import { createElement } from "../../../dom/nodes/utils/create_element.ts";
+import { createElement } from "../../../nodes/utils/create_element.ts";
 import { $ } from "../../../internal.ts";
 import { isFormAssociatedElement } from "../elements/forms/attributes_common_to_form_control.ts";
 import { isHTMLElement } from "../utils.ts";

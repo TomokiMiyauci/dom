@@ -1,5 +1,5 @@
 import type { IInnerHTML } from "../../interface.d.ts";
-import { replaceAllNode } from "../../dom/nodes/node_trees/mutation.ts";
+import { replaceAllNode } from "../../nodes/node_trees/mutation.ts";
 import { convert, DOMString } from "../webidl/types.ts";
 import { parseFragment, serializeFragment } from "./fragment.ts";
 

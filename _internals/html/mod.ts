@@ -1,5 +1,5 @@
-export { HTMLElement } from "./dom/html_element.ts";
-export { HTMLUnknownElement } from "./dom/html_unknown_element.ts";
+export { HTMLElement } from "./html_element.ts";
+export { HTMLUnknownElement } from "./html_unknown_element.ts";
 export { HTMLHtmlElement } from "./semantics/html_html_element.ts";
 export { HTMLHeadElement } from "./semantics/html_head_element.ts";
 export { HTMLTitleElement } from "./semantics/html_title_element.ts";

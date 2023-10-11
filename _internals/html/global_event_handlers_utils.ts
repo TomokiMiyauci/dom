@@ -1,5 +1,5 @@
-import { createEvent } from "../../dom/events/construct.ts";
-import { dispatch } from "../../dom/events/dispatch.ts";
+import { createEvent } from "../../events/construct.ts";
+import { dispatch } from "../../events/dispatch.ts";
 import { $ } from "../../internal.ts";
 import { MouseEvent } from "../uievents/mouse_event.ts";
 

@@ -1,10 +1,10 @@
 import { LinkStyle } from "../link_style.ts";
-import { ProcessingInstruction } from "../../../dom/nodes/processing_instruction.ts";
+import { ProcessingInstruction } from "../../../nodes/processing_instruction.ts";
 import { HTMLStyleElement } from "../../../_internals/html/elements/html_style_element.ts";
 import { HTMLLinkElement } from "../../../_internals/html/elements/html_link_element.ts";
 import { includes } from "../../../utils.ts";
 
-declare module "../../../dom/nodes/processing_instruction.ts" {
+declare module "../../../nodes/processing_instruction.ts" {
   interface ProcessingInstruction extends LinkStyle {}
 }
 

@@ -1,5 +1,5 @@
 import { iter } from "../../../deps.ts";
-import { isElement } from "../../../dom/nodes/utils.ts";
+import { isElement } from "../../../nodes/utils.ts";
 import { isHTMLElement } from "../utils.ts";
 import { tree } from "../../../internal.ts";
 

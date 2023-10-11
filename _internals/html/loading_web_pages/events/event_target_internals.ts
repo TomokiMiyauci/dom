@@ -1,4 +1,4 @@
-import { EventTargetInternals } from "../../../../dom/events/event_target.ts";
+import { EventTargetInternals } from "../../../../events/event_target.ts";
 import { EventHandler, type EventHandlerName } from "../../events.ts";
 
 /**
@@ -16,7 +16,7 @@ class EventHandlerMap extends Map<EventHandlerName, EventHandler> {
   }
 }
 
-declare module "../../../../dom/events/event_target.ts" {
+declare module "../../../../events/event_target.ts" {
   interface EventTargetInternals {
     /**
      * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-map)

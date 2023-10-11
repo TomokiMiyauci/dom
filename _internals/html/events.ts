@@ -7,7 +7,7 @@ import {
   addEventListener,
   EventListener,
   removeEventListener,
-} from "../../dom/events/event_target.ts";
+} from "../../events/event_target.ts";
 
 /**
  * @see https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-name

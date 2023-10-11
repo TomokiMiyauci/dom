@@ -2,7 +2,7 @@ import type { ISVGAElement } from "../../../interface.d.ts";
 import { SVGGraphicsElement } from "./svg_graphics_element.ts";
 import { SVGURIReference } from "../svg_uri_reference.ts";
 import { reflect } from "../infrastructure.ts";
-import { DOMTokenList } from "../../../dom/sets/dom_token_list.ts";
+import { DOMTokenList } from "../../../sets/dom_token_list.ts";
 
 @SVGURIReference
 export class SVGAElement extends SVGGraphicsElement implements ISVGAElement {

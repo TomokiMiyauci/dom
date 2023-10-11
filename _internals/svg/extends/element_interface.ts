@@ -1,10 +1,10 @@
-import "../../../dom/nodes/documents/document.ts";
-import "../../../dom/nodes/elements/element.ts";
-import { interfaceRegistry } from "../../../dom/nodes/utils/create_element.ts";
+import "../../../nodes/documents/document.ts";
+import "../../../nodes/elements/element.ts";
+import { interfaceRegistry } from "../../../nodes/utils/create_element.ts";
 import { resolveInterface } from "../element_interface.ts";
 import { Namespace } from "../../infra/namespace.ts";
 
-declare module "../../../dom/nodes/documents/document.ts" {
+declare module "../../../nodes/documents/document.ts" {
   interface Document {
     createElementNS<K extends keyof SVGElementTagNameMap>(
       namespaceURI: "http://www.w3.org/2000/svg",
@@ -26,7 +26,7 @@ declare module "../../../dom/nodes/documents/document.ts" {
   }
 }
 
-declare module "../../../dom/nodes/elements/element.ts" {
+declare module "../../../nodes/elements/element.ts" {
   interface Element {
     getElementsByTagName<K extends keyof SVGElementTagNameMap>(
       qualifiedName: K,

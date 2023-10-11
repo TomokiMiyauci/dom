@@ -1,9 +1,9 @@
 import type { IHTMLIFrameElement } from "../../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { DOMTokenList } from "../../../dom/sets/dom_token_list.ts";
+import { DOMTokenList } from "../../../sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
-import { reflectSet } from "../../../dom/nodes/utils/set_attribute_value.ts";
+import { reflectSet } from "../../../nodes/utils/set_attribute_value.ts";
 import { $ } from "../../../internal.ts";
 import { processIframeAttributes } from "./html_iframe_element_utils.ts";
 import {
@@ -12,8 +12,8 @@ import {
   createNewChildNavigable,
 } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
 import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_documents/navigable.ts";
-import { reflectGet } from "../../../dom/nodes/elements/element_utils.ts";
-import { fireEvent } from "../../../dom/events/fire.ts";
+import { reflectGet } from "../../../nodes/elements/element_utils.ts";
+import { fireEvent } from "../../../events/fire.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @Exposed("Window", "HTMLIFrameElement")

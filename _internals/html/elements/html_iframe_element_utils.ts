@@ -1,4 +1,4 @@
-import { fireEvent } from "../../../dom/events/fire.ts";
+import { fireEvent } from "../../../events/fire.ts";
 import { $ } from "../../../internal.ts";
 import { encodingParseURL, matchAboutBlank } from "../infra/url.ts";
 import {

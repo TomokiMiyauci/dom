@@ -1,9 +1,9 @@
 import { iter } from "../../../../deps.ts";
-import { isElement } from "../../../../dom/nodes/utils.ts";
+import { isElement } from "../../../../nodes/utils.ts";
 import { $, tree } from "../../../../internal.ts";
 import { UserNavigationInvolvement } from "../../loading_web_pages/navigation_and_session_histories/navigation.ts";
 import { isHTMLElement, isHTMLElementOf } from "../../utils.ts";
-import { fireEvent } from "../../../../dom/events/fire.ts";
+import { fireEvent } from "../../../../events/fire.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-fe-disabled)

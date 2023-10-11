@@ -1,8 +1,8 @@
 import {
   getAttributeByNamespaceAndLocalName,
   removeAttributeByNamespaceAndLocalName,
-} from "../../../dom/nodes/elements/element_utils.ts";
-import { setAttributeValue } from "../../../dom/nodes/utils/set_attribute_value.ts";
+} from "../../../nodes/elements/element_utils.ts";
+import { setAttributeValue } from "../../../nodes/utils/set_attribute_value.ts";
 import { $ } from "../../../internal.ts";
 
 export function reflectGet(

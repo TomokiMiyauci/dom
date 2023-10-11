@@ -1,5 +1,5 @@
-import { appendNode } from "../../../dom/nodes/node_trees/mutation.ts";
-import { createElement } from "../../../dom/nodes/utils/create_element.ts";
+import { appendNode } from "../../../nodes/node_trees/mutation.ts";
+import { createElement } from "../../../nodes/utils/create_element.ts";
 import { Namespace } from "../../infra/namespace.ts";
 import {
   NavigationParams,

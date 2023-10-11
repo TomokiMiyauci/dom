@@ -1,4 +1,4 @@
-import { Document } from "../../dom/nodes/documents/document.ts";
+import { Document } from "../../nodes/documents/document.ts";
 import type { IDOMParser } from "../../interface.d.ts";
 import { $ } from "../../internal.ts";
 import { HTMLParser } from "./html_parser.ts";
@@ -6,7 +6,7 @@ import {
   executeScriptElement,
   prepareScriptElement,
 } from "./elements/scripting/html_script_element_utils.ts";
-import { fireEvent } from "../../dom/events/fire.ts";
+import { fireEvent } from "../../events/fire.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 
 @Exposed("Window", "DOMParser")

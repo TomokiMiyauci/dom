@@ -1,8 +1,8 @@
 import * as Selection from "../document.ts";
-import * as DOM from "../../../dom/nodes/documents/document.ts";
+import * as DOM from "../../../nodes/documents/document.ts";
 import { extend } from "../../../utils.ts";
 
-declare module "../../../dom/nodes/documents/document.ts" {
+declare module "../../../nodes/documents/document.ts" {
   interface Document extends Selection.Document {}
 }
 

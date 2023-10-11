@@ -1,4 +1,4 @@
-import { Document } from "../../dom/nodes/documents/document.ts";
+import { Document } from "../../nodes/documents/document.ts";
 import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./_adapter.ts";
 import { parse } from "../../deps.ts";
 import { $ } from "../../internal.ts";

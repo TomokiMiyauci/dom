@@ -1,7 +1,7 @@
 import type { IHTMLMetaElement } from "../../../interface.d.ts";
 import { HTMLElement } from "../dom/html_element.ts";
-import { reflectGet } from "../../../dom/nodes/elements/element_utils.ts";
-import { reflectSet } from "../../../dom/nodes/utils/set_attribute_value.ts";
+import { reflectGet } from "../../../nodes/elements/element_utils.ts";
+import { reflectSet } from "../../../nodes/utils/set_attribute_value.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @Exposed("Window", "HTMLMetaElement")

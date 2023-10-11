@@ -1,5 +1,5 @@
 import * as HTML from "../document.ts";
-import * as DOM from "../../../dom/nodes/documents/document.ts";
+import * as DOM from "../../../nodes/documents/document.ts";
 import * as Obsolete from "../obsolete.ts";
 import { extend, includes } from "../../../utils.ts";
 
@@ -7,7 +7,7 @@ declare module "../document.ts" {
   interface IDocument_HTML extends Obsolete.Document {}
 }
 
-declare module "../../../dom/nodes/documents/document.ts" {
+declare module "../../../nodes/documents/document.ts" {
   interface Document extends HTML.IDocument_HTML {}
   interface DocumentInternals extends HTML.DocumentInternals {}
 }

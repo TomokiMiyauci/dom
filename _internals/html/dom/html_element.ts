@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import { Element } from "../../../dom/nodes/elements/element.ts";
+import { Element } from "../../../nodes/elements/element.ts";
 import { fireSyntheticPointerEvent } from "../global_event_handlers_utils.ts";
 import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";
@@ -12,7 +12,7 @@ import {
   isFormAssociatedElement,
   resetFormOwner,
 } from "../elements/forms/attributes_common_to_form_control.ts";
-import { isElement } from "../../../dom/nodes/utils.ts";
+import { isElement } from "../../../nodes/utils.ts";
 import { isHTMLElement } from "../utils.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

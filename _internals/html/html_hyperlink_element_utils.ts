@@ -1,5 +1,5 @@
 import { Constructor, isOk, Result } from "../../deps.ts";
-import { type Element } from "../../dom/nodes/elements/element.ts";
+import { type Element } from "../../nodes/elements/element.ts";
 import type { IHTMLHyperlinkElementUtils } from "../../interface.d.ts";
 import { $ } from "../../internal.ts";
 

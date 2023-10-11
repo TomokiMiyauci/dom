@@ -6,11 +6,11 @@ import {
   BoundaryPoint,
   Position,
   position,
-} from "../../dom/ranges/boundary_point.ts";
+} from "../../ranges/boundary_point.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
-import { nodeLength } from "../../dom/nodes/node_trees/node_tree.ts";
-import { root, setStartOrEnd } from "../../dom/ranges/range_utils.ts";
-import { Range } from "../../dom/ranges/range.ts";
+import { nodeLength } from "../../nodes/node_trees/node_tree.ts";
+import { root, setStartOrEnd } from "../../ranges/range_utils.ts";
+import { Range } from "../../ranges/range.ts";
 
 @Exposed("Window", "Selection")
 export class Selection implements ISelection {
