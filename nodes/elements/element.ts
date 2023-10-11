@@ -22,7 +22,7 @@ import {
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { Text } from "../text.ts";
 import { find, iter, map, some, xmlValidator } from "../../deps.ts";
-import type { IElement } from "../../interface.d.ts";
+import type { CustomElementState, IElement } from "../../interface.d.ts";
 import { DOMTokenList } from "../../sets/dom_token_list.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import {
@@ -37,7 +37,6 @@ import { $, internalSlots, tree } from "../../internal.ts";
 import { ShadowRoot } from "../shadow_root.ts";
 import {
   appendAttribute,
-  CustomElementState,
   getAttributeByName,
   getAttributeByNamespaceAndLocalName,
   getAttributeValue,
@@ -285,8 +284,8 @@ export class Element extends Node implements IElement {
     const { customElementState } = this.#_;
     // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
     if (
-      customElementState === CustomElementState.Precustomized ||
-      customElementState === CustomElementState.Custom
+      customElementState === "precustomized" ||
+      customElementState === "custom"
     ) $(shadow).availableElementInternals;
 
     // 8. Set shadow’s slot assignment to init["slotAssignment"].

@@ -1,5 +1,4 @@
 import { lookUpCustomElementDefinition } from "../../_internals/html/custom_element.ts";
-import { CustomElementState } from "../constant.ts";
 import { Element } from "../elements/element.ts";
 import { $ } from "../../internal.ts";
 
@@ -93,7 +92,7 @@ export function createElement(
     $(result).namespace = namespace,
       $(result).namespacePrefix = prefix,
       $(result).localName = localName,
-      $(result).customElementState = CustomElementState.Uncustomized,
+      $(result).customElementState = "uncustomized",
       $(result).customElementDefinition = null,
       $(result).isValue = is;
     $(result).nodeDocument = document;

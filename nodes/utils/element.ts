@@ -9,17 +9,6 @@ import { $, tree } from "../../internal.ts";
 export { getQualifiedName } from "./attr.ts";
 
 /**
- * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
- */
-export enum CustomElementState {
-  Undefined = "undefined",
-  Failed = "failed",
-  Uncustomized = "uncustomized",
-  Precustomized = "precustomized",
-  Custom = "custom",
-}
-
-/**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
  */
 export function getAttributeValue(
@@ -226,7 +215,7 @@ export function getAttributeByName(
  */
 export function isCustom(element: globalThis.Element): boolean {
   // An element whose custom element state is "custom
-  return $(element).customElementState === CustomElementState.Custom;
+  return $(element).customElementState === "custom";
 }
 
 export const reflectGet = getAttributeValue;

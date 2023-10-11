@@ -39,3 +39,13 @@ export type ICustomEvent = CustomEvent;
 export type IEventTarget = EventTarget;
 export type IAbortController = AbortController;
 export type IAbortSignal = AbortSignal;
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
+ */
+export type CustomElementState =
+  | "undefined"
+  | "failed"
+  | "uncustomized"
+  | "precustomized"
+  | "custom";
