@@ -1,7 +1,6 @@
 import type { IHTMLCollection } from "../../interface.d.ts";
 import { at, find, len, range } from "../../deps.ts";
 import { Namespace } from "../../_internals/infra/namespace.ts";
-import { $filter, $root } from "../internal.ts";
 import { isElement } from "../utils/type.ts";
 import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 import {
@@ -15,6 +14,9 @@ import {
   unsignedLong,
 } from "../../_internals/webidl/types.ts";
 import { $, tree } from "../../internal.ts";
+
+export const $root = Symbol();
+export const $filter = Symbol();
 
 @Exposed("Window", "HTMLCollection")
 @LegacyUnenumerableNamedProperties

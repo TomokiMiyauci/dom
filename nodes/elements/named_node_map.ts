@@ -7,7 +7,6 @@ import {
   removeAttributeByNamespaceAndLocalName,
   setAttribute,
 } from "../utils/element.ts";
-import { $element } from "../internal.ts";
 import { Getter, getter, WebIDL } from "../../_internals/webidl/idl.ts";
 import {
   LegacyPlatformObject,
@@ -21,6 +20,7 @@ import { $ } from "../../internal.ts";
 import { Exposed } from "../../_internals/webidl/extended_attribute.ts";
 
 const $attributeList = Symbol();
+const $element = Symbol();
 
 export interface NamedNodeMapInits {
   element: Element;
