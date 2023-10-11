@@ -82,16 +82,16 @@ use features extended by other specifications, import them.
 [whatwg/html](https://html.spec.whatwg.org/multipage/):
 
 ```ts
-// "https://deno.land/x/html_std/extends/all.ts";
-// import { HTMLElement } from "https://deno.land/x/html_std/mod.ts";
-// import { $, Document } from "https://deno.land/x/dom_std/mod.ts";
-// import { assert } from "https://deno.land/std/assert/assert_equals.ts";
+"https://deno.land/x/html_std/extends/all.ts";
+import { HTMLElement } from "https://deno.land/x/html_std/mod.ts";
+import { $, Document } from "https://deno.land/x/dom_std/mod.ts";
+import { assert } from "https://deno.land/std/assert/assert_equals.ts";
 
-// const document = new Document();
-// $(document).type = "html";
-// const div = document.createElement("div");
+const document = new Document();
+$(document).type = "html";
+const div = document.createElement("div");
 
-// assert(div instanceof HTMLElement);
+assert(div instanceof HTMLElement);
 ```
 
 ## License
