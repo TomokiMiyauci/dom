@@ -2,7 +2,8 @@ import type { IStaticRange } from "../interface.d.ts";
 import { internalSlots } from "../internal.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
-import { isAttr, isDocumentType } from "../nodes/utils.ts";
+import { isDocumentType } from "../nodes/utils/type.ts";
+import { isAttr } from "../nodes/utils/attr.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 
 @Exposed("Window", "StaticRange")

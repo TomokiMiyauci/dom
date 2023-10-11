@@ -1,6 +1,6 @@
 import { Text } from "../../nodes/text.ts";
 import { Attr } from "../../nodes/elements/attr.ts";
-import { isText } from "../../nodes/utils.ts";
+import { isText } from "../../nodes/utils/type.ts";
 import { setAttributeValue } from "../../nodes/utils/set_attribute_value.ts";
 import { DocumentType } from "../../nodes/document_type.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../../deps.ts";

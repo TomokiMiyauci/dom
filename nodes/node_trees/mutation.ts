@@ -7,7 +7,7 @@ import {
   isShadowHost,
   isShadowRoot,
   isText,
-} from "../utils.ts";
+} from "../utils/type.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { isHostIncludingInclusiveAncestorOf } from "../document_fragment_algorithm.ts";

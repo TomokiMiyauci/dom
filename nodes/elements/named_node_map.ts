@@ -1,6 +1,6 @@
 import type { INamedNodeMap } from "../../interface.d.ts";
 import { find, html, map, range } from "../../deps.ts";
-import { getQualifiedName } from "../utils.ts";
+import { getQualifiedName } from "../utils/attr.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import {
   removeAttributeByName,

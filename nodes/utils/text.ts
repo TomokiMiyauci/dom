@@ -1,5 +1,5 @@
 import { type CharacterDataInternals } from "../character_data.ts";
-import { isText } from "../utils.ts";
+import { isText } from "./type.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { composeIs, Constructor, iter } from "../../deps.ts";
 import { concatString } from "../../_internals/infra/string.ts";

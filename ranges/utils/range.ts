@@ -1,11 +1,11 @@
 import {
   isCharacterData,
-  isComment,
   isDocumentFragment,
   isDocumentType,
-  isProcessingInstruction,
   isText,
-} from "../../nodes/utils.ts";
+} from "../../nodes/utils/type.ts";
+import { isProcessingInstruction } from "../../nodes/utils/type.ts";
+import { isComment } from "../../nodes/utils/type.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { DocumentFragment } from "../../nodes/document_fragment.ts";
 import { nodeLength } from "../../nodes/node_trees/node_tree.ts";

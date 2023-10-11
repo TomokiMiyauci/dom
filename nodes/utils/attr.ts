@@ -75,3 +75,21 @@ export function handleAttributesChanges(
     namespace,
   });
 }
+
+/**
+ * @see https://dom.spec.whatwg.org/#concept-attribute-qualified-name
+ */
+export function getQualifiedName(
+  localName: string,
+  namespacePrefix: string | null,
+): string {
+  return strQualifiedName(localName, namespacePrefix);
+}
+
+export function strQualifiedName(localName: string, prefix?: unknown): string {
+  return typeof prefix === "string" ? `${prefix}:${localName}` : localName;
+}
+
+export function isAttr(node: Node): node is Attr {
+  return node.nodeType === node.ATTRIBUTE_NODE;
+}

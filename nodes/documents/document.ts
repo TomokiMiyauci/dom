@@ -9,7 +9,7 @@ import {
   isDocumentFragment,
   isDocumentType,
   isShadowRoot,
-} from "../utils.ts";
+} from "../utils/type.ts";
 import { Attr } from "../elements/attr.ts";
 import { Text } from "../text.ts";
 import { Comment } from "../comment.ts";

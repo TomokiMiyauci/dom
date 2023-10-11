@@ -1,5 +1,5 @@
-import { NodeType } from "./node.ts";
-import { $, internalSlots } from "../internal.ts";
+import { NodeType } from "../node.ts";
+import { $, internalSlots } from "../../internal.ts";
 
 export interface NodeLike {
   nodeType: unknown;
@@ -30,27 +30,23 @@ export function isCharacterData(node: NodeLike): node is CharacterData {
     "data" in internalSlots.get(node as CharacterData);
 }
 
-export function isAttr(node: NodeLike): node is Attr {
-  return node.nodeType === NodeType.ATTRIBUTE_NODE;
-}
-
 export function isText(node: NodeLike): node is Text {
   return node.nodeType === NodeType.TEXT_NODE;
-}
-
-export function isComment(node: NodeLike): node is Comment {
-  return node.nodeType === NodeType.COMMENT_NODE;
-}
-
-export function isProcessingInstruction(
-  node: NodeLike,
-): node is ProcessingInstruction {
-  return node.nodeType === NodeType.COMMENT_NODE;
 }
 
 /** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */
 export function isShadowRoot(node: NodeLike): node is ShadowRoot {
   return isDocumentFragment(node) && !!$(node).host;
+}
+
+export function isProcessingInstruction(
+  node: Node,
+): node is ProcessingInstruction {
+  return node.nodeType === node.COMMENT_NODE;
+}
+
+export function isComment(node: Node): node is Comment {
+  return node.nodeType === node.COMMENT_NODE;
 }
 
 export type ShadowHost = Element & {
@@ -63,19 +59,4 @@ export type ShadowHost = Element & {
 export function isShadowHost(element: Element): element is ShadowHost {
   // shadow root is non-null.
   return internalSlots.has(element) && !!internalSlots.get(element).shadowRoot;
-}
-
-/**
- * @see https://dom.spec.whatwg.org/#concept-attribute-qualified-name
- * @see https://dom.spec.whatwg.org/#concept-element-qualified-name
- */
-export function getQualifiedName(
-  localName: string,
-  namespacePrefix: string | null,
-): string {
-  return strQualifiedName(localName, namespacePrefix);
-}
-
-export function strQualifiedName(localName: string, prefix?: unknown): string {
-  return typeof prefix === "string" ? `${prefix}:${localName}` : localName;
 }

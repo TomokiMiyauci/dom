@@ -1,11 +1,11 @@
 import {
-  isAttr,
   isCharacterData,
   isDocument,
   isDocumentType,
   isElement,
   isText,
-} from "../utils.ts";
+} from "../utils/type.ts";
+import { isAttr } from "../utils/attr.ts";
 import { $, tree } from "../../internal.ts";
 import { queueMutationObserverMicrotask } from "../mutation_observers/queue.ts";
 import { iter } from "../../deps.ts";

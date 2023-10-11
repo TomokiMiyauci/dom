@@ -1,4 +1,4 @@
-import { isElement } from "../utils.ts";
+import { isElement } from "./type.ts";
 import { iter } from "../../deps.ts";
 import { $, tree } from "../../internal.ts";
 import { isCustom } from "./element.ts";

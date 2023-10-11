@@ -1,4 +1,5 @@
-import { isAttr, isDocument, isText } from "./utils.ts";
+import { isDocument, isText } from "./utils/type.ts";
+import { isAttr } from "./utils/attr.ts";
 import { NodeList, NodeListOf } from "./node_trees/node_list.ts";
 import { isConnected, nodeLength } from "./node_trees/node_tree.ts";
 import type { INode } from "../interface.d.ts";

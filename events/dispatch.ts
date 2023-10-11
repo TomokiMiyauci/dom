@@ -3,7 +3,7 @@ import { EventListener } from "./event_target.ts";
 import { retarget } from "../nodes/utils/shadow_root.ts";
 import { List } from "../_internals/infra/data_structures/list.ts";
 import { isSlottable } from "../nodes/node_trees/node_tree.ts";
-import { isNodeLike, isShadowRoot } from "../nodes/utils.ts";
+import { isNodeLike, isShadowRoot } from "../nodes/utils/type.ts";
 import { iter, last, lastItem } from "../deps.ts";
 import { callUserObjectOperation } from "../_internals/webidl/ecmascript_bindings/callback_interface.ts";
 import { $, tree } from "../internal.ts";

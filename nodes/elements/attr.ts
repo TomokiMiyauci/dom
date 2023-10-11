@@ -1,6 +1,6 @@
 import { Node, NodeType } from "../node.ts";
 import type { IAttr } from "../../interface.d.ts";
-import { getQualifiedName } from "../utils.ts";
+import { getQualifiedName } from "../utils/attr.ts";
 import { $, internalSlots } from "../../internal.ts";
 import { setExistAttributeValue } from "../utils/attr.ts";
 import { Exposed } from "../../_internals/webidl/extended_attribute.ts";

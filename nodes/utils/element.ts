@@ -6,6 +6,7 @@ import { preInsertNode } from "../node_trees/mutation.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../../_internals/infra/string.ts";
 import { $, tree } from "../../internal.ts";
+export { getQualifiedName } from "./attr.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)

@@ -1,5 +1,5 @@
 import { type INonDocumentTypeChildNode } from "../../interface.d.ts";
-import { isElement } from "../utils.ts";
+import { isElement } from "../utils/type.ts";
 import { iter } from "../../deps.ts";
 import { tree } from "../../internal.ts";
 

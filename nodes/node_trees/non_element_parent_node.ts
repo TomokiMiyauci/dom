@@ -1,4 +1,4 @@
-import { isElement } from "../utils.ts";
+import { isElement } from "../utils/type.ts";
 import type { INonElementParentNode } from "../../interface.d.ts";
 import { convert, DOMString } from "../../_internals/webidl/types.ts";
 import { $, tree } from "../../internal.ts";

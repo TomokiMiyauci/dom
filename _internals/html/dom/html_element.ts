@@ -12,7 +12,7 @@ import {
   isFormAssociatedElement,
   resetFormOwner,
 } from "../elements/forms/attributes_common_to_form_control.ts";
-import { isElement } from "../../../nodes/utils.ts";
+import { isElement } from "../../../nodes/utils/type.ts";
 import { isHTMLElement } from "../utils.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
 

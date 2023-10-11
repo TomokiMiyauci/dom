@@ -9,7 +9,7 @@ import {
   isDocumentFragment,
   isDocumentType,
   isText,
-} from "../nodes/utils.ts";
+} from "../nodes/utils/type.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { nodeLength } from "../nodes/node_trees/node_tree.ts";
 import {

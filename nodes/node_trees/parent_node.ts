@@ -1,6 +1,6 @@
 import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
-import { isElement } from "../utils.ts";
+import { isElement } from "../utils/type.ts";
 import type { IParentNode } from "../../interface.d.ts";
 import { StaticNodeList } from "./node_list.ts";
 import { matchScopedSelectorsString } from "../../infra/selector.ts";

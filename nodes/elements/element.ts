@@ -4,7 +4,8 @@ import {
   getElementsByNamespaceAndLocalName,
   getElementsByQualifiedName,
 } from "../utils/node.ts";
-import { getQualifiedName, isElement, isShadowHost } from "../utils.ts";
+import { isElement, isShadowHost } from "../utils/type.ts";
+import { getQualifiedName } from "../utils/element.ts";
 import { Attr, cloneAttr } from "./attr.ts";
 import { changeAttributes } from "../utils/attr.ts";
 import { NamedNodeMap } from "./named_node_map.ts";

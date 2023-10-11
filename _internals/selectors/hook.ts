@@ -1,5 +1,5 @@
 import { ifilter, initLast, iter, lastItem } from "../../deps.ts";
-import { isElement } from "../../nodes/utils.ts";
+import { isElement } from "../../nodes/utils/type.ts";
 import {
   AttributeSelector,
   ClassSelector,
