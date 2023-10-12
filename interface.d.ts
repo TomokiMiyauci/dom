@@ -49,3 +49,8 @@ export type CustomElementState =
   | "uncustomized"
   | "precustomized"
   | "custom";
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
+ */
+export type CompatMode = "BackCompat" | "CSS1Compat";

@@ -19,7 +19,7 @@ import {
   validateAndExtract,
 } from "../_internals/infra/namespace.ts";
 import { DocumentFragment } from "./document_fragment.ts";
-import type { IDocument, IXMLDocument } from "../interface.d.ts";
+import type { CompatMode, IDocument, IXMLDocument } from "../interface.d.ts";
 import { find, html, xmlValidator } from "../deps.ts";
 import { ProcessingInstruction } from "./processing_instruction.ts";
 import { DOMImplementation } from "./dom_implementation.ts";
@@ -49,12 +49,18 @@ import {
 } from "../_internals/html/loading_web_pages/supporting_concepts.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
-export type CompatMode = "BackCompat" | "CSS1Compat";
-
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#document)
+ */
 @Exposed("Window", "Document")
 export class Document extends Node implements IDocument {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-document)
+   */
   constructor() {
     super();
+
+    // set this’s origin to the origin of current global object’s associated Document.
 
     const internal = new DocumentInternals({
       implementation: DOMImplementation["create"](this),
@@ -477,6 +483,7 @@ export class Document extends Node implements IDocument {
     $(event).type = "";
 
     // 7. Initialize event’s timeStamp attribute to the result of calling current high resolution time with this’s relevant global object.
+    // TODO
 
     // 8. Initialize event’s isTrusted attribute to false.
     $(event).isTrusted = false;
@@ -727,6 +734,9 @@ export class DocumentInternals {
   }
 }
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#xmldocument)
+ */
 @Exposed("Window", "XMLDocument")
 export class XMLDocument extends Document implements IXMLDocument {}
 
