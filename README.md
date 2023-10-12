@@ -1,6 +1,6 @@
 # dom
 
-DOM reference implementation.
+The DOM reference implementation.
 
 This is an implementation that strictly adheres to the DOM specifications
 ([whatwg/dom](https://dom.spec.whatwg.org/) and
@@ -30,11 +30,13 @@ specification.
 import * as mod from "https://deno.land/x/dom_std/mod.ts";
 ```
 
-<!-- npm:
+TODO: npm publish
+
+npm:
 
 ```bash
 npm i dom-std
-``` -->
+```
 
 ## Usage
 
