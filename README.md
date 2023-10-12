@@ -59,7 +59,11 @@ assert(div instanceof Element);
 The specification defines each member's private data with the expression
 "associate".
 
-To access private data, use the accessor.
+To access private data, use the `$` accessor.
+
+Example of accessing
+[`type`](https://dom.spec.whatwg.org/#concept-document-type) private data in
+`Document`:
 
 ```ts
 import { $, Document } from "https://deno.land/x/dom_std/mod.ts";
@@ -95,6 +99,10 @@ const div = document.createElement("div");
 
 assert(div instanceof HTMLElement);
 ```
+
+## Document
+
+- [Requirement](./docs/requirement.md)
 
 ## License
 
