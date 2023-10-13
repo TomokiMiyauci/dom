@@ -10,7 +10,7 @@ import { type NodeInternals } from "./nodes/node.ts";
 import { type EventInternals } from "./events/event.ts";
 import { type EventTargetInternals } from "./events/event_target.ts";
 import { type ShadowRootInternals } from "./nodes/shadow_root.ts";
-import { type SlottableInternals } from "./nodes/slottable.ts";
+import { type SlottableInternals } from "./nodes/mixins/slottable.ts";
 import { type MutationObserverInternals } from "./nodes/mutation_observer.ts";
 import { type AbortSignalInternals } from "./aborts/abort_signal.ts";
 
