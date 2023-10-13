@@ -1,5 +1,5 @@
-import type { ISlottable } from "./../interface.d.ts";
-import { findSlot } from "./utils/node_tree.ts";
+import type { ISlottable } from "../../interface.d.ts";
+import { findSlot } from "../utils/node_tree.ts";
 
 export class Slottable implements ISlottable {
   /**

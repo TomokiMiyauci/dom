@@ -1,4 +1,4 @@
-import { DocumentOrShadowRoot } from "../nodes/document_or_shadow_root.ts";
+import { DocumentOrShadowRoot } from "../nodes/mixins/document_or_shadow_root.ts";
 import { Document } from "../nodes/document.ts";
 import { ShadowRoot } from "../nodes/shadow_root.ts";
 import { IDocumentOrShadowRoot } from "../interface.d.ts";

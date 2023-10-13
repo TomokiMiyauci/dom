@@ -1,4 +1,4 @@
-import { NonDocumentTypeChildNode } from "../nodes/non_document_type_child_node.ts";
+import { NonDocumentTypeChildNode } from "../nodes/mixins/non_document_type_child_node.ts";
 import { Element } from "../nodes/element.ts";
 import { CharacterData } from "../nodes/character_data.ts";
 import { INonDocumentTypeChildNode } from "../interface.d.ts";

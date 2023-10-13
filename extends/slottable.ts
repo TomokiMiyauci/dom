@@ -1,6 +1,6 @@
 import { Element } from "../nodes/element.ts";
 import { Text } from "../nodes/text.ts";
-import { Slottable } from "../nodes/slottable.ts";
+import { Slottable } from "../nodes/mixins/slottable.ts";
 import { ISlottable } from "../interface.d.ts";
 import { includes } from "../utils.ts";
 

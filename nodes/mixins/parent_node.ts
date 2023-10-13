@@ -1,19 +1,19 @@
-import { DocumentFragment } from "./document_fragment.ts";
-import { Text } from "./text.ts";
-import { isElement } from "./utils/type.ts";
-import type { IParentNode } from "./../interface.d.ts";
-import { StaticNodeList } from "./node_list.ts";
-import { matchScopedSelectorsString } from "./../infra/selector.ts";
-import { HTMLCollection } from "./html_collection.ts";
-import { isObject, isSingle, iter, last, len } from "./../deps.ts";
+import { DocumentFragment } from "../document_fragment.ts";
+import { Text } from "../text.ts";
+import { isElement } from "../utils/type.ts";
+import type { IParentNode } from "../../interface.d.ts";
+import { StaticNodeList } from "../node_list.ts";
+import { matchScopedSelectorsString } from "../../infra/selector.ts";
+import { HTMLCollection } from "../html_collection.ts";
+import { isObject, isSingle, iter, last, len } from "../../deps.ts";
 import {
   appendNode,
   ensurePreInsertionValidity,
   preInsertNode,
   replaceAllNode,
-} from "./utils/mutation.ts";
-import { convert, DOMString } from "./../_internals/webidl/types.ts";
-import { $, tree } from "./../internal.ts";
+} from "../utils/mutation.ts";
+import { convert, DOMString } from "../../_internals/webidl/types.ts";
+import { $, tree } from "../../internal.ts";
 
 export class ParentNode implements IParentNode {
   /**

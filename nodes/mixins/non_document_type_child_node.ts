@@ -1,7 +1,7 @@
-import { type INonDocumentTypeChildNode } from "./../interface.d.ts";
-import { isElement } from "./utils/type.ts";
-import { iter } from "./../deps.ts";
-import { tree } from "./../internal.ts";
+import { type INonDocumentTypeChildNode } from "../../interface.d.ts";
+import { isElement } from "../utils/type.ts";
+import { iter } from "../../deps.ts";
+import { tree } from "../../internal.ts";
 
 export class NonDocumentTypeChildNode implements INonDocumentTypeChildNode {
   /**

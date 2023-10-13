@@ -2,7 +2,7 @@ import { CharacterData } from "../nodes/character_data.ts";
 import { Element } from "../nodes/element.ts";
 import { DocumentType } from "../nodes/document_type.ts";
 import { IChildNode } from "../interface.d.ts";
-import { ChildNode } from "../nodes/child_node.ts";
+import { ChildNode } from "../nodes/mixins/child_node.ts";
 import { includes } from "../utils.ts";
 
 declare module "../nodes/character_data.ts" {
