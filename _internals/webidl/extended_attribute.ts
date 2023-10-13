@@ -1,3 +1,5 @@
+import { DataDescriptor } from "../../ecma/data_types.ts";
+
 export const map = new Map<object, Metadata>();
 
 export type Global = "Window";
@@ -50,7 +52,7 @@ export function PutForwards<T extends object>(identifier: keyof T) {
   return (
     _: unknown,
     prop: string,
-    descriptor: { get?: () => T },
+    descriptor: { get?: () => T } & PropertyDescriptor,
   ) => {
     const getter = descriptor.get;
 
@@ -64,6 +66,7 @@ export function PutForwards<T extends object>(identifier: keyof T) {
     const name = `set ${prop}`;
 
     Object.defineProperty(setter, "name", { value: name });
-    Object.defineProperty(descriptor, "set", { value: setter });
+    // Object.defineProperty(descriptor, "set", { value: setter });
+    descriptor.set = setter;
   };
 }

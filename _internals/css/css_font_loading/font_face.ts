@@ -1,4 +1,3 @@
-import { UnImplemented } from "../../../utils.ts";
 import { type IFontFace } from "../../interface.d.ts";
 
 export class FontFace implements IFontFace {
@@ -24,6 +23,6 @@ export class FontFace implements IFontFace {
   weight: string = "";
 
   load(): Promise<FontFace> {
-    throw new UnImplemented();
+    throw new Error("load");
   }
 }

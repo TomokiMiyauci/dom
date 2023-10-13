@@ -59,7 +59,7 @@ import { Exposed } from "../_internals/webidl/extended_attribute.ts";
  */
 @Exposed("Window", "Element")
 export class Element extends Node implements IElement {
-  constructor() {
+  protected constructor() {
     super();
 
     const internal = new ElementInternals();

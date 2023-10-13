@@ -1,10 +1,7 @@
 import type { ISVGElement } from "../../interface.d.ts";
 import { Element } from "../../../nodes/element.ts";
-import { HTMLOrSVGElement } from "../../html/dom/html_or_svg_element.ts";
 import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";
 
-@HTMLOrSVGElement
-@ElementCSSInlineStyle
 export class SVGElement extends Element implements ISVGElement {
   get ownerSVGElement(): SVGSVGElement | null {
     throw new Error("ownerSVGElement");
@@ -15,7 +12,7 @@ export class SVGElement extends Element implements ISVGElement {
   }
 }
 
-export interface SVGElement extends HTMLOrSVGElement, ElementCSSInlineStyle {
+export interface SVGElement extends ElementCSSInlineStyle {
   addEventListener<K extends keyof SVGElementEventMap>(
     type: K,
     listener: (this: SVGElement, ev: SVGElementEventMap[K]) => any,

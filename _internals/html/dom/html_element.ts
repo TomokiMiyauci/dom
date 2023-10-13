@@ -4,7 +4,6 @@ import { fireSyntheticPointerEvent } from "../global_event_handlers_utils.ts";
 import { ElementContentEditable } from "../element_content_editable.ts";
 import { HTMLOrSVGElement } from "./html_or_svg_element.ts";
 import { HTMLElement_CSSOMView } from "../../cssom/html_element.ts";
-import { ElementCSSInlineStyle } from "../../cssom/element_css_inline_style.ts";
 import type { IHTMLElement } from "../../interface.d.ts";
 import { $ } from "../../../internal.ts";
 import {
@@ -18,7 +17,6 @@ import { Exposed } from "../../webidl/extended_attribute.ts";
 
 @ElementContentEditable
 @HTMLOrSVGElement
-@ElementCSSInlineStyle
 @HTMLElement_CSSOMView
 @Exposed("Window", "HTMLElement")
 export class HTMLElement extends Element implements IHTMLElement {
@@ -202,11 +200,7 @@ export class HTMLElement extends Element implements IHTMLElement {
 }
 
 export interface HTMLElement
-  extends
-    ElementContentEditable,
-    HTMLOrSVGElement,
-    ElementCSSInlineStyle,
-    HTMLElement_CSSOMView {
+  extends ElementContentEditable, HTMLOrSVGElement, HTMLElement_CSSOMView {
   addEventListener<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
