@@ -26,7 +26,7 @@ export class DOMImplementation implements IDOMImplementation {
     validate(qualifiedName);
 
     // 2. Return a new doctype, with qualifiedName as its name, publicId as its public ID, and systemId as its system ID, and with its node document set to the associated document of this.
-    const doctype = new DocumentType();
+    const doctype = Reflect.construct(DocumentType, []) as DocumentType;
     $(doctype).name = qualifiedName,
       $(doctype).publicId = publicId,
       $(doctype).systemId = systemId,
@@ -90,7 +90,7 @@ export class DOMImplementation implements IDOMImplementation {
     $(doc).contentType = "text/html";
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
-    const docType = new DocumentType();
+    const docType = Reflect.construct(DocumentType, []) as DocumentType;
     $(docType).name = "html", $(docType).nodeDocument = doc;
     appendNode(docType, doc);
 

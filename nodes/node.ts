@@ -43,8 +43,6 @@ import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
 
-const inspect = Symbol.for("Deno.customInspect");
-
 export enum NodeType {
   ELEMENT_NODE = 1,
   ATTRIBUTE_NODE,
@@ -139,7 +137,7 @@ export abstract class Node extends EventTarget implements INode {
   abstract get textContent(): string | null;
   abstract set textContent(value: string | null);
 
-  constructor() {
+  protected constructor() {
     super();
 
     internalSlots.extends<Node>(this, new NodeInternals());

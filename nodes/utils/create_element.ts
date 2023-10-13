@@ -88,7 +88,7 @@ export function createElement(
     const Interface = resolveInterface(localName, namespace);
 
     // 2. Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document.
-    result = new Interface();
+    result = Reflect.construct(Interface, []) as Element;
     $(result).namespace = namespace,
       $(result).namespacePrefix = prefix,
       $(result).localName = localName,

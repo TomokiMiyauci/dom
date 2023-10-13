@@ -3,9 +3,12 @@ import type { IDocumentType } from "../interface.d.ts";
 import { $, internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documenttype)
+ */
 @Exposed("Window", "DocumentType")
 export class DocumentType extends Node implements IDocumentType {
-  constructor() {
+  protected constructor() {
     super();
 
     const internal = new DocumentTypeInternals();

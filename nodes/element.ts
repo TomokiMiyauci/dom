@@ -54,6 +54,9 @@ import { replaceAllString } from "./utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#element)
+ */
 @Exposed("Window", "Element")
 export class Element extends Node implements IElement {
   constructor() {
@@ -518,7 +521,7 @@ export class Element extends Node implements IElement {
 
     // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
     if (attribute === null) {
-      const attribute = new Attr();
+      const attribute = Reflect.construct(Attr, []) as Attr;
       $(attribute).localName = qualifiedName,
         $(attribute).value = value,
         $(attribute).nodeDocument = this.#_.nodeDocument;
@@ -594,7 +597,7 @@ export class Element extends Node implements IElement {
       // 1. If force is not given or is true,
       if (typeof force === "undefined" || force) {
         // create an attribute whose local name is qualifiedName, value is the empty string, and node document is this’s node document,
-        const attr = new Attr();
+        const attr = Reflect.construct(Attr, []) as Attr;
         $(attr).localName = qualifiedName,
           $(attr).value = "",
           $(attr).nodeDocument = this.#_.nodeDocument;

@@ -3,9 +3,12 @@ import { NodeType } from "./node.ts";
 import type { ICDATASection } from "../interface.d.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#cdatasection)
+ */
 @Exposed("Window", "CDATASection")
 export class CDATASection extends Text implements ICDATASection {
-  constructor() {
+  protected constructor() {
     super();
   }
 

@@ -11,9 +11,12 @@ import { replaceData, substringData } from "./utils/character_data.ts";
 import { internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#characterdata)
+ */
 @Exposed("Window", "CharacterData")
 export abstract class CharacterData extends Node implements ICharacterData {
-  constructor() {
+  protected constructor() {
     super();
 
     internalSlots.extends<CharacterData>(

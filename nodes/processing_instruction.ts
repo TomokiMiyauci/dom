@@ -5,10 +5,13 @@ import { Document } from "./document.ts";
 import { $, internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#processinginstruction)
+ */
 @Exposed("Window", "ProcessingInstruction")
 export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
-  constructor() {
+  protected constructor() {
     super();
 
     internalSlots.extends<ProcessingInstruction>(

@@ -5,7 +5,7 @@ import { $, internalSlots, tree } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
 /**
- * @see https://dom.spec.whatwg.org/#interface-documentfragment
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documentfragment)
  */
 
 @Exposed("Window", "DocumentFragment")

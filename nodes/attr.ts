@@ -5,9 +5,12 @@ import { $, internalSlots } from "../internal.ts";
 import { setExistAttributeValue } from "./utils/attr.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#attr)
+ */
 @Exposed("Window", "Attr")
 export class Attr extends Node implements IAttr {
-  constructor() {
+  protected constructor() {
     super();
 
     const internal = new AttrInternals();
@@ -174,7 +177,7 @@ export class AttrInternals {
 }
 
 export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
-  const attribute = new Attr();
+  const attribute = Reflect.construct(Attr, []) as Attr;
   $(attribute).localName = $(attr).localName,
     $(attribute).value = $(attr).value,
     $(attribute).namespace = $(attr).namespace,

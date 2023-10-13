@@ -256,7 +256,7 @@ export class Document extends Node implements IDocument {
     if (isHTMLDocument(this)) localName = toASCIILowerCase(localName);
 
     // 3. Return a new attribute whose local name is localName and node document is this.
-    const attribute = new Attr();
+    const attribute = Reflect.construct(Attr, []) as Attr;
     $(attribute).localName = localName, $(attribute).nodeDocument = this;
 
     return attribute;
@@ -276,7 +276,7 @@ export class Document extends Node implements IDocument {
     );
 
     // 2. Return a new attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, and node document is this.
-    const attribute = new Attr();
+    const attribute = Reflect.construct(Attr, []) as Attr;
     $(attribute).localName = localName,
       $(attribute).namespacePrefix = prefix,
       $(attribute).namespace = ns,
@@ -306,7 +306,7 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new CDATASection node with its data set to data and node document set to this.
-    const cdataSection = new CDATASection();
+    const cdataSection = Reflect.construct(CDATASection, []) as CDATASection;
     $(cdataSection).data = data;
     $(cdataSection).nodeDocument = this;
     return cdataSection;
@@ -547,7 +547,10 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new ProcessingInstruction node, with target set to target, data set to data, and node document set to this.
-    const node = new ProcessingInstruction();
+    const node = Reflect.construct(
+      ProcessingInstruction,
+      [],
+    ) as ProcessingInstruction;
     $(node).nodeDocument = this, $(node).target = target, $(node).data = data;
 
     return node;
