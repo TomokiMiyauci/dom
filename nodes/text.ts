@@ -1,5 +1,5 @@
 import { NodeType } from "./node.ts";
-import { CharacterData, CharacterDataInternals } from "./character_data.ts";
+import { CharacterData } from "./character_data.ts";
 import { List } from "../_internals/infra/data_structures/list.ts";
 import type { IText } from "../interface.d.ts";
 import { iter } from "../deps.ts";
@@ -7,7 +7,10 @@ import { concatString } from "../_internals/infra/string.ts";
 import { $, tree } from "../internal.ts";
 import { Get } from "../utils.ts";
 import { splitText } from "./utils/split_text.ts";
+import { data } from "../symbol.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import { isMyText } from "./utils/type.ts";
+import * as $$ from "../symbol.ts";
 
 @Exposed("Window", "Text")
 export class Text extends CharacterData implements IText {
@@ -15,12 +18,12 @@ export class Text extends CharacterData implements IText {
    * @see https://dom.spec.whatwg.org/#dom-text-text
    */
   constructor(data: string = "") {
-    super();
     // Current Restrictions: parameter decorator alone cannot override arguments
     data = String(data);
+    super();
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    $<Text>(this).data = data;
+    this[$$.data] = data;
     $<Text>(this).nodeDocument = globalThis.document;
   }
 
@@ -34,7 +37,7 @@ export class Text extends CharacterData implements IText {
 
   protected override clone(document: Document): globalThis.Text {
     const text = new Text();
-    $(text).data = $<Text>(this).data, $(text).nodeDocument = document;
+    text[data] = this[data], $(text).nodeDocument = document;
     return text;
   }
 
@@ -43,8 +46,7 @@ export class Text extends CharacterData implements IText {
    */
   get wholeText(): string {
     const contiguousTextNodes = tree.contiguousTextNodes(this);
-    const dataList = iter(contiguousTextNodes)
-      .map<CharacterDataInternals>($)
+    const dataList = iter(contiguousTextNodes).filter(isMyText)
       .map(Get.data);
     // to return the concatenation of the data of the contiguous Text nodes of this, in tree order.
     const list = new List(dataList);
@@ -59,4 +61,6 @@ export class Text extends CharacterData implements IText {
     // to split this with offset offset.
     return splitText(this, offset);
   }
+
+  [$$.data]: string;
 }

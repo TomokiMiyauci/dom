@@ -1,4 +1,4 @@
-import { isDocument, isText } from "./utils/type.ts";
+import { isDocument, isMyText, isText } from "./utils/type.ts";
 import { isAttr } from "./utils/attr.ts";
 import { NodeList, NodeListOf } from "./node_list.ts";
 import { isConnected, nodeLength } from "./utils/node_tree.ts";
@@ -42,6 +42,7 @@ import {
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
+import { NodeInternals as _ } from "../i.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -239,7 +240,7 @@ export abstract class Node extends EventTarget implements INode {
    */
   normalize(): void {
     const descendants = tree.descendants(this);
-    const descendantExclusiveTextNodes = ifilter(descendants, isText);
+    const descendantExclusiveTextNodes = ifilter(descendants, isMyText);
 
     for (const node of [...descendantExclusiveTextNodes]) { // remove will occurs, use spread.
       // 1. Let length be node’s length.
@@ -255,12 +256,8 @@ export abstract class Node extends EventTarget implements INode {
         ...tree.contiguousExclusiveTextNodes(node),
       ];
       const contiguousExclusiveTextNodesExcludingNode =
-        contiguousExclusiveTextNodes.filter((v) => v !== node);
-      const dataList = contiguousExclusiveTextNodesExcludingNode.map((v) =>
-        $(v)
-      ).map(
-        Get.data,
-      );
+        contiguousExclusiveTextNodes.filter((v) => v !== node).filter(isMyText);
+      const dataList = contiguousExclusiveTextNodesExcludingNode.map(Get.data);
 
       // 3. Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order.
       const data = concatString(new List(dataList));
@@ -553,6 +550,8 @@ export abstract class Node extends EventTarget implements INode {
   get #_() {
     return $<Node>(this);
   }
+
+  // [$$.insertionSteps]: string = "";
 }
 
 export interface Node

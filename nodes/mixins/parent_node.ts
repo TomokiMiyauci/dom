@@ -14,6 +14,7 @@ import {
 } from "../utils/mutation.ts";
 import { convert, DOMString } from "../../_internals/webidl/types.ts";
 import { $, tree } from "../../internal.ts";
+import * as $$ from "../../symbol.ts";
 
 export class ParentNode implements IParentNode {
   /**
@@ -163,7 +164,7 @@ export function convertNodesToNode(
   const replaced = iter(nodes).map((node) => {
     if (typeof node === "string") {
       const text = new Text();
-      $(text).data = node, $(text).nodeDocument = document;
+      text[$$.data] = node, $(text).nodeDocument = document;
       return text;
     }
 

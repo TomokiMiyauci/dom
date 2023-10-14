@@ -10,26 +10,23 @@ import {
 import { replaceData, substringData } from "./utils/character_data.ts";
 import { internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import * as $ from "../symbol.ts";
+import type { CharacterDataInternals as _ } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#characterdata)
  */
 @Exposed("Window", "CharacterData")
-export abstract class CharacterData extends Node implements ICharacterData {
+export abstract class CharacterData extends Node implements ICharacterData, _ {
   protected constructor() {
     super();
-
-    internalSlots.extends<CharacterData>(
-      this,
-      new CharacterDataInternals(),
-    );
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-nodevalue
    */
   override get nodeValue(): string {
-    return this.#_.data;
+    return this[$.data];
   }
 
   /**
@@ -45,7 +42,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    * @see https://dom.spec.whatwg.org/#dom-node-textcontent
    */
   override get textContent(): string {
-    return this.#_.data;
+    return this[$.data];
   }
 
   /**
@@ -78,7 +75,7 @@ export abstract class CharacterData extends Node implements ICharacterData {
    */
   get data(): string {
     // to return this’s data.
-    return this.#_.data;
+    return this[$.data];
   }
 
   /**
@@ -149,11 +146,6 @@ export abstract class CharacterData extends Node implements ICharacterData {
   get #_() {
     return internalSlots.get<CharacterData>(this);
   }
-}
 
-export class CharacterDataInternals {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
-   */
-  data!: string;
+  abstract [$.data]: string;
 }

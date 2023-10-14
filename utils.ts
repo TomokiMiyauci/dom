@@ -1,7 +1,8 @@
 import { prop } from "./deps.ts";
+import { data } from "./symbol.ts";
 
 export class Get {
-  static data = prop("data");
+  static data = prop(data);
 }
 
 export function includes(

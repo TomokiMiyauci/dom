@@ -53,6 +53,7 @@ import { reflectSet, setAttributeValue } from "./utils/set_attribute_value.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import * as $$ from "../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#element)
@@ -457,7 +458,7 @@ export class Element extends Node implements IElement {
   insertAdjacentText(where: InsertPosition, data: string): void {
     const text = new Text();
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    $(text).data = data, $(text).nodeDocument = this.#_.nodeDocument;
+    text[$$.data] = data, $(text).nodeDocument = this.#_.nodeDocument;
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);

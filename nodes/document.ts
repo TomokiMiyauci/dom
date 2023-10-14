@@ -48,6 +48,7 @@ import {
   Origin,
 } from "../_internals/html/loading_web_pages/supporting_concepts.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import * as $$ from "../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#document)
@@ -306,8 +307,9 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new CDATASection node with its data set to data and node document set to this.
-    const cdataSection = Reflect.construct(CDATASection, []) as CDATASection;
-    $(cdataSection).data = data;
+    const cdataSection = Reflect.construct(CDATASection, [
+      data,
+    ]) as CDATASection;
     $(cdataSection).nodeDocument = this;
     return cdataSection;
   }
@@ -320,7 +322,7 @@ export class Document extends Node implements IDocument {
   createComment(@DOMString data: string): Comment {
     // return a new Comment node whose data is data and node document is this.
     const comment = new Comment();
-    $(comment).data = data, $(comment).nodeDocument = this;
+    comment[$$.data] = data, $(comment).nodeDocument = this;
 
     return comment;
   }
@@ -551,7 +553,7 @@ export class Document extends Node implements IDocument {
       ProcessingInstruction,
       [],
     ) as ProcessingInstruction;
-    $(node).nodeDocument = this, $(node).target = target, $(node).data = data;
+    $(node).nodeDocument = this, $(node).target = target, node[$$.data] = data;
 
     return node;
   }
@@ -576,7 +578,7 @@ export class Document extends Node implements IDocument {
   createTextNode(@DOMString data: string): Text {
     // return a new Text node whose data is data and node document is this.
     const text = new Text();
-    $(text).data = data, $(text).nodeDocument = this;
+    text[$$.data] = data, $(text).nodeDocument = this;
     return text;
   }
 

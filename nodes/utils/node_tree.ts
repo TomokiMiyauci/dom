@@ -1,5 +1,5 @@
 import {
-  isCharacterData,
+  is$CharacterData,
   isDocument,
   isDocumentType,
   isElement,
@@ -11,6 +11,8 @@ import { queueMutationObserverMicrotask } from "./queue.ts";
 import { iter } from "../../deps.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { isShadowRootNode } from "./shadow_root.ts";
+import { $CharacterData } from "../../i.ts";
+import { data } from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -22,14 +24,14 @@ export function nodeLength(
     | DocumentType
     | DocumentFragment
     | Element
-    | CharacterData
+    | $CharacterData
     | Attr,
 ): number {
   // 1. If node is a DocumentType or Attr node, then return 0.
   if (isDocumentType(node) || isAttr(node)) return 0;
 
   // 2. If node is a CharacterData node, then return node’s data’s length.
-  if (isCharacterData(node)) return $(node).data.length;
+  if (is$CharacterData(node)) return node[data].length;
 
   // 3. Return the number of node’s children.
   return tree.children(node).size;

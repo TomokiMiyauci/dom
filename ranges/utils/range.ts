@@ -1,7 +1,8 @@
 import {
-  isCharacterData,
+  is$CharacterData,
   isDocumentFragment,
   isDocumentType,
+  isMyText,
   isText,
 } from "../../nodes/utils/type.ts";
 import { isProcessingInstruction } from "../../nodes/utils/type.ts";
@@ -24,6 +25,8 @@ import { iter, last } from "../../deps.ts";
 import { type BoundaryPoint, Position, position } from "../boundary_point.ts";
 import { isCollapsed } from "./abstract_range.ts";
 import { splitText } from "../../nodes/utils/split_text.ts";
+import { $CharacterData } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)
@@ -135,13 +138,13 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
-    originalStartNode === originalEndNode && isCharacterData(originalStartNode)
+    originalStartNode === originalEndNode && is$CharacterData(originalStartNode)
   ) {
     // 1. Let clone be a clone of original start node.
-    const clone = originalStartNode.cloneNode() as CharacterData;
+    const clone = originalStartNode.cloneNode() as $CharacterData;
 
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset.
-    $(clone).data = substringData(
+    clone[$$.data] = substringData(
       originalStartNode,
       originalStartOffset,
       originalEndOffset - originalStartOffset,
@@ -204,19 +207,19 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   // 13. If first partially contained child is a CharacterData node, then:
   if (
     firstPartiallyContainedChild &&
-    isCharacterData(firstPartiallyContainedChild)
+    is$CharacterData(firstPartiallyContainedChild)
   ) {
     // 1. Let clone be a clone of original start node.
     // TODO use clone
-    const clone = originalStartNode.cloneNode();
+    const clone = originalStartNode.cloneNode() as $CharacterData;
 
     const data = substringData(
-      originalStartNode as CharacterData,
+      originalStartNode as $CharacterData,
       originalStartOffset,
       nodeLength(originalStartNode) - originalStartOffset,
     );
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.
-    $(clone as CharacterData).data = data;
+    clone[$$.data] = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);
@@ -257,19 +260,19 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 
   // 16. If last partially contained child is a CharacterData node, then:
   if (
-    lastPartiallyContainedChild && isCharacterData(lastPartiallyContainedChild)
+    lastPartiallyContainedChild && is$CharacterData(lastPartiallyContainedChild)
   ) {
     // 1. Let clone be a clone of original end node.
     // TODO use clone
-    const clone = originalEndNode.cloneNode();
+    const clone = originalEndNode.cloneNode() as $CharacterData;
 
     const data = substringData(
-      originalEndNode as CharacterData,
+      originalEndNode as $CharacterData,
       0,
       originalEndOffset,
     );
     // 2. Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset.
-    $(clone as CharacterData).data = data;
+    clone[$$.data] = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);
@@ -325,11 +328,11 @@ export function extract(range: Range): globalThis.DocumentFragment {
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
     originalStartNode === originalEndNode &&
-    isCharacterData(originalStartNode)
+    is$CharacterData(originalStartNode)
   ) {
     // 1. Let clone be a clone of original start node.
     // TODO(miyauci): use internal method
-    const clone = originalStartNode.cloneNode() as CharacterData;
+    const clone = originalStartNode.cloneNode() as $CharacterData;
 
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset.
     const data = substringData(
@@ -337,7 +340,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
       originalStartOffset,
       originalEndOffset - originalStartOffset,
     );
-    $(clone).data = data;
+    clone[$$.data] = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);
@@ -430,26 +433,26 @@ export function extract(range: Range): globalThis.DocumentFragment {
   // 15. If first partially contained child is a CharacterData node, then:
   if (
     firstPartiallyContainedChild &&
-    isCharacterData(firstPartiallyContainedChild)
+    is$CharacterData(firstPartiallyContainedChild)
   ) {
     // TODO use clone
     // 1. Let clone be a clone of original start node.
-    const clone = originalStartNode.cloneNode();
+    const clone = originalStartNode.cloneNode() as $CharacterData;
 
     const data = substringData(
-      originalStartNode as CharacterData,
+      originalStartNode as $CharacterData,
       originalStartOffset,
       nodeLength(originalStartNode) - originalStartOffset,
     );
     // 2. Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length − original start offset.
-    $(clone as CharacterData).data = data;
+    clone[$$.data] = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);
 
     // 4. Replace data with node original start node, offset original start offset, count original start node’s length − original start offset, and data the empty string.
     replaceData(
-      originalStartNode as CharacterData,
+      originalStartNode as $CharacterData,
       originalStartOffset,
       nodeLength(originalStartNode) - originalStartOffset,
       "",
@@ -486,25 +489,25 @@ export function extract(range: Range): globalThis.DocumentFragment {
 
   // 18. If last partially contained child is a CharacterData node, then:
   if (
-    lastPartiallyContainedChild && isCharacterData(lastPartiallyContainedChild)
+    lastPartiallyContainedChild && is$CharacterData(lastPartiallyContainedChild)
   ) {
     // TODO use clone
     // 1. Let clone be a clone of original end node.
-    const clone = originalEndNode.cloneNode();
+    const clone = originalEndNode.cloneNode() as $CharacterData;
 
     const data = substringData(
-      originalEndNode as CharacterData,
+      originalEndNode as $CharacterData,
       0,
       originalEndOffset,
     );
     // 2. Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset.
-    $(clone as CharacterData).data = data;
+    clone[$$.data] = data;
 
     // 3. Append clone to fragment.
     appendNode(clone, fragment);
 
     // 4. Replace data with node original end node, offset 0, count original end offset, and data the empty string.
-    replaceData(originalEndNode as CharacterData, 0, originalEndOffset, "");
+    replaceData(originalEndNode as $CharacterData, 0, originalEndOffset, "");
 
     // 19. Otherwise, if last partially contained child is not null:
   } else if (lastPartiallyContainedChild) {
@@ -563,7 +566,7 @@ export function insert(node: Node, range: Range): void {
   ensurePreInsertionValidity(node, parent, referenceNode);
 
   // 7. If range’s start node is a Text node, set referenceNode to the result of splitting it with offset range’s start offset.
-  if (isText(startNode)) {
+  if (isMyText(startNode)) {
     referenceNode = splitText(startNode, $(range).startOffset);
   }
 

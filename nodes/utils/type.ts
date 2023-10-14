@@ -1,5 +1,6 @@
 import { NodeType } from "../node.ts";
 import { $, internalSlots } from "../../internal.ts";
+import type { $CharacterData, CharacterDataInternals } from "../../i.ts";
 
 export interface NodeLike {
   nodeType: unknown;
@@ -26,12 +27,22 @@ export function isElement(node: NodeLike): node is Element {
 }
 
 export function isCharacterData(node: NodeLike): node is CharacterData {
-  return internalSlots.has(node) &&
-    "data" in internalSlots.get(node as CharacterData);
+  return node.nodeType === NodeType.TEXT_NODE ||
+    node.nodeType === NodeType.PROCESSING_INSTRUCTION_NODE ||
+    node.nodeType === NodeType.CDATA_SECTION_NODE ||
+    node.nodeType === NodeType.COMMENT_NODE;
+}
+
+export function is$CharacterData(node: NodeLike): node is $CharacterData {
+  return isCharacterData(node);
 }
 
 export function isText(node: NodeLike): node is Text {
   return node.nodeType === NodeType.TEXT_NODE;
+}
+
+export function isMyText(node: Node): node is Text & CharacterDataInternals {
+  return isText(node);
 }
 
 /** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */

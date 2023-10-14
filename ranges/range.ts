@@ -4,10 +4,11 @@ import { Const, constant } from "../_internals/webidl/idl.ts";
 import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
 import { BoundaryPoint, Position, position } from "./boundary_point.ts";
 import {
-  isCharacterData,
+  is$CharacterData,
   isDocument,
   isDocumentFragment,
   isDocumentType,
+  isMyText,
   isText,
 } from "../nodes/utils/type.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
@@ -42,6 +43,7 @@ import {
   removeNode,
   replaceAllNode,
 } from "../nodes/utils/mutation.ts";
+import { data } from "../symbol.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
@@ -304,7 +306,7 @@ export class Range extends AbstractRange implements IRange {
     // 3. If original start node is original end node and it is a CharacterData node,
     if (
       originalStartNode === originalEndNode &&
-      isCharacterData(originalStartNode)
+      is$CharacterData(originalStartNode)
     ) {
       // then replace data with node original start node, offset original start offset, count original end offset minus original start offset, and data the empty string,
       replaceData(
@@ -355,7 +357,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 7. If original start node is a CharacterData node,
-    if (isCharacterData(originalStartNode)) {
+    if (is$CharacterData(originalStartNode)) {
       // then replace data with node original start node, offset original start offset, count original start node’s length − original start offset, data the empty string.
       replaceData(
         originalStartNode,
@@ -369,7 +371,7 @@ export class Range extends AbstractRange implements IRange {
     for (const node of nodesToRemove) removeNode(node);
 
     // 9. If original end node is a CharacterData node,
-    if (isCharacterData(originalEndNode)) {
+    if (is$CharacterData(originalEndNode)) {
       // then replace data with node original end node, offset 0, count original end offset and data the empty string.
       replaceData(originalEndNode, 0, originalEndOffset, "");
     }
@@ -556,17 +558,17 @@ export class Range extends AbstractRange implements IRange {
     const { startNode, endNode, startOffset, endOffset } = this._;
 
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
-    if (startNode === endNode && isText(startNode)) {
+    if (startNode === endNode && isMyText(startNode)) {
       return substringCodeUnitByPositions(
-        $(startNode).data,
+        startNode[data],
         startOffset,
         endOffset,
       );
     }
 
     // 3. If this’s start node is a Text node, then append the substring of that node’s data from this’s start offset until the end to s.
-    if (isText(startNode)) {
-      s += substringCodeUnitToEnd($(startNode).data, startOffset);
+    if (isMyText(startNode)) {
+      s += substringCodeUnitToEnd(startNode[data], startOffset);
     }
 
     // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
@@ -584,8 +586,8 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 5. If this’s end node is a Text node, then append the substring of that node’s data from its start until this’s end offset to s.
-    if (isText(endNode)) {
-      s += substringCodeUnitByPositions($(endNode).data, 0, endOffset);
+    if (isMyText(endNode)) {
+      s += substringCodeUnitByPositions(endNode[data], 0, endOffset);
     }
 
     // 6. Return s.

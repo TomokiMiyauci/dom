@@ -1,9 +1,7 @@
-import { type CharacterDataInternals } from "../character_data.ts";
-import { isText } from "./type.ts";
+import { isMyText, isText } from "./type.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { composeIs, Constructor, iter } from "../../deps.ts";
 import { concatString } from "../../_internals/infra/string.ts";
-import { $ } from "../../internal.ts";
 import { Get } from "../../utils.ts";
 import { Tree } from "../../infra/tree.ts";
 
@@ -29,8 +27,7 @@ export function TextTree<T extends Constructor<Tree<Node>>>(
       // node is the concatenation of the data of all the Text node children of node, in tree order.
       const children = this.children(node);
       const datalist = iter(children)
-        .filter(isText)
-        .map<CharacterDataInternals>($)
+        .filter(isMyText)
         .map(Get.data);
 
       return concatString(new List(datalist));
@@ -40,8 +37,7 @@ export function TextTree<T extends Constructor<Tree<Node>>>(
       // node is the concatenation of the data of all the Text node descendants of node, in tree order.
       const descendants = this.descendants(node);
       const datalist = iter(descendants)
-        .filter(isText)
-        .map<CharacterDataInternals>($)
+        .filter(isMyText)
         .map(Get.data);
 
       return concatString(new List(datalist));

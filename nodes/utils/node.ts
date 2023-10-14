@@ -1,7 +1,3 @@
-/** {@linkcode Node} algorithms
- * @module
- */
-
 import { isElement, isText } from "./type.ts";
 import { getDocumentElement } from "./node_tree.ts";
 import { HTMLCollection } from "../html_collection.ts";
@@ -13,6 +9,13 @@ import {
 } from "../../_internals/infra/string.ts";
 import { parseOrderSet } from "../../infra/ordered_set.ts";
 import { $, tree } from "../../internal.ts";
+import type {
+  $CharacterData,
+  $DocumentType,
+  $ProcessingInstruction,
+} from "../../i.ts";
+import { data } from "../../symbol.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname
@@ -313,14 +316,12 @@ export function equals(A: Node, B: Node): boolean {
 }
 
 export function equalsDocumentType(
-  left: DocumentType,
-  right: DocumentType,
+  left: $DocumentType,
+  right: $DocumentType,
 ): boolean {
-  const _ = $(left), __ = $(right);
-
-  return _.name === __.name &&
-    _.publicId === __.publicId &&
-    _.systemId === __.systemId;
+  return left[$$.name] === right[$$.name] &&
+    left[$$.publicId] === right[$$.publicId] &&
+    left[$$.systemId] === right[$$.systemId];
 }
 
 export function equalsInternalSlot(
@@ -329,7 +330,7 @@ export function equalsInternalSlot(
 ): boolean {
   switch (left.nodeType) {
     case left.DOCUMENT_TYPE_NODE:
-      return equalsDocumentType(<DocumentType> left, <DocumentType> right);
+      return equalsDocumentType(<$DocumentType> left, <$DocumentType> right);
 
     case left.ELEMENT_NODE:
       return equalsElement(<Element> left, <Element> right);
@@ -337,13 +338,13 @@ export function equalsInternalSlot(
       return equalsAttr(<Attr> left, <Attr> right);
     case left.PROCESSING_INSTRUCTION_NODE:
       return equalsProcessingInstruction(
-        <ProcessingInstruction> left,
-        <ProcessingInstruction> right,
+        <$ProcessingInstruction> left,
+        <$ProcessingInstruction> right,
       );
     case left.TEXT_NODE:
     case left.CDATA_SECTION_NODE:
     case left.COMMENT_NODE:
-      return equalsCharacterData(<CharacterData> left, <CharacterData> right);
+      return equalsCharacterData(<$CharacterData> left, <$CharacterData> right);
     default:
       return true;
   }
@@ -374,15 +375,15 @@ export function equalsAttr(left: Attr, right: Attr): boolean {
 }
 
 export function equalsCharacterData(
-  left: CharacterData,
-  right: CharacterData,
+  left: $CharacterData,
+  right: $CharacterData,
 ): boolean {
-  return $(left).data === $(right).data;
+  return left[data] === right[data];
 }
 
 export function equalsProcessingInstruction(
-  left: ProcessingInstruction,
-  right: ProcessingInstruction,
+  left: $ProcessingInstruction,
+  right: $ProcessingInstruction,
 ): boolean {
   return equalsCharacterData(left, right) &&
     $(left).target === $(right).target;

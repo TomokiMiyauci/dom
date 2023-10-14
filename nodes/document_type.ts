@@ -1,18 +1,18 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentType } from "../interface.d.ts";
-import { $, internalSlots } from "../internal.ts";
+import { $ } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import { name, publicId, systemId } from "../symbol.ts";
+import type { DocumentTypeInternals } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documenttype)
  */
 @Exposed("Window", "DocumentType")
-export class DocumentType extends Node implements IDocumentType {
+export class DocumentType extends Node
+  implements IDocumentType, DocumentTypeInternals {
   protected constructor() {
     super();
-
-    const internal = new DocumentTypeInternals();
-    internalSlots.extends<DocumentType>(this, internal);
   }
 
   override get nodeType(): NodeType.DOCUMENT_TYPE_NODE {
@@ -20,7 +20,7 @@ export class DocumentType extends Node implements IDocumentType {
   }
 
   override get nodeName(): string {
-    return this.#_.name;
+    return this[name];
   }
 
   /**
@@ -63,46 +63,35 @@ export class DocumentType extends Node implements IDocumentType {
   protected override clone(document: Document): DocumentType {
     const doctype = new DocumentType();
 
-    $(doctype).name = this.#_.name,
-      $(doctype).publicId = this.#_.publicId,
-      $(doctype).systemId = this.#_.systemId,
-      $(doctype).nodeDocument = document;
+    doctype[name] = this[name],
+      doctype[publicId] = this[publicId],
+      doctype[systemId] = this[systemId];
+
+    $(doctype).nodeDocument = document;
 
     return doctype;
   }
 
   get name(): string {
-    return this.#_.name;
+    return this[name];
   }
 
   get publicId(): string {
-    return this.#_.publicId;
+    return this[publicId];
   }
 
   get systemId(): string {
-    return this.#_.systemId;
+    return this[systemId];
   }
 
   get #_() {
     return $<DocumentType>(this);
   }
-}
-
-export class DocumentTypeInternals {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-name)
-   */
-  name!: string;
 
   /**
-   * @default ""
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-publicid)
+   * @remarks Set after creation
    */
-  publicId = "";
-
-  /**
-   * @default ""
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-doctype-systemid)
-   */
-  systemId = "";
+  [name]!: string;
+  [publicId] = "";
+  [systemId] = "";
 }

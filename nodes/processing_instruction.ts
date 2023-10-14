@@ -4,6 +4,7 @@ import { NodeType } from "./node.ts";
 import { Document } from "./document.ts";
 import { $, internalSlots } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import { data } from "../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#processinginstruction)
@@ -13,11 +14,6 @@ export class ProcessingInstruction extends CharacterData
   implements IProcessingInstruction {
   protected constructor() {
     super();
-
-    internalSlots.extends<ProcessingInstruction>(
-      this,
-      new ProcessingInstructionInternals(),
-    );
   }
 
   override readonly nodeType: NodeType.PROCESSING_INSTRUCTION_NODE =
@@ -35,7 +31,7 @@ export class ProcessingInstruction extends CharacterData
     const node = new ProcessingInstruction();
     $(node).nodeDocument = document,
       $(node).target = this.#_.target,
-      $(node).data = this.#_.data;
+      node[data] = this[data];
 
     return node;
   }
@@ -43,6 +39,11 @@ export class ProcessingInstruction extends CharacterData
   get #_() {
     return internalSlots.get<ProcessingInstruction>(this);
   }
+
+  /**
+   * @remarks Set after creation
+   */
+  [data]!: string;
 }
 
 export class ProcessingInstructionInternals {

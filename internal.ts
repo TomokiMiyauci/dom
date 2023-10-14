@@ -1,8 +1,5 @@
-import { type DocumentTypeInternals } from "./nodes/document_type.ts";
 import { type AttrInternals } from "./nodes/attr.ts";
 import { type ElementInternals } from "./nodes/element.ts";
-import { type CharacterDataInternals } from "./nodes/character_data.ts";
-import { type DocumentFragmentInternals } from "./nodes/document_fragment.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
 import { type DOMImplementationInternals } from "./nodes/dom_implementation.ts";
 import { type ProcessingInstructionInternals } from "./nodes/processing_instruction.ts";
@@ -45,10 +42,7 @@ type InternalSlotEntries = [
   [EventTarget, EventTargetInternals],
   [Node, NodeInternals],
   [Attr, AttrInternals],
-  [DocumentType, DocumentTypeInternals],
-  [DocumentFragment, DocumentFragmentInternals],
   [Element, ElementInternals],
-  [CharacterData, CharacterDataInternals],
   [Document, DocumentInternals],
   [DOMImplementation, DOMImplementationInternals],
   [AbstractRange, AbstractRangeInternals],

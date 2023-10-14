@@ -11,14 +11,13 @@ import { isNotNull, iter } from "../../deps.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { $, tree } from "../../internal.ts";
 import { Text } from "../text.ts";
+import type { $Text } from "../../i.ts";
+import { data } from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-text-split
  */
-export function splitText(
-  node: globalThis.Text,
-  offset: number,
-): globalThis.Text {
+export function splitText(node: $Text, offset: number): globalThis.Text {
   // 1 Let length be node’s length.
   const length = nodeLength(node);
 
@@ -35,7 +34,7 @@ export function splitText(
 
   const newNode = new Text();
   // 5 Let new node be a new Text node, with the same node document as node. Set new node’s data to new data.
-  $(newNode).data = newData, $(newNode).nodeDocument = $(node).nodeDocument;
+  newNode[data] = newData, $(newNode).nodeDocument = $(node).nodeDocument;
 
   // 6 Let parent be node’s parent.
   const parent = tree.parent(node);

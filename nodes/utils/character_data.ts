@@ -14,13 +14,15 @@ import {
   equalsNodeStartNode,
   Operator,
 } from "./mutation.ts";
+import { $CharacterData } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-cd-replace
  * @throws {DOMException}
  */
 export function replaceData(
-  node: CharacterData,
+  node: $CharacterData,
   offset: number,
   count: number,
   data: string,
@@ -42,7 +44,7 @@ export function replaceData(
     node,
     null,
     null,
-    $(node).data,
+    node[$$.data],
     new OrderedSet(),
     new OrderedSet(),
     null,
@@ -50,8 +52,8 @@ export function replaceData(
   );
 
   // 5 Insert data into node’s data after offset code units.
-  $(node).data = $(node).data.substring(0, offset) + data +
-    $(node).data.substring(offset + count);
+  node[$$.data] = node[$$.data].substring(0, offset) + data +
+    node[$$.data].substring(offset + count);
 
   // 6 Let delete offset be offset + data’s length.
   // const deleteOffset = offset + $(node).data.length;
@@ -144,7 +146,7 @@ export function replaceData(
  * @throws {DOMException}
  */
 export function substringData(
-  node: CharacterData,
+  node: $CharacterData,
   offset: number,
   count: number,
 ): string {
@@ -157,8 +159,8 @@ export function substringData(
   }
 
   // 3. If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return.
-  if (offset + count > length) return $(node).data.slice(offset);
+  if (offset + count > length) return node[$$.data].slice(offset);
 
   // 4. Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data.
-  return $(node).data.slice(offset, offset + count);
+  return node[$$.data].slice(offset, offset + count);
 }

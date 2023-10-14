@@ -8,8 +8,8 @@ import { Exposed } from "../_internals/webidl/extended_attribute.ts";
  */
 @Exposed("Window", "CDATASection")
 export class CDATASection extends Text implements ICDATASection {
-  protected constructor() {
-    super();
+  protected constructor(data: string) {
+    super(data);
   }
 
   override get nodeType(): NodeType.CDATA_SECTION_NODE {
