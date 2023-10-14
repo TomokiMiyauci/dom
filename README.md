@@ -76,7 +76,7 @@ const div = document.createElement("div");
 assertEquals(div.namespaceURI, "http://www.w3.org/1999/xhtml");
 ```
 
-Normally this is done by the `DOMParser`.
+Normally this is done by the User Agent.
 
 <!-- For more information, see About private data. -->
 
