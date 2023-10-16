@@ -549,11 +549,11 @@ export class Document extends Node implements IDocument {
     }
 
     // 3. Return a new ProcessingInstruction node, with target set to target, data set to data, and node document set to this.
-    const node = Reflect.construct(
+    const node: ProcessingInstruction = Reflect.construct(
       ProcessingInstruction,
       [],
-    ) as ProcessingInstruction;
-    $(node).nodeDocument = this, $(node).target = target, node[$$.data] = data;
+    );
+    $(node).nodeDocument = this, node[$$.target] = target, node[$$.data] = data;
 
     return node;
   }

@@ -66,7 +66,7 @@ export interface DocumentTypeInternals {
   [$.systemId]: string;
 }
 
-export interface DocumentFragmentInternals extends NodeInternals {
+export interface DocumentFragmentInternals {
   /**
    * @default null
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
@@ -176,6 +176,41 @@ export interface DocumentInternals extends NodeInternals {
   [$.ranges]: Set<globalThis.Range>;
 }
 
+export interface ProcessingInstructionInternals extends CharacterDataInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-pi-target)
+   */
+  [$.target]: string;
+}
+
+export interface ShadowRootInternals extends DocumentFragmentInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-mode)
+   */
+
+  [$.mode]: ShadowRootMode;
+
+  /**
+   * @default false
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-delegates-focus)
+   */
+  [$.delegatesFocus]: boolean;
+
+  /**
+   * @default false
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-available-to-element-internals)
+   */
+
+  [$.availableElementInternals]: boolean;
+
+  /**
+   * @default "named"
+   */
+  [$.slotAssignment]: SlotAssignmentMode;
+
+  [$.host]: Element;
+}
+
 export interface $Node extends Node, NodeInternals {}
 
 export interface $ParentNode extends ParentNode, NodeInternals {}
@@ -189,7 +224,7 @@ export interface $CharacterData extends CharacterData, CharacterDataInternals {}
 export interface $Text extends Text, CharacterDataInternals {}
 
 export interface $ProcessingInstruction
-  extends ProcessingInstruction, CharacterDataInternals {}
+  extends ProcessingInstruction, ProcessingInstructionInternals {}
 
 export interface $DocumentFragment
   extends DocumentFragment, DocumentFragmentInternals {}
@@ -199,3 +234,5 @@ export interface $Attr extends Attr, AttrInternals {}
 export interface $Element extends Element, ElementInternals {}
 
 export interface $Document extends Document, DocumentInternals {}
+
+export interface $ShadowRoot extends ShadowRoot, ShadowRootInternals {}

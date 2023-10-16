@@ -3,11 +3,9 @@ import { type DocumentFragmentInternals } from "./nodes/document_fragment.ts";
 import { type ElementInternals } from "./nodes/element.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
 import { type DOMImplementationInternals } from "./nodes/dom_implementation.ts";
-import { type ProcessingInstructionInternals } from "./nodes/processing_instruction.ts";
 import { type NodeInternals } from "./nodes/node.ts";
 import { type EventInternals } from "./events/event.ts";
 import { type EventTargetInternals } from "./events/event_target.ts";
-import { type ShadowRootInternals } from "./nodes/shadow_root.ts";
 import { type SlottableInternals } from "./nodes/mixins/slottable.ts";
 import { type MutationObserverInternals } from "./nodes/mutation_observer.ts";
 import { type AbortSignalInternals } from "./aborts/abort_signal.ts";
@@ -48,10 +46,8 @@ type InternalSlotEntries = [
   [DocumentFragment, DocumentFragmentInternals],
   [DOMImplementation, DOMImplementationInternals],
   [AbstractRange, AbstractRangeInternals],
-  [ShadowRoot, ShadowRootInternals],
   [NodeIterator, NodeIteratorInternals],
   [TreeWalker, TreeWalkerInternals],
-  [ProcessingInstruction, ProcessingInstructionInternals],
   [Selection, SelectionInternals],
   [MutationObserver, MutationObserverInternals],
   [Slottable, SlottableInternals],

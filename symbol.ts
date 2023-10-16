@@ -27,3 +27,4 @@ export const ranges = Symbol("ranges");
 export const delegatesFocus = Symbol("delegatesFocus");
 export const availableElementInternals = Symbol("availableElementInternals");
 export const slotAssignment = Symbol("slotAssignment");
+export const target = Symbol("target");
