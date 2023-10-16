@@ -43,6 +43,7 @@ import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
 import { NodeInternals as _ } from "../i.ts";
+import * as $$ from "../symbol.ts";
 
 export enum NodeType {
   ELEMENT_NODE = 1,
@@ -404,12 +405,12 @@ export abstract class Node extends EventTarget implements INode {
     let attr2: Attr | null = null;
 
     // 4. node1 is an attribute, then set attr1 to node1 and node1 to attr1’s element.
-    if (isAttr(node1)) attr1 = node1, node1 = $(attr1).element;
+    if (isAttr(node1)) attr1 = node1, node1 = attr1[$$.element];
 
     // 5. If node2 is an attribute, then:
     if (isAttr(node2)) {
       // 1. Set attr2 to node2 and node2 to attr2’s element.
-      attr2 = node2, node2 = $(attr2).element;
+      attr2 = node2, node2 = attr2[$$.element];
 
       // 2. If attr1 and node1 are non-null, and node2 is node1, then:
       if (!!attr1 && !!node1 && node2 === node1) {

@@ -1,20 +1,25 @@
 import { Node, NodeType } from "./node.ts";
 import type { IAttr } from "../interface.d.ts";
-import { getQualifiedName } from "./utils/attr.ts";
-import { $, internalSlots } from "../internal.ts";
+import { qualifiedName } from "./utils/attr.ts";
+import { $ } from "../internal.ts";
 import { setExistAttributeValue } from "./utils/attr.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import type { $Attr, AttrInternals } from "../i.ts";
+import {
+  element,
+  localName,
+  namespace,
+  namespacePrefix,
+  value,
+} from "../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#attr)
  */
 @Exposed("Window", "Attr")
-export class Attr extends Node implements IAttr {
+export class Attr extends Node implements IAttr, AttrInternals {
   protected constructor() {
     super();
-
-    const internal = new AttrInternals();
-    internalSlots.extends<Attr>(this, internal);
   }
 
   /**
@@ -25,7 +30,7 @@ export class Attr extends Node implements IAttr {
   }
 
   override get nodeName(): string {
-    return this.#_.qualifiedName;
+    return qualifiedName(this);
   }
 
   /**
@@ -33,7 +38,7 @@ export class Attr extends Node implements IAttr {
    */
   override get nodeValue(): string {
     // this’s value.
-    return this.#_.value;
+    return this[value];
   }
 
   /**
@@ -49,7 +54,7 @@ export class Attr extends Node implements IAttr {
    */
   override get textContent(): string {
     // this’s value.
-    return this.#_.value;
+    return this[value];
   }
 
   /**
@@ -78,7 +83,7 @@ export class Attr extends Node implements IAttr {
    */
   get namespaceURI(): string | null {
     // The namespaceURI getter steps are to return this’s namespace.
-    return this.#_.namespace;
+    return this[namespace];
   }
 
   /**
@@ -86,7 +91,7 @@ export class Attr extends Node implements IAttr {
    */
   get prefix(): string | null {
     // The prefix getter steps are to return this’s namespace prefix.
-    return this.#_.namespacePrefix;
+    return this[namespacePrefix];
   }
 
   /**
@@ -94,7 +99,7 @@ export class Attr extends Node implements IAttr {
    */
   get localName(): string {
     // The localName getter steps are to return this’s local name.
-    return this.#_.localName;
+    return this[localName];
   }
 
   /**
@@ -102,7 +107,7 @@ export class Attr extends Node implements IAttr {
    */
   get name(): string {
     // The name getter steps are to return this’s qualified name.
-    return this.#_.qualifiedName;
+    return qualifiedName(this);
   }
 
   /**
@@ -110,7 +115,7 @@ export class Attr extends Node implements IAttr {
    */
   get value(): string {
     // The value getter steps are to return this’s value.
-    return this.#_.value;
+    return this[value];
   }
 
   /**
@@ -126,7 +131,7 @@ export class Attr extends Node implements IAttr {
    */
   get ownerElement(): Element | null {
     // The ownerElement getter steps are to return this’s element.
-    return this.#_.element;
+    return this[element];
   }
 
   /**
@@ -140,49 +145,25 @@ export class Attr extends Node implements IAttr {
   get #_() {
     return $<Attr>(this);
   }
+
+  [namespace]: string | null = null;
+  [namespacePrefix]: string | null = null;
+
+  /**
+   * @remarks Set after creation
+   */
+  [localName]!: string;
+  [value]: string = "";
+  [element]: Element | null = null;
 }
 
-export class AttrInternals {
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
-   */
-  namespace: string | null = null;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-namespace-prefix
-   */
-  namespacePrefix: string | null = null;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-local-name
-   */
-  localName!: string;
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-value
-   */
-  value = "";
-
-  /**
-   * @see https://dom.spec.whatwg.org/#concept-attribute-element
-   */
-  element: Element | null = null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-attribute-qualified-name)
-   */
-  get qualifiedName(): string {
-    return getQualifiedName(this.localName, this.namespacePrefix);
-  }
-}
-
-export function cloneAttr(attr: globalThis.Attr, document: Document): Attr {
-  const attribute = Reflect.construct(Attr, []) as Attr;
-  $(attribute).localName = $(attr).localName,
-    $(attribute).value = $(attr).value,
-    $(attribute).namespace = $(attr).namespace,
-    $(attribute).namespacePrefix = $(attr).namespacePrefix,
-    $(attribute).element = $(attr).element,
+export function cloneAttr(attr: $Attr, document: Document): Attr {
+  const attribute: Attr = Reflect.construct(Attr, []);
+  attribute[localName] = attr[localName],
+    attribute[value] = attr[value],
+    attribute[namespace] = attr[namespace],
+    attribute[namespacePrefix] = attr[namespacePrefix],
+    attribute[element] = attr[element],
     $(attribute).nodeDocument = document;
 
   return attribute;

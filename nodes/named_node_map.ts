@@ -18,6 +18,8 @@ import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
 import { $ } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import type { $Attr } from "../i.ts";
+import * as $$ from "../symbol.ts";
 
 const $attributeList = Symbol();
 const $element = Symbol();
@@ -50,7 +52,9 @@ export class NamedNodeMap extends LegacyPlatformObject
     // 1. Let names be the qualified names of the attributes in this NamedNodeMap object’s attribute list, with duplicates omitted, in order.
     const qualifiedNames = map(
       this[$attributeList],
-      (attr) => getQualifiedName($(attr).localName, $(attr).namespacePrefix),
+      (attr) => {
+        return getQualifiedName(attr[$$.localName], attr[$$.namespacePrefix]);
+      },
     );
     const names = new Set(qualifiedNames);
 
@@ -111,7 +115,7 @@ export class NamedNodeMap extends LegacyPlatformObject
   /**
    * @see https://dom.spec.whatwg.org/#dom-namednodemap-setnameditem
    */
-  setNamedItem(attr: Attr): Attr | null {
+  setNamedItem(attr: $Attr): $Attr | null {
     // return the result of setting an attribute given attr and element.
     return setAttribute(attr, this[$element]);
   }
@@ -119,7 +123,7 @@ export class NamedNodeMap extends LegacyPlatformObject
   /**
    * @see https://dom.spec.whatwg.org/#dom-namednodemap-setnameditemns
    */
-  setNamedItemNS(attr: Attr): Attr | null {
+  setNamedItemNS(attr: $Attr): $Attr | null {
     // return the result of setting an attribute given attr and element.
     return setAttribute(attr, this[$element]);
   }

@@ -6,7 +6,11 @@ import { preInsertNode } from "./mutation.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../../_internals/infra/string.ts";
 import { $, tree } from "../../internal.ts";
+import { $Attr } from "../../i.ts";
 export { getQualifiedName } from "./attr.ts";
+import { qualifiedName as qualifiedNameOfAttr } from "./attr.ts";
+import { value } from "../../symbol.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
@@ -27,18 +31,18 @@ export function getAttributeValue(
   if (attr === null) return "";
 
   // 3. Return attr’s value.
-  return $(attr).value;
+  return attr[value];
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
  */
 export function setAttribute(
-  attr: globalThis.Attr,
-  element: globalThis.Element,
-): globalThis.Attr | null {
+  attr: $Attr,
+  element: Element,
+): $Attr | null {
   // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
-  if (!($(attr).element === null || $(attr).element === element)) {
+  if (!(attr[$$.element] === null || attr[$$.element] === element)) {
     throw new DOMException(
       "The attribute is in use by another element",
       "InUseAttributeError",
@@ -47,8 +51,8 @@ export function setAttribute(
 
   // 2. Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element.
   const oldAttr = getAttributeByNamespaceAndLocalName(
-    $(attr).namespace,
-    $(attr).localName,
+    attr[$$.namespace],
+    attr[$$.localName],
     element,
   );
 
@@ -71,7 +75,7 @@ export function getAttributeByNamespaceAndLocalName(
   namespace: string | null,
   localName: string,
   element: globalThis.Element,
-): globalThis.Attr | null {
+): $Attr | null {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
 
@@ -79,8 +83,8 @@ export function getAttributeByNamespaceAndLocalName(
   return find(
     $(element).attributeList,
     (attribute) =>
-      $(attribute).namespace === namespace &&
-      $(attribute).localName === localName,
+      attribute[$$.namespace] === namespace &&
+      attribute[$$.localName] === localName,
   ) ?? null;
 }
 
@@ -88,27 +92,27 @@ export function getAttributeByNamespaceAndLocalName(
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-append
  */
 export function appendAttribute(
-  attribute: globalThis.Attr,
+  attribute: $Attr,
   element: globalThis.Element,
 ): void {
   // 1. Append attribute to element’s attribute list.
   $(element).attributeList.append(attribute);
 
   // 2. Set attribute’s element to element.
-  $(attribute).element = element;
+  attribute[$$.element] = element;
 
   // 3. Handle attribute changes for attribute with element, null, and attribute’s value.
-  handleAttributesChanges(attribute, element, null, $(attribute).value);
+  handleAttributesChanges(attribute, element, null, attribute[value]);
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-replace
  */
 export function replaceAttribute(
-  oldAttr: globalThis.Attr,
-  newAttr: globalThis.Attr,
+  oldAttr: $Attr,
+  newAttr: $Attr,
 ): void {
-  const oldElement = $(oldAttr).element;
+  const oldElement = oldAttr[$$.element];
   // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
   oldElement && $(oldElement).attributeList.replace(
     newAttr,
@@ -116,39 +120,39 @@ export function replaceAttribute(
   );
 
   // 2. Set newAttr’s element to oldAttr’s element.
-  $(newAttr).element = $(oldAttr).element;
+  newAttr[$$.element] = oldAttr[$$.element];
 
   // 3. Set oldAttr’s element to null.
-  $(oldAttr).element = null;
+  oldAttr[$$.element] = null;
 
-  const element = $(newAttr).element;
+  const element = newAttr[$$.element];
   // 4. Handle attribute changes for oldAttr with newAttr’s element, oldAttr’s value, and newAttr’s value.
   element &&
     handleAttributesChanges(
       oldAttr,
       element,
-      $(oldAttr).value,
-      $(newAttr).value,
+      oldAttr[value],
+      newAttr[value],
     );
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove
  */
-export function removeAttribute(attribute: globalThis.Attr): void {
+export function removeAttribute(attribute: $Attr): void {
   // Unclear whether there is always a element in attribute.
   // 1. Let element be attribute’s element.
-  const element = $(attribute).element;
+  const element = attribute[$$.element];
 
   // 2. Remove attribute from element’s attribute list.
   element && $(element).attributeList.remove((attr) => attr === attribute);
 
   // 3. Set attribute’s element to null.
-  $(attribute).element = null;
+  attribute[$$.element] = null;
 
   // 4. Handle attribute changes for attribute with element, attribute’s value, and null.
   element &&
-    handleAttributesChanges(attribute, element, $(attribute).value, null);
+    handleAttributesChanges(attribute, element, attribute[value], null);
 }
 
 /**
@@ -157,7 +161,7 @@ export function removeAttribute(attribute: globalThis.Attr): void {
 export function removeAttributeByName(
   qualifiedName: string,
   element: globalThis.Element,
-): globalThis.Attr | null {
+): $Attr | null {
   // 1. Let attr be the result of getting an attribute given qualifiedName and element.
   const attr = getAttributeByName(qualifiedName, element);
 
@@ -196,7 +200,7 @@ export function removeAttributeByNamespaceAndLocalName(
 export function getAttributeByName(
   qualifiedName: string,
   element: globalThis.Element,
-): globalThis.Attr | null {
+): $Attr | null {
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
     $(element).namespace === Namespace.HTML &&
@@ -206,7 +210,7 @@ export function getAttributeByName(
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
   return find(
     $(element).attributeList,
-    (attribute) => $(attribute).qualifiedName === qualifiedName,
+    (attribute) => qualifiedNameOfAttr(attribute) === qualifiedName,
   ) ?? null;
 }
 
@@ -225,7 +229,7 @@ export function hasAttributeByQualifiedName(
   element: globalThis.Element,
 ): boolean {
   for (const attr of $(element).attributeList) {
-    if ($(attr).qualifiedName === qualifiedName) return true;
+    if (qualifiedNameOfAttr(attr) === qualifiedName) return true;
   }
 
   return false;

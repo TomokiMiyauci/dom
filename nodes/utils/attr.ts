@@ -2,18 +2,18 @@ import { isCustom } from "./element.ts";
 import { queueMutationRecord } from "./queue.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { $ } from "../../internal.ts";
+import { $Attr } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#set-an-existing-attribute-value
  */
 export function setExistAttributeValue(
-  attribute: Attr,
+  attribute: $Attr,
   value: string,
 ): void {
-  const _ = $(attribute);
-
   // 1. If attribute’s element is null, then set attribute’s value to value.
-  if (_.element === null) _.value = value;
+  if (attribute[$$.element] === null) attribute[$$.value] = value;
   // 2. Otherwise, change attribute to value.
   else changeAttributes(attribute, value);
 }
@@ -22,20 +22,18 @@ export function setExistAttributeValue(
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-change
  */
 export function changeAttributes(
-  attribute: Attr,
+  attribute: $Attr,
   value: string,
 ): void {
-  const _ = $(attribute);
-
   // 1. Let oldValue be attribute’s value.
-  const oldValue = _.value;
+  const oldValue = attribute[$$.value];
 
   // 2. Set attribute’s value to value.
-  _.value = value;
+  attribute[$$.value] = value;
 
   // 3. Handle attribute changes for attribute with attribute’s element, oldValue, and value.
-  if (_.element) {
-    handleAttributesChanges(attribute, _.element, oldValue, value);
+  if (attribute[$$.element]) {
+    handleAttributesChanges(attribute, attribute[$$.element], oldValue, value);
   }
 }
 
@@ -43,19 +41,17 @@ export function changeAttributes(
  * @see https://dom.spec.whatwg.org/#handle-attribute-changes
  */
 export function handleAttributesChanges(
-  attribute: Attr,
+  attribute: $Attr,
   element: Element,
   oldValue: string | null,
   newValue: string | null,
 ): void {
-  const { namespace, localName } = $(attribute);
-
   // 1. Queue a mutation record of "attributes" for element with attribute’s local name, attribute’s namespace, oldValue, « », « », null, and null.
   queueMutationRecord(
     "attributes",
     element,
-    localName,
-    namespace,
+    attribute[$$.localName],
+    attribute[$$.namespace],
     oldValue,
     new OrderedSet(),
     new OrderedSet(),
@@ -69,10 +65,10 @@ export function handleAttributesChanges(
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
   $(element).attributeChangeSteps.run({
     element,
-    localName,
+    localName: attribute[$$.localName],
     oldValue,
     value: newValue,
-    namespace,
+    namespace: attribute[$$.namespace],
   });
 }
 
@@ -84,6 +80,10 @@ export function getQualifiedName(
   namespacePrefix: string | null,
 ): string {
   return strQualifiedName(localName, namespacePrefix);
+}
+
+export function qualifiedName(attr: $Attr): string {
+  return getQualifiedName(attr[$$.localName], attr[$$.namespacePrefix]);
 }
 
 export function strQualifiedName(localName: string, prefix?: unknown): string {

@@ -7,7 +7,10 @@ import {
 import { isElement, isShadowHost } from "./utils/type.ts";
 import { getQualifiedName } from "./utils/element.ts";
 import { Attr, cloneAttr } from "./attr.ts";
-import { changeAttributes } from "./utils/attr.ts";
+import {
+  changeAttributes,
+  qualifiedName as qualifiedNameOfAttr,
+} from "./utils/attr.ts";
 import { NamedNodeMap } from "./named_node_map.ts";
 import { isHTMLDocument } from "./utils/document.ts";
 import {
@@ -54,6 +57,7 @@ import { replaceAllString } from "./utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import * as $$ from "../symbol.ts";
+import { $Attr } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#element)
@@ -310,7 +314,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return $(attr).value;
+    return attr[$$.value];
   }
 
   /**
@@ -328,7 +332,7 @@ export class Element extends Node implements IElement {
     if (attr === null) return attr;
 
     // 3. Return attr’s value.
-    return $(attr).value;
+    return attr[$$.value];
   }
 
   /**
@@ -338,7 +342,7 @@ export class Element extends Node implements IElement {
     // return the qualified names of the attributes in this’s attribute list, in order; otherwise a new list.
     const qualifiedNames = map(
       this.#_.attributeList,
-      (attr) => getQualifiedName($(attr).localName, $(attr).namespacePrefix),
+      (attr) => getQualifiedName(attr[$$.localName], attr[$$.namespacePrefix]),
     );
 
     return qualifiedNames;
@@ -429,7 +433,7 @@ export class Element extends Node implements IElement {
     return some(
       this.#_.attributeList,
       (attr) =>
-        $(attr).namespace === namespace && $(attr).localName === localName,
+        attr[$$.namespace] === namespace && attr[$$.localName] === localName,
     );
   }
 
@@ -517,14 +521,14 @@ export class Element extends Node implements IElement {
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
       this.#_.attributeList,
-      (attr) => $(attr).qualifiedName === qualifiedName,
+      (attr) => qualifiedNameOfAttr(attr) === qualifiedName,
     ) ?? null;
 
     // 4. If attribute is null, create an attribute whose local name is qualifiedName, value is value, and node document is this’s node document, then append this attribute to this, and then return.
     if (attribute === null) {
-      const attribute = Reflect.construct(Attr, []) as Attr;
-      $(attribute).localName = qualifiedName,
-        $(attribute).value = value,
+      const attribute: Attr = Reflect.construct(Attr, []);
+      attribute[$$.localName] = qualifiedName,
+        attribute[$$.value] = value,
         $(attribute).nodeDocument = this.#_.nodeDocument;
 
       appendAttribute(attribute, this);
@@ -556,7 +560,7 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-setattributenode
    */
-  setAttributeNode(attr: globalThis.Attr): globalThis.Attr | null {
+  setAttributeNode(attr: $Attr): $Attr | null {
     // to return the result of setting an attribute given attr and this.
     return setAttribute(attr, this);
   }
@@ -564,7 +568,7 @@ export class Element extends Node implements IElement {
   /**
    * @see https://dom.spec.whatwg.org/#dom-element-setattributenodens
    */
-  setAttributeNodeNS(attr: globalThis.Attr): globalThis.Attr | null {
+  setAttributeNodeNS(attr: $Attr): $Attr | null {
     // to return the result of setting an attribute given attr and this.
     return setAttribute(attr, this);
   }
@@ -590,7 +594,7 @@ export class Element extends Node implements IElement {
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
       this.#_.attributeList,
-      (attr) => $(attr).qualifiedName === qualifiedName,
+      (attr) => qualifiedNameOfAttr(attr) === qualifiedName,
     ) ?? null;
 
     // 4. If attribute is null, then:
@@ -598,9 +602,9 @@ export class Element extends Node implements IElement {
       // 1. If force is not given or is true,
       if (typeof force === "undefined" || force) {
         // create an attribute whose local name is qualifiedName, value is the empty string, and node document is this’s node document,
-        const attr = Reflect.construct(Attr, []) as Attr;
-        $(attr).localName = qualifiedName,
-          $(attr).value = "",
+        const attr: Attr = Reflect.construct(Attr, []);
+        attr[$$.localName] = qualifiedName,
+          attr[$$.value] = "",
           $(attr).nodeDocument = this.#_.nodeDocument;
 
         // then append this attribute to this,
@@ -732,7 +736,7 @@ export class ElementInternals {
    * @default new List()
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-attribute)
    */
-  attributeList: List<globalThis.Attr> = new List();
+  attributeList: List<$Attr> = new List();
 
   /**
    * @default new Steps()

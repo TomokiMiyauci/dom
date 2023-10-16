@@ -1,4 +1,3 @@
-import { type AttrInternals } from "./nodes/attr.ts";
 import { type DocumentFragmentInternals } from "./nodes/document_fragment.ts";
 import { type ElementInternals } from "./nodes/element.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
@@ -40,7 +39,6 @@ type InternalSlotEntries = [
   [Event, EventInternals],
   [EventTarget, EventTargetInternals],
   [Node, NodeInternals],
-  [Attr, AttrInternals],
   [Element, ElementInternals],
   [Document, DocumentInternals],
   [DocumentFragment, DocumentFragmentInternals],

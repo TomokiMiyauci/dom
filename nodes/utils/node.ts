@@ -10,6 +10,7 @@ import {
 import { parseOrderSet } from "../../infra/ordered_set.ts";
 import { $, tree } from "../../internal.ts";
 import type {
+  $Attr,
   $CharacterData,
   $DocumentType,
   $ProcessingInstruction,
@@ -160,7 +161,7 @@ export function getInterface(node: Node, nodeType: number): Element | null {
       return null;
     case node.ATTRIBUTE_NODE:
       // Return the result of locating a namespace prefix for its element, if its element is non-null; otherwise null.
-      return $(node as Attr).element;
+      return (node as $Attr)[$$.element];
     default:
       // Return the result of locating a namespace prefix for its parent element, if its parent element is non-null; otherwise null.
       return getParentElement(node);
@@ -182,11 +183,11 @@ export function locateNamespacePrefix(
   const { attributeList } = $(element);
   // 2. If element has an attribute whose namespace prefix is "xmlns" and value is namespace, then return element’s first such attribute’s local name.
   const attribute = iter(attributeList).find((attr) =>
-    $(attr).namespacePrefix === Namespace.XMLNS &&
-    $(attr).value === namespace
+    attr[$$.namespacePrefix] === Namespace.XMLNS &&
+    attr[$$.value] === namespace
   );
 
-  if (attribute) return $(attribute).localName;
+  if (attribute) return attribute[$$.localName];
 
   // 3. If element’s parent element is not null, then return the result of running locate a namespace prefix on that element using namespace.
   const parent = getParentElement(element);
@@ -226,21 +227,26 @@ export function locateNamespace(
       // 4. If it has an attribute whose namespace is the XMLNS namespace, namespace prefix is "xmlns", and local name is prefix,
       const hasAttr = iter(attrList)
         .find((attr) => {
-          const { namespace, namespacePrefix, localName } = $(attr);
-
-          return namespace === Namespace.XMLNS &&
-            namespacePrefix === "xmlns" &&
-            localName === prefix;
+          return attr[$$.namespace] === Namespace.XMLNS &&
+            attr[$$.namespacePrefix] === "xmlns" &&
+            attr[$$.localName] === prefix;
         });
 
       // or if prefix is null and it has an attribute whose namespace is the XMLNS namespace, namespace prefix is null, and local name is "xmlns",
       const attribute = hasAttr ??
         (prefix === null
-          ? iter(attrList).find((attr) => isXMLNamespace($(attr)))
+          ? iter(attrList).find((attr) =>
+            isXMLNamespace({
+              namespace: attr[$$.namespace],
+              namespacePrefix: attr[$$.namespacePrefix],
+              localName: attr[$$.localName],
+              ...$(attr),
+            })
+          )
           : null);
 
       // then return its value if it is not the empty string, and null otherwise.
-      if (attribute) return $(attribute).value || null;
+      if (attribute) return attribute[$$.value] || null;
 
       const parentElement = getParentElement(element);
 
@@ -266,7 +272,7 @@ export function locateNamespace(
       return null;
 
     case node.ATTRIBUTE_NODE: {
-      const element = $(node as Attr).element;
+      const element = (node as $Attr)[$$.element];
 
       // 1. If its element is null, then return null.
       if (element === null) return null;
@@ -335,7 +341,7 @@ export function equalsInternalSlot(
     case left.ELEMENT_NODE:
       return equalsElement(<Element> left, <Element> right);
     case left.ATTRIBUTE_NODE:
-      return equalsAttr(<Attr> left, <Attr> right);
+      return equalsAttr(<$Attr> left, <$Attr> right);
     case left.PROCESSING_INSTRUCTION_NODE:
       return equalsProcessingInstruction(
         <$ProcessingInstruction> left,
@@ -364,14 +370,14 @@ export function equalsElement(left: Element, right: Element): boolean {
     );
 }
 
-export function equalsAttr(left: Attr, right: Attr): boolean {
+export function equalsAttr(left: $Attr, right: $Attr): boolean {
   const _ = $(left), __ = $(right);
 
   // Its namespace, local name, and value.
   return left === right ||
-    _.namespace === __.namespace &&
-      _.localName === __.localName &&
-      _.value === __.value;
+    left[$$.namespace] === right[$$.namespace] &&
+      left[$$.localName] === right[$$.localName] &&
+      left[$$.value] === right[$$.value];
 }
 
 export function equalsCharacterData(

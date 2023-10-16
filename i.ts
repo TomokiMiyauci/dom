@@ -74,7 +74,7 @@ export interface DocumentFragmentInternals {
   [$.host]: Element | null;
 }
 
-export interface AttrInternals extends NodeInternals {
+export interface AttrInternals {
   /**
    * @default null
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
@@ -102,7 +102,7 @@ export interface AttrInternals extends NodeInternals {
    * @default null
    * @see https://dom.spec.whatwg.org/#concept-attribute-element
    */
-  [$.element]: $Element | null;
+  [$.element]: Element | null;
 }
 
 export interface ElementInternals extends NodeInternals {

@@ -239,11 +239,11 @@ class AttrConvertor {
   }
 
   static to(attribute: Token.Attribute, document: Document): Attr {
-    const attr = Reflect.construct(Attr, []) as Attr;
-    if (attribute.namespace) $(attr).namespace = attribute.namespace;
-    if (attribute.prefix) $(attr).namespacePrefix = attribute.prefix;
-    $(attr).localName = attribute.name;
-    $(attr).value = attribute.value;
+    const attr: Attr = Reflect.construct(Attr, []);
+    if (attribute.namespace) attr[$$.namespace] = attribute.namespace;
+    if (attribute.prefix) attr[$$.namespacePrefix] = attribute.prefix;
+    attr[$$.localName] = attribute.name;
+    attr[$$.value] = attribute.value;
     $(attr).nodeDocument = document;
 
     return attr;

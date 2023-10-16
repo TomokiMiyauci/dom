@@ -3,7 +3,7 @@ import {
   removeAttributeByNamespaceAndLocalName,
 } from "../../../nodes/utils/element.ts";
 import { setAttributeValue } from "../../../nodes/utils/set_attribute_value.ts";
-import { $ } from "../../../internal.ts";
+import { value } from "../../../symbol.ts";
 
 export function reflectGet(
   type: "DOMString",
@@ -144,7 +144,7 @@ export class ElementTarget implements ReflectedTarget {
     if (!attribute) return null;
 
     // 3. Return attribute's value.
-    return $(attribute).value;
+    return attribute[value];
   }
 
   setContentAttribute(value: string): void {

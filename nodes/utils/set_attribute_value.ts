@@ -5,6 +5,7 @@ import {
 } from "./element.ts";
 import { changeAttributes } from "./attr.ts";
 import { $ } from "../../internal.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set-value
@@ -25,11 +26,11 @@ export function setAttributeValue(
 
   // 2. If attribute is null, create an attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, value is value, and node document is element’s node document, then append this attribute to element, and then return.
   if (attribute === null) {
-    const attr = Reflect.construct(Attr, []) as Attr;
-    $(attr).namespace = namespace,
-      $(attr).namespacePrefix = prefix,
-      $(attr).localName = localName,
-      $(attr).value = value,
+    const attr: Attr = Reflect.construct(Attr, []);
+    attr[$$.namespace] = namespace,
+      attr[$$.namespacePrefix] = prefix,
+      attr[$$.localName] = localName,
+      attr[$$.value] = value,
       $(attr).nodeDocument = $(element).nodeDocument;
 
     appendAttribute(attr, element);

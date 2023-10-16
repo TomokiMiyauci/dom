@@ -258,7 +258,7 @@ export class Document extends Node implements IDocument {
 
     // 3. Return a new attribute whose local name is localName and node document is this.
     const attribute = Reflect.construct(Attr, []) as Attr;
-    $(attribute).localName = localName, $(attribute).nodeDocument = this;
+    attribute[$$.localName] = localName, $(attribute).nodeDocument = this;
 
     return attribute;
   }
@@ -277,10 +277,10 @@ export class Document extends Node implements IDocument {
     );
 
     // 2. Return a new attribute whose namespace is namespace, namespace prefix is prefix, local name is localName, and node document is this.
-    const attribute = Reflect.construct(Attr, []) as Attr;
-    $(attribute).localName = localName,
-      $(attribute).namespacePrefix = prefix,
-      $(attribute).namespace = ns,
+    const attribute: Attr = Reflect.construct(Attr, []);
+    attribute[$$.localName] = localName,
+      attribute[$$.namespacePrefix] = prefix,
+      attribute[$$.namespace] = ns,
       $(attribute).nodeDocument = this;
 
     return attribute;
