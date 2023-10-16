@@ -10,9 +10,10 @@ import { $, tree } from "../../internal.ts";
 import { queueMutationObserverMicrotask } from "./queue.ts";
 import { iter } from "../../deps.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
-import { isShadowRootNode } from "./shadow_root.ts";
-import { $CharacterData } from "../../i.ts";
+import { isShadowRoot } from "./type.ts";
+import { $CharacterData, $ShadowRoot } from "../../i.ts";
 import { data } from "../../symbol.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-length
@@ -70,17 +71,17 @@ export function findSlot(
 
   // 2. Let shadow be slottable’s parent’s shadow root.
   const shadow =
-    ($(parent) as any as { shadowRoot: ShadowRoot | null }).shadowRoot;
+    ($(parent) as any as { shadowRoot: $ShadowRoot | null }).shadowRoot;
 
   // 3. If shadow is null, then return null.
   if (!shadow) return null;
 
   // 4. If the open flag is set and shadow’s mode is not "open", then return null.
-  if (open && $(shadow).mode !== "open") return null;
+  if (open && shadow[$$.mode] !== "open") return null;
 
   const shadowDescendants = iter(tree.descendants(shadow));
   // 5. If shadow’s slot assignment is "manual", then return the slot in shadow’s descendants whose manually assigned nodes contains slottable, if any; otherwise null.
-  if ($(shadow).slotAssignment === "manual") {
+  if (shadow[$$.slotAssignment] === "manual") {
     return shadowDescendants.filter(isElement).filter(isSlot).find(
       slotManuallyAssignedNodesContainsSlottable,
     ) ?? null;
@@ -113,13 +114,13 @@ export function findSlottables(slot: HTMLSlotElement): List<Slottable> {
   const root = tree.root(slot);
 
   // 3. If root is not a shadow root, then return result.
-  if (!isShadowRootNode(root)) return result;
+  if (!isShadowRoot(root)) return result;
 
   // 4. Let host be root’s host.
-  const { host } = $(root);
+  const host = root[$$.host];
 
   // 5. If root’s slot assignment is "manual", then:
-  if ($(root).slotAssignment === "manual") {
+  if (root[$$.slotAssignment] === "manual") {
     // 1. Let result be « ». // This is not necessary
 
     // 2. For each slottable slottable of slot’s manually assigned nodes,

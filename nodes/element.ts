@@ -220,10 +220,10 @@ export class Element extends Node implements IElement {
    */
   get shadowRoot(): globalThis.ShadowRoot | null {
     // 1. Let shadow be this’s shadow root.
-    const shadow = this.#_.shadowRoot;
+    const shadow = this.#_.shadowRoot as ShadowRoot;
 
     // 2. If shadow is null or its mode is "closed", then return null.
-    if (!shadow || $(shadow).mode === "closed") return null;
+    if (!shadow || shadow[$$.mode] === "closed") return null;
 
     // 3. Return shadow.
     return shadow;
@@ -275,22 +275,22 @@ export class Element extends Node implements IElement {
     }
 
     // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
-    const shadow = new ShadowRoot();
-    $(shadow).nodeDocument = this.#_.nodeDocument;
-    $(shadow).host = this,
-      $(shadow).mode = init.mode,
+    const shadow: ShadowRoot = Reflect.construct(ShadowRoot, []);
+    $(shadow).nodeDocument = this.#_.nodeDocument,
+      shadow[$$.host] = this,
+      shadow[$$.mode] = init.mode,
       // 6. Set shadow’s delegates focus to init["delegatesFocus"].
-      $(shadow).delegatesFocus = init.delegatesFocus ?? false;
+      shadow[$$.delegatesFocus] = init.delegatesFocus ?? false;
 
     const { customElementState } = this.#_;
     // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
     if (
       customElementState === "precustomized" ||
       customElementState === "custom"
-    ) $(shadow).availableElementInternals;
+    ) shadow[$$.availableElementInternals] = true;
 
     // 8. Set shadow’s slot assignment to init["slotAssignment"].
-    $(shadow).slotAssignment = init.slotAssignment;
+    shadow[$$.slotAssignment] = init.slotAssignment;
 
     // 9. Set this’s shadow root to shadow.
     this.#_.shadowRoot = shadow;

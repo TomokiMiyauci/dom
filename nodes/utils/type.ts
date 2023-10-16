@@ -1,6 +1,12 @@
 import { NodeType } from "../node.ts";
 import { $, internalSlots } from "../../internal.ts";
-import type { $CharacterData, CharacterDataInternals } from "../../i.ts";
+import type {
+  $CharacterData,
+  $DocumentFragment,
+  $ShadowRoot,
+  CharacterDataInternals,
+} from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 export interface NodeLike {
   nodeType: unknown;
@@ -14,7 +20,7 @@ export function isDocument(node: NodeLike): node is Document {
   return node.nodeType === NodeType.DOCUMENT_NODE;
 }
 
-export function isDocumentFragment(node: NodeLike): node is DocumentFragment {
+export function isDocumentFragment(node: NodeLike): node is $DocumentFragment {
   return node.nodeType === NodeType.DOCUMENT_FRAGMENT_NODE;
 }
 
@@ -46,8 +52,8 @@ export function isMyText(node: Node): node is Text & CharacterDataInternals {
 }
 
 /** Whether the {@linkcode node} is {@linkcode ShadowRoot} or not. */
-export function isShadowRoot(node: NodeLike): node is ShadowRoot {
-  return isDocumentFragment(node) && !!$(node).host;
+export function isShadowRoot(node: NodeLike): node is $ShadowRoot {
+  return isDocumentFragment(node) && !!node[$$.host];
 }
 
 export function isProcessingInstruction(

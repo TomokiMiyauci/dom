@@ -1,5 +1,5 @@
 import { fireEvent } from "../../../../events/fire.ts";
-import { isShadowRootNode } from "../../../../nodes/utils/shadow_root.ts";
+import { isShadowRoot } from "../../../../nodes/utils/type.ts";
 import { $, tree } from "../../../../internal.ts";
 import { unblockRendering } from "../../semantics/document_utils.ts";
 import {
@@ -72,7 +72,7 @@ export function executeScriptElement(el: HTMLScriptElement): void {
       const oldCurrentScript = $(document).currentScript;
 
       // 2. If el's root is not a shadow root, then set document's currentScript attribute to el.
-      if (!isShadowRootNode(tree.root(el))) {
+      if (!isShadowRoot(tree.root(el))) {
         $(document).currentScript = el;
       } // Otherwise, set it to null.
       else $(document).currentScript = null;

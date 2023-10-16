@@ -1,17 +1,9 @@
 import { Constructor } from "../../deps.ts";
 import { $, tree } from "../../internal.ts";
 import { Tree } from "../../infra/tree.ts";
-import { isDocumentFragment, isNodeLike } from "./type.ts";
-
-export function isShadowRoot(
-  fragment: DocumentFragment,
-): fragment is ShadowRoot {
-  return !!$(fragment).host;
-}
-
-export function isShadowRootNode(node: Node): node is ShadowRoot {
-  return isDocumentFragment(node) && isShadowRoot(node);
-}
+import { isNodeLike } from "./type.ts";
+import * as $$ from "../../symbol.ts";
+import { isShadowRoot } from "./type.ts";
 
 export function ShadowTree<T extends Constructor<Tree<Node>>>(
   Ctor: T,
@@ -21,9 +13,8 @@ export function ShadowTree<T extends Constructor<Tree<Node>>>(
       const root = this.root(node);
 
       // its root’s host’s shadow-including root, if the object’s root is a shadow root; otherwise its root.
-      if (isShadowRootNode(root)) {
-        const { host } = $(root);
-        return this.shadowIncludingRoot(host);
+      if (isShadowRoot(root)) {
+        return this.shadowIncludingRoot(root[$$.host]);
       }
 
       return root;
@@ -33,9 +24,8 @@ export function ShadowTree<T extends Constructor<Tree<Node>>>(
       for (const descendant of this.descendants(node)) {
         const root = this.root(descendant);
 
-        if (isShadowRootNode(root)) {
-          const { host } = $(root);
-          yield* this.shadowIncludingInclusiveDescendants(host);
+        if (isShadowRoot(root)) {
+          yield* this.shadowIncludingInclusiveDescendants(root[$$.host]);
         } else yield descendant;
       }
     }
@@ -50,8 +40,8 @@ export function ShadowTree<T extends Constructor<Tree<Node>>>(
 
       const root = this.root(A);
 
-      return isShadowRootNode(root) &&
-        this.isShadowIncludingInclusiveDescendant($(root).host, B);
+      return isShadowRoot(root) &&
+        this.isShadowIncludingInclusiveDescendant(root[$$.host], B);
     }
 
     isShadowIncludingInclusiveDescendant(A: Node, B: Node): boolean {
@@ -110,8 +100,8 @@ export function isShadowIncludingDescendant(A: Node, B: unknown): boolean {
 
   const root = tree.root(A);
 
-  return isNodeLike(root) && isShadowRootNode(root) &&
-    isShadowInclusiveAncestor($(root).host, B);
+  return isNodeLike(root) && isShadowRoot(root) &&
+    isShadowInclusiveAncestor(root[$$.host], B);
 }
 
 /**
@@ -127,7 +117,7 @@ export function retarget<T extends object | null>(
     const root = tree.root(A as Node);
 
     if (
-      !isShadowRootNode(root) ||
+      !isShadowRoot(root) ||
       (isNodeLike(B) && isShadowInclusiveAncestor(root, B))
     ) return A;
 

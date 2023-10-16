@@ -4,16 +4,15 @@ import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "../_internals/html/events.ts";
-import { internalSlots } from "../internal.ts";
+import { ShadowRootInternals as _ } from "../i.ts";
+import * as $$ from "../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#interface-shadowroot
  */
-export class ShadowRoot extends DocumentFragment implements IShadowRoot {
-  constructor() {
+export class ShadowRoot extends DocumentFragment implements IShadowRoot, _ {
+  protected constructor() {
     super();
-
-    internalSlots.extends<ShadowRoot>(this, new ShadowRootInternals());
   }
 
   /**
@@ -21,7 +20,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get mode(): ShadowRootMode {
     // return this’s mode.
-    return this.#_.mode;
+    return this[$$.mode];
   }
 
   /**
@@ -37,7 +36,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get slotAssignment(): SlotAssignmentMode {
     // return this’s delegates focus.
-    return this.#_.slotAssignment;
+    return this[$$.slotAssignment];
   }
 
   /**
@@ -45,7 +44,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
    */
   get host(): Element {
     // return this’s host.
-    throw this.#_.host;
+    throw this[$$.host];
   }
 
   /**
@@ -64,30 +63,17 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot {
     setEventHandlerIDLAttribute(this, "onslotchange", value);
   }
 
-  get #_() {
-    return internalSlots.get<ShadowRoot>(this);
-  }
-}
-
-export class ShadowRootInternals {
   /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-mode)
+   * @remarks Set after creation
    */
-
-  mode!: ShadowRootMode;
+  [$$.host]!: Element;
 
   /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-delegates-focus)
+   * @remarks Set after creation
    */
-  delegatesFocus = false;
+  [$$.mode]!: ShadowRootMode;
 
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#shadowroot-available-to-element-internals)
-   */
-
-  availableElementInternals = false;
-
-  slotAssignment: SlotAssignmentMode = "named";
-
-  host!: Element;
+  [$$.delegatesFocus]: boolean = false;
+  [$$.availableElementInternals]: boolean = false;
+  [$$.slotAssignment]: SlotAssignmentMode = "named";
 }

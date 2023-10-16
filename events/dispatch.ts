@@ -9,6 +9,8 @@ import { callUserObjectOperation } from "../_internals/webidl/ecmascript_binding
 import { $, tree } from "../internal.ts";
 import { Node } from "../nodes/node.ts";
 import { MouseEvent } from "../_internals/uievents/mouse_event.ts";
+import * as $$ from "../symbol.ts";
+import { $ShadowRoot } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-event-dispatch)
@@ -89,7 +91,7 @@ export function dispatch(
 
         // 3. If parent’s root is a shadow root whose mode is "closed", then set slot-in-closed-tree to true.
         const root = tree.root(parent as Node);
-        if (isShadowRoot(root) && $(root).mode === "closed") {
+        if (isShadowRoot(root) && root[$$.mode] === "closed") {
           slotInClosedTree = true;
         }
       }
@@ -290,7 +292,7 @@ export function appendEventPath(
   let rootOfClosedTree = false;
 
   // 4. If invocationTarget is a shadow root whose mode is "closed", then set root-of-closed-tree to true.
-  if (resolved.isShadowRoot && $(resolved.root).mode === "closed") {
+  if (resolved.isShadowRoot && resolved.root[$$.mode] === "closed") {
     rootOfClosedTree = true;
   }
 
@@ -308,7 +310,7 @@ export function appendEventPath(
 
 function resolveRoot(
   eventTarget: EventTarget,
-): { isShadowRoot: false } | { isShadowRoot: true; root: ShadowRoot } {
+): { isShadowRoot: false } | { isShadowRoot: true; root: $ShadowRoot } {
   if (!isNodeLike(eventTarget)) return { isShadowRoot: false };
 
   const root = tree.root(eventTarget as Node);

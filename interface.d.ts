@@ -54,3 +54,28 @@ export type CustomElementState =
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
  */
 export type CompatMode = "BackCompat" | "CSS1Compat";
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
+ */
+export interface RegisteredObserver {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-observer)
+   */
+  observer: MutationObserver;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-options)
+   */
+  options: MutationObserverInit;
+}
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#transient-registered-observer)
+ */
+export interface TransientRegisteredObserver extends RegisteredObserver {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#transient-registered-observer-source)
+   */
+  source: RegisteredObserver;
+}

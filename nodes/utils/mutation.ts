@@ -28,6 +28,7 @@ import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elem
 import { isAssigned } from "./slottable.ts";
 import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
 import { adoptNode } from "./document.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -246,7 +247,7 @@ export function insertNode(
       isShadowHost(parent) &&
       // TODO
       $(parent).shadowRoot &&
-      $($(parent).shadowRoot!).slotAssignment === "named" &&
+      ($(parent).shadowRoot as any)![$$.slotAssignment] === "named" &&
       isSlottable(node)
     ) assignSlot(node);
 
