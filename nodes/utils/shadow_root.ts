@@ -121,6 +121,6 @@ export function retarget<T extends object | null>(
       (isNodeLike(B) && isShadowInclusiveAncestor(root, B))
     ) return A;
 
-    A = $(root).host as T;
+    A = root[$$.host] as T;
   }
 }

@@ -7,6 +7,7 @@ import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../../deps.ts";
 import { $, internalSlots } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
 import { appropriateTemplateContentsOwnerDocument } from "./elements/html_template_element_utils.ts";
+import { $DocumentFragment } from "../../i.ts";
 
 type Child = Node & ChildNode;
 
@@ -59,7 +60,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
 
   setTemplateContent(
     templateElement: HTMLTemplateElement,
-    contentElement: DocumentFragment,
+    contentElement: $DocumentFragment,
   ): void {
     const { nodeDocument } = $(templateElement);
     // 1. Let doc be the template element's node document's appropriate template contents owner document.
@@ -68,7 +69,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = this.document.createDocumentFragment();
     $(fragment).nodeDocument = doc;
-    $(fragment).host = templateElement;
+    fragment[$$.host] = templateElement;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
     internalSlots.extends<HTMLTemplateElement>(templateElement, {
@@ -76,7 +77,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     });
 
     $(contentElement).nodeDocument = $(fragment).nodeDocument;
-    $(contentElement).host = $(fragment).host;
+    contentElement[$$.host] = fragment[$$.host];
     $(templateElement).templateContents = contentElement;
   }
 

@@ -1,4 +1,3 @@
-import { type DocumentFragmentInternals } from "./nodes/document_fragment.ts";
 import { type ElementInternals } from "./nodes/element.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
 import { type DOMImplementationInternals } from "./nodes/dom_implementation.ts";
@@ -41,7 +40,6 @@ type InternalSlotEntries = [
   [Node, NodeInternals],
   [Element, ElementInternals],
   [Document, DocumentInternals],
-  [DocumentFragment, DocumentFragmentInternals],
   [DOMImplementation, DOMImplementationInternals],
   [AbstractRange, AbstractRangeInternals],
   [NodeIterator, NodeIteratorInternals],

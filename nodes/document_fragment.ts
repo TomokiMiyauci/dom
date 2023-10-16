@@ -1,8 +1,9 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
-import { $, internalSlots, tree } from "../internal.ts";
+import { $, tree } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
+import { host } from "../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documentfragment)
@@ -15,9 +16,6 @@ export class DocumentFragment extends Node implements IDocumentFragment {
    */
   constructor() {
     super();
-
-    const internal = new DocumentFragmentInternals();
-    internalSlots.extends<DocumentFragment>(this, internal);
 
     // set this’s node document to current global object’s associated Document.
     $<DocumentFragment>(this).nodeDocument = globalThis.document;
@@ -88,16 +86,10 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   get #_() {
     return $<DocumentFragment>(this);
   }
+
+  [host]: Element | null = null;
 }
 
 export interface DocumentFragment {
   getElementById(elementId: string): HTMLElement | null;
-}
-
-export class DocumentFragmentInternals {
-  /**
-   * @default null
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
-   */
-  host: Element | null = null;
 }
