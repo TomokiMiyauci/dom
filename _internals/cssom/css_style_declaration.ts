@@ -1,9 +1,10 @@
 import type { ICSSStyleDeclaration } from "../interface.d.ts";
 import { setAttributeValue } from "../../nodes/utils/set_attribute_value.ts";
+import { $Element } from "../../i.ts";
 
 export class CSSStyleDeclaration implements ICSSStyleDeclaration {
-  #ownerNode: Element;
-  constructor({ ownerNode }: { ownerNode: Element }) {
+  #ownerNode: $Element;
+  constructor({ ownerNode }: { ownerNode: $Element }) {
     this.#ownerNode = ownerNode;
   }
 

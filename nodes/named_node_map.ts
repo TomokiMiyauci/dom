@@ -25,18 +25,18 @@ const $attributeList = Symbol();
 const $element = Symbol();
 
 export interface NamedNodeMapInits {
-  element: Element;
-  attributeList: List<Attr>;
+  element: $Element;
+  attributeList: List<$Attr>;
 }
 
 @Exposed("Window", "NamedNodeMap")
 @LegacyUnenumerableNamedProperties
 export class NamedNodeMap extends LegacyPlatformObject
   implements INamedNodeMap {
-  readonly [k: number]: Attr;
+  readonly [k: number]: $Attr;
 
-  [$attributeList]: List<Attr>;
-  [$element]: Element;
+  [$attributeList]: List<$Attr>;
+  [$element]: $Element;
 
   constructor({ attributeList, element }: NamedNodeMapInits) {
     super();

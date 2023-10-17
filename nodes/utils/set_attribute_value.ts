@@ -6,12 +6,13 @@ import {
 import { changeAttributes } from "./attr.ts";
 import { $ } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
+import { $Element } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-set-value
  */
 export function setAttributeValue(
-  element: globalThis.Element,
+  element: $Element,
   localName: string,
   value: string,
   prefix: string | null = null,

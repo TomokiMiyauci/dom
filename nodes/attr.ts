@@ -4,7 +4,7 @@ import { qualifiedName } from "./utils/attr.ts";
 import { $ } from "../internal.ts";
 import { setExistAttributeValue } from "./utils/attr.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
-import type { $Attr, AttrInternals } from "../i.ts";
+import type { $Attr, $Element, AttrInternals } from "../i.ts";
 import {
   element,
   localName,
@@ -74,7 +74,7 @@ export class Attr extends Node implements IAttr, AttrInternals {
     return this.#_.nodeDocument;
   }
 
-  protected override clone(document: Document): Attr {
+  protected override clone(document: Document): $Attr {
     return cloneAttr(this, document);
   }
 
@@ -154,7 +154,7 @@ export class Attr extends Node implements IAttr, AttrInternals {
    */
   [localName]!: string;
   [value]: string = "";
-  [element]: Element | null = null;
+  [element]: $Element | null = null;
 }
 
 export function cloneAttr(attr: $Attr, document: Document): Attr {

@@ -42,7 +42,7 @@ import {
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
-import { $Element, NodeInternals as _ } from "../i.ts";
+import { $Attr, $Element, NodeInternals as _ } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 export enum NodeType {
@@ -401,8 +401,8 @@ export abstract class Node extends EventTarget implements INode {
     let node1: globalThis.Node | null = other;
     // deno-lint-ignore no-this-alias
     let node2: globalThis.Node | Element | null = this;
-    let attr1: Attr | null = null;
-    let attr2: Attr | null = null;
+    let attr1: $Attr | null = null;
+    let attr2: $Attr | null = null;
 
     // 4. node1 is an attribute, then set attr1 to node1 and node1 to attr1’s element.
     if (isAttr(node1)) attr1 = node1, node1 = attr1[$$.element];

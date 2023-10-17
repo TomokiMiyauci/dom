@@ -16,7 +16,7 @@ import * as $$ from "../../symbol.ts";
  * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-value
  */
 export function getAttributeValue(
-  element: globalThis.Element,
+  element: $Element,
   localName: string,
   namespace: string | null = null,
 ): string {
@@ -39,7 +39,7 @@ export function getAttributeValue(
  */
 export function setAttribute(
   attr: $Attr,
-  element: Element,
+  element: $Element,
 ): $Attr | null {
   // 1. If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException.
   if (!(attr[$$.element] === null || attr[$$.element] === element)) {
@@ -74,7 +74,7 @@ export function setAttribute(
 export function getAttributeByNamespaceAndLocalName(
   namespace: string | null,
   localName: string,
-  element: globalThis.Element,
+  element: $Element,
 ): $Attr | null {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
@@ -93,7 +93,7 @@ export function getAttributeByNamespaceAndLocalName(
  */
 export function appendAttribute(
   attribute: $Attr,
-  element: globalThis.Element,
+  element: $Element,
 ): void {
   // 1. Append attribute to element’s attribute list.
   element[$$.attributeList].append(attribute);
@@ -178,8 +178,8 @@ export function removeAttributeByName(
 export function removeAttributeByNamespaceAndLocalName(
   namespace: string | null,
   localName: string,
-  element: globalThis.Element,
-): globalThis.Attr | null {
+  element: $Element,
+): $Attr | null {
   // 1. Let attr be the result of getting an attribute given namespace, localName, and element.
   const attr = getAttributeByNamespaceAndLocalName(
     namespace,

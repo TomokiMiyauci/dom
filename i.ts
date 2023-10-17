@@ -105,7 +105,7 @@ export interface AttrInternals {
    * @default null
    * @see https://dom.spec.whatwg.org/#concept-attribute-element
    */
-  [$.element]: Element | null;
+  [$.element]: $Element | null;
 }
 
 export interface ElementInternals {

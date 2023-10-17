@@ -1,3 +1,4 @@
+import { $Element } from "../../../i.ts";
 import {
   getAttributeByNamespaceAndLocalName,
   removeAttributeByNamespaceAndLocalName,
@@ -7,17 +8,17 @@ import { value } from "../../../symbol.ts";
 
 export function reflectGet(
   type: "DOMString",
-  element: Element,
+  element: $Element,
   name: string,
 ): string;
 export function reflectGet(
   type: "boolean",
-  element: Element,
+  element: $Element,
   name: string,
 ): boolean;
 export function reflectGet(
   type: "boolean" | "DOMString",
-  element: Element,
+  element: $Element,
   name: string,
 ): boolean | string {
   const IDLAttribute = type === "boolean" ? BooleanIDL : DOMStringIDL;
@@ -28,7 +29,7 @@ export function reflectGet(
 }
 
 export function reflectSet(
-  element: Element,
+  element: $Element,
   name: string,
   value: boolean | string,
 ): void {
@@ -122,12 +123,12 @@ export interface ReflectedTarget {
 }
 
 export class ElementTarget implements ReflectedTarget {
-  #element: Element;
-  constructor(element: Element, public name: string) {
+  #element: $Element;
+  constructor(element: $Element, public name: string) {
     this.#element = element;
   }
 
-  getElement(): Element {
+  getElement(): $Element {
     // 1. Return element.
     return this.#element;
   }

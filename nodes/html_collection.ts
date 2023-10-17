@@ -25,10 +25,10 @@ export const $filter = Symbol();
 export class HTMLCollection extends LegacyPlatformObject
   implements IHTMLCollection {
   private [$root]: Node;
-  private [$filter]: (element: Element) => boolean;
+  private [$filter]: (element: $Element) => boolean;
 
   constructor(
-    { root, filter }: { root: Node; filter: (element: Element) => boolean },
+    { root, filter }: { root: Node; filter: (element: $Element) => boolean },
   ) {
     super();
 
@@ -65,7 +65,7 @@ export class HTMLCollection extends LegacyPlatformObject
 
   @convert
   @getter("index")
-  item(@unsignedLong index: number): Element | null {
+  item(@unsignedLong index: number): $Element | null {
     return at(this.represent(), index) ?? null;
   }
 
@@ -74,7 +74,7 @@ export class HTMLCollection extends LegacyPlatformObject
    */
   @convert
   @getter("name")
-  namedItem(@DOMString key: string): Element | null {
+  namedItem(@DOMString key: string): $Element | null {
     // 1. If key is the empty string, return null.
     if (key === "") return null;
 
@@ -97,4 +97,4 @@ export class HTMLCollection extends LegacyPlatformObject
 }
 
 export interface HTMLCollection
-  extends Getter<"index", Element>, Getter<"name", Element> {}
+  extends Getter<"index", $Element>, Getter<"name", $Element> {}

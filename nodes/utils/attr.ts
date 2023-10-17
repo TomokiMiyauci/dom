@@ -1,7 +1,6 @@
 import { isCustom } from "./element.ts";
 import { queueMutationRecord } from "./queue.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
-import { $ } from "../../internal.ts";
 import { $Attr, $Element } from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
@@ -90,6 +89,6 @@ export function strQualifiedName(localName: string, prefix?: unknown): string {
   return typeof prefix === "string" ? `${prefix}:${localName}` : localName;
 }
 
-export function isAttr(node: Node): node is Attr {
+export function isAttr(node: Node): node is $Attr {
   return node.nodeType === node.ATTRIBUTE_NODE;
 }

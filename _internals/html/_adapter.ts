@@ -7,7 +7,7 @@ import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../../deps.ts";
 import { $, internalSlots } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
 import { appropriateTemplateContentsOwnerDocument } from "./elements/html_template_element_utils.ts";
-import { $DocumentFragment } from "../../i.ts";
+import { $DocumentFragment, $Element } from "../../i.ts";
 import { qualifiedName } from "../../nodes/utils/element.ts";
 
 type Child = Node & ChildNode;
@@ -133,7 +133,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     throw new Error("insertBefore");
   }
 
-  adoptAttributes(recipient: Element, attrs: Token.Attribute[]): void {
+  adoptAttributes(recipient: $Element, attrs: Token.Attribute[]): void {
     for (const attr of attrs) {
       const { name, namespace, prefix, value } = attr;
       setAttributeValue(recipient, name, value, prefix, namespace);
@@ -168,7 +168,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     parentNode.appendChild(newNode);
   }
 
-  getTagName(element: Element): string {
+  getTagName(element: $Element): string {
     return qualifiedName(element);
   }
 
