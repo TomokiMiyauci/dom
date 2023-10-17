@@ -1,6 +1,7 @@
 import { isElement, isText } from "./type.ts";
 import { getDocumentElement } from "./node_tree.ts";
 import { HTMLCollection } from "../html_collection.ts";
+import { qualifiedName as qualifiedNameOfElement } from "./element.ts";
 import { Namespace } from "../../_internals/infra/namespace.ts";
 import { html, iter, izip, takewhile } from "../../deps.ts";
 import {
@@ -13,6 +14,7 @@ import type {
   $Attr,
   $CharacterData,
   $DocumentType,
+  $Element,
   $ProcessingInstruction,
 } from "../../i.ts";
 import { data } from "../../symbol.ts";
@@ -37,11 +39,12 @@ export function getElementsByQualifiedName(
       filter: (element) =>
         element !== root &&
           // - Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase.
-          ($(element).namespace === Namespace.HTML &&
-            $(element).qualifiedName === toASCIILowerCase(qualifiedName)) ||
+          (element[$$.namespace] === Namespace.HTML &&
+            qualifiedNameOfElement(element) ===
+              toASCIILowerCase(qualifiedName)) ||
         // - Whose namespace is not the HTML namespace and whose qualified name is qualifiedName.
-        ($(element).namespace !== Namespace.HTML &&
-          $(element).qualifiedName === qualifiedName),
+        (element[$$.namespace] !== Namespace.HTML &&
+          qualifiedNameOfElement(element) === qualifiedName),
     });
   }
 
@@ -49,7 +52,7 @@ export function getElementsByQualifiedName(
   return new HTMLCollection({
     root,
     filter: (element) =>
-      element !== root && $(element).qualifiedName === qualifiedName,
+      element !== root && qualifiedNameOfElement(element) === qualifiedName,
   });
 }
 
@@ -108,7 +111,7 @@ export function getElementsByNamespaceAndLocalName(
       filter: (element) => {
         if (element === root) return false;
 
-        return $(element).localName === localName;
+        return element[$$.localName] === localName;
       },
     });
   }
@@ -120,7 +123,7 @@ export function getElementsByNamespaceAndLocalName(
       filter: (element) => {
         if (element === root) return false;
 
-        return $(element).namespace === namespace;
+        return element[$$.namespace] === namespace;
       },
     });
   }
@@ -131,8 +134,8 @@ export function getElementsByNamespaceAndLocalName(
     filter: (element) => {
       if (element === root) return false;
 
-      return $(element).namespace === namespace &&
-        $(element).localName === localName;
+      return element[$$.namespace] === namespace &&
+        element[$$.localName] === localName;
     },
   });
 }
@@ -140,18 +143,18 @@ export function getElementsByNamespaceAndLocalName(
 /**
  * @see https://dom.spec.whatwg.org/#parent-element
  */
-export function getParentElement(node: Node): Element | null {
+export function getParentElement(node: Node): $Element | null {
   const parent = tree.parent(node);
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
 }
 
-export function getInterface(node: Node, nodeType: number): Element | null {
+export function getInterface(node: Node, nodeType: number): $Element | null {
   switch (nodeType) {
     case node.ELEMENT_NODE:
       // Return the result of locating a namespace prefix for it using namespace.
-      return (node as Element);
+      return (node as $Element);
     case node.DOCUMENT_NODE:
       // Return the result of locating a namespace prefix for its document element, if its document element is non-null; otherwise null.
       return getDocumentElement(node);
@@ -172,17 +175,16 @@ export function getInterface(node: Node, nodeType: number): Element | null {
  * @see https://dom.spec.whatwg.org/#locate-a-namespace-prefix
  */
 export function locateNamespacePrefix(
-  element: Element,
+  element: $Element,
   namespace: string,
 ): string | null {
   // 1. If element’s namespace is namespace and its namespace prefix is non-null, then return its namespace prefix.
   if (
-    $(element).namespace === namespace && $(element).namespacePrefix !== null
-  ) return $(element).namespacePrefix;
+    element[$$.namespace] === namespace && element[$$.namespacePrefix] !== null
+  ) return element[$$.namespacePrefix];
 
-  const { attributeList } = $(element);
   // 2. If element has an attribute whose namespace prefix is "xmlns" and value is namespace, then return element’s first such attribute’s local name.
-  const attribute = iter(attributeList).find((attr) =>
+  const attribute = iter(element[$$.attributeList]).find((attr) =>
     attr[$$.namespacePrefix] === Namespace.XMLNS &&
     attr[$$.value] === namespace
   );
@@ -214,15 +216,15 @@ export function locateNamespace(
       // 2. If prefix is "xmlns", then return the XMLNS namespace.
       if (prefix === "xmlns") return Namespace.XMLNS;
 
-      const element = node as Element;
-      const namespace = $(element).namespace;
+      const element = node as $Element;
+      const namespace = element[$$.namespace];
 
       // 3. If its namespace is non-null and its namespace prefix is prefix, then return namespace.
-      if (namespace !== null && $(element).namespacePrefix === prefix) {
+      if (namespace !== null && element[$$.namespacePrefix] === prefix) {
         return namespace;
       }
 
-      const attrList = $(element).attributeList;
+      const attrList = element[$$.attributeList];
 
       // 4. If it has an attribute whose namespace is the XMLNS namespace, namespace prefix is "xmlns", and local name is prefix,
       const hasAttr = iter(attrList)
@@ -339,7 +341,7 @@ export function equalsInternalSlot(
       return equalsDocumentType(<$DocumentType> left, <$DocumentType> right);
 
     case left.ELEMENT_NODE:
-      return equalsElement(<Element> left, <Element> right);
+      return equalsElement(<$Element> left, <$Element> right);
     case left.ATTRIBUTE_NODE:
       return equalsAttr(<$Attr> left, <$Attr> right);
     case left.PROCESSING_INSTRUCTION_NODE:
@@ -356,17 +358,17 @@ export function equalsInternalSlot(
   }
 }
 
-export function equalsElement(left: Element, right: Element): boolean {
+export function equalsElement(left: $Element, right: $Element): boolean {
   const _ = $(left), __ = $(right);
 
-  return _.namespace === __.namespace &&
-    _.namespacePrefix === __.namespacePrefix &&
-    _.localName === __.localName &&
-    _.attributeList.size === __.attributeList.size &&
+  return left[$$.namespace] === right[$$.namespace] &&
+    left[$$.namespacePrefix] === right[$$.namespacePrefix] &&
+    left[$$.localName] === right[$$.localName] &&
+    left[$$.attributeList].size === right[$$.attributeList].size &&
     // each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list.
     // TODO:(miyauci) improve performance. O(n²)
-    iter(_.attributeList).every((left) =>
-      iter(__.attributeList).some((right) => equalsAttr(left, right))
+    iter(left[$$.attributeList]).every((left) =>
+      iter(right[$$.attributeList]).some((right) => equalsAttr(left, right))
     );
 }
 

@@ -1,6 +1,8 @@
 import { lookUpCustomElementDefinition } from "../../_internals/html/custom_element.ts";
 import { Element } from "../element.ts";
 import { $ } from "../../internal.ts";
+import { $Element } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-create-element)
@@ -12,9 +14,9 @@ export function createElement(
   prefix: string | null = null, // 1. If prefix was not given, let prefix be null.
   is: string | null = null, // 2. If is was not given, let is be null.
   synchronousCustomElements: boolean | null = null,
-): globalThis.Element {
+): $Element {
   // 3. Let result be null.
-  let result: Element | null = null;
+  let result: $Element | null = null;
 
   // 4. Let definition be the result of looking up a custom element definition given document, namespace, localName, and is.
   const definition = lookUpCustomElementDefinition(
@@ -89,12 +91,12 @@ export function createElement(
 
     // 2. Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document.
     result = Reflect.construct(Interface, []) as Element;
-    $(result).namespace = namespace,
-      $(result).namespacePrefix = prefix,
-      $(result).localName = localName,
-      $(result).customElementState = "uncustomized",
-      $(result).customElementDefinition = null,
-      $(result).isValue = is;
+    result[$$.namespace] = namespace,
+      result[$$.namespacePrefix] = prefix,
+      result[$$.localName] = localName,
+      result[$$.customElementState] = "uncustomized",
+      result[$$.customElementDefinition] = null,
+      result[$$.isValue] = is;
     $(result).nodeDocument = document;
 
     // 3. If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined".

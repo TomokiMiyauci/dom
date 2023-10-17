@@ -246,8 +246,8 @@ export function insertNode(
       isElement(parent) &&
       isShadowHost(parent) &&
       // TODO
-      $(parent).shadowRoot &&
-      ($(parent).shadowRoot as any)![$$.slotAssignment] === "named" &&
+      parent[$$.shadowRoot] &&
+      parent[$$.shadowRoot][$$.slotAssignment] === "named" &&
       isSlottable(node)
     ) assignSlot(node);
 

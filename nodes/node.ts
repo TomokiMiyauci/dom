@@ -42,7 +42,7 @@ import {
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
-import { NodeInternals as _ } from "../i.ts";
+import { $Element, NodeInternals as _ } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 export enum NodeType {
@@ -415,7 +415,7 @@ export abstract class Node extends EventTarget implements INode {
       // 2. If attr1 and node1 are non-null, and node2 is node1, then:
       if (!!attr1 && !!node1 && node2 === node1) {
         // 2. For each attr in node2’s attribute list:
-        for (const attr of $(node2 as Element).attributeList) {
+        for (const attr of (node2 as $Element)[$$.attributeList]) {
           // 1. If attr equals attr1, then return the result of adding DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC and DOCUMENT_POSITION_PRECEDING.
           if (equals(attr, attr1)) {
             return Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC +

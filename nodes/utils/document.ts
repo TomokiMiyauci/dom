@@ -4,6 +4,7 @@ import { $, tree } from "../../internal.ts";
 import { isCustom } from "./element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
 import { removeNode } from "./mutation.ts";
+import { attributeList } from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-adopt
@@ -29,8 +30,9 @@ export function adoptNode(node: Node, document: Document): void {
       // 2. If inclusiveDescendant is an element,
       if (isElement(inclusiveDescendant)) {
         // then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
-        const { attributeList } = $(inclusiveDescendant);
-        iter(attributeList).forEach((attr) => $(attr).nodeDocument = document);
+        iter(inclusiveDescendant[attributeList]).forEach((attr) =>
+          $(attr).nodeDocument = document
+        );
       }
     }
   }

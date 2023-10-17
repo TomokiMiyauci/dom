@@ -10,6 +10,9 @@ import {
   Origin,
 } from "./_internals/html/loading_web_pages/supporting_concepts.ts";
 import type { List } from "./_internals/infra/data_structures/list.ts";
+import type { CustomElementState } from "./interface.d.ts";
+import { CustomElementDefinition } from "./_internals/html/custom_element.ts";
+
 export interface NodeInternals {
   [$.nodeDocument]: $Document;
 
@@ -105,18 +108,66 @@ export interface AttrInternals {
   [$.element]: Element | null;
 }
 
-export interface ElementInternals extends NodeInternals {
-  // /**
-  //  * @default null
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
-  //  */
-  // [$.namespace]: string | null;
+export interface ElementInternals {
+  /**
+   * @default null
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
+   */
+  [$.namespace]: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace-prefix)
+   */
+  [$.namespacePrefix]: string | null;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-local-name)
+   */
+  [$.localName]: string;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
+   */
+  [$.customElementState]: CustomElementState;
+
+  [$.customElementDefinition]: CustomElementDefinition | null;
 
   /**
    * @default new List()
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-attribute)
    */
   [$.attributeList]: List<$Attr>;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-is-value)
+   */
+  [$.isValue]: string | null;
+
+  /**
+   * @default null
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-id)
+   */
+  [$.ID]: string | null;
+
+  /**
+   * @default new Steps()
+   * @see [DOM Living Standard]((https://dom.spec.whatwg.org/#concept-element-attributes-change-ext)
+   */
+  [$.attributeChangeSteps]: Steps<[AttributesContext]>;
+
+  /**
+   * @default null
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-shadow-root)
+   */
+  [$.shadowRoot]: $ShadowRoot | null;
+}
+
+export interface AttributesContext {
+  element: $Element;
+  localName: string;
+  oldValue: string | null;
+  value: string | null;
+  namespace: string | null;
 }
 
 export type Doctype = "xml" | "html";

@@ -1,7 +1,6 @@
 import { Iterable, iterable } from "../_internals/webidl/iterable.ts";
 import type { IDOMTokenList } from "../interface.d.ts";
 import { OrderedSet } from "../_internals/infra/data_structures/set.ts";
-import { type AttributesContext } from "../nodes/element.ts";
 import { getAttributeValue } from "../nodes/utils/element.ts";
 import { setAttributeValue } from "../nodes/utils/set_attribute_value.ts";
 import { DOMExceptionName } from "../_internals/webidl/exception.ts";
@@ -12,12 +11,14 @@ import { getter, stringifier, WebIDL } from "../_internals/webidl/idl.ts";
 import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { range } from "../deps.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
-import { $ } from "../internal.ts";
+import { attributeList } from "../symbol.ts";
+import { $Element, AttributesContext } from "../i.ts";
+import { attributeChangeSteps } from "../symbol.ts";
 
 const $tokenSet = Symbol();
 
 interface DOMTokenListInits {
-  element: Element;
+  element: $Element;
   localName: string;
 }
 
@@ -29,7 +30,7 @@ export class DOMTokenList extends LegacyPlatformObject
   implements IDOMTokenList {
   [k: number]: string;
 
-  #element: Element;
+  #element: $Element;
   #localName: string;
 
   [$tokenSet]: OrderedSet<string> = new OrderedSet();
@@ -42,7 +43,7 @@ export class DOMTokenList extends LegacyPlatformObject
         else this[$tokenSet] = parseOrderSet(ctx.value);
       }
     };
-    const steps = $(element).attributeChangeSteps;
+    const steps = element[attributeChangeSteps];
     steps.define(attributeChangeStep);
 
     // 1. Let element be associated element.
@@ -242,7 +243,7 @@ export class DOMTokenList extends LegacyPlatformObject
    */
   #updateSteps(): void {
     // 1. If the associated element does not have an associated attribute and token set is empty, then return.
-    if ($(this.#element).attributeList.isEmpty && this[$tokenSet].isEmpty) {
+    if (this.#element[attributeList].isEmpty && this[$tokenSet].isEmpty) {
       return;
     }
 

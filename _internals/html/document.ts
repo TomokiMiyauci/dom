@@ -14,6 +14,8 @@ import { OrderedSet } from "../infra/data_structures/set.ts";
 import { SameObject } from "../webidl/extended_attribute.ts";
 import { HTMLCollection } from "../../nodes/html_collection.ts";
 import { isHTMLScriptElement } from "./elements/scripting/html_script_element_utils.ts";
+import { $Element } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 type PartialDocument =
   // [resource metadata management](https://html.spec.whatwg.org/multipage/dom.html#resource-metadata-management)
@@ -109,7 +111,7 @@ export class Document implements IDocument_HTML {
 
     if (!documentElement) return "";
 
-    const maybeTitle = $(documentElement).localName === "svg"
+    const maybeTitle = documentElement[$$.localName] === "svg"
       // 1. If the document element is an SVG svg element, then let value be the child text content of the first SVG title element that is a child of the document element.
       ? iter(tree.children(documentElement))
         .filter(isElement)
@@ -141,7 +143,7 @@ export class Document implements IDocument_HTML {
 
     if (!documentElement) return null as any;
 
-    if ($(documentElement).localName !== "html") return null as any;
+    if (documentElement[$$.localName] !== "html") return null as any;
 
     const documentElementChildren = tree.children(documentElement);
     const bodyOrFrameSet = iter(documentElementChildren)
@@ -163,7 +165,7 @@ export class Document implements IDocument_HTML {
     // return the head element of the document (a head element or null).
     const head =
       iter(children).filter(isElement).find((element) =>
-        $(element).localName === "html"
+        element[$$.localName] === "html"
       ) ?? null;
 
     return head as HTMLHeadElement;
@@ -401,13 +403,13 @@ export function getTitleElement(node: Node): Element | null {
   // the first title element in the document (in tree order), if there is one, or null otherwise.
   return iter(descendant)
     .filter(isElement)
-    .find((element) => $(element).localName === "title") ??
+    .find((element) => element[$$.localName] === "title") ??
     null;
 }
 
-function isSVGTitle(element: Element): boolean {
-  return $(element).localName === "title" &&
-    $(element).namespace === Namespace.SVG;
+function isSVGTitle(element: $Element): boolean {
+  return element[$$.localName] === "title" &&
+    element[$$.namespace] === Namespace.SVG;
 }
 
 const tags = new Set<string>(["body", "frameset"]);
@@ -415,5 +417,5 @@ const tags = new Set<string>(["body", "frameset"]);
 function isBodyOrFrameset(node: Node): boolean {
   if (!isElement(node)) return false;
 
-  return tags.has($(node).localName);
+  return tags.has(node[$$.localName]);
 }

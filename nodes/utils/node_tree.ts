@@ -11,7 +11,7 @@ import { queueMutationObserverMicrotask } from "./queue.ts";
 import { iter } from "../../deps.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { isShadowRoot } from "./type.ts";
-import { $CharacterData, $ShadowRoot } from "../../i.ts";
+import { $CharacterData, $Element, $ShadowRoot } from "../../i.ts";
 import { data } from "../../symbol.ts";
 import * as $$ from "../../symbol.ts";
 
@@ -187,7 +187,7 @@ export function signalSlotChange(slot: Element): void {
 /**
  * @see https://dom.spec.whatwg.org/#connected
  */
-export function isConnected(node: Node): node is Element {
+export function isConnected(node: Node): node is $Element {
   const root = tree.shadowIncludingRoot(node);
   // if its shadow-including root is a document.
   return isDocument(root);
@@ -205,7 +205,7 @@ export function isSlot(element: Element): element is HTMLSlotElement {
  */
 export function getDocumentElement<T extends Node>(
   node: T,
-): globalThis.Element | null {
+): $Element | null {
   for (const child of tree.children(node)) if (isElement(child)) return child;
 
   return null;

@@ -3,6 +3,7 @@ import { $, internalSlots } from "../../internal.ts";
 import type {
   $CharacterData,
   $DocumentFragment,
+  $Element,
   $ShadowRoot,
   CharacterDataInternals,
 } from "../../i.ts";
@@ -28,7 +29,7 @@ export function isDocumentType(node: NodeLike): node is DocumentType {
   return node.nodeType === NodeType.DOCUMENT_TYPE_NODE;
 }
 
-export function isElement(node: NodeLike): node is Element {
+export function isElement(node: NodeLike): node is $Element {
   return node.nodeType === NodeType.ELEMENT_NODE;
 }
 
@@ -66,14 +67,14 @@ export function isComment(node: Node): node is Comment {
   return node.nodeType === node.COMMENT_NODE;
 }
 
-export type ShadowHost = Element & {
+export type ShadowHost = $Element & {
   _shadowRoot: ShadowRoot;
 };
 
 /**
  * @see https://dom.spec.whatwg.org/#element-shadow-host
  */
-export function isShadowHost(element: Element): element is ShadowHost {
+export function isShadowHost(element: $Element): element is ShadowHost {
   // shadow root is non-null.
-  return internalSlots.has(element) && !!internalSlots.get(element).shadowRoot;
+  return !!element[$$.shadowRoot];
 }

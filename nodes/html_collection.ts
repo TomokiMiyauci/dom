@@ -14,6 +14,8 @@ import {
   unsignedLong,
 } from "../_internals/webidl/types.ts";
 import { $, tree } from "../internal.ts";
+import { $Element } from "../i.ts";
+import * as $$ from "../symbol.ts";
 
 export const $root = Symbol();
 export const $filter = Symbol();
@@ -44,10 +46,10 @@ export class HTMLCollection extends LegacyPlatformObject
     const set = new Set<string>();
 
     for (const element of this.represent()) {
-      const id = $(element).ID;
+      const id = element[$$.ID];
 
       if (typeof id === "string") set.add(id);
-      if ($(element).namespace === Namespace.HTML) {
+      if (element[$$.namespace] === Namespace.HTML) {
         const value = element.getAttribute("name");
 
         if (value) set.add(value);
@@ -79,13 +81,13 @@ export class HTMLCollection extends LegacyPlatformObject
     // 2. Return the first element in the collection for which at least one of the following is true:
     return find(this.represent(), (element) =>
       // - it has an ID which is key;
-      $(element).ID === key ||
+      element[$$.ID] === key ||
       // - it is in the HTML namespace and has a name attribute whose value is key;
-      ($(element).namespace === Namespace.HTML &&
+      (element[$$.namespace] === Namespace.HTML &&
         element.getAttribute("name") === key)) ?? null; // or null if there is no such element.
   }
 
-  protected *represent(): IterableIterator<Element> {
+  protected *represent(): IterableIterator<$Element> {
     for (const node of tree.inclusiveDescendants(this[$root])) {
       if (isElement(node) && this[$filter](node)) yield node;
     }

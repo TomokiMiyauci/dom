@@ -18,7 +18,7 @@ import { DOMExceptionName } from "../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
 import { $ } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
-import type { $Attr } from "../i.ts";
+import type { $Attr, $Element } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 const $attributeList = Symbol();
@@ -61,7 +61,7 @@ export class NamedNodeMap extends LegacyPlatformObject
     // 2. If this NamedNodeMap object’s element is in the HTML namespace and its node document is an HTML document, then for each name in names:
     const element = this[$element];
     if (
-      $(element).namespace === Namespace.HTML &&
+      element[$$.namespace] === Namespace.HTML &&
       isHTMLDocument($(element).nodeDocument)
     ) {
       names.forEach((name) => {
@@ -175,7 +175,7 @@ export interface NamedNodeMap extends Getter<"index">, Getter<"name"> {}
 
 function getAttributesByName(
   qualifiedName: string,
-  element: Element,
+  element: $Element,
 ): Attr | null {
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
@@ -183,7 +183,7 @@ function getAttributesByName(
     isHTMLDocument($(element).nodeDocument)
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
-  return find($(element).attributeList, (attr) => {
+  return find(element[$$.attributeList], (attr) => {
     const q = attr.prefix === null
       ? attr.localName
       : attr.prefix + ":" + attr.localName;
@@ -195,11 +195,11 @@ function getAttributesByName(
 function getAttributeByNamespace(
   namespace: string | null,
   localName: string,
-  element: Element,
+  element: $Element,
 ): Attr | null {
   namespace ||= null;
 
-  return find($(element).attributeList, (attr) => {
+  return find(element[$$.attributeList], (attr) => {
     return attr.namespaceURI === namespace && attr.localName === localName;
   }) ?? null;
 }

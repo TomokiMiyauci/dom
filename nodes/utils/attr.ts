@@ -2,7 +2,7 @@ import { isCustom } from "./element.ts";
 import { queueMutationRecord } from "./queue.ts";
 import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { $ } from "../../internal.ts";
-import { $Attr } from "../../i.ts";
+import { $Attr, $Element } from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
 /**
@@ -42,7 +42,7 @@ export function changeAttributes(
  */
 export function handleAttributesChanges(
   attribute: $Attr,
-  element: Element,
+  element: $Element,
   oldValue: string | null,
   newValue: string | null,
 ): void {
@@ -63,7 +63,7 @@ export function handleAttributesChanges(
   if (isCustom(element)) throw new Error("handleAttributesChanges");
 
   // 3. Run the attribute change steps with element, attribute’s local name, oldValue, newValue, and attribute’s namespace.
-  $(element).attributeChangeSteps.run({
+  element[$$.attributeChangeSteps].run({
     element,
     localName: attribute[$$.localName],
     oldValue,

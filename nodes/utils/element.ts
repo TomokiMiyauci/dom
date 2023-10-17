@@ -6,8 +6,8 @@ import { preInsertNode } from "./mutation.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../../_internals/infra/string.ts";
 import { $, tree } from "../../internal.ts";
-import { $Attr } from "../../i.ts";
-export { getQualifiedName } from "./attr.ts";
+import { $Attr, $Element } from "../../i.ts";
+import { getQualifiedName } from "./attr.ts";
 import { qualifiedName as qualifiedNameOfAttr } from "./attr.ts";
 import { value } from "../../symbol.ts";
 import * as $$ from "../../symbol.ts";
@@ -81,7 +81,7 @@ export function getAttributeByNamespaceAndLocalName(
 
   // 2. Return the attribute in element’s attribute list whose namespace is namespace and local name is localName, if any; otherwise null.
   return find(
-    $(element).attributeList,
+    element[$$.attributeList],
     (attribute) =>
       attribute[$$.namespace] === namespace &&
       attribute[$$.localName] === localName,
@@ -96,7 +96,7 @@ export function appendAttribute(
   element: globalThis.Element,
 ): void {
   // 1. Append attribute to element’s attribute list.
-  $(element).attributeList.append(attribute);
+  element[$$.attributeList].append(attribute);
 
   // 2. Set attribute’s element to element.
   attribute[$$.element] = element;
@@ -114,7 +114,7 @@ export function replaceAttribute(
 ): void {
   const oldElement = oldAttr[$$.element];
   // 1. Replace oldAttr by newAttr in oldAttr’s element’s attribute list.
-  oldElement && $(oldElement).attributeList.replace(
+  oldElement && oldElement[$$.attributeList].replace(
     newAttr,
     (attr) => attr === oldAttr,
   );
@@ -145,7 +145,7 @@ export function removeAttribute(attribute: $Attr): void {
   const element = attribute[$$.element];
 
   // 2. Remove attribute from element’s attribute list.
-  element && $(element).attributeList.remove((attr) => attr === attribute);
+  element && element[$$.attributeList].remove((attr) => attr === attribute);
 
   // 3. Set attribute’s element to null.
   attribute[$$.element] = null;
@@ -160,7 +160,7 @@ export function removeAttribute(attribute: $Attr): void {
  */
 export function removeAttributeByName(
   qualifiedName: string,
-  element: globalThis.Element,
+  element: $Element,
 ): $Attr | null {
   // 1. Let attr be the result of getting an attribute given qualifiedName and element.
   const attr = getAttributeByName(qualifiedName, element);
@@ -199,17 +199,17 @@ export function removeAttributeByNamespaceAndLocalName(
  */
 export function getAttributeByName(
   qualifiedName: string,
-  element: globalThis.Element,
+  element: $Element,
 ): $Attr | null {
   // 1. If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
   if (
-    $(element).namespace === Namespace.HTML &&
+    element[$$.namespace] === Namespace.HTML &&
     $($(element).nodeDocument).type !== "xml"
   ) qualifiedName = toASCIILowerCase(qualifiedName);
 
   // 2. Return the first attribute in element’s attribute list whose qualified name is qualifiedName; otherwise null.
   return find(
-    $(element).attributeList,
+    element[$$.attributeList],
     (attribute) => qualifiedNameOfAttr(attribute) === qualifiedName,
   ) ?? null;
 }
@@ -217,18 +217,18 @@ export function getAttributeByName(
 /**
  * @see https://dom.spec.whatwg.org/#concept-element-custom
  */
-export function isCustom(element: globalThis.Element): boolean {
+export function isCustom(element: $Element): boolean {
   // An element whose custom element state is "custom
-  return $(element).customElementState === "custom";
+  return element[$$.customElementState] === "custom";
 }
 
 export const reflectGet = getAttributeValue;
 
 export function hasAttributeByQualifiedName(
   qualifiedName: string,
-  element: globalThis.Element,
+  element: $Element,
 ): boolean {
-  for (const attr of $(element).attributeList) {
+  for (const attr of element[$$.attributeList]) {
     if (qualifiedNameOfAttr(attr) === qualifiedName) return true;
   }
 
@@ -304,4 +304,11 @@ export function isValidShadowHostName(name: string) {
   // - a valid custom element name
   // - "article", "aside", "blockquote", "body", "div", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "main", "nav", "p", "section", or "span"
   return isValidCustomElementName(name) || validShadowHostTagName.has(name);
+}
+
+/**
+ * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-qualified-name)
+ */
+export function qualifiedName(element: $Element): string {
+  return getQualifiedName(element[$$.localName], element[$$.namespacePrefix]);
 }

@@ -8,6 +8,7 @@ import { $, internalSlots } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
 import { appropriateTemplateContentsOwnerDocument } from "./elements/html_template_element_utils.ts";
 import { $DocumentFragment } from "../../i.ts";
+import { qualifiedName } from "../../nodes/utils/element.ts";
 
 type Child = Node & ChildNode;
 
@@ -168,7 +169,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   getTagName(element: Element): string {
-    return $(element).qualifiedName;
+    return qualifiedName(element);
   }
 
   getTextNodeContent(textNode: Text): string {

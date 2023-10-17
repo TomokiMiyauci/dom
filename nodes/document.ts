@@ -230,7 +230,7 @@ export class Document extends Node implements IDocument {
 
     // 3. If node is a DocumentFragment node whose host is non-null, then return.
     if (
-      isDocumentFragment(node) && $<globalThis.DocumentFragment>(node).host
+      isDocumentFragment(node) && node[$$.host]
     ) return node; // TODO(miyauci): Check return null or not.
 
     // 4. Adopt node into this.

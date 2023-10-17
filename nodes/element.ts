@@ -5,7 +5,7 @@ import {
   getElementsByQualifiedName,
 } from "./utils/node.ts";
 import { isElement, isShadowHost } from "./utils/type.ts";
-import { getQualifiedName } from "./utils/element.ts";
+import { qualifiedName as qualifiedNameOfElement } from "./utils/element.ts";
 import { Attr, cloneAttr } from "./attr.ts";
 import {
   changeAttributes,
@@ -57,13 +57,13 @@ import { replaceAllString } from "./utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import * as $$ from "../symbol.ts";
-import { $Attr } from "../i.ts";
+import { $Attr, AttributesContext, ElementInternals as _ } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#element)
  */
 @Exposed("Window", "Element")
-export class Element extends Node implements IElement {
+export class Element extends Node implements IElement, _ {
   protected constructor() {
     super();
 
@@ -74,10 +74,11 @@ export class Element extends Node implements IElement {
       // 1. If localName is id, namespace is null, and value is null or the empty string, then unset element’s ID.
       if (localName === "id" && namespace === null) {
         // 2. Otherwise, if localName is id, namespace is null, then set element’s ID to value.
-        this.#_.ID = value ? value : null;
+        this[$$.ID] = value ? value : null;
       }
     };
-    internal.attributeChangeSteps.define(changeAttribute);
+
+    this[$$.attributeChangeSteps].define(changeAttribute);
     internalSlots.extends<Element>(this, internal);
   }
 
@@ -134,14 +135,14 @@ export class Element extends Node implements IElement {
     // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
     const copy = createElement(
       document,
-      this.#_.localName,
-      this.#_.namespace,
-      this.#_.namespacePrefix,
-      this.#_.isValue,
+      this[$$.localName],
+      this[$$.namespace],
+      this[$$.namespacePrefix],
+      this[$$.isValue],
     );
 
     // 2. For each attribute in node’s attribute list:
-    for (const attribute of this.#_.attributeList) {
+    for (const attribute of this[$$.attributeList]) {
       // 1. Let copyAttribute be a clone of attribute.
       const copyAttribute = cloneAttr(attribute, document);
 
@@ -193,7 +194,7 @@ export class Element extends Node implements IElement {
    * @see https://dom.spec.whatwg.org/#dom-element-localname
    */
   get localName(): string {
-    return this.#_.localName;
+    return this[$$.localName];
   }
 
   /**
@@ -201,7 +202,7 @@ export class Element extends Node implements IElement {
    */
   get namespaceURI(): string | null {
     // return this’s namespace.
-    return this.#_.namespace;
+    return this[$$.namespace];
   }
 
   /**
@@ -216,15 +217,15 @@ export class Element extends Node implements IElement {
    */
   get prefix(): string | null {
     // return this’s namespace prefix.
-    return this.#_.namespacePrefix;
+    return this[$$.namespacePrefix];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-element-shadowroot)
    */
-  get shadowRoot(): globalThis.ShadowRoot | null {
+  get shadowRoot(): ShadowRoot | null {
     // 1. Let shadow be this’s shadow root.
-    const shadow = this.#_.shadowRoot as ShadowRoot;
+    const shadow = this[$$.shadowRoot];
 
     // 2. If shadow is null or its mode is "closed", then return null.
     if (!shadow || shadow[$$.mode] === "closed") return null;
@@ -241,30 +242,30 @@ export class Element extends Node implements IElement {
     reflectSet(this, "slot", value);
   }
 
-  attachShadow(init: ShadowRootInit): globalThis.ShadowRoot {
+  attachShadow(init: ShadowRootInit): ShadowRoot {
     init.slotAssignment ??= "named";
     init.delegatesFocus ??= false;
 
     // 1. If this’s namespace is not the HTML namespace, then throw a "NotSupportedError" DOMException.
-    if (this.#_.namespace !== Namespace.HTML) {
+    if (this[$$.namespace] !== Namespace.HTML) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
     // 2. If this’s local name is not a valid shadow host name, then throw a "NotSupportedError" DOMException.
-    if (!isValidShadowHostName(this.#_.localName)) {
+    if (!isValidShadowHostName(this[$$.localName])) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
     }
 
     // 3. If this’s local name is a valid custom element name, or this’s is value is not null, then:
     if (
-      isValidCustomElementName(this.#_.localName) || this.#_.isValue !== null
+      isValidCustomElementName(this[$$.localName]) || this[$$.isValue] !== null
     ) {
       // 1. Let definition be the result of looking up a custom element definition given this’s node document, its namespace, its local name, and its is value.
       const definition = lookUpCustomElementDefinition(
         this.#_.nodeDocument,
-        this.#_.namespace,
-        this.#_.localName,
-        this.#_.isValue,
+        this[$$.namespace],
+        this[$$.localName],
+        this[$$.isValue],
       );
 
       // 2. If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException.
@@ -286,7 +287,7 @@ export class Element extends Node implements IElement {
       // 6. Set shadow’s delegates focus to init["delegatesFocus"].
       shadow[$$.delegatesFocus] = init.delegatesFocus ?? false;
 
-    const { customElementState } = this.#_;
+    const customElementState = this[$$.customElementState];
     // 7. If this’s custom element state is "precustomized" or "custom", then set shadow’s available to element internals to true.
     if (
       customElementState === "precustomized" ||
@@ -297,7 +298,7 @@ export class Element extends Node implements IElement {
     shadow[$$.slotAssignment] = init.slotAssignment;
 
     // 9. Set this’s shadow root to shadow.
-    this.#_.shadowRoot = shadow;
+    this[$$.shadowRoot] = shadow;
 
     // 10 .Return shadow.
     return shadow;
@@ -341,8 +342,8 @@ export class Element extends Node implements IElement {
   getAttributeNames(): string[] {
     // return the qualified names of the attributes in this’s attribute list, in order; otherwise a new list.
     const qualifiedNames = map(
-      this.#_.attributeList,
-      (attr) => getQualifiedName(attr[$$.localName], attr[$$.namespacePrefix]),
+      this[$$.attributeList],
+      (attr) => qualifiedNameOfAttr(attr),
     );
 
     return qualifiedNames;
@@ -403,7 +404,7 @@ export class Element extends Node implements IElement {
   hasAttribute(qualifiedName: string): boolean {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this.#_.namespace === Namespace.HTML &&
+      this[$$.namespace] === Namespace.HTML &&
       isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
@@ -417,7 +418,7 @@ export class Element extends Node implements IElement {
   @SameObject
   get attributes(): NamedNodeMap {
     return new NamedNodeMap({
-      attributeList: this.#_.attributeList,
+      attributeList: this[$$.attributeList],
       element: this,
     });
   }
@@ -431,7 +432,7 @@ export class Element extends Node implements IElement {
 
     // 2. Return true if this has an attribute whose namespace is namespace and local name is localName; otherwise false.
     return some(
-      this.#_.attributeList,
+      this[$$.attributeList],
       (attr) =>
         attr[$$.namespace] === namespace && attr[$$.localName] === localName,
     );
@@ -442,7 +443,7 @@ export class Element extends Node implements IElement {
    */
   hasAttributes(): boolean {
     // return false if this’s attribute list is empty; otherwise true.
-    return !this.#_.attributeList.isEmpty;
+    return !this[$$.attributeList].isEmpty;
   }
 
   /**
@@ -489,7 +490,7 @@ export class Element extends Node implements IElement {
    */
   removeAttributeNode(attr: Attr): Attr {
     // 1. If this’s attribute list does not contain attr, then throw a "NotFoundError" DOMException.
-    if (!this.#_.attributeList.contains(attr)) {
+    if (!this[$$.attributeList].contains(attr)) {
       throw new DOMException("<message>", DOMExceptionName.NotFoundError);
     }
 
@@ -514,13 +515,13 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this.#_.namespace === Namespace.HTML &&
+      this[$$.namespace] === Namespace.HTML &&
       isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
-      this.#_.attributeList,
+      this[$$.attributeList],
       (attr) => qualifiedNameOfAttr(attr) === qualifiedName,
     ) ?? null;
 
@@ -587,13 +588,13 @@ export class Element extends Node implements IElement {
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
-      this.#_.namespace === Namespace.HTML &&
+      this[$$.namespace] === Namespace.HTML &&
       isHTMLDocument(this.#_.nodeDocument)
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
     const attribute = find(
-      this.#_.attributeList,
+      this[$$.attributeList],
       (attr) => qualifiedNameOfAttr(attr) === qualifiedName,
     ) ?? null;
 
@@ -683,11 +684,11 @@ export class Element extends Node implements IElement {
    */
   get #upperQualifiedName(): string {
     // 1. Let qualifiedName be this’s qualified name.
-    let qualifiedName = this.#_.qualifiedName;
+    let qualifiedName = qualifiedNameOfElement(this);
 
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
-      this.#_.namespace === Namespace.HTML &&
+      this[$$.namespace] === Namespace.HTML &&
       $(this.#_.nodeDocument).type !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
@@ -696,72 +697,42 @@ export class Element extends Node implements IElement {
     // 3. Return qualifiedName.
     return qualifiedName;
   }
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.namespace]!: string | null;
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.namespacePrefix]!: string | null;
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.localName]!: string;
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.isValue]!: string | null;
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.customElementState]!: CustomElementState;
+
+  /**
+   * @remarks Set after creation
+   */
+  [$$.customElementDefinition]!: CustomElementDefinition | null;
+
+  [$$.attributeList]: List<$Attr> = new List();
+  [$$.ID]: string | null = null;
+  [$$.attributeChangeSteps]: Steps<[AttributesContext]> = new Steps();
+  [$$.shadowRoot]: ShadowRoot | null = null;
 }
 
 export class ElementInternals {
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
-   */
-  namespace!: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace-prefix)
-   */
-  namespacePrefix!: string | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-local-name)
-   */
-  localName!: string;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-custom-element-state)
-   */
-  customElementState!: CustomElementState;
-
-  customElementDefinition!: CustomElementDefinition | null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-is-value)
-   */
-  isValue!: string | null;
-
-  /**
-   * @default null
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-shadow-root)
-   */
-  shadowRoot: globalThis.ShadowRoot | null = null;
-
-  /**
-   * @default new List()
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-attribute)
-   */
-  attributeList: List<$Attr> = new List();
-
-  /**
-   * @default new Steps()
-   * @see [DOM Living Standard]((https://dom.spec.whatwg.org/#concept-element-attributes-change-ext)
-   */
-  attributeChangeSteps: Steps<[AttributesContext]> = new Steps();
-
-  /**
-   * @default null
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-id)
-   */
-  ID: string | null = null;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-qualified-name)
-   */
-  get qualifiedName(): string {
-    return getQualifiedName(this.localName, this.namespacePrefix);
-  }
-}
-
-export interface AttributesContext {
-  element: globalThis.Element;
-  localName: string;
-  oldValue: string | null;
-  value: string | null;
-  namespace: string | null;
 }
