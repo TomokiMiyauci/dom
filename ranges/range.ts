@@ -44,6 +44,7 @@ import {
   replaceAllNode,
 } from "../nodes/utils/mutation.ts";
 import { data } from "../symbol.ts";
+import { $Node } from "../i.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
@@ -399,7 +400,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-insertnode
    */
-  insertNode(node: Node): void {
+  insertNode(node: $Node): void {
     // insert node into this.
     insert(node, this);
   }
@@ -407,7 +408,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-range-surroundcontents)
    */
-  surroundContents(newParent: Node): void {
+  surroundContents(newParent: $Node): void {
     // 1. If a non-Text node is partially contained in this, then throw an "InvalidStateError" DOMException.
 
     // 2. If newParent is a Document, DocumentType, or DocumentFragment node, then throw an "InvalidNodeTypeError" DOMException.

@@ -1,6 +1,5 @@
 import { lookUpCustomElementDefinition } from "../../_internals/html/custom_element.ts";
 import { Element } from "../element.ts";
-import { $ } from "../../internal.ts";
 import { $Element } from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
@@ -97,7 +96,7 @@ export function createElement(
       result[$$.customElementState] = "uncustomized",
       result[$$.customElementDefinition] = null,
       result[$$.isValue] = is;
-    $(result).nodeDocument = document;
+    result[$$.nodeDocument] = document;
 
     // 3. If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined".
   }

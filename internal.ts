@@ -1,7 +1,6 @@
 import { type ElementInternals } from "./nodes/element.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
 import { type DOMImplementationInternals } from "./nodes/dom_implementation.ts";
-import { type NodeInternals } from "./nodes/node.ts";
 import { type EventInternals } from "./events/event.ts";
 import { type EventTargetInternals } from "./events/event_target.ts";
 import { type SlottableInternals } from "./nodes/mixins/slottable.ts";
@@ -37,7 +36,6 @@ import type { FormAssociatedElement } from "./_internals/html/elements/forms/att
 type InternalSlotEntries = [
   [Event, EventInternals],
   [EventTarget, EventTargetInternals],
-  [Node, NodeInternals],
   [Element, ElementInternals],
   [Document, DocumentInternals],
   [DOMImplementation, DOMImplementationInternals],

@@ -29,14 +29,15 @@ import { isAssigned } from "./slottable.ts";
 import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
 import { adoptNode } from "./document.ts";
 import * as $$ from "../../symbol.ts";
+import { $Node } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
  */
 export function replaceChild<T extends Node>(
   child: T,
-  node: Node,
-  parent: Node,
+  node: $Node,
+  parent: $Node,
 ): T {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -163,16 +164,16 @@ export function replaceChild<T extends Node>(
  * @see https://dom.spec.whatwg.org/#concept-node-insert
  */
 export function insertNode(
-  node: Node,
-  parent: Node,
-  child: Node | null,
+  node: $Node,
+  parent: $Node,
+  child: $Node | null,
   suppressObservers: boolean | null = null,
 ): void {
   const nodeIsDocumentFragment = isDocumentFragment(node);
   // 1. Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ».
   const nodes = nodeIsDocumentFragment
     ? new OrderedSet(tree.children(node))
-    : new OrderedSet<Node>([node]);
+    : new OrderedSet<$Node>([node]);
 
   // 2. Let count be nodes’s size.
   const count = nodes.size;
@@ -191,8 +192,7 @@ export function insertNode(
 
   // 5. If child is non-null, then:
   if (child) {
-    const { nodeDocument } = $(node);
-    const { ranges: _ranges } = $(nodeDocument);
+    const { ranges: _ranges } = $(node[$$.nodeDocument]);
     const ranges = iter(_ranges);
     const startNodeIsParent = equalsNodeStartNode.bind(null, parent);
     const childIndex = tree.index(child);
@@ -234,7 +234,7 @@ export function insertNode(
   // 7. For each node in nodes, in tree order:
   for (const node of nodes) {
     // 1. Adopt node into parent’s node document.
-    adoptNode(node, $(parent).nodeDocument);
+    adoptNode(node, parent[$$.nodeDocument]);
 
     // 2. If child is null, then append node to parent’s children.
     if (child === null) tree.children(parent).append(node as ChildNode);
@@ -269,7 +269,7 @@ export function insertNode(
       )
     ) {
       // 1. Run the insertion steps with inclusiveDescendant.
-      $(node).insertionSteps.run(inclusiveDescendant);
+      node[$$.insertionSteps].run(inclusiveDescendant);
 
       // 2. If inclusiveDescendant is connected, then:
       if (isConnected(inclusiveDescendant)) {
@@ -299,7 +299,7 @@ export function insertNode(
   }
 
   // 9. Run the children changed steps for parent.
-  $(parent).childrenChangedSteps.run();
+  parent[$$.childrenChangedSteps].run();
 }
 
 export function equalsNodeEndNode(node: Node, range: Range): boolean {
@@ -408,10 +408,10 @@ export function ensurePreInsertionValidity(
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-pre-insert
  */
-export function preInsertNode<T extends Node>(
+export function preInsertNode<T extends $Node>(
   node: T,
-  parent: Node,
-  child: Node | null,
+  parent: $Node,
+  child: $Node | null,
 ): T {
   // 1. Ensure pre-insertion validity of node into parent before child.
   ensurePreInsertionValidity(node, parent, child);
@@ -433,8 +433,8 @@ export function preInsertNode<T extends Node>(
  * @see https://dom.spec.whatwg.org/#concept-node-replace-all
  */
 export function replaceAllNode(
-  node: Node | null,
-  parent: Node,
+  node: $Node | null,
+  parent: $Node,
 ): void {
   // 1. Let removedNodes be parent’s children.
   const removeNodes = new OrderedSet(tree.children(parent)); // No lazy generation due to the possibility of being referenced in subsequent processing.
@@ -481,7 +481,7 @@ export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
  * @see https://dom.spec.whatwg.org/#concept-node-remove
  */
 export function removeNode(
-  node: Node,
+  node: $Node,
   suppressObservers: boolean | null = null,
 ): void {
   // 1. Let parent be node’s parent.
@@ -491,8 +491,7 @@ export function removeNode(
 
   // 3. Let index be node’s index.
   const index = tree.index(node);
-
-  const { nodeDocument } = $(node);
+  const nodeDocument = node[$$.nodeDocument];
   const { iterators, ranges: _ranges } = $(nodeDocument);
   const ranges = iter(_ranges);
 
@@ -535,7 +534,7 @@ export function removeNode(
   function rootNodeDocumentIsNodeNodeDocument(iterator: NodeIterator): boolean {
     const { root } = $(iterator);
 
-    return $(root).nodeDocument === nodeDocument;
+    return root[$$.nodeDocument] === nodeDocument;
   }
 
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document,
@@ -578,7 +577,7 @@ export function removeNode(
   }
 
   // 15. Run the removing steps with node and parent.
-  $(node).removingSteps.run(node, parent);
+  node[$$.removingSteps].run(node, parent);
 
   // 16. Let isParentConnected be parent’s connected.
   const isParentConnected = isConnected(parent);
@@ -592,7 +591,7 @@ export function removeNode(
   // 18. For each shadow-including descendant descendant of node, in shadow-including tree order, then:
   for (const descendant of tree.shadowIncludingDescendants(node)) {
     // 1. Run the removing steps with descendant and null.
-    $(node).removingSteps.run(descendant, null);
+    node[$$.removingSteps].run(descendant, null);
 
     // 2. If descendant is custom and isParentConnected is true,
     if (isElement(descendant) && isCustom(descendant) && isParentConnected) {
@@ -607,7 +606,7 @@ export function removeNode(
 
   // 19. For each inclusive ancestor inclusiveAncestor of parent,
   for (const inclusiveAncestor of tree.inclusiveAncestors(parent)) {
-    const { registeredObserverList } = $(inclusiveAncestor);
+    const registeredObserverList = inclusiveAncestor[$$.registeredObserverList];
     // and then for each registered of inclusiveAncestor’s registered observer list,
     for (const registered of [...registeredObserverList]) {
       // if registered’s options["subtree"] is true,
@@ -637,7 +636,7 @@ export function removeNode(
   }
 
   // 21. Run the children changed steps for parent.
-  $(parent).childrenChangedSteps.run();
+  parent[$$.childrenChangedSteps].run();
 
   function isStartNodeInclusiveDescendantOfNode(range: Range): boolean {
     const { startNode } = $(range);

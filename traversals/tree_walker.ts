@@ -248,7 +248,7 @@ export class TreeWalkerInternals {
 
   filter: NodeFilter | null;
 
-  current: Node;
+  current: $Node;
 
   constructor({ filter, whatToShow, root, current }: {
     filter: NodeFilter | null;

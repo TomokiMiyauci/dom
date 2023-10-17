@@ -63,13 +63,14 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     templateElement: HTMLTemplateElement,
     contentElement: $DocumentFragment,
   ): void {
-    const { nodeDocument } = $(templateElement);
     // 1. Let doc be the template element's node document's appropriate template contents owner document.
-    const doc = appropriateTemplateContentsOwnerDocument(nodeDocument);
+    const doc = appropriateTemplateContentsOwnerDocument(
+      templateElement[$$.nodeDocument],
+    );
 
     // 2. Create a DocumentFragment object whose node document is doc and host is the template element.
     const fragment = this.document.createDocumentFragment();
-    $(fragment).nodeDocument = doc;
+    fragment[$$.nodeDocument] = doc;
     fragment[$$.host] = templateElement;
 
     // 3. Set the template element's template contents to the newly created DocumentFragment object.
@@ -77,7 +78,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
       templateContents: fragment,
     });
 
-    $(contentElement).nodeDocument = $(fragment).nodeDocument;
+    contentElement[$$.nodeDocument] = fragment[$$.nodeDocument];
     contentElement[$$.host] = fragment[$$.host];
     $(templateElement).templateContents = contentElement;
   }
@@ -96,7 +97,7 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
     documentType[$$.name] = name,
       documentType[$$.publicId] = publicId,
       documentType[$$.systemId] = systemId;
-    $(documentType).nodeDocument = document;
+    documentType[$$.nodeDocument] = document;
 
     document.appendChild(documentType);
   }
@@ -246,7 +247,7 @@ class AttrConvertor {
     if (attribute.prefix) attr[$$.namespacePrefix] = attribute.prefix;
     attr[$$.localName] = attribute.name;
     attr[$$.value] = attribute.value;
-    $(attr).nodeDocument = document;
+    attr[$$.nodeDocument] = document;
 
     return attr;
   }

@@ -2,7 +2,7 @@ import { Node, NodeType } from "./node.ts";
 import type { IDocumentType } from "../interface.d.ts";
 import { $ } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
-import { name, publicId, systemId } from "../symbol.ts";
+import { name, nodeDocument, publicId, systemId } from "../symbol.ts";
 import type { DocumentTypeInternals } from "../i.ts";
 
 /**
@@ -57,7 +57,7 @@ export class DocumentType extends Node
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this.#_.nodeDocument;
+    return this[nodeDocument];
   }
 
   protected override clone(document: Document): DocumentType {
@@ -66,8 +66,7 @@ export class DocumentType extends Node
     doctype[name] = this[name],
       doctype[publicId] = this[publicId],
       doctype[systemId] = this[systemId];
-
-    $(doctype).nodeDocument = document;
+    doctype[nodeDocument] = document;
 
     return doctype;
   }

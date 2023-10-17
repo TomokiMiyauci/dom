@@ -12,6 +12,7 @@ import {
 import { matchJavaScriptMIMETypeEssence } from "../../../mimesniff/mod.ts";
 import { documentBaseURL, encodingParseURL } from "../../infra/url.ts";
 import { toASCIILowerCase } from "../../../infra/string.ts";
+import { nodeDocument } from "../../../../symbol.ts";
 
 export function isHTMLScriptElement(
   element: Element,
@@ -41,7 +42,7 @@ export function markAsReady(
  */
 export function executeScriptElement(el: HTMLScriptElement): void {
   // 1. Let document be el's node document.
-  const document = $(el).nodeDocument;
+  const document = el[nodeDocument];
 
   // 2. If el's preparation-time document is not equal to document, then return.
   if ($(el).preparationTimeDocument !== document) return;
@@ -167,7 +168,7 @@ export async function prepareScriptElement(
   $(el).alreadyStarted = true;
 
   // 15. Set el's preparation-time document to its node document.
-  $(el).preparationTimeDocument = $(el).nodeDocument;
+  $(el).preparationTimeDocument = el[nodeDocument];
 
   // 16. If parser document is non-null, and parser document is not equal to el's preparation-time document, then return.
 
@@ -233,7 +234,7 @@ export async function prepareScriptElement(
     $(el).fromExternalFile = true;
 
     // 5. Let url be the result of encoding-parsing a URL given src, relative to el's node document.
-    const url = encodingParseURL(src, $(el).nodeDocument);
+    const url = encodingParseURL(src, el[nodeDocument]);
 
     // 6. If url is failure,
     if (!url) {
@@ -270,7 +271,7 @@ export async function prepareScriptElement(
     // 32. If el does not have a src content attribute:
   } else {
     // 1. Let base URL be el's node document's document base URL.
-    const baseURL = documentBaseURL($(el).nodeDocument);
+    const baseURL = documentBaseURL(el[nodeDocument]);
 
     // 2. Switch on el's type:
     switch ($(el).type) {

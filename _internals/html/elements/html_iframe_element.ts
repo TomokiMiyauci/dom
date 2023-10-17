@@ -15,6 +15,7 @@ import { Navigable } from "../loading_web_pages/infrastructure_for_sequences_of_
 import { reflectGet } from "../../../nodes/utils/element.ts";
 import { fireEvent } from "../../../events/fire.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
+import { insertionSteps } from "../../../symbol.ts";
 
 @Exposed("Window", "HTMLIFrameElement")
 export class HTMLIFrameElement extends HTMLElement
@@ -22,7 +23,7 @@ export class HTMLIFrameElement extends HTMLElement
   constructor() {
     super();
 
-    this.#_.insertionSteps.define(async (element: any) => {
+    this[insertionSteps].define(async (element: any) => {
       // // 1. Create a new child navigable for element.
       createNewChildNavigable(element);
 

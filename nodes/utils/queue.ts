@@ -4,6 +4,7 @@ import { OrderedSet } from "../../_internals/infra/data_structures/set.ts";
 import { $, tree } from "../../internal.ts";
 import { fireEvent } from "../../events/fire.ts";
 import { queueMicrotask } from "../../runtime.ts";
+import { registeredObserverList } from "../../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
@@ -82,7 +83,7 @@ export function notifyMutationObservers(): void {
 
     // 3. For each node of mo’s node list, remove all transient registered observers whose observer is mo from node’s registered observer list.
     for (const node of [...$(mo).nodeList]) {
-      $(node).registeredObserverList.remove((registered) => {
+      node[registeredObserverList].remove((registered) => {
         return "source" in registered && registered.observer === mo;
       });
     }
@@ -151,7 +152,7 @@ export function queueMutationRecord(
 
   // 3. For each node in nodes, and then for each registered of node’s registered observer list:
   for (const node of nodes) {
-    for (const registered of $(node).registeredObserverList) {
+    for (const registered of node[registeredObserverList]) {
       // 1. Let options be registered’s options.
       const options = registered.options;
 

@@ -60,8 +60,7 @@ export function replaceData(
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 
-  const { nodeDocument } = $(node);
-  const { ranges: _ranges } = $(nodeDocument);
+  const { ranges: _ranges } = $(node[$$.nodeDocument]);
   const ranges = iter(_ranges);
   const startNodeIsNode = equalsNodeStartNode.bind(null, node);
   const startOffsetIsGtOffset = compareRangeOffset.bind(
@@ -138,7 +137,7 @@ export function replaceData(
 
   const parent = tree.parent(node);
   // 12 If node’s parent is non-null, then run the children changed steps for node’s parent.
-  if (parent) $(parent).childrenChangedSteps.run();
+  if (parent) parent[$$.childrenChangedSteps].run();
 }
 
 /**

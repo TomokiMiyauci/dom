@@ -24,7 +24,7 @@ export class Text extends CharacterData implements IText {
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
     this[$$.data] = data;
-    $<Text>(this).nodeDocument = globalThis.document;
+    this[$$.nodeDocument] = globalThis.document;
   }
 
   override get nodeType(): NodeType.TEXT_NODE | NodeType.CDATA_SECTION_NODE {
@@ -37,7 +37,7 @@ export class Text extends CharacterData implements IText {
 
   protected override clone(document: Document): globalThis.Text {
     const text = new Text();
-    text[data] = this[data], $(text).nodeDocument = document;
+    text[data] = this[data], text[$$.nodeDocument] = document;
     return text;
   }
 

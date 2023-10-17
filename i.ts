@@ -16,34 +16,33 @@ import { CustomElementDefinition } from "./_internals/html/custom_element.ts";
 export interface NodeInternals {
   [$.nodeDocument]: $Document;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
-  //  */
-  // [$.insertionSteps]: Steps<[insertedNode: globalThis.Node]>;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
+   */
+  [$.insertionSteps]: Steps<[insertedNode: $Node]>;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-adopt-ext)
-  //  */
-  // [$.adoptingSteps]: Steps<[node: globalThis.Node, oldDocument: Document]>;
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
-  //  */
-  // [$.childrenChangedSteps]: Steps<[]>;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-adopt-ext)
+   */
+  [$.adoptingSteps]: Steps<[node: $Node, oldDocument: Document]>;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-remove-ext)
-  //  */
-  // [$.removingSteps]: Steps<
-  //   [removedNode: globalThis.Node, oldParent: globalThis.Node | null]
-  // >;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
+   */
+  [$.childrenChangedSteps]: Steps<[]>;
 
-  // /** @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-list) */
-  // [$.registeredObserverList]: List<
-  //   RegisteredObserver | TransientRegisteredObserver
-  // >;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-remove-ext)
+   */
+  [$.removingSteps]: Steps<[removedNode: $Node, oldParent: $Node | null]>;
+
+  /** @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-list) */
+  [$.registeredObserverList]: List<
+    RegisteredObserver | TransientRegisteredObserver
+  >;
 }
 
-export interface CharacterDataInternals {
+export interface CharacterDataInternals extends NodeInternals {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-cd-data)
    */
@@ -69,7 +68,7 @@ export interface DocumentTypeInternals {
   [$.systemId]: string;
 }
 
-export interface DocumentFragmentInternals {
+export interface DocumentFragmentInternals extends NodeInternals {
   /**
    * @default null
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
@@ -77,7 +76,7 @@ export interface DocumentFragmentInternals {
   [$.host]: Element | null;
 }
 
-export interface AttrInternals {
+export interface AttrInternals extends NodeInternals {
   /**
    * @default null
    * @see https://dom.spec.whatwg.org/#concept-attribute-namespace
@@ -108,7 +107,7 @@ export interface AttrInternals {
   [$.element]: $Element | null;
 }
 
-export interface ElementInternals {
+export interface ElementInternals extends NodeInternals {
   /**
    * @default null
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-element-namespace)
@@ -287,3 +286,6 @@ export interface $Element extends Element, ElementInternals {}
 export interface $Document extends Document, DocumentInternals {}
 
 export interface $ShadowRoot extends ShadowRoot, ShadowRootInternals {}
+export interface $Node extends Node, NodeInternals {}
+export interface $ParentNode extends ParentNode, NodeInternals {}
+export interface $ChildNode extends ChildNode, NodeInternals {}

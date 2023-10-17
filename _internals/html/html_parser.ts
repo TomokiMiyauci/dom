@@ -3,6 +3,8 @@ import { DOMTreeAdapter, type DOMTreeAdapterMap } from "./_adapter.ts";
 import { parse } from "../../deps.ts";
 import { $ } from "../../internal.ts";
 import { getEncoding, windows_1252 } from "../encoding/encoding.ts";
+import { nodeDocument } from "../../symbol.ts";
+import type { $Element } from "../../i.ts";
 
 export class HTMLParser {
   #adaptor: DOMTreeAdapter;
@@ -35,7 +37,7 @@ export class HTMLParser {
  * @see https://html.spec.whatwg.org/multipage/parsing.html#html-fragment-parsing-algorithm
  */
 export function parseHTMLFragment(
-  context: Element,
+  context: $Element,
   input: string,
 ): Iterable<Node> {
   console.warn("parseHTMLFragment is not standard behavior");
@@ -45,7 +47,7 @@ export function parseHTMLFragment(
   $(document).type = "html";
 
   // 2. If the node document of the context element is in quirks mode, then let the Document be in quirks mode. Otherwise, the node document of the context element is in limited-quirks mode, then let the Document be in limited-quirks mode. Otherwise, leave the Document in no-quirks mode.
-  $(document).mode = $($(context).nodeDocument).mode;
+  $(document).mode = $(context[nodeDocument]).mode;
 
   // 3. Create a new HTML parser, and associate it with the just created Document node.
   const parser = new HTMLParser(document);

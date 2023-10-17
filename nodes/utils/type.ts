@@ -1,7 +1,7 @@
 import { NodeType } from "../node.ts";
-import { $, internalSlots } from "../../internal.ts";
 import type {
   $CharacterData,
+  $Document,
   $DocumentFragment,
   $Element,
   $ShadowRoot,
@@ -17,7 +17,7 @@ export function isNodeLike(object: object): object is NodeLike {
   return "nodeType" in object;
 }
 
-export function isDocument(node: NodeLike): node is Document {
+export function isDocument(node: NodeLike): node is $Document {
   return node.nodeType === NodeType.DOCUMENT_NODE;
 }
 

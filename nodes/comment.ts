@@ -1,7 +1,6 @@
 import { NodeType } from "./node.ts";
 import { CharacterData } from "./character_data.ts";
 import { IComment } from "../interface.d.ts";
-import { $ } from "../internal.ts";
 import { data } from "../symbol.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import * as $$ from "../symbol.ts";
@@ -19,7 +18,7 @@ export class Comment extends CharacterData implements IComment {
     super();
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
-    this[$$.data] = data, $<Comment>(this).nodeDocument = globalThis.document;
+    this[$$.data] = data, this[$$.nodeDocument] = globalThis.document;
   }
 
   override get nodeType(): NodeType.COMMENT_NODE {
@@ -32,7 +31,7 @@ export class Comment extends CharacterData implements IComment {
 
   protected override clone(document: Document): Comment {
     const comment = new Comment(this[data]);
-    $(comment).nodeDocument = document;
+    comment[$$.nodeDocument] = document;
 
     return comment;
   }

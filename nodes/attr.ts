@@ -10,6 +10,7 @@ import {
   localName,
   namespace,
   namespacePrefix,
+  nodeDocument,
   value,
 } from "../symbol.ts";
 
@@ -71,7 +72,7 @@ export class Attr extends Node implements IAttr, AttrInternals {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this.#_.nodeDocument;
+    return this[nodeDocument];
   }
 
   protected override clone(document: Document): $Attr {
@@ -164,7 +165,7 @@ export function cloneAttr(attr: $Attr, document: Document): Attr {
     attribute[namespace] = attr[namespace],
     attribute[namespacePrefix] = attr[namespacePrefix],
     attribute[element] = attr[element],
-    $(attribute).nodeDocument = document;
+    attribute[nodeDocument] = document;
 
   return attribute;
 }

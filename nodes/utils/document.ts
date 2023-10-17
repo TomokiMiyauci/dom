@@ -4,14 +4,15 @@ import { $, tree } from "../../internal.ts";
 import { isCustom } from "./element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
 import { removeNode } from "./mutation.ts";
-import { attributeList } from "../../symbol.ts";
+import { adoptingSteps, attributeList, nodeDocument } from "../../symbol.ts";
+import { $Node } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-adopt
  */
-export function adoptNode(node: Node, document: Document): void {
+export function adoptNode(node: $Node, document: Document): void {
   // 1. Let oldDocument be node’s node document.
-  const oldDocument = $(node).nodeDocument;
+  const oldDocument = node[nodeDocument];
 
   // 2. If node’s parent is non-null, then remove node.
   if (tree.parent(node)) removeNode(node);
@@ -25,13 +26,13 @@ export function adoptNode(node: Node, document: Document): void {
       )
     ) {
       // 1. Set inclusiveDescendant’s node document to document.
-      $(inclusiveDescendant).nodeDocument = document;
+      inclusiveDescendant[nodeDocument] = document;
 
       // 2. If inclusiveDescendant is an element,
       if (isElement(inclusiveDescendant)) {
         // then set the node document of each attribute in inclusiveDescendant’s attribute list to document.
         iter(inclusiveDescendant[attributeList]).forEach((attr) =>
-          $(attr).nodeDocument = document
+          attr[nodeDocument] = document
         );
       }
     }
@@ -57,7 +58,7 @@ export function adoptNode(node: Node, document: Document): void {
   // 3. For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order,
   for (const inclusiveDescendant of shadowIncludingInclusiveDescendants) {
     // run the adopting steps with inclusiveDescendant and oldDocument.
-    $(node).adoptingSteps.run(inclusiveDescendant, oldDocument);
+    node[adoptingSteps].run(inclusiveDescendant, oldDocument);
   }
 }
 

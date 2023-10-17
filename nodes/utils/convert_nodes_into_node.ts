@@ -2,7 +2,7 @@ import { DocumentFragment } from "../document_fragment.ts";
 import { Text } from "../text.ts";
 import { isSingle, iter } from "./../../deps.ts";
 import { appendNode } from "./mutation.ts";
-import { $ } from "./../../internal.ts";
+import { data, nodeDocument } from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#converting-nodes-into-a-node
@@ -15,7 +15,7 @@ export function convertNodesIntoNode(
   const replaced = iter(nodes).map((node) => {
     if (typeof node === "string") {
       const text = new Text();
-      $(text).data = node, $(text).nodeDocument = document;
+      text[data] = node, text[nodeDocument] = document;
       return text;
     }
 
@@ -27,7 +27,7 @@ export function convertNodesIntoNode(
 
   // 1. Let node be null. // 4. Otherwise, set node to a new DocumentFragment node whose node document is document, and then append each node in nodes, if any, to it.
   const fragment = new DocumentFragment();
-  $(fragment).nodeDocument = document;
+  fragment[nodeDocument] = document;
   replaced.forEach((node) => appendNode(node, fragment));
 
   // 5. Return node.

@@ -4,7 +4,7 @@ import { HTMLElement } from "../dom/html_element.ts";
 import { DOMTokenList } from "../../../sets/dom_token_list.ts";
 import { reflect } from "../infrastructure.ts";
 import { PutForwards, SameObject } from "../../webidl/extended_attribute.ts";
-import { $, internalSlots } from "../../../internal.ts";
+import { internalSlots } from "../../../internal.ts";
 import {
   navigate,
   UserNavigationInvolvement,
@@ -12,6 +12,8 @@ import {
 } from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
 import { encodingParseAndSerializeURL } from "../infra/url.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
+import { nodeDocument } from "../../../symbol.ts";
+import type { $Element } from "../../../i.ts";
 
 @HTMLHyperlinkElementUtils
 @Exposed("Window", "HTMLAnchorElement")
@@ -174,7 +176,7 @@ export interface HTMLAnchorElement extends HTMLHyperlinkElementUtils {}
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/links.html#following-hyperlinks-2)
  */
 export function followHyperlink(
-  subject: Element,
+  subject: $Element,
   hyperlinkSuffix: string | null = null,
   userInvolvement = UserNavigationInvolvement.None,
 ): void {
@@ -195,7 +197,7 @@ export function followHyperlink(
   // 8. Let urlString be the result of encoding-parsing-and-serializing a URL given subject's href attribute value, relative to subject's node document.
   let urlString = encodingParseAndSerializeURL(
     subject.getAttribute("href") ?? "",
-    $(subject).nodeDocument,
+    subject[nodeDocument],
   );
 
   // 9. If urlString is failure, then return.
@@ -212,12 +214,12 @@ export function followHyperlink(
   navigate(
     {
       activeSessionHistoryEntry: {
-        documentState: $(subject).nodeDocument,
-        URL: $($(subject).nodeDocument).URL,
+        documentState: subject[nodeDocument],
+        URL: subject[nodeDocument].URL,
       },
     } as any,
     new URL(urlString),
-    $(subject).nodeDocument,
+    subject[nodeDocument],
     undefined,
     undefined,
     undefined,

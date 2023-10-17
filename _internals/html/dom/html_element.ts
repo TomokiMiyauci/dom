@@ -14,6 +14,7 @@ import {
 import { isElement } from "../../../nodes/utils/type.ts";
 import { isHTMLElement } from "../utils.ts";
 import { Exposed } from "../../webidl/extended_attribute.ts";
+import { insertionSteps } from "../../../symbol.ts";
 
 @ElementContentEditable
 @HTMLOrSVGElement
@@ -23,7 +24,7 @@ export class HTMLElement extends Element implements IHTMLElement {
   constructor() {
     super();
 
-    $<HTMLElement>(this).insertionSteps.define((insertedNode) => {
+    this[insertionSteps].define((insertedNode) => {
       // 1. If insertedNode is an element whose namespace is the HTML namespace, and this standard defines HTML element insertion steps for insertedNode's local name, then run the corresponding HTML element insertion steps given insertedNode.
 
       // 2. If insertedNode is a form-associated element or the ancestor of a form-associated element, then:

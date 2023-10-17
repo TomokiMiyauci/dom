@@ -10,12 +10,14 @@ import {
   NavigationHistoryBehavior,
 } from "../loading_web_pages/navigation_and_session_histories/navigation.ts";
 import { completelyLoaded } from "../loading_web_pages/document_lifecycle.ts";
+import { nodeDocument } from "../../../symbol.ts";
+import type { $Element } from "../../../i.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#process-the-iframe-attributes)
  */
 export async function processIframeAttributes(
-  element: Element,
+  element: $Element,
   initialInsertion = false,
 ): Promise<void> {
   // 1. If element's srcdoc attribute is specified, then:
@@ -76,7 +78,7 @@ export async function processIframeAttributes(
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#shared-attribute-processing-steps-for-iframe-and-frame-elements)
  */
 export function sharedAttributeProcessingSteps(
-  element: Element,
+  element: $Element,
   initialInsertion: boolean,
 ): URL | null {
   // 1. Let url be the URL record about:blank.
@@ -86,7 +88,7 @@ export function sharedAttributeProcessingSteps(
   // 2. If element has a src attribute specified, and its value is not the empty string, then:
   if (src) {
     // 1. Let maybeURL be the result of encoding-parsing a URL given that attribute's value, relative to element's node document.
-    const maybeURL = encodingParseURL(src, $(element).nodeDocument);
+    const maybeURL = encodingParseURL(src, element[nodeDocument]);
 
     // 2. If maybeURL is not failure, then set url to maybeURL.
     if (maybeURL) url = maybeURL;
@@ -104,7 +106,7 @@ export function sharedAttributeProcessingSteps(
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#navigate-an-iframe-or-frame)
  */
 export async function navigateIframeOrFrame(
-  element: Element,
+  element: $Element,
   url: URL,
   referrerPolicy: ReferrerPolicy,
   srcdocString: string | null = null,
@@ -130,7 +132,7 @@ export async function navigateIframeOrFrame(
   contentNavigable && await navigate(
     contentNavigable,
     url,
-    $(element).nodeDocument,
+    element[nodeDocument],
     undefined,
     srcdocString,
     undefined,

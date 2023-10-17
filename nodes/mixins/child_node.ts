@@ -5,6 +5,8 @@ import { preInsertNode, removeNode, replaceChild } from "../utils/mutation.ts";
 import { convertNodesToNode } from "./parent_node.ts";
 import { convert, DOMString } from "../../_internals/webidl/types.ts";
 import { $, tree } from "../../internal.ts";
+import { nodeDocument } from "../../symbol.ts";
+import { $Node } from "../../i.ts";
 
 export class ChildNode implements IChildNode {
   /**
@@ -25,7 +27,7 @@ export class ChildNode implements IChildNode {
     const viableNextSibling = find(followingSiblings, notHas) ?? null;
 
     // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[nodeDocument]);
 
     // 5. Pre-insert node into parent before viableNextSibling.
     preInsertNode(node, parent, viableNextSibling);
@@ -50,7 +52,7 @@ export class ChildNode implements IChildNode {
     let viablePreviousSibling = find(precedingSiblings, notHas) ?? null;
 
     // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[nodeDocument]);
 
     // 5. If viablePreviousSibling is null, then set it to parent’s first child;
     if (!viablePreviousSibling) {
@@ -79,7 +81,7 @@ export class ChildNode implements IChildNode {
     const viableNextSibling = find(followingSiblings, notHas) ?? null;
 
     // 4. Let node be the result of converting nodes into a node, given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[nodeDocument]);
 
     // 5. If this’s parent is parent, replace this with node within parent.
     if (tree.parent(this) === parent) replaceChild(this, node, parent);
@@ -103,4 +105,4 @@ export class ChildNode implements IChildNode {
   }
 }
 
-export interface ChildNode extends Node {}
+export interface ChildNode extends $Node {}

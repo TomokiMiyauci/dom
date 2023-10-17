@@ -25,7 +25,7 @@ import { iter, last } from "../../deps.ts";
 import { type BoundaryPoint, Position, position } from "../boundary_point.ts";
 import { isCollapsed } from "./abstract_range.ts";
 import { splitText } from "../../nodes/utils/split_text.ts";
-import { $CharacterData } from "../../i.ts";
+import { $CharacterData, $Node } from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
 /**
@@ -125,7 +125,7 @@ export function setStartOrEnd(
 export function cloneContents(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = new DocumentFragment();
-  $(fragment).nodeDocument = $($(range).startNode).nodeDocument;
+  fragment[$$.nodeDocument] = $(range).startNode[$$.nodeDocument];
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;
@@ -312,7 +312,7 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 export function extract(range: Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = new DocumentFragment();
-  $(fragment).nodeDocument = $($(range).startNode).nodeDocument;
+  fragment[$$.nodeDocument] = $(range).startNode[$$.nodeDocument];
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;
@@ -540,7 +540,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-insert)
  */
-export function insert(node: Node, range: Range): void {
+export function insert(node: $Node, range: Range): void {
   const { startNode } = $(range);
 
   // 1. If range’s start node is a ProcessingInstruction or Comment node, is a Text node whose parent is null, or is node, then throw a "HierarchyRequestError" DOMException.
@@ -618,7 +618,7 @@ export function select(node: Node, range: Range): void {
 
 export function* containedNodes(
   range: Range,
-): IterableIterator<Node> {
+): IterableIterator<$Node> {
   const { startNode, endNode } = $(range);
   const endOfNode = tree.nextDescendant(endNode);
 

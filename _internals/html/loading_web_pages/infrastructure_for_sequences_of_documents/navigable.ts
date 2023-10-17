@@ -12,6 +12,8 @@ import {
   createNewBrowsingContextAndDocument,
 } from "./browsing_context.ts";
 import { $ } from "../../../../internal.ts";
+import { $Element } from "../../../../i.ts";
+import { nodeDocument } from "../../../../symbol.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 
 /** A navigable presents a Document to the user via its active session history entry.
@@ -57,7 +59,7 @@ export class Navigable {
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#navigable-container)
  */
-export type NavigableContainer = Element;
+export type NavigableContainer = $Element;
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#nav-document)
@@ -105,7 +107,6 @@ export function targetName(navigable: Navigable): string {
 }
 
 export function nodeNavigable(node: NavigableContainer) {
-  const { nodeDocument } = $(node);
 }
 
 export function initializeNavigable(
@@ -198,7 +199,7 @@ export function contentDocument(
   // 3. If document's origin and container's node document's origin are not same origin-domain, then return null.
   if (document) {
     const documentOrigin = $(document).origin;
-    const containerNodeDocument = $(container).nodeDocument;
+    const containerNodeDocument = container[nodeDocument];
     const containerNodeDocumentOrigin = $(containerNodeDocument).origin;
 
     if (!sameOriginDomain(documentOrigin, containerNodeDocumentOrigin)) {
@@ -242,7 +243,7 @@ export function createNewChildNavigable(element: Element): void {
 
   // 3. Let browsingContext and document be the result of creating a new browsing context and document given element's node document, element, and group.
   const { document } = createNewBrowsingContextAndDocument(
-    $(element).nodeDocument,
+    element[nodeDocument],
     element,
     {},
   );
@@ -310,5 +311,5 @@ export function containerDocument(navigable: Navigable): Document | null {
   if (!navigableContainer) return null;
 
   // 2. Return navigable's container's node document.
-  return $(navigableContainer).nodeDocument;
+  return navigableContainer[nodeDocument];
 }

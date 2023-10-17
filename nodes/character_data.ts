@@ -59,7 +59,7 @@ export abstract class CharacterData extends Node implements ICharacterData, _ {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this.#_.nodeDocument;
+    return this[$.nodeDocument];
   }
 
   /**

@@ -68,7 +68,7 @@ export class Document extends Node implements IDocument {
     });
 
     internalSlots.extends<Document>(this, internal);
-    $<Document>(this).nodeDocument = this;
+    this[$$.nodeDocument] = this;
   }
 
   get #_() {
@@ -258,7 +258,7 @@ export class Document extends Node implements IDocument {
 
     // 3. Return a new attribute whose local name is localName and node document is this.
     const attribute = Reflect.construct(Attr, []) as Attr;
-    attribute[$$.localName] = localName, $(attribute).nodeDocument = this;
+    attribute[$$.localName] = localName, attribute[$$.nodeDocument] = this;
 
     return attribute;
   }
@@ -281,7 +281,7 @@ export class Document extends Node implements IDocument {
     attribute[$$.localName] = localName,
       attribute[$$.namespacePrefix] = prefix,
       attribute[$$.namespace] = ns,
-      $(attribute).nodeDocument = this;
+      attribute[$$.nodeDocument] = this;
 
     return attribute;
   }
@@ -310,7 +310,7 @@ export class Document extends Node implements IDocument {
     const cdataSection = Reflect.construct(CDATASection, [
       data,
     ]) as CDATASection;
-    $(cdataSection).nodeDocument = this;
+    cdataSection[$$.nodeDocument] = this;
     return cdataSection;
   }
 
@@ -322,7 +322,7 @@ export class Document extends Node implements IDocument {
   createComment(@DOMString data: string): Comment {
     // return a new Comment node whose data is data and node document is this.
     const comment = new Comment();
-    comment[$$.data] = data, $(comment).nodeDocument = this;
+    comment[$$.data] = data, comment[$$.nodeDocument] = this;
 
     return comment;
   }
@@ -333,7 +333,7 @@ export class Document extends Node implements IDocument {
   createDocumentFragment(): globalThis.DocumentFragment {
     // return a new DocumentFragment node whose node document is this.
     const fragment = new DocumentFragment();
-    $(fragment).nodeDocument = this;
+    fragment[$$.nodeDocument] = this;
 
     return fragment;
   }
@@ -553,7 +553,9 @@ export class Document extends Node implements IDocument {
       ProcessingInstruction,
       [],
     );
-    $(node).nodeDocument = this, node[$$.target] = target, node[$$.data] = data;
+    node[$$.nodeDocument] = this,
+      node[$$.target] = target,
+      node[$$.data] = data;
 
     return node;
   }
@@ -578,7 +580,7 @@ export class Document extends Node implements IDocument {
   createTextNode(@DOMString data: string): Text {
     // return a new Text node whose data is data and node document is this.
     const text = new Text();
-    text[$$.data] = data, $(text).nodeDocument = this;
+    text[$$.data] = data, text[$$.nodeDocument] = this;
     return text;
   }
 
@@ -646,11 +648,11 @@ export class Document extends Node implements IDocument {
     }
 
     // TODO(miyauci): improve dirty re-assignment
-    const document = $<globalThis.Node>(node).nodeDocument;
-    $<globalThis.Node>(node).nodeDocument = this;
+    const document = node[$$.nodeDocument];
+    node[$$.nodeDocument] = this;
     // 2. Return a clone of node, with this and the clone children flag set if deep is true.
     const copy = node.cloneNode(deep) as T;
-    $<globalThis.Node>(node).nodeDocument = document;
+    node[$$.nodeDocument] = document;
 
     return copy;
   }

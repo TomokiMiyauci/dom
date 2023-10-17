@@ -6,6 +6,7 @@ import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { dispatch } from "./dispatch.ts";
 import { $, internalSlots } from "../internal.ts";
 import { add } from "../aborts/utils/abort_signal.ts";
+import { nodeDocument } from "../symbol.ts";
 
 @Exposed("*", "EventTarget")
 export class EventTarget implements IEventTarget {
@@ -209,12 +210,12 @@ export function defaultPassiveValue(
     events.has(type) &&
     // eventTarget is a Window object, or is a node whose node document is eventTarget, or is a node whose node document’s document element is eventTarget, or is a node whose node document’s body element is eventTarget.
     (eventTarget instanceof globalThis.Window ||
-      ("_nodeDocument" in eventTarget &&
-        eventTarget._nodeDocument === eventTarget) ||
-      "_nodeDocument" in eventTarget &&
-        typeof eventTarget._nodeDocument === "object" &&
-        eventTarget._nodeDocument && "body" in eventTarget._nodeDocument &&
-        eventTarget._nodeDocument.body === eventTarget)
+      (nodeDocument in eventTarget &&
+        eventTarget[nodeDocument] === eventTarget) ||
+      nodeDocument in eventTarget &&
+        typeof eventTarget[nodeDocument] === "object" &&
+        eventTarget[nodeDocument] && "body" in eventTarget[nodeDocument] &&
+        eventTarget[nodeDocument].body === eventTarget)
   ) return false;
 
   return false;

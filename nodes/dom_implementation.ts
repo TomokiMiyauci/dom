@@ -32,7 +32,7 @@ export class DOMImplementation implements IDOMImplementation {
     doctype[$$.name] = qualifiedName,
       doctype[$$.publicId] = publicId,
       doctype[$$.systemId] = systemId,
-      $(doctype).nodeDocument = $<DOMImplementation>(this).document;
+      doctype[$$.nodeDocument] = $<DOMImplementation>(this).document;
 
     return doctype;
   }
@@ -93,7 +93,7 @@ export class DOMImplementation implements IDOMImplementation {
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
     const docType = Reflect.construct(DocumentType, []) as DocumentType;
-    docType[$$.name] = "html", $(docType).nodeDocument = doc;
+    docType[$$.name] = "html", docType[$$.nodeDocument] = doc;
     appendNode(docType, doc);
 
     // 4. Append the result of creating an element given doc, html, and the HTML namespace, to doc.
@@ -111,7 +111,7 @@ export class DOMImplementation implements IDOMImplementation {
       appendNode(titleElement, headElement);
 
       const text = new Text();
-      text[data] = title, $(text).nodeDocument = doc;
+      text[data] = title, text[$$.nodeDocument] = doc;
       // 2. Append a new Text node, with its data set to title (which could be the empty string) and its node document set to doc, to the title element created earlier.
       appendNode(text, titleElement);
     }

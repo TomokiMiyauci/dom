@@ -15,6 +15,7 @@ import type {
   $CharacterData,
   $DocumentType,
   $Element,
+  $Node,
   $ProcessingInstruction,
 } from "../../i.ts";
 import { data } from "../../symbol.ts";
@@ -25,7 +26,7 @@ import * as $$ from "../../symbol.ts";
  */
 export function getElementsByQualifiedName(
   qualifiedName: string,
-  root: Node,
+  root: $Node,
 ): HTMLCollection {
   // 1. If qualifiedName is U+002A (*), then return an HTMLCollection rooted at root, whose filter matches only descendant elements.
   if (qualifiedName === "*") {
@@ -33,7 +34,7 @@ export function getElementsByQualifiedName(
   }
 
   // 2. Otherwise, if root’s node document is an HTML document, return an HTMLCollection rooted at root, whose filter matches the following descendant elements:
-  if ($($(root).nodeDocument).type !== "xml") {
+  if ($(root[$$.nodeDocument]).type !== "xml") {
     return new HTMLCollection({
       root,
       filter: (element) =>
@@ -61,13 +62,13 @@ export function getElementsByQualifiedName(
  */
 export function getElementsByClassName(
   classNames: string,
-  root: Node,
+  root: $Node,
 ): HTMLCollection {
   const classes = parseOrderSet(classNames);
 
   if (classes.isEmpty) return new HTMLCollection({ root, filter: () => false });
 
-  const match = $($(root).nodeDocument).mode === html.DOCUMENT_MODE.QUIRKS
+  const match = $(root[$$.nodeDocument]).mode === html.DOCUMENT_MODE.QUIRKS
     ? matchASCIICaseInsensitive
     : Object.is;
 

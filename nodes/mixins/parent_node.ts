@@ -60,7 +60,7 @@ export class ParentNode implements IParentNode {
   @convert
   prepend(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
     // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[$$.nodeDocument]);
 
     // 2. Pre-insert node into this before this’s first child.
     preInsertNode(node, this, tree.firstChild(this));
@@ -72,7 +72,7 @@ export class ParentNode implements IParentNode {
   @convert
   append(@DOMString.exclude(isObject) ...nodes: (string | Node)[]): void {
     // Let node be the result of converting nodes into a node given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[$$.nodeDocument]);
 
     // Append node to this.
     appendNode(node, this);
@@ -86,7 +86,7 @@ export class ParentNode implements IParentNode {
     @DOMString.exclude(isObject) ...nodes: (string | Node)[]
   ): void {
     // 1. Let node be the result of converting nodes into a node given nodes and this’s node document.
-    const node = convertNodesToNode(nodes, this._.nodeDocument);
+    const node = convertNodesToNode(nodes, this[$$.nodeDocument]);
 
     // 2. Ensure pre-insertion validity of node into this before null.
     ensurePreInsertionValidity(node, this, null);
@@ -164,7 +164,7 @@ export function convertNodesToNode(
   const replaced = iter(nodes).map((node) => {
     if (typeof node === "string") {
       const text = new Text();
-      text[$$.data] = node, $(text).nodeDocument = document;
+      text[$$.data] = node, text[$$.nodeDocument] = document;
       return text;
     }
 
@@ -176,7 +176,7 @@ export function convertNodesToNode(
 
   // 1. Let node be null. // 4. Otherwise, set node to a new DocumentFragment node whose node document is document, and then append each node in nodes, if any, to it.
   const fragment = new DocumentFragment();
-  $(fragment).nodeDocument = document;
+  fragment[$$.nodeDocument] = document;
   replaced.forEach((node) => appendNode(node, fragment));
 
   // 5. Return node.

@@ -4,7 +4,6 @@ import {
   getAttributeByNamespaceAndLocalName,
 } from "./element.ts";
 import { changeAttributes } from "./attr.ts";
-import { $ } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
 import { $Element } from "../../i.ts";
 
@@ -32,7 +31,7 @@ export function setAttributeValue(
       attr[$$.namespacePrefix] = prefix,
       attr[$$.localName] = localName,
       attr[$$.value] = value,
-      $(attr).nodeDocument = $(element).nodeDocument;
+      attr[$$.nodeDocument] = element[$$.nodeDocument];
 
     appendAttribute(attr, element);
     return;

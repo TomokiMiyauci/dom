@@ -128,7 +128,7 @@ export class Element extends Node implements IElement, _ {
   override get ownerDocument(): Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
-    return this.#_.nodeDocument;
+    return this[$$.nodeDocument];
   }
 
   protected override clone(document: Document): globalThis.Element {
@@ -262,7 +262,7 @@ export class Element extends Node implements IElement, _ {
     ) {
       // 1. Let definition be the result of looking up a custom element definition given this’s node document, its namespace, its local name, and its is value.
       const definition = lookUpCustomElementDefinition(
-        this.#_.nodeDocument,
+        this[$$.nodeDocument],
         this[$$.namespace],
         this[$$.localName],
         this[$$.isValue],
@@ -281,7 +281,7 @@ export class Element extends Node implements IElement, _ {
 
     // 5. Let shadow be a new shadow root whose node document is this’s node document, host is this, and mode is init["mode"].
     const shadow: ShadowRoot = Reflect.construct(ShadowRoot, []);
-    $(shadow).nodeDocument = this.#_.nodeDocument,
+    shadow[$$.nodeDocument] = this[$$.nodeDocument],
       shadow[$$.host] = this,
       shadow[$$.mode] = init.mode,
       // 6. Set shadow’s delegates focus to init["delegatesFocus"].
@@ -405,7 +405,7 @@ export class Element extends Node implements IElement, _ {
     // 1. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$$.namespace] === Namespace.HTML &&
-      isHTMLDocument(this.#_.nodeDocument)
+      isHTMLDocument(this[$$.nodeDocument])
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 2. Return true if this has an attribute whose qualified name is qualifiedName; otherwise false.
@@ -463,7 +463,7 @@ export class Element extends Node implements IElement, _ {
   insertAdjacentText(where: InsertPosition, data: string): void {
     const text = new Text();
     // 1. Let text be a new Text node whose data is data and node document is this’s node document.
-    text[$$.data] = data, $(text).nodeDocument = this.#_.nodeDocument;
+    text[$$.data] = data, text[$$.nodeDocument] = this[$$.nodeDocument];
 
     // 2. Run insert adjacent, given this, where, and text.
     insertAdjacent(this, where, text);
@@ -516,7 +516,7 @@ export class Element extends Node implements IElement, _ {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$$.namespace] === Namespace.HTML &&
-      isHTMLDocument(this.#_.nodeDocument)
+      isHTMLDocument(this[$$.nodeDocument])
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -530,7 +530,7 @@ export class Element extends Node implements IElement, _ {
       const attribute: Attr = Reflect.construct(Attr, []);
       attribute[$$.localName] = qualifiedName,
         attribute[$$.value] = value,
-        $(attribute).nodeDocument = this.#_.nodeDocument;
+        attribute[$$.nodeDocument] = this[$$.nodeDocument];
 
       appendAttribute(attribute, this);
       return;
@@ -589,7 +589,7 @@ export class Element extends Node implements IElement, _ {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase.
     if (
       this[$$.namespace] === Namespace.HTML &&
-      isHTMLDocument(this.#_.nodeDocument)
+      isHTMLDocument(this[$$.nodeDocument])
     ) qualifiedName = toASCIILowerCase(qualifiedName);
 
     // 3. Let attribute be the first attribute in this’s attribute list whose qualified name is qualifiedName, and null otherwise.
@@ -606,7 +606,7 @@ export class Element extends Node implements IElement, _ {
         const attr: Attr = Reflect.construct(Attr, []);
         attr[$$.localName] = qualifiedName,
           attr[$$.value] = "",
-          $(attr).nodeDocument = this.#_.nodeDocument;
+          attr[$$.nodeDocument] = this[$$.nodeDocument];
 
         // then append this attribute to this,
         appendAttribute(attr, this);
@@ -689,7 +689,7 @@ export class Element extends Node implements IElement, _ {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
       this[$$.namespace] === Namespace.HTML &&
-      $(this.#_.nodeDocument).type !== "xml"
+      $(this[$$.nodeDocument]).type !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }

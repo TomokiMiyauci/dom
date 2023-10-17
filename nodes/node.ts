@@ -29,7 +29,7 @@ import {
 } from "./utils/queue.ts";
 import { Steps } from "../infra/applicable.ts";
 import { EventTarget } from "../events/event_target.ts";
-import { $, internalSlots, tree } from "../internal.ts";
+import { $, tree } from "../internal.ts";
 import { OrderedSet } from "../_internals/infra/data_structures/set.ts";
 import { Get } from "../utils.ts";
 import {
@@ -42,7 +42,7 @@ import {
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
-import { $Attr, $Element, NodeInternals as _ } from "../i.ts";
+import { $Attr, $Document, $Element, NodeInternals } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 export enum NodeType {
@@ -70,7 +70,7 @@ enum Position {
 }
 
 @Exposed("Window", "Node")
-export abstract class Node extends EventTarget implements INode {
+export abstract class Node extends EventTarget implements INode, NodeInternals {
   @constant
   static DOCUMENT_POSITION_DISCONNECTED =
     Position.DOCUMENT_POSITION_DISCONNECTED;
@@ -142,8 +142,6 @@ export abstract class Node extends EventTarget implements INode {
   protected constructor() {
     super();
 
-    internalSlots.extends<Node>(this, new NodeInternals());
-
     // returns the node’s assigned slot, if node is assigned; otherwise node’s parent.
     // TODO
     $<Node>(this).getParent = () => tree.parent(this);
@@ -153,7 +151,7 @@ export abstract class Node extends EventTarget implements INode {
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-node-baseuri)
    */
   get baseURI(): string {
-    const url = documentBaseURL(this.#_.nodeDocument);
+    const url = documentBaseURL(this[$$.nodeDocument]);
     // return this’s node document’s document base URL, serialized.
     return URLSerializer.serialize(url);
   }
@@ -269,8 +267,7 @@ export abstract class Node extends EventTarget implements INode {
       // 5. Let currentNode be node’s next sibling.
       let currentNode = tree.nextSibling(node);
 
-      const { nodeDocument } = $(node);
-      const { ranges: _ranges } = $(nodeDocument);
+      const { ranges: _ranges } = $(node[$$.nodeDocument]);
       const ranges = iter(_ranges);
       // 6. While currentNode is an exclusinve Text node:
       while (
@@ -354,7 +351,7 @@ export abstract class Node extends EventTarget implements INode {
   }
 
   cloneNode(deep?: boolean | undefined): globalThis.Node {
-    let document = this.#_.nodeDocument;
+    let document = this[$$.nodeDocument];
     const copy = this.clone(document);
 
     if (isDocument(copy)) document = copy;
@@ -552,7 +549,18 @@ export abstract class Node extends EventTarget implements INode {
     return $<Node>(this);
   }
 
-  // [$$.insertionSteps]: string = "";
+  /**
+   * @remarks set after creation
+   */
+  [$$.nodeDocument]!: $Document;
+  [$$.insertionSteps]: Steps<[insertedNode: Node]> = new Steps();
+  [$$.childrenChangedSteps]: Steps<[]> = new Steps();
+  [$$.adoptingSteps]: Steps<[node: Node, oldDocument: Document]> = new Steps();
+  [$$.removingSteps]: Steps<[removedNode: Node, oldParent: Node | null]> =
+    new Steps();
+  [$$.registeredObserverList]: List<
+    RegisteredObserver | TransientRegisteredObserver
+  > = new List();
 }
 
 export interface Node
@@ -584,35 +592,3 @@ export interface Node
       "DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC",
       Position.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     > {}
-
-export class NodeInternals {
-  nodeDocument!: Document;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-insert-ext)
-   */
-  insertionSteps: Steps<[insertedNode: globalThis.Node]> = new Steps();
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-adopt-ext)
-   */
-  adoptingSteps: Steps<[node: globalThis.Node, oldDocument: Document]> =
-    new Steps();
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-children-changed-ext)
-   */
-  childrenChangedSteps: Steps<[]> = new Steps();
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-node-remove-ext)
-   */
-  removingSteps: Steps<
-    [removedNode: globalThis.Node, oldParent: globalThis.Node | null]
-  > = new Steps();
-
-  /** @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer-list) */
-  registeredObserverList: List<
-    RegisteredObserver | TransientRegisteredObserver
-  > = new List();
-}
