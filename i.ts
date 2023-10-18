@@ -268,10 +268,10 @@ export interface NodeIteratorInternals {
    */
   [$.activeFlag]: boolean;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-root)
-  //  */
-  // [$.root]: Node;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-root)
+   */
+  [$.root]: $Node;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-whattoshow)
@@ -283,25 +283,27 @@ export interface NodeIteratorInternals {
    */
   [$.filter]: NodeFilter | null;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
-  //  */
-  // [$.iteratorCollection]: Iterable<Node>;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
+   */
+  [$.iteratorCollection]: Iterable<$Node>;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-reference)
-  //  */
-  // [$.reference]: Node;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-reference)
+   */
+  [$.reference]: $Node;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pointer-before-reference)
-  //  */
-  // [$.pointerBeforeReference]: boolean;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pointer-before-reference)
+   */
+  [$.pointerBeforeReference]: boolean;
 
-  // /**
-  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pre-removing-steps)
-  //  */
-  // [$.preRemovingSteps]: Steps<[nodeIterator: NodeIterator, toBeRemovedNode: Node]>;
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pre-removing-steps)
+   */
+  [$.preRemovingSteps]: Steps<
+    [nodeIterator: $NodeIterator, toBeRemovedNode: $Node]
+  >;
 }
 
 export interface TreeWalkerInternals {

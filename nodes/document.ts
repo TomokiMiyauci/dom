@@ -31,11 +31,8 @@ import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
 import { Range } from "../ranges/range.ts";
 import { type Encoding, utf8 } from "../_internals/encoding/encoding.ts";
-import {
-  NodeIterator,
-  NodeIteratorInternals,
-} from "../traversals/node_iterator.ts";
-import { TreeWalker, TreeWalkerInternals } from "../traversals/tree_walker.ts";
+import { NodeIterator } from "../traversals/node_iterator.ts";
+import { TreeWalker } from "../traversals/tree_walker.ts";
 import { createEvent } from "../events/construct.ts";
 import { Event } from "../events/event.ts";
 import { CustomEvent } from "../events/custom_event.ts";
@@ -506,20 +503,14 @@ export class Document extends Node implements IDocument, _ {
   ): NodeIterator {
     // 1. Let iterator be a new NodeIterator object.
     const iterator = new NodeIterator();
-    const internal = new NodeIteratorInternals({
-      // 2. Set iterator’s root and iterator’s reference to root.
-      root,
-      reference: root,
-      // 3. Set iterator’s pointer before reference to true.
-      pointerBeforeReference: true,
-    });
-
+    // 2. Set iterator’s root and iterator’s reference to root.
+    iterator[$$.root] = root, iterator[$$.reference] = root;
+    // 3. Set iterator’s pointer before reference to true.
+    iterator[$$.pointerBeforeReference] = true;
     // 4. Set iterator’s whatToShow to whatToShow.
     iterator[$$.whatToShow] = whatToShow;
     // 5. Set iterator’s filter to filter.
     iterator[$$.filter] = filter;
-
-    internalSlots.extends(iterator as globalThis.NodeIterator, internal);
 
     // Non-standard process
     this[$$.iterators].add(iterator);
