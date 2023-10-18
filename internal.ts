@@ -1,6 +1,5 @@
 import { type ElementInternals } from "./nodes/element.ts";
 import { type DocumentInternals } from "./nodes/document.ts";
-import { type DOMImplementationInternals } from "./nodes/dom_implementation.ts";
 import { type EventInternals } from "./events/event.ts";
 import { type EventTargetInternals } from "./events/event_target.ts";
 import { type SlottableInternals } from "./nodes/mixins/slottable.ts";
@@ -36,7 +35,6 @@ type InternalSlotEntries = [
   [EventTarget, EventTargetInternals],
   [Element, ElementInternals],
   [Document, DocumentInternals],
-  [DOMImplementation, DOMImplementationInternals],
   [Selection, SelectionInternals],
   [MutationObserver, MutationObserverInternals],
   [Slottable, SlottableInternals],

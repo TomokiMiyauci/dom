@@ -7,7 +7,6 @@ import { Namespace } from "../_internals/infra/namespace.ts";
 import { validate } from "../_internals/infra/namespace.ts";
 import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { isUndefined } from "../deps.ts";
-import { $, internalSlots } from "../internal.ts";
 import { internalCreateElement } from "./utils/internal_create_element.ts";
 import { createElement } from "./utils/create_element.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
@@ -28,11 +27,11 @@ export class DOMImplementation implements IDOMImplementation {
     validate(qualifiedName);
 
     // 2. Return a new doctype, with qualifiedName as its name, publicId as its public ID, and systemId as its system ID, and with its node document set to the associated document of this.
-    const doctype = Reflect.construct(DocumentType, []) as DocumentType;
+    const doctype: DocumentType = Reflect.construct(DocumentType, []);
     doctype[$$.name] = qualifiedName,
       doctype[$$.publicId] = publicId,
       doctype[$$.systemId] = systemId,
-      doctype[$$.nodeDocument] = $<DOMImplementation>(this).document;
+      doctype[$$.nodeDocument] = this[$$.document];
 
     return doctype;
   }
@@ -68,7 +67,7 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    document[$$.origin] = this.#_.document[$$.origin];
+    document[$$.origin] = this[$$.document][$$.origin];
 
     // 7. document’s content type is determined by namespace:
     document[$$.contentType] = namespaceToContentType(namespace);
@@ -120,7 +119,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    doc[$$.origin] = this.#_.document[$$.origin];
+    doc[$$.origin] = this[$$.document][$$.origin];
 
     // 9. Return doc.
     return doc;
@@ -136,23 +135,15 @@ export class DOMImplementation implements IDOMImplementation {
 
   private static create(document: Document): DOMImplementation {
     const instance = new DOMImplementation();
-
-    const _: DOMImplementationInternals = { document };
-    internalSlots.extends<DOMImplementation>(instance, _);
+    instance[$$.document] = document;
 
     return instance;
   }
 
-  get #_() {
-    return $<DOMImplementation>(this);
-  }
-}
-
-export interface DOMImplementationInternals {
   /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
+   * @remarks set after creation
    */
-  document: globalThis.Document;
+  [$$.document]!: Document;
 }
 
 function namespaceToContentType(namespace: string | null): string {

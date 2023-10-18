@@ -45,3 +45,4 @@ export const preRemovingSteps = Symbol("preRemovingSteps");
 export const current = Symbol("current");
 export const start = Symbol("start");
 export const end = Symbol("end");
+export const document = Symbol("document");

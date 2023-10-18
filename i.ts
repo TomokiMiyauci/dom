@@ -327,6 +327,13 @@ export interface AbstractRangeInternals {
   [$.end]: BoundaryPoint;
 }
 
+export interface DOMImplementationInternals {
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
+   */
+  [$.document]: $Document;
+}
+
 /**
  * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp)
  */
