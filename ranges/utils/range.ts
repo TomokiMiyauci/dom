@@ -20,41 +20,47 @@ import {
   replaceData,
   substringData,
 } from "../../nodes/utils/character_data.ts";
-import { $, tree } from "../../internal.ts";
+import { tree } from "../../internal.ts";
 import { iter, last } from "../../deps.ts";
-import { type BoundaryPoint, Position, position } from "../boundary_point.ts";
+import { Position, position } from "../boundary_point.ts";
 import { isCollapsed } from "./abstract_range.ts";
+import * as RangeUtils from "./abstract_range.ts";
 import { splitText } from "../../nodes/utils/split_text.ts";
-import { $CharacterData, $Node } from "../../i.ts";
+import {
+  $CharacterData,
+  $ChildNode,
+  $Node,
+  $Range,
+  BoundaryPoint,
+} from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-root)
  */
-export function root(range: Range): Node {
-  const { startNode } = $(range);
-
+export function root(range: $Range): $Node {
   // the root of its start node.
-  return tree.root(startNode);
+  return tree.root(RangeUtils.startNode(range));
 }
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#contained)
  */
-export function isContained(node: Node, range: Range): boolean {
+export function isContained(node: $Node, range: $Range): boolean {
   // if node’s root is range’s root,
   return tree.root(node) === root(range) &&
     // and (node, 0) is after range’s start,
-    position([node, 0], $(range).start) === Position.After &&
+    position([node, 0], range[$$.start]) === Position.After &&
     // and (node, node’s length) is before range’s end.
-    position([node, nodeLength(node)], $(range).end) === Position.Before;
+    position([node, nodeLength(node)], range[$$.end]) === Position.Before;
 }
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#partially-contained)
  */
-export function isPartiallyContained(node: Node, range: Range): boolean {
-  const { startNode, endNode } = $(range);
+export function isPartiallyContained(node: $Node, range: $Range): boolean {
+  const startNode = RangeUtils.startNode(range),
+    endNode = RangeUtils.endNode(range);
 
   // if it’s an inclusive ancestor of the live range’s start node but not its end node, or vice versa.
   return (tree.isInclusiveAncestor(node, startNode) &&
@@ -68,7 +74,7 @@ export function isPartiallyContained(node: Node, range: Range): boolean {
  */
 export function setStartOrEnd(
   step: "start" | "end",
-  range: Range,
+  range: $Range,
   boundaryPoint: BoundaryPoint,
 ): void {
   const node = boundaryPoint[0], offset = boundaryPoint[1];
@@ -95,12 +101,12 @@ export function setStartOrEnd(
       // If range’s root is not equal to node’s root, or if bp is after the range’s end,
       if (
         root(range) !== tree.root(node) ||
-        position(bp, $(range).end) === Position.After
+        position(bp, range[$$.end]) === Position.After
         // set range’s end to bp.
-      ) $(range).end = bp;
+      ) range[$$.end] = bp;
 
       // 2. Set range’s start to bp.
-      $(range).start = bp;
+      range[$$.start] = bp;
       break;
     }
 
@@ -109,12 +115,12 @@ export function setStartOrEnd(
       // 1. If range’s root is not equal to node’s root, or if bp is before the range’s start,
       if (
         root(range) !== tree.root(node) ||
-        position(bp, $(range).start) === Position.Before
+        position(bp, range[$$.start]) === Position.Before
         // set range’s start to bp.
-      ) $(range).start = bp;
+      ) range[$$.start] = bp;
 
       // 2. Set range’s end to bp.
-      $(range).end = bp;
+      range[$$.end] = bp;
     }
   }
 }
@@ -122,19 +128,19 @@ export function setStartOrEnd(
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-clone)
  */
-export function cloneContents(range: Range): globalThis.DocumentFragment {
+export function cloneContents(range: $Range): globalThis.DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = new DocumentFragment();
-  fragment[$$.nodeDocument] = $(range).startNode[$$.nodeDocument];
+  fragment[$$.nodeDocument] = RangeUtils.startNode(range)[$$.nodeDocument];
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
-  const originalStartNode = $(range).startNode,
-    originalStartOffset = $(range).startOffset,
-    originalEndNode = $(range).endNode,
-    originalEndOffset = $(range).endOffset;
+  const originalStartNode = RangeUtils.startNode(range),
+    originalStartOffset = RangeUtils.startOffset(range),
+    originalEndNode = RangeUtils.endNode(range),
+    originalEndOffset = RangeUtils.endOffset(range);
 
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
@@ -169,7 +175,7 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   }
 
   // 7. Let first partially contained child be null.
-  let firstPartiallyContainedChild: ChildNode | null = null;
+  let firstPartiallyContainedChild: $ChildNode | null = null;
 
   // 8. If original start node is not an inclusive ancestor of original end node,
   if (!tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
@@ -182,7 +188,7 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   }
 
   // 9. Let last partially contained child be null.
-  let lastPartiallyContainedChild: ChildNode | null = null;
+  let lastPartiallyContainedChild: $ChildNode | null = null;
 
   // 10. If original end node is not an inclusive ancestor of original start node,
   if (!tree.isInclusiveAncestor(originalEndNode, originalStartNode)) {
@@ -235,8 +241,8 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 
     // 3. Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length).
     const subrange = new Range();
-    $(subrange).start = [originalStartNode, originalStartOffset],
-      $(subrange).end = [
+    subrange[$$.start] = [originalStartNode, originalStartOffset],
+      subrange[$$.end] = [
         firstPartiallyContainedChild,
         nodeLength(firstPartiallyContainedChild),
       ];
@@ -288,8 +294,8 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 
     // 3. Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset).
     const subrange = new Range();
-    $(subrange).start = [lastPartiallyContainedChild, 0],
-      $(subrange).end = [originalEndNode, originalEndOffset];
+    subrange[$$.start] = [lastPartiallyContainedChild, 0],
+      subrange[$$.end] = [originalEndNode, originalEndOffset];
 
     // 4. Let subfragment be the result of cloning the contents of subrange.
     const subfragment = cloneContents(subrange);
@@ -301,7 +307,7 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
   // 18. Return fragment.
   return fragment;
 
-  function contained(node: Node): boolean {
+  function contained(node: $Node): boolean {
     return isContained(node, range);
   }
 }
@@ -309,21 +315,19 @@ export function cloneContents(range: Range): globalThis.DocumentFragment {
 /**
  * @see https://dom.spec.whatwg.org/#concept-range-extract
  */
-export function extract(range: Range): globalThis.DocumentFragment {
+export function extract(range: $Range): DocumentFragment {
   // 1. Let fragment be a new DocumentFragment node whose node document is range’s start node’s node document.
   const fragment = new DocumentFragment();
-  fragment[$$.nodeDocument] = $(range).startNode[$$.nodeDocument];
+  fragment[$$.nodeDocument] = RangeUtils.startNode(range)[$$.nodeDocument];
 
   // 2. If range is collapsed, then return fragment.
   if (isCollapsed(range)) return fragment;
 
   // 3. Let original start node, original start offset, original end node, and original end offset be range’s start node, start offset, end node, and end offset, respectively.
-  const {
-    startNode: originalStartNode,
-    startOffset: originalStartOffset,
-    endNode: originalEndNode,
-    endOffset: originalEndOffset,
-  } = $(range);
+  const originalStartNode = RangeUtils.startNode(range),
+    originalStartOffset = RangeUtils.startOffset(range),
+    originalEndNode = RangeUtils.endNode(range),
+    originalEndOffset = RangeUtils.endOffset(range);
 
   // 4. If original start node is original end node and it is a CharacterData node, then:
   if (
@@ -370,13 +374,13 @@ export function extract(range: Range): globalThis.DocumentFragment {
   }
 
   // 7. Let first partially contained child be null.
-  let firstPartiallyContainedChild: ChildNode | null = null;
+  let firstPartiallyContainedChild: $ChildNode | null = null;
 
-  function partiallyContained(node: Node): boolean {
+  function partiallyContained(node: $Node): boolean {
     return isPartiallyContained(node, range);
   }
 
-  function contained(node: Node): boolean {
+  function contained(node: $Node): boolean {
     return isContained(node, range);
   }
 
@@ -409,7 +413,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
     throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
   }
 
-  let newNode: Node, newOffset: number;
+  let newNode: $Node, newOffset: number;
 
   // 13. If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset.
   if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
@@ -469,8 +473,8 @@ export function extract(range: Range): globalThis.DocumentFragment {
 
     // 3. Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length).
     const subrange = new Range();
-    $(subrange).start = [originalStartNode, originalStartOffset],
-      $(subrange).end = [
+    subrange[$$.start] = [originalStartNode, originalStartOffset],
+      subrange[$$.end] = [
         firstPartiallyContainedChild,
         nodeLength(firstPartiallyContainedChild),
       ];
@@ -520,8 +524,8 @@ export function extract(range: Range): globalThis.DocumentFragment {
 
     // 3. Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset).
     const subrange = new Range();
-    $(subrange).start = [lastPartiallyContainedChild, 0],
-      $(subrange).end = [originalEndNode, originalEndOffset];
+    subrange[$$.start] = [lastPartiallyContainedChild, 0],
+      subrange[$$.end] = [originalEndNode, originalEndOffset];
 
     // 4. Let subfragment be the result of extracting subrange.
     const subfragment = extract(subrange);
@@ -531,7 +535,7 @@ export function extract(range: Range): globalThis.DocumentFragment {
   }
 
   // 20. Set range’s start and end to (new node, new offset).
-  $(range).start = [newNode, newOffset], $(range).end = [newNode, newOffset];
+  range[$$.start] = [newNode, newOffset], range[$$.end] = [newNode, newOffset];
 
   // 21. Return fragment.
   return fragment;
@@ -540,8 +544,8 @@ export function extract(range: Range): globalThis.DocumentFragment {
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-range-insert)
  */
-export function insert(node: $Node, range: Range): void {
-  const { startNode } = $(range);
+export function insert(node: $Node, range: $Range): void {
+  const startNode = RangeUtils.startNode(range);
 
   // 1. If range’s start node is a ProcessingInstruction or Comment node, is a Text node whose parent is null, or is node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -551,13 +555,14 @@ export function insert(node: $Node, range: Range): void {
   ) throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
 
   // 2. Let referenceNode be null.
-  let referenceNode: Node | null = null;
+  let referenceNode: $Node | null = null;
 
   // 3. If range’s start node is a Text node, set referenceNode to that Text node.
   if (isText(startNode)) referenceNode = startNode;
   // 4. Otherwise, set referenceNode to the child of start node whose index is start offset, and null if there is no such child.
-  else {referenceNode = tree.children(startNode)[$(range).startOffset] ??
-      null;}
+  else {referenceNode =
+      tree.children(startNode)[RangeUtils.startOffset(range)] ??
+        null;}
 
   // 5. Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise.
   const parent = !referenceNode ? startNode : tree.parent(referenceNode)!; // maybe ensure parent
@@ -567,7 +572,7 @@ export function insert(node: $Node, range: Range): void {
 
   // 7. If range’s start node is a Text node, set referenceNode to the result of splitting it with offset range’s start offset.
   if (isMyText(startNode)) {
-    referenceNode = splitText(startNode, $(range).startOffset);
+    referenceNode = splitText(startNode, RangeUtils.startOffset(range));
   }
 
   // 8. If node is referenceNode, set referenceNode to its next sibling.
@@ -588,13 +593,13 @@ export function insert(node: $Node, range: Range): void {
   preInsertNode(node, parent, referenceNode);
 
   // 13. If range is collapsed, then set range’s end to (parent, newOffset).
-  if (isCollapsed(range)) $(range).end = [parent, newOffset];
+  if (isCollapsed(range)) range[$$.end] = [parent, newOffset];
 }
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-range-select
  */
-export function select(node: Node, range: Range): void {
+export function select(node: $Node, range: $Range): void {
   // 1. Let parent be node’s parent.
   const parent = tree.parent(node);
 
@@ -610,16 +615,17 @@ export function select(node: Node, range: Range): void {
   const index = tree.index(node);
 
   // 4. Set range’s start to boundary point (parent, index).
-  $(range).start = [parent, index];
+  range[$$.start] = [parent, index];
 
   // 5. Set range’s end to boundary point (parent, index plus 1).
-  $(range).end = [parent, index + 1];
+  range[$$.end] = [parent, index + 1];
 }
 
 export function* containedNodes(
-  range: Range,
+  range: $Range,
 ): IterableIterator<$Node> {
-  const { startNode, endNode } = $(range);
+  const startNode = RangeUtils.startNode(range),
+    endNode = RangeUtils.endNode(range);
   const endOfNode = tree.nextDescendant(endNode);
 
   let current = startNode;

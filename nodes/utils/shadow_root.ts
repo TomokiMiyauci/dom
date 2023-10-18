@@ -115,7 +115,7 @@ export function retarget<T extends object | null>(
   while (true) {
     if (!A || !isNodeLike(A)) return A;
 
-    const root = tree.root(A as Node);
+    const root = tree.root(A as $Node);
 
     if (
       !isShadowRoot(root) ||

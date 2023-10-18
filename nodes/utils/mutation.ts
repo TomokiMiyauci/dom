@@ -29,7 +29,8 @@ import { isAssigned } from "./slottable.ts";
 import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
 import { adoptNode } from "./document.ts";
 import * as $$ from "../../symbol.ts";
-import { $ChildNode, $Node } from "../../i.ts";
+import { $ChildNode, $Node, $NodeIterator, $Range } from "../../i.ts";
+import * as RangeUtils from "../../ranges/utils/abstract_range.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
@@ -128,7 +129,7 @@ export function replaceChild<T extends $Node>(
   const previousSibling = tree.previousSibling(child);
 
   // 10. Let removedNodes be the empty set.
-  let removedNodes = new OrderedSet<Node>();
+  let removedNodes = new OrderedSet<$Node>();
 
   // 11. If child’s parent is non-null, then:
   if (tree.parent(child)) {
@@ -208,7 +209,7 @@ export function insertNode(
       const range of ranges.filter(startNodeIsParent).filter(
         startOffsetIsGtChildIndex,
       )
-    ) $(range).start[1] += count;
+    ) range[$$.start][1] += count;
 
     const endNodeIsParent = equalsNodeEndNode.bind(null, parent);
     const endOffsetIsGtChildIndex = compareRangeOffset.bind(
@@ -223,7 +224,7 @@ export function insertNode(
       const range of ranges.filter(endNodeIsParent).filter(
         endOffsetIsGtChildIndex,
       )
-    ) $(range).end[1] += count;
+    ) range[$$.end][1] += count;
   }
 
   // 6. Let previousSibling be child’s previous sibling or parent’s last child if child is null.
@@ -302,12 +303,12 @@ export function insertNode(
   parent[$$.childrenChangedSteps].run();
 }
 
-export function equalsNodeEndNode(node: Node, range: Range): boolean {
-  return $(range).startNode === node;
+export function equalsNodeEndNode(node: $Node, range: $Range): boolean {
+  return RangeUtils.endNode(range) === node;
 }
 
-export function equalsNodeStartNode(node: Node, range: Range): boolean {
-  return $(range).startNode === node;
+export function equalsNodeStartNode(node: $Node, range: $Range): boolean {
+  return RangeUtils.startNode(range) === node;
 }
 
 /**
@@ -441,7 +442,7 @@ export function replaceAllNode(
 
   // 2. Let addedNodes be the empty set.
   const addNodes = !node
-    ? new OrderedSet<Node>()
+    ? new OrderedSet<$Node>()
     // 3. If node is a DocumentFragment node, then set addedNodes to node’s children.
     : isDocumentFragment(node)
     ? tree.children(node).clone()
@@ -498,12 +499,12 @@ export function removeNode(
 
   // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).
   for (const range of ranges.filter(isStartNodeInclusiveDescendantOfNode)) {
-    $(range).start = [parent, index];
+    range[$$.start] = [parent, index];
   }
 
   // 5. For each live range whose end node is an inclusive descendant of node, set its end to (parent, index).
   for (const range of ranges.filter(isEndNodeInclusiveDescendantOfNode)) {
-    $(range).end = [parent, index];
+    range[$$.end] = [parent, index];
   }
 
   const isStartNodeParent = equalsNodeStartNode.bind(null, parent);
@@ -517,7 +518,7 @@ export function removeNode(
   // 6. For each live range whose start node is parent and start offset is greater than index, decrease its start offset by 1.
   for (
     const range of ranges.filter(isStartNodeParent).filter(startOffsetIsGtIndex)
-  ) $(range).start[1]--;
+  ) range[$$.start][1]--;
 
   const endOffsetIsGtIndex = compareRangeOffset.bind(
     null,
@@ -530,19 +531,19 @@ export function removeNode(
   // 7. For each live range whose end node is parent and end offset is greater than index, decrease its end offset by 1.
   for (
     const range of ranges.filter(isEndNodeParent).filter(endOffsetIsGtIndex)
-  ) $(range).end[1]--;
+  ) range[$$.end][1]--;
 
-  function rootNodeDocumentIsNodeNodeDocument(iterator: NodeIterator): boolean {
-    const { root } = $(iterator);
-
-    return root[$$.nodeDocument] === nodeDocument;
+  function rootNodeDocumentIsNodeNodeDocument(
+    iterator: $NodeIterator,
+  ): boolean {
+    return iterator[$$.root][$$.nodeDocument] === nodeDocument;
   }
 
   // 8. For each NodeIterator object iterator whose root’s node document is node’s node document,
   for (
     const iterator of iter(iterators).filter(rootNodeDocumentIsNodeNodeDocument)
     // run the NodeIterator pre-removing steps given node and iterator.
-  ) $(iterator).preRemovingSteps.run(iterator, node);
+  ) iterator[$$.preRemovingSteps].run(iterator, node);
 
   // 9. Let oldPreviousSibling be node’s previous sibling.
   const oldPreviousSibling = tree.previousSibling(node);
@@ -639,16 +640,12 @@ export function removeNode(
   // 21. Run the children changed steps for parent.
   parent[$$.childrenChangedSteps].run();
 
-  function isStartNodeInclusiveDescendantOfNode(range: Range): boolean {
-    const { startNode } = $(range);
-
-    return tree.isInclusiveDescendant(startNode, node);
+  function isStartNodeInclusiveDescendantOfNode(range: $Range): boolean {
+    return tree.isInclusiveDescendant(RangeUtils.startNode(range), node);
   }
 
-  function isEndNodeInclusiveDescendantOfNode(range: Range): boolean {
-    const { endNode } = $(range);
-
-    return tree.isInclusiveDescendant(endNode, node);
+  function isEndNodeInclusiveDescendantOfNode(range: $Range): boolean {
+    return tree.isInclusiveDescendant(RangeUtils.endNode(range), node);
   }
 }
 
@@ -670,10 +667,11 @@ export function compareRangeOffset(
   operator: Operator,
   offset: number,
   isStart: boolean,
-  range: Range,
+  range: $Range,
 ): boolean {
-  const _ = $(range);
-  const rangeOffset = isStart ? _.startOffset : _.endOffset;
+  const rangeOffset = isStart
+    ? RangeUtils.startOffset(range)
+    : RangeUtils.endOffset(range);
 
   switch (operator) {
     case Operator.Eq:

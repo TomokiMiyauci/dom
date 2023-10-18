@@ -43,3 +43,5 @@ export const reference = Symbol("reference");
 export const pointerBeforeReference = Symbol("pointerBeforeReference");
 export const preRemovingSteps = Symbol("preRemovingSteps");
 export const current = Symbol("current");
+export const start = Symbol("start");
+export const end = Symbol("end");

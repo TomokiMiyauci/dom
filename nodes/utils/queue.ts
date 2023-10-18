@@ -5,6 +5,7 @@ import { $, tree } from "../../internal.ts";
 import { fireEvent } from "../../events/fire.ts";
 import { queueMicrotask } from "../../runtime.ts";
 import { registeredObserverList } from "../../symbol.ts";
+import type { $Node } from "../../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#registered-observer)
@@ -109,9 +110,9 @@ export function notifyMutationObservers(): void {
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#queue-a-tree-mutation-record)
  */
 export function queueTreeMutationRecord(
-  target: Node,
-  addedNodes: OrderedSet<Node>,
-  removedNodes: OrderedSet<Node>,
+  target: $Node,
+  addedNodes: OrderedSet<$Node>,
+  removedNodes: OrderedSet<$Node>,
   previousSibling: Node | null,
   nextSibling: Node | null,
 ): void {
@@ -135,12 +136,12 @@ export function queueTreeMutationRecord(
  */
 export function queueMutationRecord(
   type: MutationRecordType,
-  target: Node,
+  target: $Node,
   name: string | null,
   namespace: string | null,
   oldValue: string | null,
-  addedNodes: OrderedSet<Node>,
-  removedNodes: OrderedSet<Node>,
+  addedNodes: OrderedSet<$Node>,
+  removedNodes: OrderedSet<$Node>,
   previousSibling: Node | null,
   nextSibling: Node | null,
 ): void {

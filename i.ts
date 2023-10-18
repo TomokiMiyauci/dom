@@ -217,13 +217,13 @@ export interface DocumentInternals extends NodeInternals {
    * Non standard field
    * @default Set
    */
-  [$.iterators]: Set<NodeIterator>;
+  [$.iterators]: Set<$NodeIterator>;
 
   /**
    * Non standard field
    * @default Set
    */
-  [$.ranges]: Set<Range>;
+  [$.ranges]: Set<$Range>;
 }
 
 export interface ProcessingInstructionInternals extends CharacterDataInternals {
@@ -322,6 +322,16 @@ export interface TreeWalkerInternals {
   [$.current]: $Node;
 }
 
+export interface AbstractRangeInternals {
+  [$.start]: BoundaryPoint;
+  [$.end]: BoundaryPoint;
+}
+
+/**
+ * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp)
+ */
+export type BoundaryPoint = [node: $Node, offset: number];
+
 export interface $Node extends Node, NodeInternals {}
 
 export interface $ParentNode extends ParentNode, NodeInternals {}
@@ -352,3 +362,12 @@ export interface $ParentNode extends ParentNode, NodeInternals {}
 export interface $ChildNode extends ChildNode, NodeInternals {}
 export interface $NodeIterator extends NodeIterator, NodeIteratorInternals {}
 export interface $TreeWalker extends TreeWalker, TreeWalkerInternals {}
+export interface $AbstractRange extends AbstractRange, AbstractRangeInternals {}
+export interface $Range extends Range, AbstractRangeInternals {}
+
+export interface StaticRangeInit {
+  endContainer: $Node;
+  endOffset: number;
+  startContainer: $Node;
+  startOffset: number;
+}

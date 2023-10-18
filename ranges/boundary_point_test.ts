@@ -1,6 +1,7 @@
-import { BoundaryPoint, Position, position } from "./boundary_point.ts";
+import { Position, position } from "./boundary_point.ts";
 import { assertEquals, describe, it } from "../_dev_deps.ts";
 import { A, B } from "../tests/fixture.ts";
+import type { BoundaryPoint } from "../i.ts";
 
 describe("position", () => {
   it("should return position", () => {

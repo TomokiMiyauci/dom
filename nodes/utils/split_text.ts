@@ -60,7 +60,7 @@ export function splitText(node: $Text, offset: number): Text {
       const range of ranges.filter(startNodeIsNode).filter(
         startOffsetIsGtOffset,
       )
-    ) $(range).start[0] = newNode, $(range).start[1] -= offset;
+    ) range[$$.start][0] = newNode, range[$$.start][1] -= offset;
 
     const endNodeIsNode = equalsNodeEndNode.bind(null, node);
     const endOffsetIsGtOffset = compareRangeOffset.bind(
@@ -73,7 +73,7 @@ export function splitText(node: $Text, offset: number): Text {
     // 3 For each live range whose end node is node and end offset is greater than offset, set its end node to new node and decrease its end offset by offset.
     for (
       const range of ranges.filter(endNodeIsNode).filter(endOffsetIsGtOffset)
-    ) $(range).end[0] = newNode, $(range).end[1] -= offset;
+    ) range[$$.end][0] = newNode, range[$$.end][1] -= offset;
 
     const startNodeIsParent = equalsNodeStartNode.bind(null, parent);
     const indexOfNodePlus1 = tree.index(node) + 1;
@@ -89,7 +89,7 @@ export function splitText(node: $Text, offset: number): Text {
       const range of ranges.filter(startNodeIsParent).filter(
         startOffsetIsEqIndexOfNodePlus1,
       )
-    ) $(range).start[1]++;
+    ) range[$$.start][1]++;
 
     const endNodeIsParent = equalsNodeEndNode.bind(null, parent);
     const endOffsetIsEqIndexOfNodePlus1 = compareRangeOffset.bind(
@@ -104,7 +104,7 @@ export function splitText(node: $Text, offset: number): Text {
       const range of ranges.filter(endNodeIsParent).filter(
         endOffsetIsEqIndexOfNodePlus1,
       )
-    ) $(range).end[1]++;
+    ) range[$$.end][1]++;
   }
 
   // 8 Replace data with node node, offset offset, count count, and data the empty string.

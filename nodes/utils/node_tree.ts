@@ -11,7 +11,17 @@ import { queueMutationObserverMicrotask } from "./queue.ts";
 import { iter } from "../../deps.ts";
 import { List } from "../../_internals/infra/data_structures/list.ts";
 import { isShadowRoot } from "./type.ts";
-import { $CharacterData, $Element, $ShadowRoot } from "../../i.ts";
+import {
+  $Attr,
+  $CharacterData,
+  $Document,
+  $DocumentFragment,
+  $DocumentType,
+  $Element,
+  $Node,
+  $ShadowRoot,
+  $Text,
+} from "../../i.ts";
 import { data } from "../../symbol.ts";
 import * as $$ from "../../symbol.ts";
 
@@ -20,13 +30,13 @@ import * as $$ from "../../symbol.ts";
  */
 export function nodeLength(
   node:
-    | Node
-    | Document
-    | DocumentType
-    | DocumentFragment
-    | Element
+    | $Node
+    | $Document
+    | $DocumentType
+    | $DocumentFragment
+    | $Element
     | $CharacterData
-    | Attr,
+    | $Attr,
 ): number {
   // 1. If node is a DocumentType or Attr node, then return 0.
   if (isDocumentType(node) || isAttr(node)) return 0;
@@ -38,7 +48,7 @@ export function nodeLength(
   return tree.children(node).size;
 }
 
-type Slottable = Element | Text;
+type Slottable = $Element | $Text;
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-slotable
@@ -148,7 +158,7 @@ export function findSlottables(slot: HTMLSlotElement): List<Slottable> {
 /**
  * @see https://dom.spec.whatwg.org/#assign-slotables-for-a-tree
  */
-export function assignSlottablesForTree(root: Node): void {
+export function assignSlottablesForTree(root: $Node): void {
   const inclusiveDescendants = tree.inclusiveDescendants(root);
 
   // run assign slottables for each slot slot in root’s inclusive descendants, in tree order.
@@ -187,7 +197,7 @@ export function signalSlotChange(slot: Element): void {
 /**
  * @see https://dom.spec.whatwg.org/#connected
  */
-export function isConnected(node: Node): node is $Element {
+export function isConnected(node: $Node): node is $Element {
   const root = tree.shadowIncludingRoot(node);
   // if its shadow-including root is a document.
   return isDocument(root);

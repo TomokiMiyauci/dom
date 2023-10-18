@@ -51,6 +51,7 @@ import {
   $ParentNode,
   NodeInternals,
 } from "../i.ts";
+import * as RangeUtils from "../ranges/utils/abstract_range.ts";
 import * as $$ from "../symbol.ts";
 
 export enum NodeType {
@@ -289,7 +290,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
         for (
           const range of ranges.filter(startNodeIsCurrentNode)
           // add length to its start offset and set its start node to node.
-        ) length += $(range).startOffset, $(range).start[0] = node;
+        ) length += RangeUtils.startOffset(range), range[$$.start][0] = node;
 
         const endNodeIsCurrentNode = equalsNodeEndNode.bind(
           null,
@@ -298,7 +299,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
         // 2. For each live range whose end node is currentNode,
         for (const range of ranges.filter(endNodeIsCurrentNode)) {
           // add length to its end offset and set its end node to node.
-          length += $(range).endOffset, $(range).end[0] = node;
+          length += RangeUtils.endOffset(range), range[$$.end][0] = node;
         }
 
         const parent = tree.parent(currentNode);
@@ -322,7 +323,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
               startOffsetIsCurrentNodeIndex,
             )
             // set its start node to node and its start offset to length.
-          ) $(range).start[0] = node, $(range).start[1] = length;
+          ) range[$$.start][0] = node, range[$$.start][1] = length;
 
           const endNodeIsCurrentParent = equalsNodeEndNode.bind(
             null,
@@ -341,7 +342,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
               endOffsetIsCurrentNodeIndex,
             )
             // set its end node to node and its end offset to length.
-          ) $(range).end[0] = node, $(range).end[1] = length;
+          ) range[$$.end][0] = node, range[$$.end][1] = length;
         }
 
         // 5. Add currentNode’s length to length.
@@ -382,7 +383,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-isequalnode
    */
-  isEqualNode(otherNode: globalThis.Node | null): boolean {
+  isEqualNode(otherNode: Node | null): boolean {
     // return true if otherNode is non-null and this equals otherNode; otherwise false.
     return !!otherNode && equals(this, otherNode);
   }

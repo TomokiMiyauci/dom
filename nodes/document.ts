@@ -67,10 +67,6 @@ export class Document extends Node implements IDocument, _ {
     this[$$.nodeDocument] = this;
   }
 
-  get #_() {
-    return $<Document>(this);
-  }
-
   override get nodeType(): NodeType.DOCUMENT_NODE {
     return NodeType.DOCUMENT_NODE;
   }
@@ -558,7 +554,7 @@ export class Document extends Node implements IDocument, _ {
   createRange(): Range {
     // return a new live range with (this, 0) as its start an end.
     const range = new Range();
-    $(range).start = [this, 0], $(range).end = [this, 0];
+    range[$$.start] = [this, 0], range[$$.end] = [this, 0];
 
     this[$$.ranges].add(range);
 

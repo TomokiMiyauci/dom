@@ -2,15 +2,13 @@ import type { ISelection } from "../interface.d.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
 import { convert, DOMString, unsignedLong } from "../webidl/types.ts";
 import { $, internalSlots, tree } from "../../internal.ts";
-import {
-  BoundaryPoint,
-  Position,
-  position,
-} from "../../ranges/boundary_point.ts";
+import { Position, position } from "../../ranges/boundary_point.ts";
 import { DOMExceptionName } from "../webidl/exception.ts";
 import { nodeLength } from "../../nodes/utils/node_tree.ts";
 import { root, setStartOrEnd } from "../../ranges/utils/range.ts";
 import { Range } from "../../ranges/range.ts";
+import { $Node, $Range, BoundaryPoint } from "../../i.ts";
+import * as $$ from "../../symbol.ts";
 
 @Exposed("Window", "Selection")
 export class Selection implements ISelection {
@@ -130,7 +128,7 @@ export class Selection implements ISelection {
    * @see [Selection API](https://w3c.github.io/selection-api/#dom-selection-collapse)
    */
   @convert
-  collapse(node: Node | null, @unsignedLong offset = 0): void {
+  collapse(node: $Node | null, @unsignedLong offset = 0): void {
     // 1. If node is null, this method must behave identically as removeAllRanges() and abort these steps.
     if (node === null) {
       this.removeAllRanges();
@@ -160,7 +158,7 @@ export class Selection implements ISelection {
    * @see [Selection API](https://w3c.github.io/selection-api/#dom-selection-setposition)
    */
   @convert
-  setPosition(node: Node | null, @unsignedLong offset = 0): void {
+  setPosition(node: $Node | null, @unsignedLong offset = 0): void {
     // be an alias, and behave identically, to collapse().
     this.collapse(node, offset);
   }
@@ -176,7 +174,7 @@ export class Selection implements ISelection {
 
     // Otherwise, it must create a new range,
     const newRange = new Range();
-    const { start } = $(this.#_.range!);
+    const start = this.#_.range![$$.start];
 
     // set the start both its start and end to the start of this's range,
     setStartOrEnd("start", newRange, start),
@@ -197,7 +195,7 @@ export class Selection implements ISelection {
 
     // Otherwise, it must create a new range,
     const newRange = new Range();
-    const { end } = $(this.#_.range!);
+    const end = this.#_.range![$$.end];
 
     // set the start both its start and end to the end of this's range,
     setStartOrEnd("start", newRange, end), setStartOrEnd("end", newRange, end);
@@ -209,7 +207,7 @@ export class Selection implements ISelection {
   /**
    * @see [Selection API](https://w3c.github.io/selection-api/#dom-selection-extend)
    */
-  extend(node: Node, @unsignedLong offset = 0): void {
+  extend(node: $Node, @unsignedLong offset = 0): void {
     // 1. If the document associated with this is not a shadow-including inclusive ancestor of node, abort these steps.
     // if (nodeRoot(node) !== implForWrapper(this._globalObject._document)) {
     //   return;
@@ -237,10 +235,10 @@ export class Selection implements ISelection {
       // 6. Otherwise, if oldAnchor is before or equal to newFocus,
     } else if (position(oldAnchor, newFocus) !== Position.After) {
       // set the start newRange's start to oldAnchor, then set its end to newFocus.
-      setStartOrEnd("start", newRange, oldAnchor), $(newRange).end = newFocus;
+      setStartOrEnd("start", newRange, oldAnchor), newRange[$$.end] = newFocus;
     } else {
       // 7. Otherwise, set the start newRange's start to newFocus, then set its end to oldAnchor.
-      setStartOrEnd("start", newRange, newFocus), $(newRange).end = oldAnchor;
+      setStartOrEnd("start", newRange, newFocus), newRange[$$.end] = oldAnchor;
     }
 
     // 8. Set this's range to newRange.
@@ -257,9 +255,9 @@ export class Selection implements ISelection {
    */
   @convert
   setBaseAndExtent(
-    anchorNode: Node,
+    anchorNode: $Node,
     @unsignedLong anchorOffset: number,
-    focusNode: Node,
+    focusNode: $Node,
     @unsignedLong focusOffset: number,
   ): void {
     // 1. If anchorOffset is longer than anchorNode's length or if focusOffset is longer than focusNode's length, throw an IndexSizeError exception and abort these steps.
@@ -280,9 +278,9 @@ export class Selection implements ISelection {
 
     // 5. If anchor is before focus, set the start the newRange's start to anchor and its end to focus. Otherwise, set the start them to focus and anchor respectively.
     if (position(anchor, focus) === Position.Before) {
-      setStartOrEnd("start", newRange, anchor), $(newRange).end = focus;
+      setStartOrEnd("start", newRange, anchor), newRange[$$.end] = focus;
     } else {
-      setStartOrEnd("start", newRange, focus), $(newRange).end = anchor;
+      setStartOrEnd("start", newRange, focus), newRange[$$.end] = anchor;
     }
 
     // 6. Set this's range to newRange.
@@ -297,7 +295,7 @@ export class Selection implements ISelection {
   /**
    * @see [Selection API](https://w3c.github.io/selection-api/#dom-selection-selectallchildren)
    */
-  selectAllChildren(node: Node): void {
+  selectAllChildren(node: $Node): void {
     // 1. If node's root is not the document associated with this, abort these steps.
     // TODO
 
@@ -305,10 +303,10 @@ export class Selection implements ISelection {
     const newRange = new Range(), childCount = tree.children(node).size;
 
     // 3. Set newRange's start to (node, 0).
-    $(newRange).start = [node, 0];
+    newRange[$$.start] = [node, 0];
 
     // 4. Set newRange's end to (node, childCount).
-    $(newRange).end = [node, childCount];
+    newRange[$$.end] = [node, childCount];
 
     // 5. Set this's range to newRange.
     this.#_.range = newRange;
@@ -374,7 +372,7 @@ enum Direction {
 }
 
 export class SelectionInternals {
-  range: globalThis.Range | null = null;
+  range: $Range | null = null;
   direction: Direction = Direction.Directionless;
 
   get anchor(): BoundaryPoint | null {
@@ -383,9 +381,9 @@ export class SelectionInternals {
 
     switch (this.direction) {
       case Direction.Forwards:
-        return $(range).start;
+        return range[$$.start];
       default:
-        return $(range).end;
+        return range[$$.end];
     }
   }
 
@@ -395,9 +393,9 @@ export class SelectionInternals {
 
     switch (this.direction) {
       case Direction.Forwards:
-        return $(range).end;
+        return range[$$.end];
       default:
-        return $(range).start;
+        return range[$$.start];
     }
   }
 }

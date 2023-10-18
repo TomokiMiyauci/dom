@@ -1,11 +1,12 @@
 import { createElement } from "./create_element.ts";
 import { validateAndExtract } from "../../_internals/infra/namespace.ts";
+import type { $Document } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#internal-createelementns-steps
  */
 export function internalCreateElement(
-  document: globalThis.Document,
+  document: $Document,
   namespace: string | null,
   qualifiedName: string,
   options?: string | ElementCreationOptions,

@@ -83,7 +83,7 @@ export function replaceData(
     const range of startNodeIsNodeRanges.filter(startOffsetIsGtOffset)
       .filter(startOffsetLteOffsetPlusCount)
     // set its start offset to offset.
-  ) $(range).start[1] = offset;
+  ) range[$$.start][1] = offset;
 
   const endNodeIsNode = equalsNodeEndNode.bind(null, node);
   const endOffsetIsGtOffset = compareRangeOffset.bind(
@@ -106,7 +106,7 @@ export function replaceData(
       endOffsetLteOffsetPlusCount,
     )
     // set its end offset to offset.
-  ) $(range).end[1] = offset;
+  ) range[$$.end][1] = offset;
 
   const diff = data.length - count;
   const startOffsetIsGtOffsetPlusCount = compareRangeOffset.bind(
@@ -120,7 +120,7 @@ export function replaceData(
   for (
     const range of startNodeIsNodeRanges.filter(startOffsetIsGtOffsetPlusCount)
     // increase its start offset by data’s length and decrease it by count.
-  ) $(range).start[1] += diff;
+  ) range[$$.start][1] += diff;
 
   const endOffsetIsGtOffsetPlusCount = compareRangeOffset.bind(
     null,
@@ -133,7 +133,7 @@ export function replaceData(
   for (
     const range of endNodeIsNodeRanges.filter(endOffsetIsGtOffsetPlusCount)
     // increase its end offset by data’s length and decrease it by count.
-  ) $(range).end[1] += diff;
+  ) range[$$.end][1] += diff;
 
   const parent = tree.parent(node);
   // 12 If node’s parent is non-null, then run the children changed steps for node’s parent.

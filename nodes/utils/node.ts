@@ -92,7 +92,7 @@ export function getElementsByClassName(
 export function getElementsByNamespaceAndLocalName(
   namespace: string | null,
   localName: string,
-  root: Node,
+  root: $Node,
 ): HTMLCollection {
   // 1. If namespace is the empty string, then set it to null.
   namespace ||= null;
@@ -144,14 +144,14 @@ export function getElementsByNamespaceAndLocalName(
 /**
  * @see https://dom.spec.whatwg.org/#parent-element
  */
-export function getParentElement(node: Node): $Element | null {
+export function getParentElement(node: $Node): $Element | null {
   const parent = tree.parent(node);
 
   // If the node has a parent of a different type, its parent element is null.
   return parent && isElement(parent) ? parent : null;
 }
 
-export function getInterface(node: Node, nodeType: number): $Element | null {
+export function getInterface(node: $Node, nodeType: number): $Element | null {
   switch (nodeType) {
     case node.ELEMENT_NODE:
       // Return the result of locating a namespace prefix for it using namespace.
@@ -205,7 +205,7 @@ export function locateNamespacePrefix(
  * @see https://dom.spec.whatwg.org/#locate-a-namespace
  */
 export function locateNamespace(
-  node: Node,
+  node: $Node,
   prefix: string | null,
 ): string | null {
   // switch on the interface node implements:
@@ -308,7 +308,7 @@ function isXMLNamespace(
     localName === "xmlns";
 }
 
-export function equals(A: Node, B: Node): boolean {
+export function equals(A: $Node, B: $Node): boolean {
   // A and B implement the same interfaces.
   if (A.nodeType !== B.nodeType) return false;
 
@@ -402,7 +402,7 @@ export function equalsProcessingInstruction(
  * @see https://dom.spec.whatwg.org/#contiguous-text-nodes
  */
 export function* contiguousTextNodesExclusive(
-  node: Node,
+  node: $Node,
 ): IterableIterator<Text> {
   const previousSibling = tree.previousSibling(node);
 

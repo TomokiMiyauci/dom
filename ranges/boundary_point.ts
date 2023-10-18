@@ -1,4 +1,5 @@
 import { tree } from "../internal.ts";
+import type { BoundaryPoint } from "../i.ts";
 
 export enum Position {
   /**
@@ -16,11 +17,6 @@ export enum Position {
    */
   After = "after",
 }
-
-/**
- * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp)
- */
-export type BoundaryPoint = [node: Node, offset: number];
 
 /**
  * @see [DOM Living standard](https://dom.spec.whatwg.org/#concept-range-bp-position)

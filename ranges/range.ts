@@ -1,8 +1,8 @@
 import type { IRange } from "../interface.d.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { Const, constant } from "../_internals/webidl/idl.ts";
-import { AbstractRange, AbstractRangeInternals } from "./abstract_range.ts";
-import { BoundaryPoint, Position, position } from "./boundary_point.ts";
+import { AbstractRange } from "./abstract_range.ts";
+import { Position, position } from "./boundary_point.ts";
 import {
   is$CharacterData,
   isDocument,
@@ -24,7 +24,7 @@ import {
 } from "../_internals/webidl/types.ts";
 import { Range_CSSOM } from "../_internals/cssom/range.ts";
 import { Range_DOMParsing } from "../_internals/domparsing/range.ts";
-import { $, internalSlots, tree } from "../internal.ts";
+import { tree } from "../internal.ts";
 import {
   cloneContents,
   containedNodes,
@@ -36,6 +36,7 @@ import {
   setStartOrEnd,
 } from "./utils/range.ts";
 import { isCollapsed } from "./utils/abstract_range.ts";
+import * as RangeUtils from "./utils/abstract_range.ts";
 import { replaceData } from "../nodes/utils/character_data.ts";
 import { iter } from "../deps.ts";
 import {
@@ -43,26 +44,19 @@ import {
   removeNode,
   replaceAllNode,
 } from "../nodes/utils/mutation.ts";
-import { data } from "../symbol.ts";
-import { $Node } from "../i.ts";
+import { data, end, start } from "../symbol.ts";
+import { $Document, $Node, BoundaryPoint } from "../i.ts";
 
 @Range_CSSOM
 @Range_DOMParsing
 @Exposed("Window", "Range")
 export class Range extends AbstractRange implements IRange {
-  protected override get _(): AbstractRangeInternals {
-    return $<Range>(this);
-  }
-
   constructor() {
     super();
 
     // set this’s start and end to (current global object’s associated Document, 0).
-    const internal = new AbstractRangeInternals([globalThis.document, 0], [
-      globalThis.document,
-      0,
-    ]);
-    internalSlots.extends<Range>(this, internal);
+    this[start] = [globalThis.document as $Document, 0],
+      this[end] = [globalThis.document as $Document, 0];
   }
 
   /**
@@ -70,8 +64,8 @@ export class Range extends AbstractRange implements IRange {
    */
   get commonAncestorContainer(): Node {
     // 1. Let container be start node.
-    let container = this._.startNode;
-    const endNode = this._.endNode;
+    let container = RangeUtils.startNode(this);
+    const endNode = RangeUtils.endNode(this);
 
     // 2. While container is not an inclusive ancestor of end node, let container be container’s parent.
     while (!tree.isInclusiveAncestor(container, endNode)) {
@@ -90,7 +84,7 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#dom-range-setstart
    */
   @convert
-  setStart(node: Node, @unsignedLong offset: number): void {
+  setStart(node: $Node, @unsignedLong offset: number): void {
     // set the start of this to boundary point (node, offset).
     setStartOrEnd("start", this, [node, offset]);
   }
@@ -99,7 +93,7 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#dom-range-setend
    */
   @convert
-  setEnd(node: Node, @unsignedLong offset: number): void {
+  setEnd(node: $Node, @unsignedLong offset: number): void {
     // set the end of this to boundary point (node, offset).
     setStartOrEnd("end", this, [node, offset]);
   }
@@ -107,7 +101,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setstartbefore
    */
-  setStartBefore(node: Node): void {
+  setStartBefore(node: $Node): void {
     // 1. Let parent be node’s parent.
     const parent = tree.parent(node);
 
@@ -126,7 +120,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setstartafter
    */
-  setStartAfter(node: Node): void {
+  setStartAfter(node: $Node): void {
     // 1. Let parent be node’s parent.
     const parent = tree.parent(node);
 
@@ -145,7 +139,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setendbefore
    */
-  setEndBefore(node: Node): void {
+  setEndBefore(node: $Node): void {
     // 1. Let parent be node’s parent.
     const parent = tree.parent(node);
 
@@ -164,7 +158,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-setendafter
    */
-  setEndAfter(node: Node): void {
+  setEndAfter(node: $Node): void {
     // 1. Let parent be node’s parent.
     const parent = tree.parent(node);
 
@@ -185,14 +179,14 @@ export class Range extends AbstractRange implements IRange {
    */
   collapse(toStart = false): void {
     // if toStart is true, set end to start; otherwise set start to end.
-    if (toStart) this._.end = this._.start;
-    else this._.start = this._.end;
+    if (toStart) this[end] = this[start];
+    else this[start] = this[end];
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-selectnode
    */
-  selectNode(node: Node): void {
+  selectNode(node: $Node): void {
     // select node within this.
     select(node, this);
   }
@@ -200,7 +194,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-selectnodecontents
    */
-  selectNodeContents(node: Node): void {
+  selectNodeContents(node: $Node): void {
     // 1. If node is a doctype, throw an "InvalidNodeTypeError" DOMException.
     if (isDocumentType(node)) {
       throw new DOMException(
@@ -213,10 +207,10 @@ export class Range extends AbstractRange implements IRange {
     const length = nodeLength(node);
 
     // 3. Set start to the boundary point (node, 0).
-    this._.start = [node, 0];
+    this[start] = [node, 0];
 
     // 4. Set end to the boundary point (node, length).
-    this._.end = [node, length];
+    this[end] = [node, length];
   }
 
   /**
@@ -271,12 +265,12 @@ export class Range extends AbstractRange implements IRange {
 
     // 3. If how is:
     const { point, otherPoint } = how === Range.START_TO_START
-      ? { point: this._.start, otherPoint: sourceRange._.start }
+      ? { point: this[start], otherPoint: sourceRange[start] }
       : how === Range.START_TO_END
-      ? { point: this._.end, otherPoint: sourceRange._.start }
+      ? { point: this[end], otherPoint: sourceRange[start] }
       : how === Range.END_TO_START
-      ? { point: this._.end, otherPoint: sourceRange._.end }
-      : { point: this._.start, otherPoint: sourceRange._.end };
+      ? { point: this[end], otherPoint: sourceRange[end] }
+      : { point: this[start], otherPoint: sourceRange[end] };
 
     // 4. If the position of this point relative to other point is
     switch (position(point, otherPoint)) {
@@ -297,12 +291,10 @@ export class Range extends AbstractRange implements IRange {
     if (isCollapsed(this)) return;
 
     // 2. Let original start node, original start offset, original end node, and original end offset be this’s start node, start offset, end node, and end offset, respectively.
-    const {
-      startNode: originalStartNode,
-      startOffset: originalStartOffset,
-      endNode: originalEndNode,
-      endOffset: originalEndOffset,
-    } = this._;
+    const originalStartNode = RangeUtils.startNode(this),
+      originalStartOffset = RangeUtils.startOffset(this),
+      originalEndNode = RangeUtils.endNode(this),
+      originalEndOffset = RangeUtils.endOffset(this);
 
     // 3. If original start node is original end node and it is a CharacterData node,
     if (
@@ -320,7 +312,7 @@ export class Range extends AbstractRange implements IRange {
       return;
     }
 
-    const nodeParentIsNotContained = (node: Node): boolean => {
+    const nodeParentIsNotContained = (node: $Node): boolean => {
       const parent = tree.parent(node);
 
       return !!parent && !isContained(parent, this);
@@ -330,7 +322,7 @@ export class Range extends AbstractRange implements IRange {
       nodeParentIsNotContained,
     );
 
-    let newNode: Node, newOffset: number;
+    let newNode: $Node, newOffset: number;
 
     // 5. If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset.
     if (tree.isInclusiveAncestor(originalStartNode, originalEndNode)) {
@@ -378,7 +370,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 10. Set start and end to (new node, new offset).
-    this._.start = [newNode, newOffset], this._.end = [newNode, newOffset];
+    this[start] = [newNode, newOffset], this[end] = [newNode, newOffset];
   }
 
   /**
@@ -444,7 +436,7 @@ export class Range extends AbstractRange implements IRange {
    */
   cloneRange(): Range {
     const range = new Range();
-    range._.start = this._.start, range._.end = this._.end;
+    range[start] = this[start], range[end] = this[end];
 
     // return a new live range with the same start and end as this.
     return range;
@@ -458,7 +450,7 @@ export class Range extends AbstractRange implements IRange {
   }
 
   @convert
-  isPointInRange(node: Node, @unsignedLong offset: number): boolean {
+  isPointInRange(node: $Node, @unsignedLong offset: number): boolean {
     // 1. If node’s root is different from this’s root, return false.
     if (tree.root(node) !== this.#root) return false;
 
@@ -478,8 +470,8 @@ export class Range extends AbstractRange implements IRange {
     const bp: BoundaryPoint = [node, offset];
     // 4. If (node, offset) is before start or after end, return false.
     if (
-      position(bp, this._.start) === Position.Before ||
-      position(bp, this._.end) === Position.After
+      position(bp, this[start]) === Position.Before ||
+      position(bp, this[end]) === Position.After
     ) return false;
 
     // 5. Return true.
@@ -490,7 +482,7 @@ export class Range extends AbstractRange implements IRange {
    * @see https://dom.spec.whatwg.org/#dom-range-comparepoint
    */
   @convert
-  comparePoint(node: Node, @unsignedLong offset: number): number {
+  comparePoint(node: $Node, @unsignedLong offset: number): number {
     // 1. If node’s root is different from this’s root, then throw a "WrongDocumentError" DOMException.
     if (tree.root(node) !== this.#root) {
       throw new DOMException("<message>", DOMExceptionName.WrongDocumentError);
@@ -512,10 +504,10 @@ export class Range extends AbstractRange implements IRange {
     const bp: BoundaryPoint = [node, offset];
 
     // 4. If (node, offset) is before start, return −1.
-    if (position(bp, this._.start) === Position.Before) return -1;
+    if (position(bp, this[start]) === Position.Before) return -1;
 
     // 5. If (node, offset) is after end, return 1.
-    if (position(bp, this._.end) === Position.After) return 1;
+    if (position(bp, this[end]) === Position.After) return 1;
 
     // 6. Return 0.
     return 0;
@@ -524,7 +516,7 @@ export class Range extends AbstractRange implements IRange {
   /**
    * @see https://dom.spec.whatwg.org/#dom-range-intersectsnode
    */
-  intersectsNode(node: Node): boolean {
+  intersectsNode(node: $Node): boolean {
     // 1. If node’s root is different from this’s root, return false.
     if (tree.root(node) !== this.#root) return false;
 
@@ -541,8 +533,8 @@ export class Range extends AbstractRange implements IRange {
 
     // 5. If (parent, offset) is before end and (parent, offset plus 1) is after start, return true.
     if (
-      position(startBp, this._.end) === Position.Before &&
-      position(endBp, this._.start) === Position.After
+      position(startBp, this[end]) === Position.Before &&
+      position(endBp, this[start]) === Position.After
     ) return true;
 
     // 6. Return false.
@@ -556,7 +548,10 @@ export class Range extends AbstractRange implements IRange {
     // 1. Let s be the empty string.
     let s = "";
 
-    const { startNode, endNode, startOffset, endOffset } = this._;
+    const startNode = RangeUtils.startNode(this),
+      endNode = RangeUtils.endNode(this),
+      startOffset = RangeUtils.startOffset(this),
+      endOffset = RangeUtils.endOffset(this);
 
     // 2. If this’s start node is this’s end node and it is a Text node, then return the substring of that Text node’s data beginning at this’s start offset and ending at this’s end offset.
     if (startNode === endNode && isMyText(startNode)) {
@@ -574,7 +569,7 @@ export class Range extends AbstractRange implements IRange {
 
     // @see https://github.com/capricorn86/happy-dom/blob/61dd11d4887fec939f16bdf09a2e693f7ceffdb9/packages/happy-dom/src/range/Range.ts#L1034C3-L1046
     // TODO(miyauci): Follow spec
-    let currentNode: Node | null = startNode;
+    let currentNode: $Node | null = startNode;
     const end = tree.nextDescendant(endNode);
 
     while (currentNode && currentNode !== end) {
@@ -602,9 +597,12 @@ export class Range extends AbstractRange implements IRange {
     return root(this);
   }
 
-  #contained(node: Node): boolean {
+  #contained(node: $Node): boolean {
     return isContained(node, this);
   }
+
+  [start]: BoundaryPoint;
+  [end]: BoundaryPoint;
 }
 
 export interface Range

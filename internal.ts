@@ -12,7 +12,6 @@ import { SelectionInternals } from "./_internals/selection/selection.ts";
 import { HTMLTemplateElementInternals } from "./_internals/html/elements/html_template_element.ts";
 import { Tree } from "./infra/tree.ts";
 import { ShadowTree } from "./nodes/utils/shadow_root.ts";
-import { AbstractRangeInternals } from "./ranges/abstract_range.ts";
 import { OrderedSet } from "./_internals/infra/data_structures/set.ts";
 import { List } from "./_internals/infra/data_structures/list.ts";
 import { TextTree } from "./nodes/utils/text.ts";
@@ -38,7 +37,6 @@ type InternalSlotEntries = [
   [Element, ElementInternals],
   [Document, DocumentInternals],
   [DOMImplementation, DOMImplementationInternals],
-  [AbstractRange, AbstractRangeInternals],
   [Selection, SelectionInternals],
   [MutationObserver, MutationObserverInternals],
   [Slottable, SlottableInternals],
