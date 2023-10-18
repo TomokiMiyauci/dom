@@ -26,15 +26,15 @@ import { Range_CSSOM } from "../_internals/cssom/range.ts";
 import { Range_DOMParsing } from "../_internals/domparsing/range.ts";
 import { tree } from "../internal.ts";
 import {
-  cloneContents,
   containedNodes,
-  extract,
   insert,
   isContained,
   root,
   select,
   setStartOrEnd,
 } from "./utils/range.ts";
+import { extractRange } from "./utils/extract_range.ts";
+import { cloneContents } from "./utils/clone_contents.ts";
 import { isCollapsed } from "./utils/abstract_range.ts";
 import * as RangeUtils from "./utils/abstract_range.ts";
 import { replaceData } from "../nodes/utils/character_data.ts";
@@ -378,7 +378,7 @@ export class Range extends AbstractRange implements IRange {
    */
   extractContents(): DocumentFragment {
     // return the result of extracting this.
-    return extract(this);
+    return extractRange(this);
   }
 
   /**
@@ -416,7 +416,7 @@ export class Range extends AbstractRange implements IRange {
     }
 
     // 3. Let fragment be the result of extracting this.
-    const fragment = extract(this);
+    const fragment = extractRange(this);
 
     // 4. If newParent has children, then replace all with null within newParent.
     if (fragment.hasChildNodes()) replaceAllNode(null, newParent);
