@@ -5,8 +5,8 @@ import { find } from "../../deps.ts";
 import { preInsertNode } from "./mutation.ts";
 import { DOMExceptionName } from "../../_internals/webidl/exception.ts";
 import { toASCIILowerCase } from "../../_internals/infra/string.ts";
-import { $, tree } from "../../internal.ts";
-import { $Attr, $Element } from "../../i.ts";
+import { tree } from "../../internal.ts";
+import { $Attr, $Element, $Node } from "../../i.ts";
 import { getQualifiedName } from "./attr.ts";
 import { qualifiedName as qualifiedNameOfAttr } from "./attr.ts";
 import { value } from "../../symbol.ts";
@@ -240,10 +240,10 @@ export function hasAttributeByQualifiedName(
  * @see https://dom.spec.whatwg.org/#insert-adjacent
  */
 export function insertAdjacent(
-  element: globalThis.Element,
+  element: $Element,
   where: string,
-  node: globalThis.Node,
-): globalThis.Node | null {
+  node: $Node,
+): $Node | null {
   // run the steps associated with the first ASCII case-insensitive match for where:
   switch (toASCIILowerCase(where)) {
     case "beforebegin": {

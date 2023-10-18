@@ -3,13 +3,14 @@ import { Text } from "../text.ts";
 import { isSingle, iter } from "./../../deps.ts";
 import { appendNode } from "./mutation.ts";
 import { data, nodeDocument } from "../../symbol.ts";
+import type { $Document } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#converting-nodes-into-a-node
  */
 export function convertNodesIntoNode(
   nodes: Iterable<Node | string>,
-  document: Document,
+  document: $Document,
 ): Node {
   // 2. Replace each string in nodes with a new Text node whose data is the string and node document is document.
   const replaced = iter(nodes).map((node) => {

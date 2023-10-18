@@ -1,9 +1,10 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentFragment } from "../interface.d.ts";
 import { replaceAllString } from "./utils/replace_all_string.ts";
-import { $, tree } from "../internal.ts";
+import { tree } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { host, nodeDocument } from "../symbol.ts";
+import type { $Document } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documentfragment)
@@ -18,7 +19,7 @@ export class DocumentFragment extends Node implements IDocumentFragment {
     super();
 
     // set this’s node document to current global object’s associated Document.
-    this[nodeDocument] = globalThis.document;
+    this[nodeDocument] = globalThis.document as $Document;
   }
 
   /**
@@ -70,21 +71,17 @@ export class DocumentFragment extends Node implements IDocumentFragment {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): Document {
+  override get ownerDocument(): $Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[nodeDocument];
   }
 
-  protected override clone(document: Document): globalThis.DocumentFragment {
+  protected override clone(document: $Document): DocumentFragment {
     const fragment = new DocumentFragment();
     fragment[nodeDocument] = document;
 
     return fragment;
-  }
-
-  get #_() {
-    return $<DocumentFragment>(this);
   }
 
   [host]: Element | null = null;

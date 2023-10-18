@@ -1,9 +1,8 @@
 import { Node, NodeType } from "./node.ts";
 import type { IDocumentType } from "../interface.d.ts";
-import { $ } from "../internal.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { name, nodeDocument, publicId, systemId } from "../symbol.ts";
-import type { DocumentTypeInternals } from "../i.ts";
+import type { $Document, DocumentTypeInternals } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#documenttype)
@@ -54,13 +53,13 @@ export class DocumentType extends Node
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-ownerdocument
    */
-  override get ownerDocument(): Document {
+  override get ownerDocument(): $Document {
     // return null, if this is a document; otherwise this’s node document.
     // Document should override this.
     return this[nodeDocument];
   }
 
-  protected override clone(document: Document): DocumentType {
+  protected override clone(document: $Document): DocumentType {
     const doctype = new DocumentType();
 
     doctype[name] = this[name],
@@ -81,10 +80,6 @@ export class DocumentType extends Node
 
   get systemId(): string {
     return this[systemId];
-  }
-
-  get #_() {
-    return $<DocumentType>(this);
   }
 
   /**

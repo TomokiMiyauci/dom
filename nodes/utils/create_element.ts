@@ -1,13 +1,13 @@
 import { lookUpCustomElementDefinition } from "../../_internals/html/custom_element.ts";
 import { Element } from "../element.ts";
-import { $Element } from "../../i.ts";
+import { $Document, $Element } from "../../i.ts";
 import * as $$ from "../../symbol.ts";
 
 /**
  * [DOM Living Standard](https://dom.spec.whatwg.org/#concept-create-element)
  */
 export function createElement(
-  document: Document,
+  document: $Document,
   localName: string,
   namespace: string | null,
   prefix: string | null = null, // 1. If prefix was not given, let prefix be null.

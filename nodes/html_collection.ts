@@ -13,8 +13,8 @@ import {
   DOMString,
   unsignedLong,
 } from "../_internals/webidl/types.ts";
-import { $, tree } from "../internal.ts";
-import { $Element } from "../i.ts";
+import { tree } from "../internal.ts";
+import { $Element, $Node } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 export const $root = Symbol();
@@ -24,11 +24,11 @@ export const $filter = Symbol();
 @LegacyUnenumerableNamedProperties
 export class HTMLCollection extends LegacyPlatformObject
   implements IHTMLCollection {
-  private [$root]: Node;
+  private [$root]: $Node;
   private [$filter]: (element: $Element) => boolean;
 
   constructor(
-    { root, filter }: { root: Node; filter: (element: $Element) => boolean },
+    { root, filter }: { root: $Node; filter: (element: $Element) => boolean },
   ) {
     super();
 

@@ -36,7 +36,7 @@ import { convert, DOMString } from "../_internals/webidl/types.ts";
 import { createElement } from "./utils/create_element.ts";
 import { toASCIILowerCase } from "../_internals/infra/string.ts";
 import { Steps } from "../infra/applicable.ts";
-import { $, internalSlots, tree } from "../internal.ts";
+import { internalSlots, tree } from "../internal.ts";
 import { ShadowRoot } from "./shadow_root.ts";
 import {
   appendAttribute,
@@ -57,13 +57,19 @@ import { replaceAllString } from "./utils/replace_all_string.ts";
 import { matchSelector, parseSelector } from "../_internals/selectors/hook.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import * as $$ from "../symbol.ts";
-import { $Attr, AttributesContext, ElementInternals as _ } from "../i.ts";
+import {
+  $Attr,
+  $Document,
+  $Element,
+  AttributesContext,
+  ElementInternals as _,
+} from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#element)
  */
 @Exposed("Window", "Element")
-export class Element extends Node implements IElement, _ {
+export class Element extends Node implements IElement, ElementInternals {
   protected constructor() {
     super();
 
@@ -131,7 +137,7 @@ export class Element extends Node implements IElement, _ {
     return this[$$.nodeDocument];
   }
 
-  protected override clone(document: Document): globalThis.Element {
+  protected override clone(document: $Document): $Element {
     // 1. Let copy be the result of creating an element, given document, node’s local name, node’s namespace, node’s namespace prefix, and node’s is value, with the synchronous custom elements flag unset.
     const copy = createElement(
       document,
@@ -674,10 +680,6 @@ export class Element extends Node implements IElement, _ {
    * @see [HTML Living Standard](https://dom.spec.whatwg.org/#dom-element-webkitmatchesselector)
    */
   webkitMatchesSelector = this.matches;
-
-  get #_() {
-    return $<Element>(this);
-  }
 
   /**
    * @see https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name

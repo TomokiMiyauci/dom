@@ -73,7 +73,7 @@ export interface DocumentFragmentInternals extends NodeInternals {
    * @default null
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-documentfragment-host)
    */
-  [$.host]: Element | null;
+  [$.host]: $Element | null;
 }
 
 export interface AttrInternals extends NodeInternals {
@@ -258,7 +258,7 @@ export interface ShadowRootInternals extends DocumentFragmentInternals {
    */
   [$.slotAssignment]: SlotAssignmentMode;
 
-  [$.host]: Element;
+  [$.host]: $Element;
 }
 
 export interface $Node extends Node, NodeInternals {}

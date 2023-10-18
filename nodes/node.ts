@@ -42,7 +42,15 @@ import {
 import { documentBaseURL } from "../_internals/html/infra/url.ts";
 import { URLSerializer } from "../_internals/url/serializer.ts";
 import { isExclusiveTextNode } from "./utils/text.ts";
-import { $Attr, $Document, $Element, NodeInternals } from "../i.ts";
+import {
+  $Attr,
+  $ChildNode,
+  $Document,
+  $Element,
+  $Node,
+  $ParentNode,
+  NodeInternals,
+} from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 export enum NodeType {
@@ -177,7 +185,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-parentnode
    */
-  get parentNode(): ParentNode | null {
+  get parentNode(): $ParentNode | null {
     // return this’s parent.
     return tree.parent(this);
   }
@@ -191,15 +199,15 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
   }
 
   @SameObject
-  get childNodes(): NodeListOf<ChildNode> {
+  get childNodes(): NodeListOf<$ChildNode> {
     return new NodeList({
       root: this,
       filter: (node, root): boolean => {
-        return (tree.children(root) as OrderedSet<globalThis.Node>).contains(
+        return (tree.children(root) as OrderedSet<$Node>).contains(
           node,
         );
       },
-    }) as NodeListOf<ChildNode>;
+    }) as NodeListOf<$ChildNode>;
   }
 
   /**
@@ -390,14 +398,14 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-comparedocumentposition
    */
-  compareDocumentPosition(other: globalThis.Node): number {
+  compareDocumentPosition(other: $Node): number {
     // 1. If this is other, then return zero.
     if (this === other) return 0;
 
     // 2. Let node1 be other and node2 be this.
-    let node1: globalThis.Node | null = other;
+    let node1: $Node | null = other;
     // deno-lint-ignore no-this-alias
-    let node2: globalThis.Node | Element | null = this;
+    let node2: $Node | $Element | null = this;
     let attr1: $Attr | null = null;
     let attr2: $Attr | null = null;
 
@@ -463,7 +471,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
   /**
    * @see https://dom.spec.whatwg.org/#dom-node-contains
    */
-  contains(other: globalThis.Node | null): boolean {
+  contains(other: $Node | null): boolean {
     if (!other) return false;
 
     // return true if other is an inclusive descendant of this; otherwise false (including when other is null).

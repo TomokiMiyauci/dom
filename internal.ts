@@ -32,6 +32,7 @@ import { WindowInternals } from "./_internals/html/loading_web_pages/window.ts";
 import { HTMLScriptElementInternals } from "./_internals/html/elements/scripting/html_script_element.ts";
 import type { HTMLInputElementInternals } from "./_internals/html/elements/html_input_element.ts";
 import type { FormAssociatedElement } from "./_internals/html/elements/forms/attributes_common_to_form_control.ts";
+import type { $ChildNode, $Node, $ParentNode } from "./i.ts";
 
 type InternalSlotEntries = [
   [Event, EventInternals],
@@ -106,4 +107,4 @@ export const $ = internalSlots.get.bind(internalSlots);
 
 const ExtendedTree = TextTree(ShadowTree(Tree));
 
-export const tree = new ExtendedTree<Node, ParentNode, ChildNode>();
+export const tree = new ExtendedTree<$Node, $ParentNode, $ChildNode>();

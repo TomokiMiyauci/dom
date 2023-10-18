@@ -1,6 +1,7 @@
 import { filter } from "../traversal.ts";
 import { NodeFilter } from "../node_filter.ts";
 import { $, tree } from "../../internal.ts";
+import type { $Node } from "../../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traverse-children)
@@ -8,9 +9,9 @@ import { $, tree } from "../../internal.ts";
 export function traverseChildren(
   walker: TreeWalker,
   type: "first" | "last",
-): Node | null {
+): $Node | null {
   // 1. Let node be walker’s current.
-  let node: Node | null = $(walker).current;
+  let node: $Node | null = $(walker).current;
 
   // 2. Set node to node’s first child if type is first, and node’s last child if type is last.
   node = type === "first" ? tree.firstChild(node) : tree.lastChild(node);
@@ -78,7 +79,7 @@ export function traverseChildren(
 export function traverseSiblings(
   walker: TreeWalker,
   type: "next" | "previous",
-): Node | null {
+): $Node | null {
   // 1. Let node be walker’s current.
   let node = $(walker).current;
 

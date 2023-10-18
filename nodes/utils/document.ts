@@ -10,12 +10,12 @@ import {
   nodeDocument,
   type,
 } from "../../symbol.ts";
-import { $Node, $Document } from "../../i.ts";
+import { $Document, $Node } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-adopt
  */
-export function adoptNode(node: $Node, document: Document): void {
+export function adoptNode(node: $Node, document: $Document): void {
   // 1. Let oldDocument be node’s node document.
   const oldDocument = node[nodeDocument];
 

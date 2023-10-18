@@ -29,12 +29,12 @@ import { isAssigned } from "./slottable.ts";
 import { tryUpgradeElement } from "../../_internals/html/elements/custom_elements/upgrade.ts";
 import { adoptNode } from "./document.ts";
 import * as $$ from "../../symbol.ts";
-import { $Node } from "../../i.ts";
+import { $ChildNode, $Node } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-replace
  */
-export function replaceChild<T extends Node>(
+export function replaceChild<T extends $Node>(
   child: T,
   node: $Node,
   parent: $Node,
@@ -75,7 +75,7 @@ export function replaceChild<T extends Node>(
     throw new DOMException("<message>", DOMExceptionName.HierarchyRequestError);
   }
 
-  function checkNode(node: Node): boolean {
+  function checkNode(node: $Node): boolean {
     switch (node.nodeType) {
       case node.DOCUMENT_FRAGMENT_NODE: {
         // If node has more than one element child or has a Text node child.
@@ -237,9 +237,9 @@ export function insertNode(
     adoptNode(node, parent[$$.nodeDocument]);
 
     // 2. If child is null, then append node to parent’s children.
-    if (child === null) tree.children(parent).append(node as ChildNode);
+    if (child === null) tree.children(parent).append(node as $ChildNode);
     // 3. Otherwise, insert node into parent’s children before child’s index.
-    else tree.children(parent).insert(tree.index(child), node as ChildNode);
+    else tree.children(parent).insert(tree.index(child), node as $ChildNode);
 
     // 4. If parent is a shadow host whose shadow root’s slot assignment is "named" and node is a slottable, then assign a slot for node.
     if (
@@ -315,9 +315,9 @@ export function equalsNodeStartNode(node: Node, range: Range): boolean {
  * @throws {DOMException}
  */
 export function ensurePreInsertionValidity(
-  node: Node,
-  parent: Node,
-  child: Node | null,
+  node: $Node,
+  parent: $Node,
+  child: $Node | null,
 ): void {
   // 1. If parent is not a Document, DocumentFragment, or Element node, then throw a "HierarchyRequestError" DOMException.
   if (
@@ -464,7 +464,7 @@ export function replaceAllNode(
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-pre-remove
  */
-export function preRemoveChild<T extends Node>(child: T, parent: Node): T {
+export function preRemoveChild<T extends $Node>(child: T, parent: $Node): T {
   // 1. If child’s parent is not parent, then throw a "NotFoundError" DOMException.
   if (tree.parent(child) !== parent) {
     throw new DOMException("<message>", DOMExceptionName.NotFoundError);

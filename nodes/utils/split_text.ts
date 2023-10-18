@@ -18,7 +18,7 @@ import * as $$ from "../../symbol.ts";
 /**
  * @see https://dom.spec.whatwg.org/#concept-text-split
  */
-export function splitText(node: $Text, offset: number): globalThis.Text {
+export function splitText(node: $Text, offset: number): Text {
   // 1 Let length be node’s length.
   const length = nodeLength(node);
 

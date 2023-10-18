@@ -4,13 +4,14 @@ import { List } from "../_internals/infra/data_structures/list.ts";
 import type { IText } from "../interface.d.ts";
 import { iter } from "../deps.ts";
 import { concatString } from "../_internals/infra/string.ts";
-import { $, tree } from "../internal.ts";
+import { tree } from "../internal.ts";
 import { Get } from "../utils.ts";
 import { splitText } from "./utils/split_text.ts";
 import { data } from "../symbol.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import { isMyText } from "./utils/type.ts";
 import * as $$ from "../symbol.ts";
+import type { $Document } from "../i.ts";
 
 @Exposed("Window", "Text")
 export class Text extends CharacterData implements IText {
@@ -24,7 +25,7 @@ export class Text extends CharacterData implements IText {
 
     // set this’s data to data and this’s node document to current global object’s associated Document.
     this[$$.data] = data;
-    this[$$.nodeDocument] = globalThis.document;
+    this[$$.nodeDocument] = globalThis.document as $Document;
   }
 
   override get nodeType(): NodeType.TEXT_NODE | NodeType.CDATA_SECTION_NODE {
@@ -35,7 +36,7 @@ export class Text extends CharacterData implements IText {
     return "#text";
   }
 
-  protected override clone(document: Document): globalThis.Text {
+  protected override clone(document: $Document): Text {
     const text = new Text();
     text[data] = this[data], text[$$.nodeDocument] = document;
     return text;
@@ -57,7 +58,7 @@ export class Text extends CharacterData implements IText {
   /**
    * @see https://dom.spec.whatwg.org/#dom-text-splittext
    */
-  splitText(offset: number): globalThis.Text {
+  splitText(offset: number): Text {
     // to split this with offset offset.
     return splitText(this, offset);
   }

@@ -4,7 +4,7 @@ import {
   getEventHandlerIDLAttribute,
   setEventHandlerIDLAttribute,
 } from "../_internals/html/events.ts";
-import { ShadowRootInternals as _ } from "../i.ts";
+import { $Element, ShadowRootInternals as _ } from "../i.ts";
 import * as $$ from "../symbol.ts";
 
 /**
@@ -66,7 +66,7 @@ export class ShadowRoot extends DocumentFragment implements IShadowRoot, _ {
   /**
    * @remarks Set after creation
    */
-  [$$.host]!: Element;
+  [$$.host]!: $Element;
 
   /**
    * @remarks Set after creation
