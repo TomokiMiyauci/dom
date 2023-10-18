@@ -1,6 +1,7 @@
 import { $ } from "../../../internal.ts";
 import { EnvironmentSettingsObject } from "../web_application_apis/scripting.ts";
 import { URLSerializer } from "../../url/serializer.ts";
+import * as $$ from "../../../symbol.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#fallback-base-url)
@@ -14,12 +15,12 @@ export function fallbackBaseURL(document: Document): URL {
     return $(document).aboutBaseURL!;
   }
 
-  const { URL, aboutBaseURL } = $(document);
+  const { aboutBaseURL } = $(document);
   // 2. If document's URL matches about:blank and document's about base URL is non-null, then return document's about base URL.
-  if (matchAboutBlank(URL) && aboutBaseURL) return aboutBaseURL;
+  if (matchAboutBlank(document[$$.URL]) && aboutBaseURL) return aboutBaseURL;
 
   // 3. Return document's URL.
-  return URL;
+  return document[$$.URL];
 }
 
 /**

@@ -3,6 +3,7 @@ import { Attr } from "../../nodes/attr.ts";
 import { isText } from "../../nodes/utils/type.ts";
 import { setAttributeValue } from "../../nodes/utils/set_attribute_value.ts";
 import { DocumentType } from "../../nodes/document_type.ts";
+import type { Document } from "../../nodes/document.ts";
 import { html, Token, TreeAdapter, TreeAdapterTypeMap } from "../../deps.ts";
 import { $, internalSlots } from "../../internal.ts";
 import * as $$ from "../../symbol.ts";
@@ -103,14 +104,14 @@ export class DOMTreeAdapter implements TreeAdapter<DOMTreeAdapterMap> {
   }
 
   setDocumentMode(
-    document: globalThis.Document,
+    document: Document,
     mode: html.DOCUMENT_MODE,
   ): void {
-    $(document).mode = mode;
+    document[$$.mode] = mode;
   }
 
   getDocumentMode(document: Document): html.DOCUMENT_MODE {
-    return $(document).mode;
+    return document[$$.mode];
   }
 
   insertText(parentNode: Element, text: string): void {

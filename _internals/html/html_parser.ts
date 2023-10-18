@@ -5,14 +5,15 @@ import { $ } from "../../internal.ts";
 import { getEncoding, windows_1252 } from "../encoding/encoding.ts";
 import { nodeDocument } from "../../symbol.ts";
 import type { $Element } from "../../i.ts";
+import { encoding, mode, type } from "../../symbol.ts";
 
 export class HTMLParser {
   #adaptor: DOMTreeAdapter;
-  constructor(public document: globalThis.Document) {
+  constructor(public document: Document) {
     this.#adaptor = new DOMTreeAdapter(document);
   }
 
-  parse(input: string): globalThis.Document {
+  parse(input: string): Document {
     const document = parse<DOMTreeAdapterMap>(input, {
       treeAdapter: this.#adaptor,
     });
@@ -26,7 +27,7 @@ export class HTMLParser {
       // 15. If charset is x-user-defined, then set charset to windows-1252.
       if (charsetValue === "x-user-defined") charset = windows_1252;
 
-      if (charset) $(document).encoding = charset;
+      if (charset) document[encoding] = charset;
     }
 
     return document;
@@ -44,10 +45,10 @@ export function parseHTMLFragment(
 
   // 1. Create a new Document node, and mark it as being an HTML document.
   const document = new Document();
-  $(document).type = "html";
+  document[type] = "html";
 
   // 2. If the node document of the context element is in quirks mode, then let the Document be in quirks mode. Otherwise, the node document of the context element is in limited-quirks mode, then let the Document be in limited-quirks mode. Otherwise, leave the Document in no-quirks mode.
-  $(document).mode = $(context[nodeDocument]).mode;
+  document[mode] = context[nodeDocument][mode];
 
   // 3. Create a new HTML parser, and associate it with the just created Document node.
   const parser = new HTMLParser(document);

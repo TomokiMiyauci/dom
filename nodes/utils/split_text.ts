@@ -13,6 +13,7 @@ import { $, tree } from "../../internal.ts";
 import { Text } from "../text.ts";
 import type { $Text } from "../../i.ts";
 import { data, nodeDocument } from "../../symbol.ts";
+import * as $$ from "../../symbol.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-text-split
@@ -44,7 +45,7 @@ export function splitText(node: $Text, offset: number): globalThis.Text {
     // 1 Insert new node into parent before node’s next sibling.
     insertNode(newNode, parent, tree.nextSibling(node));
 
-    const { ranges: _ranges } = $(node[nodeDocument]);
+    const _ranges = node[nodeDocument][$$.ranges];
     const ranges = iter(_ranges);
     const startNodeIsNode = equalsNodeStartNode.bind(null, node);
     const startOffsetIsGtOffset = compareRangeOffset.bind(

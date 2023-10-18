@@ -223,7 +223,7 @@ export interface DocumentInternals extends NodeInternals {
    * Non standard field
    * @default Set
    */
-  [$.ranges]: Set<globalThis.Range>;
+  [$.ranges]: Set<Range>;
 }
 
 export interface ProcessingInstructionInternals extends CharacterDataInternals {

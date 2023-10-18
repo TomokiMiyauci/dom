@@ -49,12 +49,13 @@ import {
 } from "../_internals/html/loading_web_pages/supporting_concepts.ts";
 import { Exposed } from "../_internals/webidl/extended_attribute.ts";
 import * as $$ from "../symbol.ts";
+import type { Doctype, DocumentInternals as _ } from "../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#document)
  */
 @Exposed("Window", "Document")
-export class Document extends Node implements IDocument {
+export class Document extends Node implements IDocument, _ {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-document-document)
    */
@@ -62,12 +63,10 @@ export class Document extends Node implements IDocument {
     super();
 
     // set this’s origin to the origin of current global object’s associated Document.
-
-    const internal = new DocumentInternals({
-      implementation: DOMImplementation["create"](this),
-    });
-
+    const internal = new DocumentInternals();
     internalSlots.extends<Document>(this, internal);
+
+    this[$$.implementation] = DOMImplementation["create"](this);
     this[$$.nodeDocument] = this;
   }
 
@@ -111,11 +110,11 @@ export class Document extends Node implements IDocument {
     // noop
   }
 
-  protected override clone(document: globalThis.Document): globalThis.Document {
-    const doc = new (this.constructor as typeof globalThis.Document)();
+  protected override clone(document: Document): Document {
+    const doc = new (this.constructor as typeof Document)();
 
-    $(doc).type = $(document).type;
-    $(doc).contentType = $(document).contentType;
+    doc[$$.type] = document[$$.type];
+    doc[$$.contentType] = document[$$.contentType];
 
     return doc;
   }
@@ -125,7 +124,7 @@ export class Document extends Node implements IDocument {
    */
   get URL(): string {
     // return this’s URL, serialized.
-    return this.#_.URL.href;
+    return this[$$.URL].href;
   }
 
   /**
@@ -133,7 +132,7 @@ export class Document extends Node implements IDocument {
    */
   get characterSet(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this[$$.encoding].name;
   }
 
   /**
@@ -141,7 +140,7 @@ export class Document extends Node implements IDocument {
    */
   get charset(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this[$$.encoding].name;
   }
 
   /**
@@ -149,7 +148,7 @@ export class Document extends Node implements IDocument {
    */
   get compatMode(): CompatMode {
     // return "BackCompat" if this’s mode is "quirks"; otherwise "CSS1Compat".
-    switch (this.#_.mode) {
+    switch (this[$$.mode]) {
       case html.DOCUMENT_MODE.QUIRKS:
         return "BackCompat";
       default:
@@ -158,7 +157,7 @@ export class Document extends Node implements IDocument {
   }
 
   get contentType(): string {
-    return this.#_.contentType;
+    return this[$$.contentType];
   }
 
   /**
@@ -184,7 +183,7 @@ export class Document extends Node implements IDocument {
    */
   get documentURI(): string {
     // return this’s URL, serialized.
-    return this.#_.URL.href;
+    return this[$$.URL].href;
   }
 
   /**
@@ -192,7 +191,7 @@ export class Document extends Node implements IDocument {
    */
   get implementation(): DOMImplementation {
     // return the DOMImplementation object that is associated with this.
-    return this.#_.implementation;
+    return this[$$.implementation];
   }
 
   /**
@@ -200,7 +199,7 @@ export class Document extends Node implements IDocument {
    */
   get inputEncoding(): string {
     // return this’s encoding’s name.
-    return this.#_.encoding.name;
+    return this[$$.encoding].name;
   }
 
   /**
@@ -365,7 +364,7 @@ export class Document extends Node implements IDocument {
 
     // 5. Let namespace be the HTML namespace, if this is an HTML document or this’s content type is "application/xhtml+xml"; otherwise null.
     const namespace =
-      (isHTMLDocument(this) || this.#_.contentType === "application/xhtml+xml")
+      (isHTMLDocument(this) || this[$$.contentType] === "application/xhtml+xml")
         ? Namespace.HTML
         : null;
 
@@ -521,7 +520,7 @@ export class Document extends Node implements IDocument {
     internalSlots.extends(iterator as globalThis.NodeIterator, internal);
 
     // Non-standard process
-    this.#_.iterators.add(iterator);
+    this[$$.iterators].add(iterator);
 
     // 6. Return iterator.
     return iterator;
@@ -568,7 +567,7 @@ export class Document extends Node implements IDocument {
     const range = new Range();
     $(range).start = [this, 0], $(range).end = [this, 0];
 
-    this.#_.ranges.add(range);
+    this[$$.ranges].add(range);
 
     return range;
   }
@@ -641,7 +640,10 @@ export class Document extends Node implements IDocument {
   /**
    * @see https://dom.spec.whatwg.org/#dom-document-importnode
    */
-  importNode<T extends globalThis.Node>(node: T, deep = false): T {
+  importNode<T extends globalThis.Node>(
+    node: T,
+    deep = false,
+  ): T {
     // 1. If node is a document or shadow root, then throw a "NotSupportedError" DOMException.
     if (isDocument(node) || isShadowRoot(node)) {
       throw new DOMException("<message>", DOMExceptionName.NotSupportedError);
@@ -656,6 +658,20 @@ export class Document extends Node implements IDocument {
 
     return copy;
   }
+
+  [$$.encoding]: Encoding = utf8;
+  [$$.contentType]: string = "application/xml";
+  [$$.origin]: Origin = new OpaqueOrigin();
+  [$$.type]: Doctype = "xml";
+  [$$.mode]: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
+  /**
+   * @remarks set after creation
+   */
+  [$$.implementation]!: DOMImplementation;
+
+  [$$.iterators]: Set<NodeIterator> = new Set();
+  [$$.ranges]: Set<Range> = new Set();
+  [$$.URL]: URL = new URL("about:blank");
 }
 
 export interface Document {
@@ -683,62 +699,6 @@ export interface Document {
 }
 
 export class DocumentInternals {
-  /**
-   * @default utf8
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-encoding)
-   */
-  encoding: Encoding = utf8;
-
-  /**
-   * @default "application/xml"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-content-type)
-   */
-  contentType = "application/xml";
-
-  /**
-   * @default new URL("about:blank")
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-url)
-   */
-  URL: URL = new URL("about:blank");
-
-  /**
-   * @default OpaqueOrigin
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-origin)
-   */
-  origin: Origin = new OpaqueOrigin();
-
-  /**
-   * @default "xml"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-type)
-   */
-  type: "xml" | "html" = "xml";
-
-  /**
-   * @default "no-quirks"
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-document-mode)
-   */
-  mode: html.DOCUMENT_MODE = html.DOCUMENT_MODE.NO_QUIRKS;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#interface-domimplementation)
-   */
-  implementation: DOMImplementation;
-
-  /**
-   * Non standard field
-   */
-  iterators: Set<NodeIterator> = new Set();
-
-  /**
-   * Non standard field
-   */
-  ranges: Set<globalThis.Range> = new Set();
-
-  constructor(
-    { implementation }: Pick<DocumentInternals, "implementation">,
-  ) {
-    this.implementation = implementation;
-  }
 }
 
 /**

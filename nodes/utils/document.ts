@@ -4,8 +4,13 @@ import { $, tree } from "../../internal.ts";
 import { isCustom } from "./element.ts";
 import { enqueueCustomElementCallbackReaction } from "../../_internals/html/elements/custom_elements/custom_element_reaction.ts";
 import { removeNode } from "./mutation.ts";
-import { adoptingSteps, attributeList, nodeDocument } from "../../symbol.ts";
-import { $Node } from "../../i.ts";
+import {
+  adoptingSteps,
+  attributeList,
+  nodeDocument,
+  type,
+} from "../../symbol.ts";
+import { $Node, $Document } from "../../i.ts";
 
 /**
  * @see https://dom.spec.whatwg.org/#concept-node-adopt
@@ -65,7 +70,7 @@ export function adoptNode(node: $Node, document: Document): void {
 /**
  * @see https://dom.spec.whatwg.org/#html-document
  */
-export function isHTMLDocument(document: globalThis.Document): boolean {
+export function isHTMLDocument(document: $Document): boolean {
   // type is "xml"; otherwise an HTML document.
-  return $(document).type !== "xml";
+  return document[type] !== "xml";
 }

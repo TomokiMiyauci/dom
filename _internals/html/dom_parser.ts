@@ -1,6 +1,6 @@
 import { Document } from "../../nodes/document.ts";
 import type { IDOMParser } from "../interface.d.ts";
-import { $ } from "../../internal.ts";
+import * as $$ from "../../symbol.ts";
 import { HTMLParser } from "./html_parser.ts";
 import {
   executeScriptElement,
@@ -8,6 +8,7 @@ import {
 } from "./elements/scripting/html_script_element_utils.ts";
 import { fireEvent } from "../../events/fire.ts";
 import { Exposed } from "../webidl/extended_attribute.ts";
+import { contentType } from "../../symbol.ts";
 
 @Exposed("Window", "DOMParser")
 export class DOMParser implements IDOMParser {
@@ -17,12 +18,12 @@ export class DOMParser implements IDOMParser {
   ): globalThis.Document {
     const document = new Document();
 
-    $(document).contentType = type;
-    if (globalThis.document) $(document).URL = $(globalThis.document).URL;
+    document[contentType] = type;
+    if (globalThis.document) document[$$.URL] = globalThis.document[$$.URL];
 
     switch (type) {
       case "text/html": {
-        $(document).type = "html";
+        document[$$.type] = "html";
 
         const parser = new HTMLParser(document);
         const result = parser.parse(string);

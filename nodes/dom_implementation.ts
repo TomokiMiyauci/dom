@@ -44,14 +44,14 @@ export class DOMImplementation implements IDOMImplementation {
     namespace: string | null,
     qualifiedName: string | null,
     doctype: globalThis.DocumentType | null = null,
-  ): globalThis.XMLDocument {
+  ): XMLDocument {
     // LegacyNullToEmptyString
     // TODO
     if (qualifiedName === null) qualifiedName = "";
     qualifiedName = String(qualifiedName);
 
     // 1. Let document be a new XMLDocument.
-    const document = new XMLDocument() as globalThis.XMLDocument;
+    const document = new XMLDocument() as XMLDocument;
 
     // 2. Let element be null.
     let element: Element | null = null;
@@ -68,10 +68,10 @@ export class DOMImplementation implements IDOMImplementation {
     if (element !== null) appendNode(element, document);
 
     // 6. document’s origin is this’s associated document’s origin.
-    $(document).origin = $(this.#_.document).origin;
+    document[$$.origin] = this.#_.document[$$.origin];
 
     // 7. document’s content type is determined by namespace:
-    $(document).contentType = namespaceToContentType(namespace);
+    document[$$.contentType] = namespaceToContentType(namespace);
 
     // 8. Return document.
     return document;
@@ -85,11 +85,11 @@ export class DOMImplementation implements IDOMImplementation {
     @DOMString.exclude(isUndefined) title?: string,
   ): globalThis.Document {
     // 1. Let doc be a new document that is an HTML document.
-    const doc = new Document() as globalThis.Document;
-    $(doc).type = "html";
+    const doc = new Document();
+    doc[$$.type] = "html";
 
     // 2. Set doc’s content type to "text/html".
-    $(doc).contentType = "text/html";
+    doc[$$.contentType] = "text/html";
 
     // 3. Append a new doctype, with "html" as its name and with its node document set to doc, to doc.
     const docType = Reflect.construct(DocumentType, []) as DocumentType;
@@ -120,7 +120,7 @@ export class DOMImplementation implements IDOMImplementation {
     appendNode(createElement(doc, "body", Namespace.HTML), htmlElement);
 
     // 8. doc’s origin is this’s associated document’s origin.
-    $(doc).origin = $(this.#_.document).origin;
+    doc[$$.origin] = this.#_.document[$$.origin];
 
     // 9. Return doc.
     return doc;

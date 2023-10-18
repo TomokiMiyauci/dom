@@ -42,6 +42,7 @@ import { origin } from "../../../url/url.ts";
 import { RequestInternals } from "../../../fetch/request.ts";
 import { isNetworkError } from "../../../fetch/response.ts";
 import { fetch } from "../../../fetch/fetching.ts";
+import * as $ from "../../../../symbol.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#attempt-to-populate-the-history-entry's-document)
@@ -237,7 +238,7 @@ export async function attemptPopulateHistoryEntryDocument(
       entry.documentState.document = document;
 
       // 4. Set entry's document state's origin to document's origin.
-      entry.documentState.origin = DOM.$(document).origin;
+      entry.documentState.origin = document[$.origin];
 
       // 5. If document's URL requires storing the policy container in history, then set entry's document state's history policy container to navigationParams's policy container.
     }
@@ -421,12 +422,12 @@ export async function createNavigationParamsByFetching(
   let fetchController: FetchController | null = null;
 
   const navigableActiveDocument = activeDocument(navigable)!; // TODO
-  const navigableActiveDocumentOrigin = DOM.$(navigableActiveDocument).origin;
+  const navigableActiveDocumentOrigin = navigableActiveDocument[$.origin];
   // 12. Let coopEnforcementResult be a new cross-origin opener policy enforcement result, with
   const coopEnforcementResult = new CrossOriginOpenerPolicyEnforcementResult(
     {
       // url: navigable's active document's URL
-      url: DOM.$(navigableActiveDocument).URL,
+      url: navigableActiveDocument[$.URL],
       // origin: navigable's active document's origin
       origin: navigableActiveDocumentOrigin,
       // cross-origin opener policy: navigable's active document's cross-origin opener policy

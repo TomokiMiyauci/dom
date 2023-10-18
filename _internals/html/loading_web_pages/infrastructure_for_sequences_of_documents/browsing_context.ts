@@ -9,6 +9,7 @@ import { documentBaseURL } from "../../infra/url.ts";
 import { origin } from "../../../url/url.ts";
 import { populateHTMLHeadBody } from "../document_lifecycle.ts";
 import { createPermissionPolicyForNavigable } from "../../../permissions_policy/algorithm.ts";
+import * as $$ from "../../../../symbol.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-sequences.html#browsing-context)
@@ -66,7 +67,7 @@ export function createNewBrowsingContextAndDocument(
   // 5. If creator is non-null, then:
   if (creator) {
     // 1. Set creatorOrigin to creator's origin.
-    creatorOrigin = $(creator).origin;
+    creatorOrigin = creator[$$.origin];
 
     // 2. Set creatorBaseURL to creator's document base URL.
     creatorBaseURL = documentBaseURL(creator);
@@ -121,10 +122,10 @@ export function createNewBrowsingContextAndDocument(
    * | is initial about:blank     | true              |
    * | about base URL             | creatorBaseURL    |
    */
-  $(document).type = "html";
-  $(document).contentType = "text/html";
-  $(document).mode = html.DOCUMENT_MODE.QUIRKS;
-  $(document).origin = origin;
+  document[$$.type] = "html";
+  document[$$.contentType] = "text/html";
+  document[$$.mode] = html.DOCUMENT_MODE.QUIRKS;
+  document[$$.origin] = origin;
   $(document).browsingContext = browsingContext;
   $(document).isInitialAboutBlank = true;
   $(document).aboutBaseURL = creatorBaseURL;

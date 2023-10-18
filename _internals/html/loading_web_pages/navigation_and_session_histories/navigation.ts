@@ -13,6 +13,7 @@ import {
   targetName,
 } from "../infrastructure_for_sequences_of_documents/navigable.ts";
 import { $ } from "../../../../internal.ts";
+import * as $$ from "../../../../symbol.ts";
 import { documentBaseURL, matchAboutBlank } from "../../infra/url.ts";
 import { equalsURL } from "../../../url/url.ts";
 import {
@@ -32,11 +33,9 @@ import { attemptPopulateHistoryEntryDocument } from "./populating_session_histor
 import { determineOrigin } from "../infrastructure_for_sequences_of_documents/browsing_context.ts";
 import { DOMExceptionName } from "../../../webidl/exception.ts";
 import { parseMediaType } from "../../../../deps.ts";
-import {
-  isJSONMIMEType,
-  JavaScriptMIMETypes,
-} from "../../../mimesniff/mod.ts";
+import { isJSONMIMEType, JavaScriptMIMETypes } from "../../../mimesniff/mod.ts";
 import { URLSerializer } from "../../../url/serializer.ts";
+import { origin } from "../../../../symbol.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/browsing-the-web.html#source-snapshot-params)
@@ -214,7 +213,7 @@ export async function navigate(
   const sourceSnapshotParams = snapshotSourceSnapshotParams(sourceDocument);
 
   // 3. Let initiatorOriginSnapshot be sourceDocument's origin.
-  const initiatorOriginSnapshot = $(sourceDocument).origin;
+  const initiatorOriginSnapshot = sourceDocument[origin];
 
   // 4. Let initiatorBaseURLSnapshot be sourceDocument's document base URL.
   const initiatorBaseURLSnapshot = documentBaseURL(sourceDocument);
@@ -243,7 +242,7 @@ export async function navigate(
     // 1. If url equals navigable's active document's URL, and initiatorOriginSnapshot is same origin with targetNavigable's active document's origin, then set historyHandling to "replace".
     if (
       navigableActiveDocument &&
-      equalsURL(url, $(navigableActiveDocument).URL) // TODO
+      equalsURL(url, navigableActiveDocument[$$.URL]) // TODO
     ) historyHandling = NavigationHistoryBehavior.Replace;
     // 2. Otherwise, set historyHandling to "push".
     else historyHandling = NavigationHistoryBehavior.Push;

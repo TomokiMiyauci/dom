@@ -192,7 +192,7 @@ export function insertNode(
 
   // 5. If child is non-null, then:
   if (child) {
-    const { ranges: _ranges } = $(node[$$.nodeDocument]);
+    const _ranges = node[$$.nodeDocument][$$.ranges];
     const ranges = iter(_ranges);
     const startNodeIsParent = equalsNodeStartNode.bind(null, parent);
     const childIndex = tree.index(child);
@@ -492,7 +492,8 @@ export function removeNode(
   // 3. Let index be node’s index.
   const index = tree.index(node);
   const nodeDocument = node[$$.nodeDocument];
-  const { iterators, ranges: _ranges } = $(nodeDocument);
+  const iterators = nodeDocument[$$.iterators];
+  const _ranges = nodeDocument[$$.ranges];
   const ranges = iter(_ranges);
 
   // 4. For each live range whose start node is an inclusive descendant of node, set its start to (parent, index).

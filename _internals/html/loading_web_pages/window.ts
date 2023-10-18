@@ -14,6 +14,7 @@ import { PutForwards } from "../../webidl/extended_attribute.ts";
 import { Location } from "./location.ts";
 import { LegacyUnenumerableNamedProperties } from "../../webidl/legacy_extended_attributes.ts";
 import { map } from "../../webidl/extended_attribute.ts";
+import * as $$ from "../../../symbol.ts";
 
 // @WindowEventHandlers
 // @Window_Selection
@@ -23,7 +24,7 @@ export class Window extends EventTarget implements IWindow {
     super();
 
     const internals = new WindowInternals();
-    $(internals.document).URL = url;
+    internals.document[$$.URL] = url;
     $(internals.location).document = internals.document;
     internalSlots.extends<globalThis.Window>(
       this as any,

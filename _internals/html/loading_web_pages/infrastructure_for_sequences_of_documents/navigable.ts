@@ -12,8 +12,9 @@ import {
   createNewBrowsingContextAndDocument,
 } from "./browsing_context.ts";
 import { $ } from "../../../../internal.ts";
+import * as $$ from "../../../../symbol.ts";
 import { $Element } from "../../../../i.ts";
-import { nodeDocument } from "../../../../symbol.ts";
+import { nodeDocument, origin } from "../../../../symbol.ts";
 import { List } from "../../../infra/data_structures/list.ts";
 
 /** A navigable presents a Document to the user via its active session history entry.
@@ -118,7 +119,7 @@ export function initializeNavigable(
   // URL            documentState's document's URL
   // document state documentState
   const entry = new SessionHistoryEntry({
-    URL: $(documentState.document).URL,
+    URL: documentState.document[$$.URL],
     documentState,
   });
 
@@ -198,9 +199,9 @@ export function contentDocument(
 
   // 3. If document's origin and container's node document's origin are not same origin-domain, then return null.
   if (document) {
-    const documentOrigin = $(document).origin;
+    const documentOrigin = document[origin];
     const containerNodeDocument = container[nodeDocument];
-    const containerNodeDocumentOrigin = $(containerNodeDocument).origin;
+    const containerNodeDocumentOrigin = containerNodeDocument[origin];
 
     if (!sameOriginDomain(documentOrigin, containerNodeDocumentOrigin)) {
       return null;
@@ -259,9 +260,9 @@ export function createNewChildNavigable(element: Element): void {
   // document              document
   documentState.document = document;
   // initiator origin      document's origin
-  documentState.initiatorOrigin = $(document).origin;
+  documentState.initiatorOrigin = document[origin];
   // origin                document's origin
-  documentState.origin = $(document).origin;
+  documentState.origin = document[origin];
   // navigable target name targetName
   documentState.navigableTargetName = targetName;
   // about base URL        document's about base URL

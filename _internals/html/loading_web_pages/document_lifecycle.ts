@@ -27,6 +27,7 @@ import {
 import { HTMLParser } from "../html_parser.ts";
 import { ResponseInternals } from "../../fetch/response.ts";
 import { html } from "../../../deps.ts";
+import * as $$ from "../../../symbol.ts";
 
 /**
  * @see [HTML Living Standard](https://html.spec.whatwg.org/multipage/document-lifecycle.html#populate-with-html/head/body)
@@ -91,7 +92,7 @@ export function createAndInitializeDocument(
   if (
     DOM.$(browsingContextActiveDocument).isInitialAboutBlank &&
     sameOriginDomain(
-      DOM.$(browsingContextActiveDocument).origin,
+      browsingContextActiveDocument[$$.origin],
       navigationParams.origin,
     )
     // then set window to browsingContext's active window.
@@ -134,11 +135,11 @@ export function createAndInitializeDocument(
   // 10. Let document be a new Document, with
   const document = new Document();
   // type: type
-  DOM.$(document).type = type;
+  document[$$.type] = type;
   // content type: contentType
-  DOM.$(document).contentType = contentType;
+  document[$$.contentType] = contentType;
   // origin: navigationParams's origin
-  DOM.$(document).origin = navigationParams.origin;
+  document[$$.origin] = navigationParams.origin;
   // browsing context: browsingContext
   DOM.$(document).browsingContext = browsingContext;
   // policy container: navigationParams's policy container
@@ -154,7 +155,7 @@ export function createAndInitializeDocument(
   DOM.$(document).duringLoadingNavigationIDForWebDriverBiDi =
     navigationParams.id;
   // URL: creationURL
-  DOM.$(document).URL = creationURL!;
+  document[$$.URL] = creationURL!;
   // current document readiness: "loading"
 
   // about base URL: navigationParams's about base URL
@@ -213,10 +214,8 @@ export function loadHTMLDocument(
     navigationParams,
   );
 
-  const { URL } = DOM.$(document);
-
   // 2. If document's URL is about:blank, then populate with html/head/body given document.
-  if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
+  if (matchAboutBlank(document[$$.URL])) populateHTMLHeadBody(document);
   // 3. Otherwise,
   else {
     // TODO
@@ -251,9 +250,8 @@ export function loadXMLDocument(
     type,
     navigationParams,
   );
-  const { URL } = DOM.$(document);
 
-  if (matchAboutBlank(URL)) populateHTMLHeadBody(document);
+  if (matchAboutBlank(document[$$.URL])) populateHTMLHeadBody(document);
   else {
     const parser = new HTMLParser(document);
     const body = DOM.$(navigationParams.response).body?.source;
@@ -282,7 +280,7 @@ export function loadTextDocument(
   // 2. Set document's parser cannot change the mode flag to true.
 
   // 3. Set document's mode to "no-quirks".
-  DOM.$(document).mode = html.DOCUMENT_MODE.NO_QUIRKS;
+  document[$$.mode] = html.DOCUMENT_MODE.NO_QUIRKS;
 
   // 4. Create an HTML parser and associate it with the document. Act as if the tokenizer had emitted a start tag token with the tag name "pre" followed by a single U+000A LINE FEED (LF) character, and switch the HTML parser's tokenizer to the PLAINTEXT state. Each task that the networking task source places on the task queue while fetching runs must then fill the parser's input byte stream with the fetched bytes and cause the HTML parser to perform the appropriate processing of the input stream.
   const parser = new HTMLParser(document);

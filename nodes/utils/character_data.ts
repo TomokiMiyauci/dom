@@ -60,7 +60,7 @@ export function replaceData(
 
   // 7 Starting from delete offset code units, remove count code units from node’s data.
 
-  const { ranges: _ranges } = $(node[$$.nodeDocument]);
+  const _ranges = node[$$.nodeDocument][$$.ranges];
   const ranges = iter(_ranges);
   const startNodeIsNode = equalsNodeStartNode.bind(null, node);
   const startOffsetIsGtOffset = compareRangeOffset.bind(

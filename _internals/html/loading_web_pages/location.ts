@@ -8,6 +8,7 @@ import { URLSerializer } from "../../url/serializer.ts";
 import { sameOriginDomain } from "./supporting_concepts.ts";
 import { DOMExceptionName } from "../../webidl/exception.ts";
 import { encodingParseURL } from "../infra/url.ts";
+import * as $$ from "../../../symbol.ts";
 
 @Exposed("Window", "Location")
 export class Location implements ILocation {
@@ -155,7 +156,7 @@ export class LocationInternals {
   get url(): URL {
     const document = this.document;
 
-    return document ? $(document).URL : new URL("about:blank");
+    return document ? document[$$.URL] : new URL("about:blank");
   }
 
   // NON-standard

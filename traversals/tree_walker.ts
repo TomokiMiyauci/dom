@@ -7,6 +7,7 @@ import {
 } from "../_internals/webidl/extended_attribute.ts";
 import { $, tree } from "../internal.ts";
 import { traverseChildren, traverseSiblings } from "./utils/tree_walker.ts";
+import type { $Node } from "../i.ts";
 
 @Exposed("Window", "TreeWalker")
 export class TreeWalker implements ITreeWalker {
@@ -254,7 +255,7 @@ export class TreeWalkerInternals {
     filter: NodeFilter | null;
     whatToShow: number;
     root: Node;
-    current: Node;
+    current: $Node;
   }) {
     this.filter = filter;
     this.whatToShow = whatToShow;

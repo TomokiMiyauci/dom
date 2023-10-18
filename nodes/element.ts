@@ -689,7 +689,7 @@ export class Element extends Node implements IElement, _ {
     // 2. If this is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII uppercase.
     if (
       this[$$.namespace] === Namespace.HTML &&
-      $(this[$$.nodeDocument]).type !== "xml"
+      this[$$.nodeDocument][$$.type] !== "xml"
     ) {
       qualifiedName = qualifiedName.toUpperCase();
     }

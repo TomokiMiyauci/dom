@@ -267,7 +267,7 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
       // 5. Let currentNode be node’s next sibling.
       let currentNode = tree.nextSibling(node);
 
-      const { ranges: _ranges } = $(node[$$.nodeDocument]);
+      const _ranges = node[$$.nodeDocument][$$.ranges];
       const ranges = iter(_ranges);
       // 6. While currentNode is an exclusinve Text node:
       while (
@@ -543,10 +543,6 @@ export abstract class Node extends EventTarget implements INode, NodeInternals {
    */
   get parentElement(): HTMLElement | null {
     return getParentElement(this) as HTMLElement | null; // The specification is `Element`
-  }
-
-  get #_() {
-    return $<Node>(this);
   }
 
   /**
