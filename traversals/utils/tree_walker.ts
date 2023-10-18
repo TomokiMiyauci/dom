@@ -1,17 +1,18 @@
 import { filter } from "../traversal.ts";
 import { NodeFilter } from "../node_filter.ts";
-import { $, tree } from "../../internal.ts";
-import type { $Node } from "../../i.ts";
+import { tree } from "../../internal.ts";
+import * as $$ from "../../symbol.ts";
+import type { $Node, $TreeWalker } from "../../i.ts";
 
 /**
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traverse-children)
  */
 export function traverseChildren(
-  walker: TreeWalker,
+  walker: $TreeWalker,
   type: "first" | "last",
 ): $Node | null {
   // 1. Let node be walker’s current.
-  let node: $Node | null = $(walker).current;
+  let node: $Node | null = walker[$$.current];
 
   // 2. Set node to node’s first child if type is first, and node’s last child if type is last.
   node = type === "first" ? tree.firstChild(node) : tree.lastChild(node);
@@ -23,7 +24,7 @@ export function traverseChildren(
 
     // 2. If result is FILTER_ACCEPT, then set walker’s current to node and return node.
     if (result === NodeFilter.FILTER_ACCEPT) {
-      $(walker).current = node;
+      walker[$$.current] = node;
       return node;
     }
 
@@ -60,8 +61,8 @@ export function traverseChildren(
       // 4. If parent is null, walker’s root, or walker’s current, then return null.
       if (
         !parent ||
-        parent === $(walker).root ||
-        parent === $(walker).current
+        parent === walker[$$.root] ||
+        parent === walker[$$.current]
       ) return null;
 
       // 5. Set node to parent.
@@ -77,14 +78,14 @@ export function traverseChildren(
  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traverse-siblings)
  */
 export function traverseSiblings(
-  walker: TreeWalker,
+  walker: $TreeWalker,
   type: "next" | "previous",
 ): $Node | null {
   // 1. Let node be walker’s current.
-  let node = $(walker).current;
+  let node = walker[$$.current];
 
   // 2. If node is root, then return null.
-  if (node === $(walker).root) return null;
+  if (node === walker[$$.root]) return null;
 
   // 3. While true:
   while (true) {
@@ -103,7 +104,7 @@ export function traverseSiblings(
 
       // 3. If result is FILTER_ACCEPT, then set walker’s current to node and return node.
       if (result === NodeFilter.FILTER_ACCEPT) {
-        $(walker).current = node;
+        walker[$$.current] = node;
         return node;
       }
 
@@ -122,7 +123,7 @@ export function traverseSiblings(
     node = tree.parent(node)!;
 
     // 4. If node is null or walker’s root, then return null.
-    if (!node || node === $(walker).root) return null;
+    if (!node || node === walker[$$.root]) return null;
 
     // 5. If the return value of filtering node within walker is FILTER_ACCEPT, then return null.
     if (filter(node, walker) === NodeFilter.FILTER_ACCEPT) return null;

@@ -512,11 +512,13 @@ export class Document extends Node implements IDocument, _ {
       reference: root,
       // 3. Set iterator’s pointer before reference to true.
       pointerBeforeReference: true,
-      // 4. Set iterator’s whatToShow to whatToShow.
-      whatToShow,
-      // 5. Set iterator’s filter to filter.
-      filter,
     });
+
+    // 4. Set iterator’s whatToShow to whatToShow.
+    iterator[$$.whatToShow] = whatToShow;
+    // 5. Set iterator’s filter to filter.
+    iterator[$$.filter] = filter;
+
     internalSlots.extends(iterator as globalThis.NodeIterator, internal);
 
     // Non-standard process
@@ -593,17 +595,12 @@ export class Document extends Node implements IDocument, _ {
   ): TreeWalker {
     // 1. Let walker be a new TreeWalker object.
     const walker = new TreeWalker();
-    const internal = new TreeWalkerInternals({
-      // 2. Set walker’s root and walker’s current to root.
-      root,
-      current: root,
-      // 3. Set walker’s whatToShow to whatToShow.
-      whatToShow,
-      // 4. Set walker’s filter to filter.
-      filter,
-    });
-    internalSlots.extends(walker, internal);
-
+    // 2. Set walker’s root and walker’s current to root.
+    walker[$$.root] = root, walker[$$.current] = root;
+    // 3. Set walker’s whatToShow to whatToShow.
+    walker[$$.whatToShow] = whatToShow;
+    // 4. Set walker’s filter to filter.
+    walker[$$.filter] = filter;
     // 5. Return walker.
     return walker;
   }

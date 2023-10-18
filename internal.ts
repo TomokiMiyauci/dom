@@ -14,7 +14,6 @@ import { Tree } from "./infra/tree.ts";
 import { ShadowTree } from "./nodes/utils/shadow_root.ts";
 import { AbstractRangeInternals } from "./ranges/abstract_range.ts";
 import { NodeIteratorInternals } from "./traversals/node_iterator.ts";
-import { TreeWalkerInternals } from "./traversals/tree_walker.ts";
 import { OrderedSet } from "./_internals/infra/data_structures/set.ts";
 import { List } from "./_internals/infra/data_structures/list.ts";
 import { TextTree } from "./nodes/utils/text.ts";
@@ -42,7 +41,6 @@ type InternalSlotEntries = [
   [DOMImplementation, DOMImplementationInternals],
   [AbstractRange, AbstractRangeInternals],
   [NodeIterator, NodeIteratorInternals],
-  [TreeWalker, TreeWalkerInternals],
   [Selection, SelectionInternals],
   [MutationObserver, MutationObserverInternals],
   [Slottable, SlottableInternals],

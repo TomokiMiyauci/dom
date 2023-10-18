@@ -8,9 +8,11 @@ import { Direction, traverse } from "./utils/node_iterator.ts";
 import { Steps } from "../infra/applicable.ts";
 import { iter, last } from "../deps.ts";
 import { first } from "npm:itertools@2.1.2";
+import type { NodeIteratorInternals as _ } from "../i.ts";
+import * as $$ from "../symbol.ts";
 
 @Exposed("Window", "NodeIterator")
-export class NodeIterator implements INodeIterator {
+export class NodeIterator implements INodeIterator, _ {
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-nodeiterator-root)
    */
@@ -41,14 +43,14 @@ export class NodeIterator implements INodeIterator {
    */
   get whatToShow(): number {
     // return this’s whatToShow.
-    return this.#_.whatToShow;
+    return this[$$.whatToShow];
   }
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#dom-nodeiterator-filter)
    */
   get filter(): NodeFilter | null {
-    return this.#_.filter;
+    return this[$$.filter];
   }
 
   /**
@@ -80,29 +82,25 @@ export class NodeIterator implements INodeIterator {
   get #_() {
     return $<NodeIterator>(this);
   }
+
+  [$$.activeFlag]: boolean = false;
+
+  /**
+   * @remarks set after creation
+   */
+  [$$.whatToShow]!: number;
+
+  /**
+   * @remarks set after creation
+   */
+  [$$.filter]!: NodeFilter | null;
 }
 
 export class NodeIteratorInternals {
   /**
-   * @default false
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-active)
-   */
-  activeFlag = false;
-
-  /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-root)
    */
   root: Node;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-whattoshow)
-   */
-  whatToShow: number;
-
-  /**
-   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-filter)
-   */
-  filter: NodeFilter | null;
 
   /**
    * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
@@ -127,18 +125,14 @@ export class NodeIteratorInternals {
   > = new Steps();
 
   constructor(
-    { reference, pointerBeforeReference, filter, whatToShow, root }: {
+    { reference, pointerBeforeReference, root }: {
       reference: Node;
       pointerBeforeReference: boolean;
-      filter: NodeFilter | null;
-      whatToShow: number;
       root: Node;
     },
   ) {
     this.reference = reference;
     this.pointerBeforeReference = pointerBeforeReference;
-    this.filter = filter;
-    this.whatToShow = whatToShow;
     this.root = root;
     this.iteratorCollection = {
       [Symbol.iterator]: () => {

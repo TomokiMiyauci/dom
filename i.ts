@@ -261,6 +261,65 @@ export interface ShadowRootInternals extends DocumentFragmentInternals {
   [$.host]: $Element;
 }
 
+export interface NodeIteratorInternals {
+  /**
+   * @default false
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-active)
+   */
+  [$.activeFlag]: boolean;
+
+  // /**
+  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-root)
+  //  */
+  // [$.root]: Node;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-whattoshow)
+   */
+  [$.whatToShow]: number;
+
+  /**
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-filter)
+   */
+  [$.filter]: NodeFilter | null;
+
+  // /**
+  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#iterator-collection)
+  //  */
+  // [$.iteratorCollection]: Iterable<Node>;
+
+  // /**
+  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-reference)
+  //  */
+  // [$.reference]: Node;
+
+  // /**
+  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pointer-before-reference)
+  //  */
+  // [$.pointerBeforeReference]: boolean;
+
+  // /**
+  //  * @see [DOM Living Standard](https://dom.spec.whatwg.org/#nodeiterator-pre-removing-steps)
+  //  */
+  // [$.preRemovingSteps]: Steps<[nodeIterator: NodeIterator, toBeRemovedNode: Node]>;
+}
+
+export interface TreeWalkerInternals {
+  /**
+   * @default null
+   * @see [DOM Living Standard](https://dom.spec.whatwg.org/#concept-traversal-active)
+   */
+  [$.activeFlag]: boolean | null;
+
+  [$.root]: $Node;
+
+  [$.whatToShow]: number;
+
+  [$.filter]: NodeFilter | null;
+
+  [$.current]: $Node;
+}
+
 export interface $Node extends Node, NodeInternals {}
 
 export interface $ParentNode extends ParentNode, NodeInternals {}
@@ -289,3 +348,5 @@ export interface $ShadowRoot extends ShadowRoot, ShadowRootInternals {}
 export interface $Node extends Node, NodeInternals {}
 export interface $ParentNode extends ParentNode, NodeInternals {}
 export interface $ChildNode extends ChildNode, NodeInternals {}
+export interface $NodeIterator extends NodeIterator, NodeIteratorInternals {}
+export interface $TreeWalker extends TreeWalker, TreeWalkerInternals {}
